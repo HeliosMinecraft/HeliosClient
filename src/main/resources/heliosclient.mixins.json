@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.heliosclient.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+  ],
+  "client": [
+    "TitleScreenMixin",
+    "MultiplayerScreenMixin",
+    "InGameHudMixin",
+    "ChatInputSuggestorMixin",
+    "ClientConnectionMixin",
+    "KeyboardMixin",
+    "SimpleOptionMixin",
+    "MinecraftClientMixin",
+    "ClientPlayerEntityMixin",
+    "MouseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
