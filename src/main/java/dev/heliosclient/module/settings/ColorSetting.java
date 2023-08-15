@@ -1,5 +1,7 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.module.Module_;
+import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.MathUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -18,14 +20,15 @@ public class ColorSetting extends Setting
     boolean slidingGreen = false;
     boolean slidingBlue = false;
     boolean slidingAlpha = false;
-    boolean rainbow=false;
+    Module_ module;
     
 
-    public ColorSetting(String name, int value)
+    public ColorSetting(String name, Module_ module, int value)
     {
         this.name = name;
         this.value = value;
         this.height = 80;
+        this.module = module;
         this.a = (value >> 24) & 0xFF;
         this.r = (value >> 16) & 0xFF;
         this.g = (value >> 8) & 0xFF;
@@ -43,18 +46,22 @@ public class ColorSetting extends Setting
         if (slidingAlpha)
         {
             a = 255-colorValue;
+            module.onSettingChange(this);
         }
         if (slidingRed)
         {
             r = 255-colorValue;
+            module.onSettingChange(this);
         }
         if (slidingGreen)
         {
             g = 255-colorValue;
+            module.onSettingChange(this);
         }
         if (slidingBlue)
         {
             b = 255-colorValue;
+            module.onSettingChange(this);
         }
 
         value = new Color(r, g, b, a).getRGB();
@@ -65,10 +72,10 @@ public class ColorSetting extends Setting
         drawContext.fillGradient(x+80, y+14, x+92, y+74, 0xFFFF0000, 0xFF000000);
         drawContext.fillGradient(x+95, y+14, x+107, y+74, 0xFF00FF00, 0xFF000000);
         drawContext.fillGradient(x+110, y+14, x+122, y+74, 0xFF0000FF, 0xFF000000);
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("Red: " + r), x+130, y+15, 0xFFFFFFFF);
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("Green: " + g), x+130, y+29, 0xFFFFFFFF);
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("Blue: " + b), x+130, y+43, 0xFFFFFFFF);
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("Alpha: " + a), x+130, y+57, 0xFFFFFFFF);
+        drawContext.drawTextWithShadow(textRenderer, Text.literal("Red: " + r), x+130, y+15, ColorManager.INSTANCE.defaultTextColor());
+        drawContext.drawTextWithShadow(textRenderer, Text.literal("Green: " + g), x+130, y+29, ColorManager.INSTANCE.defaultTextColor());
+        drawContext.drawTextWithShadow(textRenderer, Text.literal("Blue: " + b), x+130, y+43, ColorManager.INSTANCE.defaultTextColor());
+        drawContext.drawTextWithShadow(textRenderer, Text.literal("Alpha: " + a), x+130, y+57, ColorManager.INSTANCE.defaultTextColor());
         int scaledValueAlpha = (int)((double)(255-a) / 255 * 60);
         int scaledValueRed = (int)((double)(255-r) / 255 * 60);
         int scaledValueGreen = (int)((double)(255-g) / 255 * 60);

@@ -12,8 +12,8 @@ import java.util.List;
 
 public class NoFall extends Module_
 {
-    public DoubleSetting fallHeight = new DoubleSetting("Trigger height", 2.5, 2, 22, 1);
-    public CycleSetting mode = new CycleSetting("Mode", new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")), 0);
+    public DoubleSetting fallHeight = new DoubleSetting("Trigger height", this,2.5, 2, 22, 1);
+    public CycleSetting mode = new CycleSetting("Mode", this, new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")), 0);
 
     protected static MinecraftClient mc = MinecraftClient.getInstance();
     public NoFall()

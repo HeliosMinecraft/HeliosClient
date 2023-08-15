@@ -2,6 +2,7 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
+import dev.heliosclient.module.modules.ClickGUI;
 import dev.heliosclient.util.MathUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -14,8 +15,13 @@ public class ClickGUIScreen extends Screen {
     public static ClickGUIScreen INSTANCE = new ClickGUIScreen();
     public ArrayList<CategoryPane> categoryPanes;
 
+    static int scrollX = 0;
+    static int scrollY = 0;
+
     public ClickGUIScreen() {
         super(Text.literal("ClickGUI"));
+        scrollX = 0;
+        scrollY = 0;
         categoryPanes = new ArrayList<CategoryPane>();
         Map<String, Object> panePos = ((Map<String, Object>) HeliosClient.CONFIG.config.get("panes"));
         for (Category category : Category.values()) {
@@ -27,21 +33,21 @@ public class ClickGUIScreen extends Screen {
     }
 
     public static void onScroll(double horizontal, double vertical) {
-        for (CategoryPane category : ClickGUIScreen.INSTANCE.categoryPanes) {
-            category.y += vertical * 10;
-            category.x += horizontal * 10;
-        }
+        scrollX += horizontal;
+        scrollY += vertical;
     }
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext);
         for (CategoryPane category : categoryPanes) {
+            category.y += scrollY * 10;
+            category.x += scrollX * 10;
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
         }
-
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-
+        scrollY = 0;
+        scrollX = 0;
     }
 
     @Override
@@ -62,7 +68,12 @@ public class ClickGUIScreen extends Screen {
 
     @Override
     public boolean shouldPause() {
-        return false;
+        return ClickGUI.pause;
+    }
+
+    public void onLoad() {
+        scrollY = 0;
+        scrollX = 0;
     }
 }
 

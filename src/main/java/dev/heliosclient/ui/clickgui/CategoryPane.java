@@ -4,6 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.ModuleManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.system.ColorManager;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -37,10 +38,10 @@ public class CategoryPane {
             y = mouseY - startY;
         }
 
-        drawContext.fill(x, y + 16, x + width, y + 18, HeliosClient.categoryColor);
+        drawContext.fill(x, y + 16, x + width, y + 18, ColorManager.INSTANCE.clickGuiSecondary());
         drawContext.fill(x, y, x + width, y + 16, 0xFF1B1B1B);
-        drawContext.drawText(textRenderer, category.name, x + 4, y + 4, 0xFFFFFFFF, false);
-        drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, 0xFFFFFFFF, false);
+        drawContext.drawText(textRenderer, category.name, x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
+        drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         if (!collapsed) {
             int buttonYOffset = y + 18;
             for (ModuleButton m : moduleButtons) {
@@ -48,7 +49,6 @@ public class CategoryPane {
                    m.startFading();
                 }
                 m.setFaded(false);
-                //System.out.println(m+"faded: "+m.hasFaded());
                 m.render(drawContext, mouseX, mouseY, x, buttonYOffset, textRenderer);
                 buttonYOffset += 14;
             }

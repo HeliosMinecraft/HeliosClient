@@ -2,6 +2,7 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
 import net.minecraft.client.MinecraftClient;
@@ -60,8 +61,7 @@ public class ModuleButton {
         Color fill = new Color(fillColor, fillColor, fillColor, alpha);
 
         BackgroundAnimation.drawFadingBox(drawContext,x, y, width, height, fill.getRGB());
-        int textColor = HeliosClient.textColor.getRGB();
-        TextAnimation.drawFadingText(drawContext,textRenderer,module.name, x + 3, y + 3, module.active.value ? textColor : new Color(255, 255, 255, alpha).getRGB(), false);
+        TextAnimation.drawFadingText(drawContext,textRenderer,module.name, x + 3, y + 3, module.active.value ? ColorManager.INSTANCE.clickGuiSecondary() : ColorManager.INSTANCE.defaultTextColor(), false);
 
         if (hovertimer >= 100) {
             Tooltip.tooltip.changeText(module.description);

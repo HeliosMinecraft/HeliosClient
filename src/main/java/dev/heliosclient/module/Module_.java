@@ -19,10 +19,10 @@ public abstract class Module_ {
     public Category category;
     public ArrayList<Setting> settings;
 
-    public BooleanSetting chatFeedback = new BooleanSetting("Enable chat feedback", false);
-    public BooleanSetting showInModulesList = new BooleanSetting("Show in Modules List", true);
-    public KeyBind keyBind = new KeyBind("Keybind", 0);
-    public BooleanSetting active = new BooleanSetting("Active", false);
+    public BooleanSetting chatFeedback = new BooleanSetting("Enable chat feedback", this, false);
+    public BooleanSetting showInModulesList = new BooleanSetting("Show in Modules List", this, true);
+    public KeyBind keyBind = new KeyBind("Keybind", this, 0);
+    public BooleanSetting active = new BooleanSetting("Active", this, false);
 
     public Module_(String name, String description, Category category) {
         this.name = name;
@@ -79,4 +79,6 @@ public abstract class Module_ {
         settings.add(keyBind);
         settings.add(active);
     }
+
+    public void onSettingChange(Setting setting) {}
 }

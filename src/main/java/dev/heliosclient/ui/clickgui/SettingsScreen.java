@@ -1,7 +1,9 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.ClickGUI;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.system.ColorManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -12,7 +14,7 @@ public class SettingsScreen extends Screen
 {
     private Module_ module;
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    public TextButton backButton = new TextButton("< Back", 0xFFFFFF);
+    public TextButton backButton = new TextButton("< Back");
 
     int x, y, windowWidth = 224, windowHeight;
     static int offsetY = 0;
@@ -50,9 +52,9 @@ public class SettingsScreen extends Screen
 
         drawContext.fill(x, y, x+windowWidth, y+windowHeight, 0xFF222222);
         drawContext.fill(x, y, x+windowWidth, y+16, 0xFF1B1B1B);
-        drawContext.fill(x, y+16, x+windowWidth, y+18, 0xFFFF6E78);
-        drawContext.drawCenteredTextWithShadow(textRenderer, module.name, x+(windowWidth/2), y+4, 0xFFFFFF);
-        drawContext.drawCenteredTextWithShadow(textRenderer, "§o" + module.description, x+(windowWidth/2), y+26, 0xFFFFFF);
+        drawContext.fill(x, y+16, x+windowWidth, y+18, ColorManager.INSTANCE.clickGuiSecondary());
+        drawContext.drawCenteredTextWithShadow(textRenderer, module.name, x+(windowWidth/2), y+4, ColorManager.INSTANCE.clickGuiPaneText());
+        drawContext.drawCenteredTextWithShadow(textRenderer, "§o" + module.description, x+(windowWidth/2), y+26, ColorManager.INSTANCE.defaultTextColor());
         backButton.render(drawContext, textRenderer, x+4, y+4, mouseX, mouseY);
 		int yOffset = y+44;
 		for (Setting setting : module.settings)
@@ -66,11 +68,10 @@ public class SettingsScreen extends Screen
     {
 		return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + 16;
 	}
-    
+
     @Override
-    public boolean shouldPause() 
-    {
-        return false;
+    public boolean shouldPause() {
+        return ClickGUI.pause;
     }
 
     @Override

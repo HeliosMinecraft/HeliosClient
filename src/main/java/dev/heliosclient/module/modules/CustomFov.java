@@ -7,7 +7,7 @@ import dev.heliosclient.util.ISimpleOption;
 
 public class CustomFov extends Module_
 {
-    DoubleSetting FOV = new DoubleSetting("FOV", 140, 1, 240, 0);
+    DoubleSetting FOV = new DoubleSetting("FOV", this, 140, 1, 240, 0);
 
     private int previousFov = 100;
     public CustomFov()

@@ -14,9 +14,9 @@ import java.awt.*;
 
 public class HUDModule extends Module_
 {
-    public BooleanSetting clientTag = new BooleanSetting("Client Tag", true);
-    public ColorSetting colorSetting = new ColorSetting("Color", new Color(241, 83, 92, 255).getRGB());
-    BooleanSetting Rainbow = new BooleanSetting("Rainbow",false);
+    public BooleanSetting clientTag = new BooleanSetting("Client Tag", this, true);
+    public ColorSetting colorSetting = new ColorSetting("Color", this, new Color(241, 83, 92, 255).getRGB());
+    BooleanSetting Rainbow = new BooleanSetting("Rainbow", this,false);
     public int hudColor = colorSetting.value;
 
     public HUDModule()

@@ -1,5 +1,7 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.module.Module_;
+import dev.heliosclient.system.ColorManager;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -9,12 +11,14 @@ public class CycleSetting extends Setting
 {
     public int value;
     public ArrayList<String> options;
+    Module_ module;
 
-    public CycleSetting(String name, ArrayList<String> options, int value)
+    public CycleSetting(String name, Module_ module, ArrayList<String> options, int value)
     {
         this.name = name;
         this.options = options;
         this.height = 24;
+        this.module = module;
         this.value = value;
     }
 
@@ -26,7 +30,7 @@ public class CycleSetting extends Setting
         if (options.size() == 0 || options.size() - 1 < value) {
             drawContext.drawTextWithShadow(textRenderer, "No option found!", x+10, y+28, 0xFFFF0000);
         }
-        drawContext.drawTextWithShadow(textRenderer, name+": "+options.get(value), x+2, y+8, 0xFFFFFF);
+        drawContext.drawTextWithShadow(textRenderer, name+": "+options.get(value), x+2, y+8, ColorManager.INSTANCE.defaultTextColor());
     }
 
     @Override
@@ -40,6 +44,7 @@ public class CycleSetting extends Setting
             } else {
                 value++;
             }
+            module.onSettingChange(this);
         }
     }
 }

@@ -1,5 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -11,13 +12,12 @@ import java.awt.*;
 public class TextButton 
 {
     String text;
-    int x, y, color, width;
+    int x, y, width;
     private int hoverAnimationTimer = 0;
 
-    public TextButton(String text, int color)
+    public TextButton(String text)
     {
         this.text = text;
-        this.color = color;
     }
 
     public void render(DrawContext drawContext, TextRenderer textRenderer, int x, int y, int mouseX, int mouseY)
@@ -31,7 +31,7 @@ public class TextButton
             hoverAnimationTimer = Math.max(hoverAnimationTimer-2, 0);
         }
         drawContext.fill(x-1, y-2, x + width + 1, y + 10, new Color(255, 255, 255, hoverAnimationTimer).getRGB());
-        drawContext.drawText(textRenderer, Text.literal(text), x, y, color, true);
+        drawContext.drawText(textRenderer, Text.literal(text), x, y, ColorManager.INSTANCE.clickGuiPaneText(), true);
     }
 
     public boolean hovered(int mouseX, int mouseY) 
@@ -43,6 +43,7 @@ public class TextButton
     {
 		if (hovered(mouseX, mouseY)) 
         {
+            ClickGUIScreen.INSTANCE.onLoad();
             MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
 		}
 	}

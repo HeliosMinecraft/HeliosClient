@@ -19,6 +19,9 @@ public abstract class KeyboardMixin {
 
 	@Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
-        if (key == GLFW.GLFW_KEY_RIGHT_SHIFT) MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
+        if (key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+            ClickGUIScreen.INSTANCE.onLoad();
+            MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
+        }
     }
 }

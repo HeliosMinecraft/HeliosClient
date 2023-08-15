@@ -1,5 +1,7 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.module.Module_;
+import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.KeycodeToString;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -9,8 +11,10 @@ public class KeyBind extends Setting {
 
     public int value;
     public boolean listening = false;
+    Module_ module;
 
-    public KeyBind(String name, Integer value) {
+    public KeyBind(String name, Module_ module, Integer value) {
+        this.module = module;
         this.name = name;
         this.value = value;
         this.height = 24;
@@ -23,13 +27,12 @@ public class KeyBind extends Setting {
         if (value != 0) {
             String keyName = KeycodeToString.translate(value);
 
-            drawContext.drawTextWithShadow(textRenderer, name + ": " + keyName
-, x + 2, y + 8, 0xFFFFFF);
+            drawContext.drawTextWithShadow(textRenderer, name + ": " + keyName, x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
         } else {
-            drawContext.drawTextWithShadow(textRenderer, name + ": None", x + 2, y + 8, 0xFFFFFF);
+            drawContext.drawTextWithShadow(textRenderer, name + ": None", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
         }
         } else {
-            drawContext.drawTextWithShadow(textRenderer, name + ": §lLISTENING", x + 2, y + 8, 0xFFFFFF);
+            drawContext.drawTextWithShadow(textRenderer, name + ": §lLISTENING", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
         }
     }
 
@@ -43,6 +46,7 @@ public class KeyBind extends Setting {
                 this.value = 0;
             }
             listening = false;
+            module.onSettingChange(this);
         }
     }
 
