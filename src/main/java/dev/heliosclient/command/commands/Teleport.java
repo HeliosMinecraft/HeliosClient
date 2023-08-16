@@ -13,7 +13,7 @@ public class Teleport extends Command
 
     public Teleport() 
     {
-        super("teleport", "Teleports you to specified coordinates.");
+        super("teleport", "Teleports you to specified coordinates.", "tp");
     }
 
     @Override

@@ -13,7 +13,7 @@ public class Toggle extends Command
 
     public Toggle() 
     {
-        super("toggle", "Toggle a module.");
+        super("toggle", "Toggle a module.", "t");
     }
 
     @Override

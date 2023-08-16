@@ -14,7 +14,7 @@ public class Bind extends Command
 
     public Bind()
     {
-        super("bind", "Binds command to a key");
+        super("bind", "Binds command to a key", "b", "key");
     }
 
     @Override

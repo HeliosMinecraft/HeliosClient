@@ -10,7 +10,7 @@ public class Reset extends Command
 {
     public Reset() 
     {
-        super("reset", "Resets all config options.");
+        super("reset", "Resets all config options.", "r");
     }
 
     @Override
