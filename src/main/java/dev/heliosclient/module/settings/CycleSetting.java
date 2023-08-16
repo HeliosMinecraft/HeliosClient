@@ -2,6 +2,7 @@ package dev.heliosclient.module.settings;
 
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.ui.clickgui.Tooltip;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -12,10 +13,12 @@ public class CycleSetting extends Setting
     public int value;
     public ArrayList<String> options;
     Module_ module;
+    String description;
 
-    public CycleSetting(String name, Module_ module, ArrayList<String> options, int value)
+    public CycleSetting(String name, String description, Module_ module, ArrayList<String> options, int value)
     {
         this.name = name;
+        this.description = description;
         this.options = options;
         this.height = 24;
         this.module = module;
@@ -28,9 +31,19 @@ public class CycleSetting extends Setting
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         if (options.size() == 0 || options.size() - 1 < value) {
-            drawContext.drawTextWithShadow(textRenderer, "No option found!", x+10, y+28, 0xFFFF0000);
+            drawContext.drawText(textRenderer, "No option found!", x+10, y+28, 0xFFFF0000, false);
         }
-        drawContext.drawTextWithShadow(textRenderer, name+": "+options.get(value), x+2, y+8, ColorManager.INSTANCE.defaultTextColor());
+        drawContext.drawText(textRenderer, name+": "+options.get(value), x+2, y+8, ColorManager.INSTANCE.defaultTextColor(), false);
+
+        if (hovered(mouseX, mouseY)) {
+            hovertimer++;
+        } else {
+            hovertimer = 0;
+        }
+
+        if (hovertimer >= 150) {
+            Tooltip.tooltip.changeText(description);
+        }
     }
 
     @Override

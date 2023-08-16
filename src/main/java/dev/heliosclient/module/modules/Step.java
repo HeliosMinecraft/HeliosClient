@@ -8,8 +8,8 @@ import net.minecraft.client.MinecraftClient;
 
 public class Step extends Module_
 {
-    DoubleSetting stepHeight = new DoubleSetting("Height",this, 1, 1, 10, 1);
-    BooleanSetting shiftSuppress = new BooleanSetting("Crouch suppress", this, true);
+    DoubleSetting stepHeight = new DoubleSetting("Height", "Height which step should step up at.",this, 1, 1, 10, 1);
+    BooleanSetting shiftSuppress = new BooleanSetting("Crouch suppress", "Disables step when crouch key is pressed.", this, true);
 
     protected static MinecraftClient mc = MinecraftClient.getInstance();
 

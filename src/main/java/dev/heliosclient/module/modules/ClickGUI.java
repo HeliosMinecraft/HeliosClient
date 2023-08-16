@@ -13,12 +13,12 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.text.Text;
 
 public class ClickGUI extends Module_ {
-    BooleanSetting Pause = new BooleanSetting("Pause game", this,false);
-    ColorSetting AccentColor = new ColorSetting("Accent color", this, ColorManager.INSTANCE.clickGuiSecondary);
-    BooleanSetting RainbowAccent = new BooleanSetting("Rainbow", this,false);
-    BooleanSetting RainbowPane = new BooleanSetting("Rainbow", this,false);
-    ColorSetting PaneTextColor = new ColorSetting("Category pane text color", this, ColorManager.INSTANCE.clickGuiPaneText);
-    ColorSetting TextColor = new ColorSetting("Text color", this, ColorManager.INSTANCE.defaultTextColor);
+    BooleanSetting Pause = new BooleanSetting("Pause game", "Pause the game when Click GUI is on.", this,false);
+    ColorSetting AccentColor = new ColorSetting("Accent color", "Accent color of Click GUI.", this, ColorManager.INSTANCE.clickGuiSecondary);
+    BooleanSetting RainbowAccent = new BooleanSetting("Rainbow", "Rainbow effect for accent color.",this,false);
+    BooleanSetting RainbowPane = new BooleanSetting("Rainbow", "Rainbow effect for category panes.", this,false);
+    ColorSetting PaneTextColor = new ColorSetting("Category pane text color", "Color of pane text.", this, ColorManager.INSTANCE.clickGuiPaneText);
+    ColorSetting TextColor = new ColorSetting("Text color", "Color of text all through out the client.", this, ColorManager.INSTANCE.defaultTextColor);
 
     public static boolean pause = false;
 
