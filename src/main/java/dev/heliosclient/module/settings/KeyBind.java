@@ -2,6 +2,7 @@ package dev.heliosclient.module.settings;
 
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.KeycodeToString;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -12,10 +13,12 @@ public class KeyBind extends Setting {
     public int value;
     public boolean listening = false;
     Module_ module;
+    String description;
 
-    public KeyBind(String name, Module_ module, Integer value) {
+    public KeyBind(String name, String description, Module_ module, Integer value) {
         this.module = module;
         this.name = name;
+        this.description = description;
         this.value = value;
         this.height = 24;
     }
@@ -27,12 +30,22 @@ public class KeyBind extends Setting {
         if (value != 0) {
             String keyName = KeycodeToString.translate(value);
 
-            drawContext.drawTextWithShadow(textRenderer, name + ": " + keyName, x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
+            drawContext.drawText(textRenderer, name + ": " + keyName, x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
         } else {
-            drawContext.drawTextWithShadow(textRenderer, name + ": None", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
+            drawContext.drawText(textRenderer, name + ": None", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
         }
         } else {
-            drawContext.drawTextWithShadow(textRenderer, name + ": §lLISTENING", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
+            drawContext.drawText(textRenderer, name + ": §lLISTENING", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
+        }
+
+        if (hovered(mouseX, mouseY)) {
+            hovertimer++;
+        } else {
+            hovertimer = 0;
+        }
+
+        if (hovertimer >= 150) {
+            Tooltip.tooltip.changeText(description);
         }
     }
 

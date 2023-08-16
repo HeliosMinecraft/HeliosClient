@@ -19,10 +19,10 @@ public abstract class Module_ {
     public Category category;
     public ArrayList<Setting> settings;
 
-    public BooleanSetting chatFeedback = new BooleanSetting("Enable chat feedback", this, false);
-    public BooleanSetting showInModulesList = new BooleanSetting("Show in Modules List", this, true);
-    public KeyBind keyBind = new KeyBind("Keybind", this, 0);
-    public BooleanSetting active = new BooleanSetting("Active", this, false);
+    public BooleanSetting chatFeedback = new BooleanSetting("Enable chat feedback", "Toggles feedback in chat.", this, false);
+    public BooleanSetting showInModulesList = new BooleanSetting("Show in Modules List", "If this module should show up in Module List.", this, true);
+    public KeyBind keyBind = new KeyBind("Keybind", "Key to toggle this module.", this, 0);
+    public BooleanSetting active = new BooleanSetting("Active", "State of this module.", this, false);
 
     public Module_(String name, String description, Category category) {
         this.name = name;

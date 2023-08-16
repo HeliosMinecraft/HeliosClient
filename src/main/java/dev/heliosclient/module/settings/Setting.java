@@ -14,6 +14,7 @@ public abstract class Setting
     private int hoverAnimationTimer = 0;
 
     int x = 0, y = 0;
+    int hovertimer = 0;
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer)
     {
         this.x = x;

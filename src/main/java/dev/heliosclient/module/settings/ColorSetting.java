@@ -2,6 +2,7 @@ package dev.heliosclient.module.settings;
 
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.MathUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -21,11 +22,13 @@ public class ColorSetting extends Setting
     boolean slidingBlue = false;
     boolean slidingAlpha = false;
     Module_ module;
+    String description;
     
 
-    public ColorSetting(String name, Module_ module, int value)
+    public ColorSetting(String name, String description, Module_ module, int value)
     {
         this.name = name;
+        this.description = description;
         this.value = value;
         this.height = 80;
         this.module = module;
@@ -67,15 +70,15 @@ public class ColorSetting extends Setting
         value = new Color(r, g, b, a).getRGB();
 
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        drawContext.drawTextWithShadow(textRenderer, Text.literal(name), x+2, y+2, 0xFFFFFF);
+        drawContext.drawText(textRenderer, Text.literal(name), x+2, y+2, 0xFFFFFF, false);
         drawContext.fillGradient(x+65, y+14, x+77, y+74, 0xFFDDDDDD, 0x00DDDDDD);
         drawContext.fillGradient(x+80, y+14, x+92, y+74, 0xFFFF0000, 0xFF000000);
         drawContext.fillGradient(x+95, y+14, x+107, y+74, 0xFF00FF00, 0xFF000000);
         drawContext.fillGradient(x+110, y+14, x+122, y+74, 0xFF0000FF, 0xFF000000);
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("Red: " + r), x+130, y+15, ColorManager.INSTANCE.defaultTextColor());
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("Green: " + g), x+130, y+29, ColorManager.INSTANCE.defaultTextColor());
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("Blue: " + b), x+130, y+43, ColorManager.INSTANCE.defaultTextColor());
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("Alpha: " + a), x+130, y+57, ColorManager.INSTANCE.defaultTextColor());
+        drawContext.drawText(textRenderer, Text.literal("Red: " + r), x+130, y+15, ColorManager.INSTANCE.defaultTextColor(), false);
+        drawContext.drawText(textRenderer, Text.literal("Green: " + g), x+130, y+29, ColorManager.INSTANCE.defaultTextColor(), false);
+        drawContext.drawText(textRenderer, Text.literal("Blue: " + b), x+130, y+43, ColorManager.INSTANCE.defaultTextColor(), false);
+        drawContext.drawText(textRenderer, Text.literal("Alpha: " + a), x+130, y+57, ColorManager.INSTANCE.defaultTextColor(), false);
         int scaledValueAlpha = (int)((double)(255-a) / 255 * 60);
         int scaledValueRed = (int)((double)(255-r) / 255 * 60);
         int scaledValueGreen = (int)((double)(255-g) / 255 * 60);
@@ -85,6 +88,16 @@ public class ColorSetting extends Setting
         drawContext.fill(x+94, y+13+scaledValueGreen, x+108, y+15+scaledValueGreen, 0xFFAAAAAA);
         drawContext.fill(x+109, y+13+scaledValueBlue, x+123, y+15+scaledValueBlue, 0xFFAAAAAA);
         drawContext.fill(x+2, y+14, x+62, y+74, value);
+
+        if (hovered(mouseX, mouseY)) {
+            hovertimer++;
+        } else {
+            hovertimer = 0;
+        }
+
+        if (hovertimer >= 150) {
+            Tooltip.tooltip.changeText(description);
+        }
     }
 
     @Override

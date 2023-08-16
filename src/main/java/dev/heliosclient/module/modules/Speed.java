@@ -8,7 +8,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class Speed extends Module_ 
 {
-    DoubleSetting speed = new DoubleSetting("Speed", this, 2, 0.1, 10, 1);
+    DoubleSetting speed = new DoubleSetting("Speed", "Multiplier of speed.", this, 2, 0.1, 10, 1);
     public Speed() 
     {
         super("Speed", "Allows you to move faster.", Category.MOVEMENT);

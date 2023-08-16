@@ -53,8 +53,8 @@ public class SettingsScreen extends Screen
         drawContext.fill(x, y, x+windowWidth, y+windowHeight, 0xFF222222);
         drawContext.fill(x, y, x+windowWidth, y+16, 0xFF1B1B1B);
         drawContext.fill(x, y+16, x+windowWidth, y+18, ColorManager.INSTANCE.clickGuiSecondary());
-        drawContext.drawCenteredTextWithShadow(textRenderer, module.name, x+(windowWidth/2), y+4, ColorManager.INSTANCE.clickGuiPaneText());
-        drawContext.drawCenteredTextWithShadow(textRenderer, "§o" + module.description, x+(windowWidth/2), y+26, ColorManager.INSTANCE.defaultTextColor());
+        drawContext.drawText(textRenderer, module.name, drawContext.getScaledWindowWidth()/2-textRenderer.getWidth(module.name)/2, y+4, ColorManager.INSTANCE.clickGuiPaneText(), false);
+        drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth()/2-textRenderer.getWidth("§o"+module.description)/2, y+26, ColorManager.INSTANCE.defaultTextColor(), false);
         backButton.render(drawContext, textRenderer, x+4, y+4, mouseX, mouseY);
 		int yOffset = y+44;
 		for (Setting setting : module.settings)
@@ -62,6 +62,7 @@ public class SettingsScreen extends Screen
 			setting.render(drawContext, x+16, yOffset, mouseX, mouseY, textRenderer);
 			yOffset += setting.height+1;
 		}
+        Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
 	}
 
     public boolean barHovered(double mouseX, double mouseY)
