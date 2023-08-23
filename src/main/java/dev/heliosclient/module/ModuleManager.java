@@ -18,7 +18,8 @@ public class ModuleManager {
                 new Speed(),
                 new ModulesList(),
                 new CustomFov(),
-                new ClickGUI()
+                new ClickGUI(),
+                new Test()
         );
     }
 

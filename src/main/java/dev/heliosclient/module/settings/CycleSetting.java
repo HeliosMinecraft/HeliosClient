@@ -30,11 +30,17 @@ public class CycleSetting extends Setting
     {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
 
-        if (options.size() == 0 || options.size() - 1 < value) {
-            drawContext.drawText(textRenderer, "No option found!", x+10, y+28, 0xFFFF0000, false);
+        if (quickSettings){
+            if (options.size() == 0 || options.size() - 1 < value) {
+                drawContext.drawText(textRenderer, "No option found!", x + 10, y + 28, 0xFFFF0000, false);
+            }
+            drawContext.drawText(textRenderer, name + ": " + options.get(value), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
+        }else {
+            if (options.size() == 0 || options.size() - 1 < value) {
+                drawContext.drawText(textRenderer, "No option found!", x + 10, y + 28, 0xFFFF0000, false);
+            }
+            drawContext.drawText(textRenderer, name + ": " + options.get(value), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
         }
-        drawContext.drawText(textRenderer, name+": "+options.get(value), x+2, y+8, ColorManager.INSTANCE.defaultTextColor(), false);
-
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {

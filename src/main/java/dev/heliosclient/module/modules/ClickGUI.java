@@ -32,6 +32,11 @@ public class ClickGUI extends Module_ {
         settings.add(PaneTextColor);
         settings.add(RainbowPane);
         settings.add(TextColor);
+
+        quickSettings.add(Pause);
+        quickSettings.add(RainbowPane);
+        quickSettings.add(RainbowAccent);
+        quickSettings.add(TextColor);
         active.value=true;
     }
 

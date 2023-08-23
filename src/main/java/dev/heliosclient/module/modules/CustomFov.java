@@ -14,6 +14,8 @@ public class CustomFov extends Module_
     {
         super("CustomFOV", "Allows you to set custom field of view.",  Category.RENDER);
         settings.add(FOV);
+        quickSettings.add(FOV);
+        //quickSettings.add(RainbowPane);
     }
 
     @Override

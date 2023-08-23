@@ -1,6 +1,5 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.animation.AnimationUtils;
@@ -9,7 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import org.w3c.dom.Text;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
@@ -24,6 +23,7 @@ public class ModuleButton {
     private int hovertimer = 0;
     private boolean faded = true;
     private Screen parentScreen;
+    public boolean settingsOpen = false;
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
         this.width = 96;
@@ -60,7 +60,7 @@ public class ModuleButton {
         int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
         Color fill = new Color(fillColor, fillColor, fillColor, alpha);
 
-        BackgroundAnimation.drawFadingBox(drawContext,x, y, width, height, fill.getRGB());
+        BackgroundAnimation.drawFadingBox(drawContext,x, y, width, height, fill.getRGB(),false,0);
         TextAnimation.drawFadingText(drawContext,textRenderer,module.name, x + 3, y + 3, module.active.value ? ColorManager.INSTANCE.clickGuiSecondary() : ColorManager.INSTANCE.defaultTextColor(), false);
 
         if (hovertimer >= 100) {
@@ -80,6 +80,11 @@ public class ModuleButton {
                     return true;
                 } else if (button == 1) {
                     MinecraftClient.getInstance().setScreen(new SettingsScreen(module, parentScreen));
+                    return true;
+                }
+                else if(button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE){
+                    this.module.settingsOpen = !this.module.settingsOpen;
+                    this.settingsOpen=this.module.settingsOpen;
                     return true;
                 }
             }

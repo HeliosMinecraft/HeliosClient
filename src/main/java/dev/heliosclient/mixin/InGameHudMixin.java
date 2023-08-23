@@ -1,5 +1,7 @@
 package dev.heliosclient.mixin;
 
+import dev.heliosclient.module.Module_;
+import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,6 +25,10 @@ public class InGameHudMixin {
     {
 		if (ModuleManager.INSTANCE.getModuleByName("HUD").active.value) HUDOverlay.INSTANCE.render(drawContext, scaledWidth, scaledHeight);
 		if (ModuleManager.INSTANCE.getModuleByName("ModulesList").active.value) ModulesListOverlay.INSTANCE.render(drawContext, scaledWidth, scaledHeight);
+		for (Module_ m : ModuleManager.INSTANCE.getEnabledModules())
+		{
+			if (MinecraftClient.getInstance().player != null) m.render(drawContext,tickDelta,info);
+		}
 	}
 
 }

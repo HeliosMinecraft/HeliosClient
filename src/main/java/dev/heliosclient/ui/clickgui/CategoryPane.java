@@ -1,10 +1,11 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.ModuleManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -37,13 +38,23 @@ public class CategoryPane {
             x = mouseX - startX;
             y = mouseY - startY;
         }
+        Renderer2D.drawRoundedRectangle(drawContext,x, y, width, 16,3, 0xFF1B1B1B);
+        Renderer2D.drawRectangle(drawContext,x, y + 14, width,  2, ColorManager.INSTANCE.clickGuiSecondary());
 
-        drawContext.fill(x, y + 16, x + width, y + 18, ColorManager.INSTANCE.clickGuiSecondary());
-        drawContext.fill(x, y, x + width, y + 16, 0xFF1B1B1B);
         drawContext.drawText(textRenderer, category.name, x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
+
         if (!collapsed) {
-            int buttonYOffset = y + 18;
+            int buttonYOffset = y + 16;
+            int totalButtonY=y+16;
+            for (ModuleButton ignored : moduleButtons) {
+                totalButtonY += 14;
+            }
+            if(!moduleButtons.isEmpty()) {
+                Renderer2D.drawRoundedRectangle(drawContext, x, totalButtonY - 3, width, 6, 3, 0xFF1B1B1B);
+            }
+
+
             for (ModuleButton m : moduleButtons) {
                 if(m.hasFaded()){
                    m.startFading();
@@ -51,6 +62,15 @@ public class CategoryPane {
                 m.setFaded(false);
                 m.render(drawContext, mouseX, mouseY, x, buttonYOffset, textRenderer);
                 buttonYOffset += 14;
+                // Draw the settings for this module if they are open
+                if (m.settingsOpen) {
+                    for (Setting setting : m.module.quickSettings) {
+                        //setting.width=96;
+                        setting.quickSettings=m.settingsOpen;
+                        setting.render(drawContext,x, buttonYOffset,mouseX,mouseY,textRenderer);
+                        buttonYOffset += setting.height;
+                    }
+                }
             }
         }
         if (collapsed) {
@@ -67,6 +87,11 @@ public class CategoryPane {
     public void mouseClicked(int mouseX, int mouseY, int button) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.mouseClicked(mouseX, mouseY, button,collapsed)) return;
+            if (moduleButton.settingsOpen) {
+                for (Setting setting : moduleButton.module.settings) {
+                    setting.mouseClicked(mouseX,mouseY,button);
+                }
+            }
         }
         if (hovered(mouseX, mouseY) && button == 1) collapsed = !collapsed;
         else if (hovered(mouseX, mouseY) && button == 0) {
@@ -82,6 +107,13 @@ public class CategoryPane {
     }
 
     public void mouseReleased(int mouseX, int mouseY, int button) {
+        for (ModuleButton moduleButton : moduleButtons) {
+            if (moduleButton.settingsOpen) {
+                for (Setting setting : moduleButton.module.settings) {
+                    setting.mouseReleased(mouseX, mouseY, button);
+                }
+            }
+        }
         dragging = false;
     }
 }

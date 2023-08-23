@@ -1,5 +1,6 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -12,6 +13,9 @@ public abstract class Setting
     public int width = 192;
     public Object value;
     private int hoverAnimationTimer = 0;
+    public boolean quickSettings=false;
+    protected int moduleWidth=96;
+
 
     int x = 0, y = 0;
     int hovertimer = 0;
@@ -24,10 +28,21 @@ public abstract class Setting
         } else {
             hoverAnimationTimer = Math.max(hoverAnimationTimer-1, 0);
         }
+        if (quickSettings){
+            width=96;
+        }
+        else {
+            width=192;
+        }
 
-        int fillColor = (int)(34+0.85*hoverAnimationTimer);
-        drawContext.fill(x, y, x+width, y+height, new Color(fillColor, fillColor, fillColor, 255).getRGB());
-        
+        int fillColor;
+        if(quickSettings) {
+            fillColor = (int) (40 + 0.85 * hoverAnimationTimer);
+            Renderer2D.drawRoundedRectangle(drawContext, x, y, width, height, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
+        } else {
+            fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
+            Renderer2D.drawRoundedRectangle(drawContext, x, y, width, height, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
+        }
     }
 
 	public void mouseClicked(double mouseX, double mouseY, int button) { }

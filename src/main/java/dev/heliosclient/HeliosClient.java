@@ -8,6 +8,7 @@ import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.ColorUtils;
 import net.fabricmc.api.ModInitializer;
 
+import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
 
 import java.awt.*;
@@ -20,16 +21,13 @@ import dev.heliosclient.module.settings.Setting;
 public class HeliosClient implements ModInitializer
 {
 	public static final HeliosClient INSTANCE = new HeliosClient();
+	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	public static final Logger LOGGER = LoggerFactory.getLogger("Helios Client");
 	public static final String clientTag = ColorUtils.red + "Helios Client";
 	public static final String versionTag = ColorUtils.gray + "v0.dev";
 	public static Config CONFIG = new Config();
 	public static int uiColorA = 0xFF55FFFF;
 	public static int uiColor = 0x55FFFF;
-	public static int categoryColor = new Color(255, 110, 119, 255).getRGB();
-	public static Color textColor = new Color(255, 110, 119, 255);
-
-	//public static int categoryColor = new Color(255, 110, 119, 255).getRGB();
 
 
 	@Override
