@@ -2,6 +2,7 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -30,7 +31,7 @@ public class TextButton
         } else {
             hoverAnimationTimer = Math.max(hoverAnimationTimer-2, 0);
         }
-        drawContext.fill(x-1, y-2, x + width + 1, y + 10, new Color(255, 255, 255, hoverAnimationTimer).getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext,x-1, y-2, width + 2, 12,0, new Color(255, 255, 255, hoverAnimationTimer).getRGB());
         drawContext.drawText(textRenderer, Text.literal(text), x, y, ColorManager.INSTANCE.clickGuiPaneText(), true);
     }
 

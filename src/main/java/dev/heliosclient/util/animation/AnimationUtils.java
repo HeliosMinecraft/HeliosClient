@@ -1,13 +1,14 @@
 package dev.heliosclient.util.animation;
 
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
 public class AnimationUtils {
-    public float FADE_SPEED = 0.1f;
+    public float FADE_SPEED = 0.05f;
     private float alpha = 1.0f;
     private boolean fading = false;
     private boolean fadeIn = false;
@@ -19,7 +20,7 @@ public class AnimationUtils {
         this.easingType = easingType;
         alpha = fadeIn ? 0.0f : 1.0f;
     }
-    public void drawFadingBox(DrawContext context, int x, int y, int width, int height, int color) {
+    public void drawFadingBox(DrawContext context, int x, int y, int width, int height, int color,boolean RoundedBox, int radius) {
         if (fading) {
             float t = alpha;
             alpha = Easing.ease(easingType, t);
@@ -31,7 +32,11 @@ public class AnimationUtils {
         }
         int a = (int) (alpha * 255);
         int newColor = ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
-        context.fill(x, y, x + width, y + height, newColor);
+        if (!RoundedBox)
+        Renderer2D.drawRectangle(context,x, y, width, height, newColor);
+        else
+            Renderer2D.drawRoundedRectangle(context,x, y, width,  height,radius, newColor);
+
     }
 
     public void drawFadingText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int color,boolean shadow) {

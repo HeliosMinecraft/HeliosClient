@@ -5,9 +5,11 @@ import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.ui.ModulesListOverlay;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.MovementType;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 
@@ -18,6 +20,10 @@ public abstract class Module_ {
     public String description;
     public Category category;
     public ArrayList<Setting> settings;
+    public ArrayList<Setting> quickSettings;
+    public boolean settingsOpen = false;
+
+
 
     public BooleanSetting chatFeedback = new BooleanSetting("Enable chat feedback", "Toggles feedback in chat.", this, false);
     public BooleanSetting showInModulesList = new BooleanSetting("Show in Modules List", "If this module should show up in Module List.", this, true);
@@ -29,6 +35,7 @@ public abstract class Module_ {
         this.description = description;
         this.category = category;
         settings = new ArrayList<>();
+        quickSettings = new ArrayList<>();
     }
 
     public void onEnable() {
@@ -54,6 +61,8 @@ public abstract class Module_ {
     }
 
     public void onTick() {
+    }
+    public void render(DrawContext drawContext, float tickDelta, CallbackInfo info){
     }
 
     public void toggle() {
