@@ -50,6 +50,12 @@ public class KeyBind extends Setting {
     }
 
     @Override
+    public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+        super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
+        this.render(drawContext, x, y, mouseX, mouseY, textRenderer);
+    }
+
+    @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         if (listening)
         {

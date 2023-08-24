@@ -31,6 +31,7 @@ public class ColorSetting extends Setting
         this.description = description;
         this.value = value;
         this.height = 80;
+        this.heightCompact = 80;
         this.module = module;
         this.a = (value >> 24) & 0xFF;
         this.r = (value >> 16) & 0xFF;
@@ -72,7 +73,66 @@ public class ColorSetting extends Setting
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
 
-        if (quickSettings) {
+
+            drawContext.drawText(textRenderer, Text.literal(name), x+2, y+2, 0xFFFFFF, false);
+            drawContext.drawText(textRenderer, Text.literal("Red: " + r), x+130, y+15, ColorManager.INSTANCE.defaultTextColor(), false);
+            drawContext.drawText(textRenderer, Text.literal("Green: " + g), x+130, y+29, ColorManager.INSTANCE.defaultTextColor(), false);
+            drawContext.drawText(textRenderer, Text.literal("Blue: " + b), x+130, y+43, ColorManager.INSTANCE.defaultTextColor(), false);
+            drawContext.drawText(textRenderer, Text.literal("Alpha: " + a), x+130, y+57, ColorManager.INSTANCE.defaultTextColor(), false);
+            drawContext.fillGradient(x + 65, y + 14, x + 77, y + 74, 0xFFDDDDDD, 0x00DDDDDD);
+            drawContext.fillGradient(x + 80, y + 14, x + 92, y + 74, 0xFFFF0000, 0xFF000000);
+            drawContext.fillGradient(x + 95, y + 14, x + 107, y + 74, 0xFF00FF00, 0xFF000000);
+            drawContext.fillGradient(x + 110, y + 14, x + 122, y + 74, 0xFF0000FF, 0xFF000000);
+            int scaledValueAlpha = (int)((double)(255-a) / 255 * 60);
+            int scaledValueRed = (int)((double)(255-r) / 255 * 60);
+            int scaledValueGreen = (int)((double)(255-g) / 255 * 60);
+            int scaledValueBlue = (int)((double)(255-b) / 255 * 60);
+            drawContext.fill(x+64, y+13+scaledValueAlpha, x+78, y+15+scaledValueAlpha, 0xFFAAAAAA);
+            drawContext.fill(x+79, y+13+scaledValueRed, x+93, y+15+scaledValueRed, 0xFFAAAAAA);
+            drawContext.fill(x+94, y+13+scaledValueGreen, x+108, y+15+scaledValueGreen, 0xFFAAAAAA);
+            drawContext.fill(x+109, y+13+scaledValueBlue, x+123, y+15+scaledValueBlue, 0xFFAAAAAA);
+            drawContext.fill(x+2, y+14, x+62, y+74, value);
+
+            if (hovered(mouseX, mouseY)) {
+                hovertimer++;
+            } else {
+                hovertimer = 0;
+            }
+
+            if (hovertimer >= 150) {
+                Tooltip.tooltip.changeText(description);
+            }
+        }
+
+    @Override
+    public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+
+        double diff = Math.min(100, Math.max(0, (mouseY - y - 14) / 0.6));
+
+        int colorValue = (int) MathUtils.round(((diff / 100) * 255), 0);
+        if (slidingAlpha) {
+            a = 255 - colorValue;
+            module.onSettingChange(this);
+        }
+        if (slidingRed) {
+            r = 255 - colorValue;
+            module.onSettingChange(this);
+        }
+        if (slidingGreen) {
+            g = 255 - colorValue;
+            module.onSettingChange(this);
+        }
+        if (slidingBlue) {
+            b = 255 - colorValue;
+            module.onSettingChange(this);
+        }
+
+        value = new Color(r, g, b, a).getRGB();
+
+        super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
+        drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+
+
             drawContext.fill(x + moduleWidth - boxSize - 2, y + 2, x + moduleWidth - 2, y + boxSize + 2, value);
 
             drawContext.fillGradient(x + 15, y + 14, x + 27, y + 74, 0xFFDDDDDD, 0x00DDDDDD);
@@ -88,38 +148,16 @@ public class ColorSetting extends Setting
             drawContext.fill(x+44, y+13+scaledValueGreen, x+58, y+15+scaledValueGreen, 0xFFAAAAAA);
             drawContext.fill(x+59, y+13+scaledValueBlue, x+73, y+15+scaledValueBlue, 0xFFAAAAAA);
 
+        if (hovered(mouseX, mouseY)) {
+            hovertimer++;
         } else {
-            drawContext.drawText(textRenderer, Text.literal(name), x+2, y+2, 0xFFFFFF, false);
-            drawContext.drawText(textRenderer, Text.literal("Red: " + r), x+130, y+15, ColorManager.INSTANCE.defaultTextColor(), false);
-            drawContext.drawText(textRenderer, Text.literal("Green: " + g), x+130, y+29, ColorManager.INSTANCE.defaultTextColor(), false);
-            drawContext.drawText(textRenderer, Text.literal("Blue: " + b), x+130, y+43, ColorManager.INSTANCE.defaultTextColor(), false);
-            drawContext.drawText(textRenderer, Text.literal("Alpha: " + a), x+130, y+57, ColorManager.INSTANCE.defaultTextColor(), false);
-
-                drawContext.fillGradient(x + 65, y + 14, x + 77, y + 74, 0xFFDDDDDD, 0x00DDDDDD);
-                drawContext.fillGradient(x + 80, y + 14, x + 92, y + 74, 0xFFFF0000, 0xFF000000);
-                drawContext.fillGradient(x + 95, y + 14, x + 107, y + 74, 0xFF00FF00, 0xFF000000);
-                drawContext.fillGradient(x + 110, y + 14, x + 122, y + 74, 0xFF0000FF, 0xFF000000);
-                int scaledValueAlpha = (int)((double)(255-a) / 255 * 60);
-                int scaledValueRed = (int)((double)(255-r) / 255 * 60);
-                int scaledValueGreen = (int)((double)(255-g) / 255 * 60);
-                int scaledValueBlue = (int)((double)(255-b) / 255 * 60);
-                drawContext.fill(x+64, y+13+scaledValueAlpha, x+78, y+15+scaledValueAlpha, 0xFFAAAAAA);
-                drawContext.fill(x+79, y+13+scaledValueRed, x+93, y+15+scaledValueRed, 0xFFAAAAAA);
-                drawContext.fill(x+94, y+13+scaledValueGreen, x+108, y+15+scaledValueGreen, 0xFFAAAAAA);
-                drawContext.fill(x+109, y+13+scaledValueBlue, x+123, y+15+scaledValueBlue, 0xFFAAAAAA);
-                drawContext.fill(x+2, y+14, x+62, y+74, value);
-            }
-
-            if (hovered(mouseX, mouseY)) {
-                hovertimer++;
-            } else {
-                hovertimer = 0;
-            }
-
-            if (hovertimer >= 150) {
-                Tooltip.tooltip.changeText(description);
-            }
+            hovertimer = 0;
         }
+
+        if (hovertimer >= 150) {
+            Tooltip.tooltip.changeText(description);
+        }
+    }
 
 
 

@@ -67,8 +67,8 @@ public class CategoryPane {
                     for (Setting setting : m.module.quickSettings) {
                         //setting.width=96;
                         setting.quickSettings=m.settingsOpen;
-                        setting.render(drawContext,x, buttonYOffset,mouseX,mouseY,textRenderer);
-                        buttonYOffset += setting.height;
+                        setting.renderCompact(drawContext,x, buttonYOffset,mouseX,mouseY,textRenderer);
+                        buttonYOffset += setting.heightCompact;
                     }
                 }
             }

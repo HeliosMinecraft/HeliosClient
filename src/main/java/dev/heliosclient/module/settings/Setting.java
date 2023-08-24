@@ -11,6 +11,8 @@ public abstract class Setting
     public String name;
     public int height = 24;
     public int width = 192;
+    public int heightCompact = 24;
+    public int widthCompact = 96;
     public Object value;
     private int hoverAnimationTimer = 0;
     public boolean quickSettings=false;
@@ -28,21 +30,21 @@ public abstract class Setting
         } else {
             hoverAnimationTimer = Math.max(hoverAnimationTimer-1, 0);
         }
-        if (quickSettings){
-            width=96;
-        }
-        else {
-            width=192;
-        }
+        int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
+        Renderer2D.drawRoundedRectangle(drawContext, x, y, width, height, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
+    }
 
-        int fillColor;
-        if(quickSettings) {
-            fillColor = (int) (40 + 0.85 * hoverAnimationTimer);
-            Renderer2D.drawRoundedRectangle(drawContext, x, y, width, height, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
+    public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer)
+    {
+        this.x = x;
+        this.y = y;
+        if(hovered(mouseX, mouseY)) {
+            hoverAnimationTimer = Math.min(hoverAnimationTimer+1, 40);
         } else {
-            fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
-            Renderer2D.drawRoundedRectangle(drawContext, x, y, width, height, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
+            hoverAnimationTimer = Math.max(hoverAnimationTimer-1, 0);
         }
+        int fillColor = (int) (40 + 0.85 * hoverAnimationTimer);
+        Renderer2D.drawRoundedRectangle(drawContext, x, y, widthCompact, heightCompact, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
     }
 
 	public void mouseClicked(double mouseX, double mouseY, int button) { }
@@ -52,6 +54,10 @@ public abstract class Setting
     public void keyPressed(int keyCode, int scanCode, int modifiers) { }
 
     protected boolean hovered(int mouseX, int mouseY) {
-        return mouseX >= x && mouseX <= x + 192 && mouseY >= y && mouseY <= y + height;
+        if (quickSettings) {
+            return mouseX > x && mouseX < x + widthCompact && mouseY > y && mouseY < y + heightCompact;
+        } else {
+            return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height;
+        }
     }
 }
