@@ -8,6 +8,7 @@ import dev.heliosclient.event.events.PlayerLeaveEvent;
 import dev.heliosclient.event.events.PlayerRespawnEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.DeathMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.DisconnectS2CPacket;
@@ -22,32 +23,40 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
-public class MixinClientPlayNetworkHandler {
+public abstract class MixinClientPlayNetworkHandler {
     @Shadow @Final private MinecraftClient client;
+
 
     @Inject(method = "onGameJoin", at = @At("RETURN"))
     private void onGameJoin(GameJoinS2CPacket packet, CallbackInfo info) {
         MixinClientPlayNetworkHandler handler = (MixinClientPlayNetworkHandler) this;
         PlayerEntity player = handler.client.player;
+        Event event = new PlayerJoinEvent(player);
         EventManager.postEvent(new PlayerJoinEvent(player));
     }
     @Inject(method = "onDisconnect", at = @At("RETURN"))
     private void onDisconnect(DisconnectS2CPacket packet, CallbackInfo info) {
         MixinClientPlayNetworkHandler handler = (MixinClientPlayNetworkHandler) this;
         PlayerEntity player = handler.client.player;
+        Event event = new PlayerJoinEvent(player);
         EventManager.postEvent(new PlayerLeaveEvent(player));
     }
     @Inject(method = "onPlayerRespawn", at = @At("RETURN"))
     private void onPlayerRespawn(PlayerRespawnS2CPacket packet, CallbackInfo info) {
         MixinClientPlayNetworkHandler handler = (MixinClientPlayNetworkHandler) this;
         PlayerEntity player = handler.client.player;
+        Event event = new PlayerJoinEvent(player);
         EventManager.postEvent(new PlayerRespawnEvent(player));
     }
 
-    @Inject(method = "onDeathMessage", at = @At("HEAD"))
+    @Inject(method = "onDeathMessage", at = @At("HEAD"), cancellable = true)
     private void onDeathMessage(DeathMessageS2CPacket packet, CallbackInfo ci) {
         if(HeliosClient.MC.player!=null) {
-            EventManager.postEvent(new PlayerDeathEvent(HeliosClient.MC.player));
+            Event event = new PlayerJoinEvent(HeliosClient.MC.player);
+            EventManager.postEvent(event);
+            if(event.isCanceled()){
+                ci.cancel();
+            }
         }
     }
 }

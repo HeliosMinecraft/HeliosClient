@@ -1,5 +1,8 @@
 package dev.heliosclient.event.events;
 
+import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 
-public class TickEvent implements Event {}
+@Cancelable
+
+public class TickEvent extends Event {}

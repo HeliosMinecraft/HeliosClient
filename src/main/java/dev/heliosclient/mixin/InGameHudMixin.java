@@ -31,7 +31,11 @@ public class InGameHudMixin {
 		{
 			if (MinecraftClient.getInstance().player != null) m.render(drawContext,tickDelta,info);
 		}
-		EventManager.postEvent(new RenderEvent(drawContext,tickDelta));
+		RenderEvent event = new RenderEvent(drawContext,tickDelta);
+		EventManager.postEvent(event);
+		if (event.isCanceled()){
+			info.cancel();
+		}
 	}
 
 }

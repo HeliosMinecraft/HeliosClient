@@ -1,9 +1,12 @@
 package dev.heliosclient.event.events;
 
+import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 import net.minecraft.client.gui.DrawContext;
 
-public class RenderEvent implements Event {
+@Cancelable
+
+public class RenderEvent extends Event {
     private final DrawContext drawContext;
     private final float tickDelta;
 

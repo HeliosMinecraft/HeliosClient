@@ -17,10 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinServerPlayerInteractionManager {
     @Shadow @Final protected ServerPlayerEntity player;
 
-    @Inject(method = "tryBreakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;onBroken(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V"))
+    @Inject(method = "tryBreakBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;onBroken(Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V"), cancellable = true)
     private void onTryHarvestBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        ServerPlayerInteractionManager interactionManager = (ServerPlayerInteractionManager) (Object) this;
         BlockState state = player.getWorld().getBlockState(pos);
-        EventManager.postEvent(new BlockBreakEvent(pos, state));
+        BlockBreakEvent event = new BlockBreakEvent(pos,state);
+        EventManager.postEvent(event);
+        if(event.isCanceled()){
+            cir.setReturnValue(event.isCanceled());
+        }
     }
 }

@@ -105,36 +105,49 @@ public class Test extends Module_ implements Listener {
 
 
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
     public void atTick(TickEvent event) {
         System.out.println("Tick");
     }
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
     public void onPlayerJoinEvent(PlayerJoinEvent event){
         System.out.println("Join");
     }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
 
     public void onPlayerLeaveEvent(PlayerLeaveEvent event){
         System.out.println("PlayerLeaveEvent");
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
     public void onPlayerDeathEvent(PlayerDeathEvent event){
         System.out.println("PlayerDeathEvent");
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
     public void onPlayerRespawnEvent(PlayerRespawnEvent event){
         System.out.println("PlayerRespawnEvent");
     }
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
     public void itemDropEvent(ItemDropEvent event){
         System.out.println("ItemDropEvent");
     }
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
     public void itemPickUpEvent(ItemPickupEvent event){
         System.out.println("ItemPickupEvent");
     }
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
     public void onChatMsg(ChatMessageEvent event){
         System.out.println("ChatMessageEvent");
     }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
     public void BlockPlaceEvent(BlockPlaceEvent event){
         System.out.println("BlockPlaceEvent");
     }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, side = Dist.CLIENT)
     public void BlockBreakEvent(BlockBreakEvent event){
         System.out.println("BlockBreakEvent");
     }
