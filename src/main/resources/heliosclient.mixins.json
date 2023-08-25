@@ -4,18 +4,24 @@
   "package": "dev.heliosclient.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "MixinLivingEntity",
+    "MixinPlayerEntity",
+    "MixinServerPlayerInteractionManager",
+    "MixinServerPlayNetworkHandler",
+    "MixinWorldSaveHandler"
   ],
   "client": [
-    "TitleScreenMixin",
-    "MultiplayerScreenMixin",
-    "InGameHudMixin",
     "ChatInputSuggestorMixin",
     "ClientConnectionMixin",
-    "KeyboardMixin",
-    "SimpleOptionMixin",
-    "MinecraftClientMixin",
     "ClientPlayerEntityMixin",
-    "MouseMixin"
+    "InGameHudMixin",
+    "KeyboardMixin",
+    "MinecraftClientMixin",
+    "MixinClientPlayNetworkHandler",
+    "MouseMixin",
+    "MultiplayerScreenMixin",
+    "SimpleOptionMixin",
+    "TitleScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

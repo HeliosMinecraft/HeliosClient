@@ -1,5 +1,8 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.*;
+import dev.heliosclient.event.events.*;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
@@ -13,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.awt.*;
 
 
-public class Test extends Module_ {
+public class Test extends Module_ implements Listener {
     BooleanSetting rectangle = new BooleanSetting("Rectangle","",this,false);
     BooleanSetting rounded = new BooleanSetting("Rounded","",this,false);
     BooleanSetting Circle = new BooleanSetting("Circle","",this,false);
@@ -48,6 +51,13 @@ public class Test extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
+        EventManager.register(this);
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        EventManager.unregister(this);
     }
 
     @Override
@@ -58,7 +68,7 @@ public class Test extends Module_ {
 
         // Draw a 2D rounded rectangle using the CustomRenderer class
         if (rounded.value)
-            Renderer2D.drawRoundedRectangle(drawContext,120, 10, 100, 50, 10, Color.DARK_GRAY.getRGB());
+            Renderer2D.drawRoundedRectangle(drawContext,120, 10, 10, 5, 1, Color.DARK_GRAY.getRGB());
 
         // Draw a 2D circle using the CustomRenderer class
         if (Circle.value)
@@ -92,4 +102,42 @@ public class Test extends Module_ {
             }
         }
     }
+
+
+
+    public void atTick(TickEvent event) {
+        System.out.println("Tick");
+    }
+    public void onPlayerJoinEvent(PlayerJoinEvent event){
+        System.out.println("Join");
+    }
+
+    public void onPlayerLeaveEvent(PlayerLeaveEvent event){
+        System.out.println("PlayerLeaveEvent");
+    }
+
+    public void onPlayerDeathEvent(PlayerDeathEvent event){
+        System.out.println("PlayerDeathEvent");
+    }
+
+    public void onPlayerRespawnEvent(PlayerRespawnEvent event){
+        System.out.println("PlayerRespawnEvent");
+    }
+    public void itemDropEvent(ItemDropEvent event){
+        System.out.println("ItemDropEvent");
+    }
+    public void itemPickUpEvent(ItemPickupEvent event){
+        System.out.println("ItemPickupEvent");
+    }
+    public void onChatMsg(ChatMessageEvent event){
+        System.out.println("ChatMessageEvent");
+    }
+    public void BlockPlaceEvent(BlockPlaceEvent event){
+        System.out.println("BlockPlaceEvent");
+    }
+    public void BlockBreakEvent(BlockBreakEvent event){
+        System.out.println("BlockBreakEvent");
+    }
+
+
 }

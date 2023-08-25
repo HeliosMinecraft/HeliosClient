@@ -1,5 +1,7 @@
 package dev.heliosclient.mixin;
 
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.system.KeybindManager;
 import dev.heliosclient.module.ModuleManager;
 import dev.heliosclient.module.Module_;
@@ -26,6 +28,7 @@ public class MinecraftClientMixin
 		{
 			if (MinecraftClient.getInstance().player != null) m.onTick();
 		}
+		EventManager.postEvent(new TickEvent());
 
 		KeybindManager.onTick();
 	}
