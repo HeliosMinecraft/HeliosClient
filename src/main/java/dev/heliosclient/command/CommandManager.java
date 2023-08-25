@@ -29,6 +29,7 @@ public class CommandManager
         add(new Toggle());
         add(new Teleport());
         add(new Bind());
+        add(new Reset());
         commands.sort(Comparator.comparing(Command::getName));
     }
 
