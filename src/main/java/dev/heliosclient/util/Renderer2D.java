@@ -74,14 +74,39 @@ public class Renderer2D extends DrawContext {
 
     public static void drawRoundedRectangle(DrawContext drawContext, int x, int y, int width, int height, int radius, int color) {
         drawRectangle(drawContext, x + radius, y, width - radius * 2, height, color);
-        drawRectangle(drawContext, x, y + radius, radius, height - radius * 2, color);
-        drawRectangle(drawContext, x + width - radius, y + radius, radius, height - radius * 2, color);
+        drawRectangle(drawContext, x, y + radius, width, height - radius * 2, color);
 
         // Draw circles at the corners
         drawFilledCircle(drawContext, x + radius, y + radius, radius, color);
         drawFilledCircle(drawContext, x + width - radius, y + radius, radius, color);
         drawFilledCircle(drawContext, x + width - radius, y + height - radius, radius, color);
         drawFilledCircle(drawContext, x + radius, y + height - radius, radius, color);
+    }
+
+    public static void drawRoundedRectangle(DrawContext drawContext, int x, int y, boolean TL, boolean TR, boolean BL, boolean BR, int width, int height, int radius, int color) {
+        drawRectangle(drawContext, x + radius, y, width - radius * 2, height, color);
+        drawRectangle(drawContext, x, y + radius, width, height - radius * 2, color);
+
+        if (TL) {
+            drawFilledCircle(drawContext, x + radius, y + radius, radius, color);
+        } else {
+            drawRectangle(drawContext, x, y, radius, radius, color);
+        }
+        if (TR) {
+            drawFilledCircle(drawContext, x + width - radius, y + radius, radius, color);
+        } else {
+            drawRectangle(drawContext, x + width - radius, y, radius, radius, color);
+        }
+        if (BL) {
+            drawFilledCircle(drawContext, x + radius, y + height - radius, radius, color);
+        } else {
+            drawRectangle(drawContext, x, y + height - radius, radius, radius, color);
+        }
+        if (BR) {
+            drawFilledCircle(drawContext, x + width - radius, y + height - radius, radius, color);
+        } else {
+            drawRectangle(drawContext, x + width - radius, y + height - radius, radius, radius, color);
+        }
     }
 
 
