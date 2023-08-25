@@ -1,5 +1,7 @@
 package dev.heliosclient.mixin;
 
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.events.RenderEvent;
 import dev.heliosclient.module.Module_;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,6 +31,7 @@ public class InGameHudMixin {
 		{
 			if (MinecraftClient.getInstance().player != null) m.render(drawContext,tickDelta,info);
 		}
+		EventManager.postEvent(new RenderEvent(drawContext,tickDelta));
 	}
 
 }
