@@ -18,6 +18,8 @@ public class Test extends Module_ {
     BooleanSetting rounded = new BooleanSetting("Rounded","",this,false);
     BooleanSetting Circle = new BooleanSetting("Circle","",this,false);
     BooleanSetting Triangle = new BooleanSetting("Triangle","",this,false);
+
+    BooleanSetting PartiallyRounded = new BooleanSetting("NotRounded","",this,false);
     BooleanSetting Arc = new BooleanSetting("Arc","",this,false);
     BooleanSetting TracerLine = new BooleanSetting("TracerLine","",this,false);
     BooleanSetting blockOutlineAndFIll = new BooleanSetting("blockOutlineAndFIll","",this,false);
@@ -32,7 +34,15 @@ public class Test extends Module_ {
         settings.add(Triangle);
         settings.add(TracerLine);
         settings.add(blockOutlineAndFIll);
+        settings.add(PartiallyRounded);
         quickSettings.add(rectangle);
+        quickSettings.add(rounded);
+        quickSettings.add(Circle);
+        quickSettings.add(Arc);
+        quickSettings.add(Triangle);
+        quickSettings.add(TracerLine);
+        quickSettings.add(blockOutlineAndFIll);
+        quickSettings.add(PartiallyRounded);
     }
 
     @Override
@@ -61,6 +71,10 @@ public class Test extends Module_ {
         // Draw a 2D arc using the CustomRenderer class
         if (Arc.value)
             Renderer2D.drawArc(drawContext,165, 35, 50, 0, 90, Color.WHITE.getRGB());
+
+        //Not so rounded rectange
+        if (PartiallyRounded.value)
+            Renderer2D.drawRoundedRectangle(drawContext, 20, 20, false, true, true, false, 120, 120, 10, 0xFF00FF00);
 
         Entity entity = mc.player;
         // Draw a 3D block outline using the CustomRenderer3D class
