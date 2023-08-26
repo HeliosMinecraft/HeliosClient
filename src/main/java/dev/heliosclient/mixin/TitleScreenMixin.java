@@ -1,8 +1,11 @@
-package dev.heliosclient.mixin;
+    package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.ui.HeliosClientInfoScreen;
 import dev.heliosclient.ui.altmanager.AltManagerScreen;
 
+import net.minecraft.client.gui.screen.option.CreditsAndAttributionScreen;
+import net.minecraft.client.gui.widget.PressableTextWidget;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,7 +45,11 @@ public abstract class TitleScreenMixin extends Screen
         float g = this.doBackgroundFade ? MathHelper.clamp(f - 1.0F, 0.0F, 1.0F) : 1.0F;
         int l = MathHelper.ceil(g * 255.0F) << 24;
 
-        drawContext.drawTextWithShadow(this.textRenderer, HeliosClient.clientTag + " " + HeliosClient.versionTag, 2, 2, 16777215 | l);
+        //drawContext.drawTextWithShadow(this.textRenderer, HeliosClient.clientTag + " " + HeliosClient.versionTag, 2, 2, 16777215 | l);
+
+        this.addDrawableChild(new PressableTextWidget(2, 2, 150, 10, Text.literal(HeliosClient.clientTag + " " + HeliosClient.versionTag), (button) -> {
+            this.client.setScreen(HeliosClientInfoScreen.INSTANCE);
+        }, this.textRenderer));
     }
 
     @Inject(at = @At("TAIL"), method = "init")
