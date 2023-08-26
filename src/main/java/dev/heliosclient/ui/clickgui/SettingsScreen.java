@@ -1,7 +1,7 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.module.modules.ClickGUI;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.Renderer2D;

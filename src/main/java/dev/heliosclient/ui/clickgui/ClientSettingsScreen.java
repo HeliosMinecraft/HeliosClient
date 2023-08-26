@@ -1,7 +1,7 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.module.modules.ClickGUI;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
@@ -11,7 +11,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
-;
 
 public class ClientSettingsScreen extends Screen {
     private Module_ module;

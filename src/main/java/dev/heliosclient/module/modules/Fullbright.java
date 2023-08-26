@@ -35,11 +35,11 @@ public class Fullbright extends Module_
     @SubscribeEvent
     public void onTick(TickEvent event)
     {
-        System.out.println("TICK");
         if(Objects.equals(mode.get(setting.value), mode.get(0))) {
             ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(100.0);
+            mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
         } else if(mc.player!=null && Objects.equals(mode.get(setting.value), mode.get(1))){
-            mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION,50,254,true,false,false));
+            mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION,1000,254,true,false,false));
         }
 
     }
