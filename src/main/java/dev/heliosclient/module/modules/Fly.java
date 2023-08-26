@@ -1,7 +1,6 @@
 package dev.heliosclient.module.modules;
 
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
+import com.ibm.icu.impl.Assert;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 
@@ -11,9 +10,8 @@ public class Fly extends Module_
     {
         super("Fly", "Allows you to fly in survival mode.", Category.MOVEMENT);
     }
-
-    @SubscribeEvent
-    public void onTick(TickEvent event)
+    @Override
+    public void onTick()
     {
         mc.player.getAbilities().flying = true;
     }
@@ -31,6 +29,8 @@ public class Fly extends Module_
     {
         super.onDisable();
 
+        if (mc.player != null) {
         mc.player.getAbilities().flying = false;
+        }
     }
 }

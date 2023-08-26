@@ -2,7 +2,8 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
-import dev.heliosclient.module.modules.ClickGUI;
+import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.MathUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -46,6 +47,7 @@ public class ClickGUIScreen extends Screen {
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
         }
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
+        NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
         scrollY = 0;
         scrollX = 0;
     }
@@ -55,6 +57,7 @@ public class ClickGUIScreen extends Screen {
         for (CategoryPane category : categoryPanes) {
             category.mouseClicked((int) mouseX, (int) mouseY, button);
         }
+        NavBar.navBar.mouseClicked((int) mouseX, (int) mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
