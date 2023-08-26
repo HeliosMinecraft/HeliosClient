@@ -4,11 +4,10 @@
   "package": "dev.heliosclient.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MixinLivingEntity",
     "MixinPlayerEntity",
+    "MixinServerPlayerEntity",
     "MixinServerPlayerInteractionManager",
-    "MixinServerPlayNetworkHandler",
-    "MixinWorldSaveHandler"
+    "MixinServerPlayNetworkHandler"
   ],
   "client": [
     "ChatInputSuggestorMixin",

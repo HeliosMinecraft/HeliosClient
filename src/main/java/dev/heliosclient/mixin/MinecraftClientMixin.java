@@ -24,10 +24,6 @@ public class MinecraftClientMixin
 	@Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
 	public void onTick(CallbackInfo ci)
 	{
-		for (Module_ m : ModuleManager.INSTANCE.getEnabledModules())
-		{
-			if (MinecraftClient.getInstance().player != null) m.onTick();
-		}
 		EventManager.postEvent(new TickEvent());
 
 		KeybindManager.onTick();

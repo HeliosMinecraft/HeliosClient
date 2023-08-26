@@ -6,12 +6,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 @Cancelable
-
-public class BlockPlaceEvent extends Event {
+public class BlockInteractEvent extends Event {
     private final BlockPos pos;
     private final BlockState state;
 
-    public BlockPlaceEvent(BlockPos pos, BlockState state) {
+    public BlockInteractEvent(BlockPos pos, BlockState state) {
         this.pos = pos;
         this.state = state;
     }

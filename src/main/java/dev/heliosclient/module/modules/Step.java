@@ -1,10 +1,14 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.world.tick.Tick;
+
+import javax.security.auth.callback.TextInputCallback;
 
 public class Step extends Module_
 {
@@ -21,7 +25,7 @@ public class Step extends Module_
     }
 
     @Override
-    public void onTick()
+    public void onTick(TickEvent event)
     {
         if(mc.player == null) {return;}
         if (shiftSuppress.value) {

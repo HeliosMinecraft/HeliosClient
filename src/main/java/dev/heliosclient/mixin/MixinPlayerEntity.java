@@ -1,19 +1,22 @@
 package dev.heliosclient.mixin;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.EventManager;
 import dev.heliosclient.event.events.ItemDropEvent;
 import dev.heliosclient.event.events.PlayerDamageEvent;
 import dev.heliosclient.event.events.PlayerDeathEvent;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.MixinEnvironment;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -30,13 +33,11 @@ public abstract class MixinPlayerEntity {
     }
     @Inject(method = "onDeath", at = @At("HEAD"), cancellable = true)
     private void onDeath(DamageSource damageSource, CallbackInfo ci) {
-        PlayerEntity player = (PlayerEntity) (Object) this;
-        PlayerDeathEvent event = new PlayerDeathEvent(player);
-        EventManager.postEvent(event);
-        if (event.isCanceled())
-        {
-            ci.cancel();
-        }
+            PlayerDeathEvent event = new PlayerDeathEvent(HeliosClient.MC.player);
+            EventManager.postEvent(event);
+            if (event.isCanceled()) {
+                ci.cancel();
+            }
     }
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
     private void onPlayerDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {

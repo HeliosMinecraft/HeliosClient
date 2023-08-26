@@ -27,26 +27,35 @@ public abstract class MixinClientPlayNetworkHandler {
     @Shadow @Final private MinecraftClient client;
 
 
-    @Inject(method = "onGameJoin", at = @At("RETURN"))
+    @Inject(method = "onGameJoin", at = @At("RETURN"), cancellable = true)
     private void onGameJoin(GameJoinS2CPacket packet, CallbackInfo info) {
         MixinClientPlayNetworkHandler handler = (MixinClientPlayNetworkHandler) this;
         PlayerEntity player = handler.client.player;
         Event event = new PlayerJoinEvent(player);
-        EventManager.postEvent(new PlayerJoinEvent(player));
+        EventManager.postEvent(event);
+        if(event.isCanceled()){
+            info.cancel();
+        }
     }
-    @Inject(method = "onDisconnect", at = @At("RETURN"))
+    @Inject(method = "onDisconnect", at = @At("RETURN"), cancellable = true)
     private void onDisconnect(DisconnectS2CPacket packet, CallbackInfo info) {
         MixinClientPlayNetworkHandler handler = (MixinClientPlayNetworkHandler) this;
         PlayerEntity player = handler.client.player;
         Event event = new PlayerJoinEvent(player);
-        EventManager.postEvent(new PlayerLeaveEvent(player));
+        EventManager.postEvent(event);
+        if(event.isCanceled()){
+            info.cancel();
+        }
     }
-    @Inject(method = "onPlayerRespawn", at = @At("RETURN"))
+    @Inject(method = "onPlayerRespawn", at = @At("RETURN"), cancellable = true)
     private void onPlayerRespawn(PlayerRespawnS2CPacket packet, CallbackInfo info) {
         MixinClientPlayNetworkHandler handler = (MixinClientPlayNetworkHandler) this;
         PlayerEntity player = handler.client.player;
         Event event = new PlayerJoinEvent(player);
-        EventManager.postEvent(new PlayerRespawnEvent(player));
+        EventManager.postEvent(event);
+        if(event.isCanceled()){
+            info.cancel();
+        }
     }
 
     @Inject(method = "onDeathMessage", at = @At("HEAD"), cancellable = true)

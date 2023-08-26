@@ -19,10 +19,6 @@ public class ClientPlayerEntityMixin
     @Inject(method = "move", at = @At(value = "TAIL"), cancellable = true)
     public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) 
     {
-        for (Module_ m : ModuleManager.INSTANCE.getEnabledModules())
-        {
-            m.onMotion(type, movement);
-        }
         PlayerMotionEvent event = new PlayerMotionEvent(type,movement);
         EventManager.postEvent(event);
         if (event.isCanceled()){

@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.HeliosClient;
@@ -50,7 +51,7 @@ public class HUDModule extends Module_
     }
 
     @Override
-    public void onTick()
+    public void onTick(TickEvent event)
     {
         HUDOverlay.INSTANCE.showClientTag = clientTag.value;
         if (!Rainbow.value){

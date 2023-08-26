@@ -10,8 +10,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface SubscribeEvent {
     // This attribute specifies the priority of the listener
-    EventPriority priority() default EventPriority.NORMAL;
-    Dist side() default Dist.BOTH;
 }
 
 

@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 
@@ -10,7 +11,7 @@ public class Fly extends Module_
         super("Fly", "Allows you to fly in survival mode.", Category.MOVEMENT);
     }
     @Override
-    public void onTick()
+    public void onTick(TickEvent event)
     {
         mc.player.getAbilities().flying = true;
     }

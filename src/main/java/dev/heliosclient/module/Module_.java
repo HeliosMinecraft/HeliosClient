@@ -1,5 +1,11 @@
 package dev.heliosclient.module;
 
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.PlayerMotionEvent;
+import dev.heliosclient.event.events.RenderEvent;
+import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
@@ -14,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 
 
-public abstract class Module_ {
+public abstract class Module_ implements Listener {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
     public String name;
     public String description;
@@ -44,6 +50,7 @@ public abstract class Module_ {
             assert mc.player != null;
             mc.player.sendMessage(Text.literal("[§4Helios] " + this.name + " was enabled."));
         }
+        EventManager.register(this);
     }
     public boolean isActive(){
         return active.value;
@@ -55,14 +62,18 @@ public abstract class Module_ {
             assert mc.player != null;
             mc.player.sendMessage(Text.literal("[§4Helios] " + this.name + " was disabled."));
         }
+        EventManager.unregister(this);
     }
 
-    public void onMotion(MovementType type, Vec3d movement) {
+    @SubscribeEvent
+    public void onMotion(PlayerMotionEvent event) {
     }
 
-    public void onTick() {
+    @SubscribeEvent
+    public void onTick(TickEvent event) {
     }
-    public void render(DrawContext drawContext, float tickDelta, CallbackInfo info){
+    @SubscribeEvent
+    public void render(RenderEvent event){
     }
 
     public void toggle() {
