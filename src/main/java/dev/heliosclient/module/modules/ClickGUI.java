@@ -42,9 +42,13 @@ public class ClickGUI extends Module_ {
 
     @Override
     public void onSettingChange(Setting setting) {
+        ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getA();
         ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
         ColorManager.INSTANCE.clickGuiSecondaryRainbow = RainbowAccent.value;
+
         ColorManager.INSTANCE.defaultTextColor = TextColor.value;
+
+        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getA();
         ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
         ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
         pause = Pause.value;
@@ -53,9 +57,12 @@ public class ClickGUI extends Module_ {
     @Override
     public void onLoad() {
         super.onLoad();
+        ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getA();
         ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
         ColorManager.INSTANCE.clickGuiSecondaryRainbow = RainbowAccent.value;
         ColorManager.INSTANCE.defaultTextColor = TextColor.value;
+
+        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getA();
         ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
         ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
         pause = Pause.value;

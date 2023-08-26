@@ -159,9 +159,22 @@ public class ColorSetting extends Setting
         }
     }
 
+    public int getA() {
+        return a;
+    }
 
+    public int getB() {
+        return b;
+    }
 
-   /* @Override
+    public int getG() {
+        return g;
+    }
+
+    public int getR() {
+        return r;
+    }
+    /* @Override
     public void mouseClicked(double mouseX, double mouseY, int button)
     {
         if (button != 0) {return;}

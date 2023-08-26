@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
@@ -24,7 +25,7 @@ public class Step extends Module_
         settings.add(shiftSuppress);
     }
 
-    @Override
+    @SubscribeEvent
     public void onTick(TickEvent event)
     {
         if(mc.player == null) {return;}

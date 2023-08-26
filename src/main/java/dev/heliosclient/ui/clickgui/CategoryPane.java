@@ -38,21 +38,14 @@ public class CategoryPane {
             x = mouseX - startX;
             y = mouseY - startY;
         }
-        Renderer2D.drawRoundedRectangle(drawContext,x, y, width, 16,3, 0xFF1B1B1B);
-        Renderer2D.drawRectangle(drawContext,x, y + 14, width,  2, ColorManager.INSTANCE.clickGuiSecondary());
+        Renderer2D.drawRoundedRectangle(drawContext,x, y, true,true,false,false, width, 16,3, 0xFF1B1B1B);
+        Renderer2D.drawRectangle(drawContext,x, y + 16, width,  2, ColorManager.INSTANCE.clickGuiSecondary());
 
         drawContext.drawText(textRenderer, category.name, x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
 
         if (!collapsed) {
-            int buttonYOffset = y + 16;
-            int totalButtonY=y+16;
-            for (ModuleButton ignored : moduleButtons) {
-                totalButtonY += 14;
-            }
-            if(!moduleButtons.isEmpty()) {
-                Renderer2D.drawRoundedRectangle(drawContext, x, totalButtonY - 3, width, 6, 3, 0xFF1B1B1B);
-            }
+            int buttonYOffset = y + 18;
 
 
             for (ModuleButton m : moduleButtons) {

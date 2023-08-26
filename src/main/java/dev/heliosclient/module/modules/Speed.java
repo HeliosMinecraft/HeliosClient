@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.PlayerDamageEvent;
 import dev.heliosclient.event.events.PlayerMotionEvent;
 import dev.heliosclient.module.Category;
@@ -17,8 +18,7 @@ public class Speed extends Module_
         settings.add(speed);
         quickSettings.add(speed);
     }
-    
-    @Override
+    @SubscribeEvent
     public void onMotion(PlayerMotionEvent event)
     {
         assert mc.player != null;

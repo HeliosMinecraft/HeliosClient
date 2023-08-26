@@ -58,7 +58,7 @@ public class Test extends Module_ {
         super.onDisable();
     }
 
-    @Override
+    @SubscribeEvent
     public void render(RenderEvent event) {
         // Draw a 2D rectangle using the CustomRenderer class
         DrawContext drawContext = event.getDrawContext();

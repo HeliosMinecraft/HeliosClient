@@ -1,12 +1,17 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.util.ISimpleOption;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Fullbright extends Module_ 
 {
@@ -23,15 +28,27 @@ public class Fullbright extends Module_
     }
 
     @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @SubscribeEvent
     public void onTick(TickEvent event)
     {
-        ((ISimpleOption<Double>)(Object)mc.options.getGamma()).setValueUnrestricted(100.0);
+        System.out.println("TICK");
+        if(Objects.equals(mode.get(setting.value), mode.get(0))) {
+            ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(100.0);
+        } else if(mc.player!=null && Objects.equals(mode.get(setting.value), mode.get(1))){
+            mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION,50,254,true,false,false));
+        }
+
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         super.onDisable();
         mc.options.getGamma().setValue(1.0);
+        if (mc.player != null)
+            mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
     }
 }

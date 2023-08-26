@@ -19,9 +19,10 @@ public class ColorManager {
     //ClickGui
     public boolean clickGuiSecondaryRainbow = false;
     public int clickGuiSecondary = 0xffff6e78;
+    public int clickGuiSecondaryAlpha = 255;
     public int clickGuiSecondary() {
         if (clickGuiSecondaryRainbow) {
-            return ColorUtils.getRainbowColor().getRGB();
+            return ColorUtils.changeAlpha(ColorUtils.getRainbowColor(),clickGuiSecondaryAlpha).getRGB();
         } else {
             return clickGuiSecondary;
         }
@@ -29,9 +30,11 @@ public class ColorManager {
 
     public boolean clickGuiPaneTextRainbow = false;
     public int clickGuiPaneText = 0xFFFFFFFF;
+    public int clickGuiPaneTextAlpha = 255;
+
     public int clickGuiPaneText() {
         if (clickGuiPaneTextRainbow) {
-            return ColorUtils.getRainbowColor().getRGB();
+            return ColorUtils.changeAlpha(ColorUtils.getRainbowColor(),clickGuiPaneTextAlpha).getRGB();
         } else {
             return clickGuiPaneText;
         }

@@ -49,8 +49,8 @@ public class SettingsScreen extends Screen {
 
         x = Math.max(drawContext.getScaledWindowWidth()/2-windowWidth/2, 0);
 
-        Renderer2D.drawRoundedRectangle(drawContext,x, y, windowWidth, windowHeight,5, 0xFF222222);
-        Renderer2D.drawRoundedRectangle(drawContext,x, y, windowWidth, 18,5, 0xFF1B1B1B);
+        Renderer2D.drawRoundedRectangle(drawContext,x, y,windowWidth, windowHeight,5, 0xFF222222);
+        Renderer2D.drawRoundedRectangle(drawContext,x, y,true,true,false,false, windowWidth, 18,5, 0xFF1B1B1B);
         Renderer2D.drawRectangle(drawContext,x, y+16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
         drawContext.drawText(textRenderer, module.name, drawContext.getScaledWindowWidth()/2-textRenderer.getWidth(module.name)/2, y+4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth()/2-textRenderer.getWidth("§o"+module.description)/2, y+26, ColorManager.INSTANCE.defaultTextColor(), false);
