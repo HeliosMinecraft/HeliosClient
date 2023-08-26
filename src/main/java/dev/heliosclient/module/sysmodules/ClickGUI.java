@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.sysmodules;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
@@ -11,6 +11,8 @@ import dev.heliosclient.ui.ModulesListOverlay;
 import dev.heliosclient.util.ColorUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.text.Text;
+
+import java.util.ArrayList;
 
 public class ClickGUI extends Module_ {
     BooleanSetting Pause = new BooleanSetting("Pause game", "Pause the game when Click GUI is on.", this,false);
@@ -25,18 +27,13 @@ public class ClickGUI extends Module_ {
 
 
     public ClickGUI() {
-        super("ClickGUI", "ClickGui related stuff.",  Category.RENDER);
+        super("Settings", "ClickGUI settings.",  Category.RENDER);
         settings.add(Pause);
         settings.add(AccentColor);
         settings.add(RainbowAccent);
         settings.add(PaneTextColor);
         settings.add(RainbowPane);
         settings.add(TextColor);
-
-        quickSettings.add(Pause);
-        quickSettings.add(RainbowPane);
-        quickSettings.add(RainbowAccent);
-        quickSettings.add(TextColor);
         active.value=true;
     }
 
@@ -52,7 +49,6 @@ public class ClickGUI extends Module_ {
 
     @Override
     public void onLoad() {
-        super.onLoad();
         ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
         ColorManager.INSTANCE.clickGuiSecondaryRainbow = RainbowAccent.value;
         ColorManager.INSTANCE.defaultTextColor = TextColor.value;
