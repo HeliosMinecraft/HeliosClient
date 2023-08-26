@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules;
 
+import com.ibm.icu.impl.Assert;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 
@@ -28,6 +29,8 @@ public class Fly extends Module_
     {
         super.onDisable();
 
+        if (mc.player != null) {
         mc.player.getAbilities().flying = false;
+        }
     }
 }
