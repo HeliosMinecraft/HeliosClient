@@ -24,9 +24,11 @@ public class MinecraftClientMixin
 	@Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
 	public void onTick(CallbackInfo ci)
 	{
-		EventManager.postEvent(new TickEvent());
-
-		KeybindManager.onTick();
+		TickEvent event = new TickEvent();
+		EventManager.postEvent(event);
+		if (event.isCanceled()) {
+			ci.cancel();
+		}
 	}
 
     @Inject(at = @At("TAIL"), method = "scheduleStop")

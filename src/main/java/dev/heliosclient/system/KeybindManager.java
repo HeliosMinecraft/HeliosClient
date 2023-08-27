@@ -1,17 +1,26 @@
 package dev.heliosclient.system;
 
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.ModuleManager;
 import dev.heliosclient.module.Module_;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.world.tick.Tick;
 
 import java.util.ArrayList;
 
-public class KeybindManager {
+public class KeybindManager implements Listener {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
     public static ArrayList<Integer> wasPressed = new ArrayList<>();
+    public KeybindManager(){
+        EventManager.register(this);
+    }
 
-    public static void onTick() {
+    @SubscribeEvent
+    public static void onTick(TickEvent event) {
         if (mc == null || mc.player == null) return; // TO BE CHANGED
         if(mc.currentScreen != null)return;
         ArrayList<Integer> isPressed = new ArrayList<>();
@@ -33,7 +42,7 @@ public class KeybindManager {
                 }
 
                 } else {
-                    wasPressed.remove(Integer.valueOf(key));
+                    wasPressed.remove(key);
                 }
         }
     }

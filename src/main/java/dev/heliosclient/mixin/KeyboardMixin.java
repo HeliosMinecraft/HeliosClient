@@ -1,5 +1,7 @@
 package dev.heliosclient.mixin;
 
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.events.KeyPressedEvent;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,6 +18,12 @@ public abstract class KeyboardMixin {
 
 	@Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
+        KeyPressedEvent event = new KeyPressedEvent(window, key, scancode, action, modifiers);
+        EventManager.postEvent(event);
+        if (event.isCanceled()){
+            info.cancel();
+        }
+
         if (key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
             ClickGUIScreen.INSTANCE.onLoad();
             MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
