@@ -104,9 +104,20 @@ public class Test extends Module_ {
 
 
 
-    public void atTick(TickEvent event) {
-        System.out.println("Tick");
+    public void atTick(TickEvent.CLIENT event) {
+        System.out.println("Client Tick");
     }
+    @SubscribeEvent
+    public void atServerTick(TickEvent.WORLD event) {
+        System.out.println("World Tick");
+    }
+
+    @SubscribeEvent
+    public void atPlayerTick(TickEvent.PLAYER event) {
+        System.out.println("Player Tick");
+    }
+
+
     @SubscribeEvent
     public void onPlayerJoinEvent(PlayerJoinEvent event){
         System.out.println("Join");
