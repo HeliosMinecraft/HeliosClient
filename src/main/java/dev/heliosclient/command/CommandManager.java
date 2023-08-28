@@ -30,6 +30,7 @@ public class CommandManager
         add(new Teleport());
         add(new Bind());
         add(new Reset());
+        add(new Friend());
         commands.sort(Comparator.comparing(Command::getName));
     }
 

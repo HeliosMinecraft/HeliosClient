@@ -17,6 +17,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,6 +25,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
 public abstract class MixinPlayerEntity {
+
+    @Shadow public abstract boolean isPushedByFluids();
 
     @Inject(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", at = @At("HEAD"))
     private void dropItem(ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
@@ -57,10 +60,12 @@ public abstract class MixinPlayerEntity {
     @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
     public void onTick(CallbackInfo ci)
     {
-        TickEvent event = new TickEvent.PLAYER(HeliosClient.MC.player);
-        EventManager.postEvent(event);
-        if (event.isCanceled()) {
-            ci.cancel();
+        if(this !=null) {
+            TickEvent event = new TickEvent.PLAYER(HeliosClient.MC.player);
+            EventManager.postEvent(event);
+            if (event.isCanceled()) {
+                ci.cancel();
+            }
         }
     }
 }
