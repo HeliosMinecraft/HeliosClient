@@ -32,6 +32,7 @@ public class ClientSettingsScreen extends Screen {
 
         windowHeight = 52;
         for (Setting setting: module.settings) {
+            if (!setting.shouldRender()) continue;
             setting.quickSettings=false;
             windowHeight += setting.height+1;
         }
@@ -55,6 +56,7 @@ public class ClientSettingsScreen extends Screen {
         drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth()/2-textRenderer.getWidth("§o"+module.description)/2, y+26, ColorManager.INSTANCE.defaultTextColor(), false);
         int yOffset = y+44;
         for (Setting setting : module.settings) {
+            if (!setting.shouldRender()) continue;
             setting.render(drawContext,x+16,yOffset,mouseX,mouseY,textRenderer);
             yOffset += setting.height+1;
         }

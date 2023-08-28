@@ -58,6 +58,7 @@ public class CategoryPane {
                 // Draw the settings for this module if they are open
                 if (m.settingsOpen) {
                     for (Setting setting : m.module.quickSettings) {
+                        if (!setting.shouldRender()) continue;
                         //setting.width=96;
                         setting.quickSettings=m.settingsOpen;
                         setting.renderCompact(drawContext,x, buttonYOffset,mouseX,mouseY,textRenderer);
