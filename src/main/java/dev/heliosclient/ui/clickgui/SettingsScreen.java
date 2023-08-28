@@ -33,6 +33,7 @@ public class SettingsScreen extends Screen {
 
         windowHeight = 52;
         for (Setting setting: module.settings) {
+            if (!setting.shouldRender()) continue;
             setting.quickSettings=false;
             windowHeight += setting.height+1;
         }
@@ -57,6 +58,7 @@ public class SettingsScreen extends Screen {
         backButton.render(drawContext, textRenderer, x+4, y+4, mouseX, mouseY);
         int yOffset = y+44;
         for (Setting setting : module.settings) {
+            if (!setting.shouldRender()) continue;
             setting.render(drawContext,x+16,yOffset,mouseX,mouseY,textRenderer);
             yOffset += setting.height+1;
         }

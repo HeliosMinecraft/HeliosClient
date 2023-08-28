@@ -3,10 +3,12 @@ package dev.heliosclient.system;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 public class FriendManager {
     // Declare a list of friends
     private static HashSet<Friend> friends = new HashSet<>();
+    private static HashSet<String> friendsname = new HashSet<>();
 
     // Create a static method that returns true if the friend is in the set, false otherwise
     public static boolean isFriend(Friend friend) {
@@ -21,5 +23,18 @@ public class FriendManager {
     }
     public static void removeFriend(Friend friend){
         friends.remove(friend);
+    }
+
+    public static HashSet<Friend> getFriends() {
+        return friends;
+    }
+    public FriendManager(){
+        for (Friend friend: friends){
+            friendsname.add(friend.getPlayerName());
+        }
+    }
+
+    public HashSet<String> getFriendsName() {
+        return friendsname;
     }
 }
