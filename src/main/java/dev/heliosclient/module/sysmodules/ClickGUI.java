@@ -26,6 +26,13 @@ public class ClickGUI extends Module_ {
     ColorSetting TextColor = new ColorSetting("Text color", "Color of text all through out the client.", this, ColorManager.INSTANCE.defaultTextColor);
     CycleSetting TooltipMode = new CycleSetting("Tooltip mode", "Mode in what tooltips should be shown.", this, new ArrayList<String>(List.of("Normal", "Fixed", "Vanilla")), 0);
 
+    CycleSetting TooltipPos = new CycleSetting("Tooltip position", "Position of fixed tooltip.", this, new ArrayList<>(List.of("Top-left", "Top-right", "Bottom-left", "Bottom-right", "Center")), 3) {
+        @Override
+        public boolean shouldRender() {
+             return TooltipMode.value == 1;
+         }
+    };
+
     public static boolean pause = false;
 
 
@@ -34,6 +41,7 @@ public class ClickGUI extends Module_ {
         super("ClickGUI", "ClickGui related stuff.",  Category.RENDER);
         settings.add(Pause);
         settings.add(TooltipMode);
+        settings.add(TooltipPos);
         settings.add(AccentColor);
         settings.add(RainbowAccent);
         settings.add(PaneTextColor);
@@ -42,6 +50,7 @@ public class ClickGUI extends Module_ {
 
         quickSettings.add(Pause);
         quickSettings.add(TooltipMode);
+        quickSettings.add(TooltipPos);
         quickSettings.add(RainbowPane);
         quickSettings.add(RainbowAccent);
         quickSettings.add(TextColor);
@@ -51,6 +60,7 @@ public class ClickGUI extends Module_ {
     @Override
     public void onSettingChange(Setting setting) {
         Tooltip.tooltip.mode = TooltipMode.value;
+        Tooltip.tooltip.fixedPos = TooltipPos.value;
 
         ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getA();
         ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
@@ -68,6 +78,7 @@ public class ClickGUI extends Module_ {
     public void onLoad() {
         super.onLoad();
         Tooltip.tooltip.mode = TooltipMode.value;
+        Tooltip.tooltip.fixedPos = TooltipPos.value;
 
         ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getA();
         ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
