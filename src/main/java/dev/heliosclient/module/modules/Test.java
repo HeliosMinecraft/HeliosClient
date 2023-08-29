@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.awt.*;
 
 
-public class Test extends Module_ implements Listener {
+public class Test extends Module_ {
     BooleanSetting rectangle = new BooleanSetting("Rectangle","",this,false);
     BooleanSetting rounded = new BooleanSetting("Rounded","",this,false);
     BooleanSetting Circle = new BooleanSetting("Circle","",this,false);
@@ -51,18 +51,17 @@ public class Test extends Module_ implements Listener {
     @Override
     public void onEnable() {
         super.onEnable();
-        EventManager.register(this);
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
-        EventManager.unregister(this);
     }
 
-    @Override
-    public void render(DrawContext drawContext, float tickDelta, CallbackInfo info) {
+    @SubscribeEvent
+    public void render(RenderEvent event) {
         // Draw a 2D rectangle using the CustomRenderer class
+        DrawContext drawContext = event.getDrawContext();
         if (rectangle.value)
             Renderer2D.fill(drawContext,10, 10, 100, 50, 0xFFFF0000);
 
@@ -98,43 +97,72 @@ public class Test extends Module_ implements Listener {
                 // Draw a tracer line towards an entity using the CustomRenderer3D class
                 if (TracerLine.value) {
                     System.out.println("drawing at" + blockPos);
-                    Renderer3D.drawLineFromPlayer(drawContext, blockPos.toCenterPos(), Color.WHITE.getRGB(), 5.0f, tickDelta);
+                    Renderer3D.drawLineFromPlayer(drawContext, blockPos.toCenterPos(), Color.WHITE.getRGB(), 5.0f, event.getTickDelta());
             }
         }
     }
 
 
 
-    public void atTick(TickEvent event) {
-        System.out.println("Tick");
+    public void atTick(TickEvent.CLIENT event) {
+        System.out.println("Client Tick");
     }
+    @SubscribeEvent
+    public void atServerTick(TickEvent.WORLD event) {
+        System.out.println("World Tick");
+    }
+
+    @SubscribeEvent
+    public void atPlayerTick(TickEvent.PLAYER event) {
+        System.out.println("Player Tick");
+    }
+
+
+    @SubscribeEvent
     public void onPlayerJoinEvent(PlayerJoinEvent event){
         System.out.println("Join");
     }
 
+    @SubscribeEvent
     public void onPlayerLeaveEvent(PlayerLeaveEvent event){
         System.out.println("PlayerLeaveEvent");
     }
 
+    @SubscribeEvent
     public void onPlayerDeathEvent(PlayerDeathEvent event){
         System.out.println("PlayerDeathEvent");
     }
 
+    @SubscribeEvent
     public void onPlayerRespawnEvent(PlayerRespawnEvent event){
         System.out.println("PlayerRespawnEvent");
     }
+    @SubscribeEvent
+    public void onPlayerDamageEvent(PlayerDamageEvent event){
+        System.out.println("PlayerDamageEvent");
+    }
+    public void onPlayerMotionEvent(PlayerMotionEvent event){
+        System.out.println("PlayerMotionEvent");
+    }
+    @SubscribeEvent
     public void itemDropEvent(ItemDropEvent event){
         System.out.println("ItemDropEvent");
     }
+    @SubscribeEvent
     public void itemPickUpEvent(ItemPickupEvent event){
         System.out.println("ItemPickupEvent");
     }
+    @SubscribeEvent
     public void onChatMsg(ChatMessageEvent event){
         System.out.println("ChatMessageEvent");
     }
-    public void BlockPlaceEvent(BlockPlaceEvent event){
-        System.out.println("BlockPlaceEvent");
+
+    @SubscribeEvent
+    public void BlockPlaceEvent(BlockInteractEvent event){
+        System.out.println("BlockInteractEvent");
     }
+
+    @SubscribeEvent
     public void BlockBreakEvent(BlockBreakEvent event){
         System.out.println("BlockBreakEvent");
     }

@@ -1,5 +1,8 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.PlayerDamageEvent;
+import dev.heliosclient.event.events.PlayerMotionEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.DoubleSetting;
@@ -12,17 +15,14 @@ public class Speed extends Module_
     public Speed() 
     {
         super("Speed", "Allows you to move faster.", Category.MOVEMENT);
-
         settings.add(speed);
-
         quickSettings.add(speed);
     }
-    
-    @Override
-    public void onMotion(MovementType type, Vec3d movement)
+    @SubscribeEvent
+    public void onMotion(PlayerMotionEvent event)
     {
         assert mc.player != null;
-        mc.player.addVelocity(movement);
+        mc.player.addVelocity(event.getMovement());
     }
 
 }

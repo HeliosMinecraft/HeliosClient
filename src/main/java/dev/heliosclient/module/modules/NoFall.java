@@ -1,5 +1,7 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
@@ -26,9 +28,8 @@ public class NoFall extends Module_
         quickSettings.add(fallHeight);
         quickSettings.add(mode);
     }
-
-    @Override
-    public void onTick()
+    @SubscribeEvent
+    public void onTick(TickEvent event)
     {
         assert mc.player != null;
         if(mc.player.fallDistance >= fallHeight.value && !mc.player.isCreative()) {

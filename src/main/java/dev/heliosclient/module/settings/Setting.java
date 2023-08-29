@@ -47,6 +47,10 @@ public abstract class Setting
         Renderer2D.drawRoundedRectangle(drawContext, x, y, widthCompact, heightCompact, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
     }
 
+    public boolean shouldRender() {
+        return true;
+    }
+
 	public void mouseClicked(double mouseX, double mouseY, int button) { }
 	
 	public void mouseReleased(double mouseX, double mouseY, int button) { }

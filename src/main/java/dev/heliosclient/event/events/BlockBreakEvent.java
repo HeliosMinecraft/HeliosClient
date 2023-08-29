@@ -1,10 +1,12 @@
 package dev.heliosclient.event.events;
 
+import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
-public class BlockBreakEvent implements Event {
+@Cancelable
+public class BlockBreakEvent extends Event {
     private final BlockPos pos;
     private final BlockState state;
 

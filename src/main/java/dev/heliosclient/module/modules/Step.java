@@ -1,10 +1,15 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.world.tick.Tick;
+
+import javax.security.auth.callback.TextInputCallback;
 
 public class Step extends Module_
 {
@@ -23,8 +28,8 @@ public class Step extends Module_
         quickSettings.add(shiftSuppress);
     }
 
-    @Override
-    public void onTick()
+    @SubscribeEvent
+    public void onTick(TickEvent event)
     {
         if(mc.player == null) {return;}
         if (shiftSuppress.value) {
@@ -44,6 +49,7 @@ public class Step extends Module_
     public void onDisable()
     {
         super.onDisable();
+        if(mc.player == null) {return;}
         mc.player.setStepHeight(0.5f);
     }
 }

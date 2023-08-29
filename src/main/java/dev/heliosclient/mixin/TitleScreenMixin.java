@@ -1,13 +1,18 @@
-package dev.heliosclient.mixin;
+    package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.ui.HeliosClientInfoScreen;
 import dev.heliosclient.ui.altmanager.AltManagerScreen;
 
+import net.minecraft.client.gui.screen.option.CreditsAndAttributionScreen;
+import net.minecraft.client.gui.widget.PressableTextWidget;
+import net.minecraft.client.resource.language.I18n;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.MinecraftClient;
@@ -35,14 +40,23 @@ public abstract class TitleScreenMixin extends Screen
         super(null);
     }
 
-    @Inject(at = @At("TAIL"), method = "render")
-    private void clientTag(DrawContext drawContext, int mouseX, int mouseY, float delta, CallbackInfo info) 
+    @ModifyArg(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/realms/gui/screen/RealmsNotificationsScreen;init(Lnet/minecraft/client/MinecraftClient;II)V"), method = "init", index = 2)
+    private int adjustRealmsHeight(int height) {
+            return height - 51;
+    }
+
+    @Inject(at = @At("TAIL"), method = "init")
+    private void clientTag(CallbackInfo ci)
     {
         float f = this.doBackgroundFade ? (Util.getMeasuringTimeMs() - this.backgroundFadeStart) / 1000.0F : 1.0F;
         float g = this.doBackgroundFade ? MathHelper.clamp(f - 1.0F, 0.0F, 1.0F) : 1.0F;
         int l = MathHelper.ceil(g * 255.0F) << 24;
 
-        drawContext.drawTextWithShadow(this.textRenderer, HeliosClient.clientTag + " " + HeliosClient.versionTag, 2, 2, 16777215 | l);
+        //drawContext.drawTextWithShadow(this.textRenderer, HeliosClient.clientTag + " " + HeliosClient.versionTag, 2, 2, 16777215 | l);
+
+        this.addDrawableChild(new PressableTextWidget(2, 2, 150, 10, Text.literal(HeliosClient.clientTag + " " + HeliosClient.versionTag), (button) -> {
+            this.client.setScreen(HeliosClientInfoScreen.INSTANCE);
+        }, this.textRenderer));
     }
 
     @Inject(at = @At("TAIL"), method = "init")

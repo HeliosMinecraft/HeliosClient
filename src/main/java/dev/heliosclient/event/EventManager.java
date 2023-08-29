@@ -20,7 +20,7 @@ public class EventManager {
     public static void postEvent(Event event) {
         for (Listener listener : listeners) {
             for (Method method : listener.getClass().getMethods()) {
-                if (method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(event.getClass())) {
+                if (method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(event.getClass()) && method.isAnnotationPresent(SubscribeEvent.class)) {
                     try {
                         method.invoke(listener, event);
                     } catch (Exception e) {

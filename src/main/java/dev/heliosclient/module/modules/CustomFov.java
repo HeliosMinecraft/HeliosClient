@@ -1,5 +1,7 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.DoubleSetting;
@@ -17,9 +19,8 @@ public class CustomFov extends Module_
         quickSettings.add(FOV);
         //quickSettings.add(RainbowPane);
     }
-
-    @Override
-    public void onTick()
+    @SubscribeEvent
+    public void onTick(TickEvent event)
     {
         ((ISimpleOption<Integer>)(Object)mc.options.getFov()).setValueUnrestricted((int)(FOV.value));
     }
