@@ -15,7 +15,6 @@ public class DoubleSetting extends Setting
     private final double min, max;
     private final int roundingPlace;
     Module_ module;
-    String description;
 
     boolean sliding = false;
 

@@ -9,6 +9,7 @@ import java.awt.*;
 public abstract class Setting
 {
     public String name;
+    public String description;
     public int height = 24;
     public int width = 192;
     public int heightCompact = 24;
