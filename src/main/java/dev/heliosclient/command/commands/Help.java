@@ -19,9 +19,7 @@ import net.minecraft.command.CommandSource;
 
 public class Help extends Command
 {
-	// TODO (ElBe): Add optional "command" argument to show specific help and help about arguments
-
-    public Help() 
+	public Help() 
     {
 		super("help", "Gives you a list of all of the commands", "c", "commands", "h");
 	}
