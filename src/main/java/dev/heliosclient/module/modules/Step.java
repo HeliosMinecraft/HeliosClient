@@ -18,6 +18,9 @@ public class Step extends Module_
         super("Step", "Allows you to step up full blocks.", Category.MOVEMENT);
         settings.add(stepHeight);
         settings.add(shiftSuppress);
+
+        quickSettings.add(stepHeight);
+        quickSettings.add(shiftSuppress);
     }
 
     @Override

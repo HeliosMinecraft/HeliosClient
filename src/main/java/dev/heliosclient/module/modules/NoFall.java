@@ -22,6 +22,9 @@ public class NoFall extends Module_
 
         settings.add(fallHeight);
         settings.add(mode);
+
+        quickSettings.add(fallHeight);
+        quickSettings.add(mode);
     }
 
     @Override

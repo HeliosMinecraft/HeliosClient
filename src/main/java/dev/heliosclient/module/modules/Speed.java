@@ -12,6 +12,10 @@ public class Speed extends Module_
     public Speed() 
     {
         super("Speed", "Allows you to move faster.", Category.MOVEMENT);
+
+        settings.add(speed);
+
+        quickSettings.add(speed);
     }
     
     @Override
