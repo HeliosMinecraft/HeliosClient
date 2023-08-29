@@ -4,6 +4,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -41,9 +42,6 @@ public class ColorSetting extends Setting
     }
 
     int boxSize = 20;
-    int sliderWidth = 10;
-    int sliderHeight = boxSize;
-    int sliderSpacing = 2;
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
@@ -87,11 +85,11 @@ public class ColorSetting extends Setting
             int scaledValueRed = (int)((double)(255-r) / 255 * 60);
             int scaledValueGreen = (int)((double)(255-g) / 255 * 60);
             int scaledValueBlue = (int)((double)(255-b) / 255 * 60);
-            drawContext.fill(x+64, y+13+scaledValueAlpha, x+78, y+15+scaledValueAlpha, 0xFFAAAAAA);
-            drawContext.fill(x+79, y+13+scaledValueRed, x+93, y+15+scaledValueRed, 0xFFAAAAAA);
-            drawContext.fill(x+94, y+13+scaledValueGreen, x+108, y+15+scaledValueGreen, 0xFFAAAAAA);
-            drawContext.fill(x+109, y+13+scaledValueBlue, x+123, y+15+scaledValueBlue, 0xFFAAAAAA);
-            drawContext.fill(x+2, y+14, x+62, y+74, value);
+            Renderer2D.drawRectangle(drawContext,x+64, y+13+scaledValueAlpha, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext,x+79, y+13+scaledValueRed, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext,x+94, y+13+scaledValueGreen, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext,x+109, y+13+scaledValueBlue, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext,x+2, y+14, 60, 60, value);
 
             if (hovered(mouseX, mouseY)) {
                 hovertimer++;
@@ -143,10 +141,10 @@ public class ColorSetting extends Setting
             int scaledValueRed = (int)((double)(255-r) / 255 * 60);
             int scaledValueGreen = (int)((double)(255-g) / 255 * 60);
             int scaledValueBlue = (int)((double)(255-b) / 255 * 60);
-            drawContext.fill(x+14, y+13+scaledValueAlpha, x+28, y+15+scaledValueAlpha, 0xFFAAAAAA);
-            drawContext.fill(x+29, y+13+scaledValueRed, x+43, y+15+scaledValueRed, 0xFFAAAAAA);
-            drawContext.fill(x+44, y+13+scaledValueGreen, x+58, y+15+scaledValueGreen, 0xFFAAAAAA);
-            drawContext.fill(x+59, y+13+scaledValueBlue, x+73, y+15+scaledValueBlue, 0xFFAAAAAA);
+            Renderer2D.drawRectangle(drawContext,x+14, y+13+scaledValueAlpha, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext,x+29, y+13+scaledValueRed, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext,x+44, y+13+scaledValueGreen, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext,x+59, y+13+scaledValueBlue, 14, 2, 0xFFAAAAAA);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;

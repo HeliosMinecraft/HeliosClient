@@ -26,16 +26,14 @@ public class KeyBind extends Setting {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        if (!listening) {
-        if (value != 0) {
+        if (listening) {
+            drawContext.drawText(textRenderer, name + ": §lLISTENING", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
+        } else if (value == 0) {
+            drawContext.drawText(textRenderer, name + ": None", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
+        } else {
             String keyName = KeycodeToString.translate(value);
 
             drawContext.drawText(textRenderer, name + ": " + keyName, x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
-        } else {
-            drawContext.drawText(textRenderer, name + ": None", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
-        }
-        } else {
-            drawContext.drawText(textRenderer, name + ": §lLISTENING", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
         }
 
         if (hovered(mouseX, mouseY)) {
@@ -59,10 +57,10 @@ public class KeyBind extends Setting {
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         if (listening)
         {
-            if (keyCode != GLFW.GLFW_KEY_BACKSPACE && keyCode != GLFW.GLFW_KEY_ESCAPE) {
-            this.value = keyCode;
-            } else {
+            if (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_ESCAPE) {
                 this.value = 0;
+            } else {
+            this.value = keyCode;
             }
             listening = false;
             module.onSettingChange(this);

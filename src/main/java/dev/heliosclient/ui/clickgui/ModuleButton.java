@@ -11,6 +11,10 @@ import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class ModuleButton {
     AnimationUtils TextAnimation = new AnimationUtils();
@@ -33,6 +37,8 @@ public class ModuleButton {
         TextAnimation.FADE_SPEED=0.2f;
     }
 
+
+
     public void startFading() {
         BackgroundAnimation.startFading(faded,EasingType.LINEAR_IN);
         TextAnimation.startFading(faded,EasingType.LINEAR_IN);
@@ -44,26 +50,23 @@ public class ModuleButton {
     public boolean hasFaded() {
         return faded;
     }
-
     public void render(DrawContext drawContext, int mouseX, int mouseY, int x, int y, TextRenderer textRenderer) {
         this.x = x;
         this.y = y;
 
         if (hovered(mouseX, mouseY)) {
-            hovertimer++;
             hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 20);
         } else {
-            hovertimer = 0;
             hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
         }
+
 
         int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
         Color fill = new Color(fillColor, fillColor, fillColor, alpha);
 
         BackgroundAnimation.drawFadingBox(drawContext,x, y, width, height, fill.getRGB(),false,0);
         TextAnimation.drawFadingText(drawContext,textRenderer,module.name, x + 3, y + 3, module.active.value ? ColorManager.INSTANCE.clickGuiSecondary() : ColorManager.INSTANCE.defaultTextColor(), false);
-
-        if (hovertimer >= 100) {
+        if (hovered(mouseX,mouseY)) {
             Tooltip.tooltip.changeText(module.description);
         }
     }

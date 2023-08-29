@@ -1,7 +1,9 @@
 package dev.heliosclient.mixin;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.EventManager;
 import dev.heliosclient.event.events.KeyPressedEvent;
+import net.minecraft.client.gui.screen.ChatScreen;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +26,7 @@ public abstract class KeyboardMixin {
             info.cancel();
         }
 
-        if (key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+        if (key == GLFW.GLFW_KEY_RIGHT_SHIFT && !(HeliosClient.MC.currentScreen instanceof ChatScreen)) {
             ClickGUIScreen.INSTANCE.onLoad();
             MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
         }

@@ -1,5 +1,6 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -14,12 +15,12 @@ public class Separator extends Setting
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        drawContext.fill(x+2, y+height/2, x+width-2, y+height/2+1, 0xCCFFFFFF);
+        Renderer2D.drawRectangle(drawContext,x+2, y+height/2, width-2, 1, 0xCCFFFFFF);
     }
 
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        drawContext.fill(x+2, y+heightCompact/2, x+widthCompact-2, y+height/2+1, 0xCCFFFFFF);
+        Renderer2D.drawRectangle(drawContext,x+2, y+heightCompact/2, widthCompact-2, 1, 0xCCFFFFFF);
     }
 
 }

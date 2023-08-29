@@ -51,15 +51,13 @@ public class Friend extends Command {
                                     dev.heliosclient.system.Friend friend = new dev.heliosclient.system.Friend(name);
 
                                     if (FriendManager.isFriend(friend)) {
-                                        // Send an error message that the friend is not in the list
-                                        ChatUtils.sendHeliosMsg(ColorUtils.red+"You are not friends with " + name);
-                                    } else {
                                         // Remove the friend from the list
                                         FriendManager.removeFriend(friend);
                                         ChatUtils.sendHeliosMsg(ColorUtils.green +"You are no longer friends with " + name);
-
+                                    } else {
+                                        // Send an error message that the friend is not in the list
+                                        ChatUtils.sendHeliosMsg(ColorUtils.red+"You are not friends with " + name);
                                     }
-
                                     return SINGLE_SUCCESS;
                                 })
                         )
