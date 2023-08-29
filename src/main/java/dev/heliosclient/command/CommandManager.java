@@ -11,6 +11,7 @@ import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import dev.heliosclient.command.commands.*;
+import dev.heliosclient.module.Module_;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
@@ -68,6 +69,15 @@ public class CommandManager
         command.registerTo(DISPATCHER);
         commands.add(command);
         commandInstances.put(command.getClass(), command);
+    }
+
+    public Command getCommandByName(String commandName) {
+        for (Command command : commands) {
+            if ((command.getName().trim().equalsIgnoreCase(commandName))) {
+                return command;
+            }
+        }
+        return null;
     }
 
     public int getCount() {

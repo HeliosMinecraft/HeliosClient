@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.heliosclient.command.Command;
+import dev.heliosclient.command.CommandArgumentType;
 import dev.heliosclient.command.CommandManager;
 import dev.heliosclient.command.ModuleArgumentType;
 import dev.heliosclient.module.Module_;
@@ -28,6 +29,23 @@ public class Help extends Command
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) 
 	{
+		builder.then(argument("command", new CommandArgumentType()).executes(context -> {
+			ClientPlayerEntity player = mc.player;
+			assert player != null;
+			
+			Command command = context.getArgument("command", Command.class);
+
+			ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + command.getName());
+			ChatUtils.sendMsg(command.getDescription());
+
+			if (command.getAliases().size() > 0) {
+				ChatUtils.sendMsg(
+						ColorUtils.aqua + "Aliases" + ColorUtils.gray + ": " + String.join(", ", command.getAliases()));
+			}
+
+			return SINGLE_SUCCESS;
+		}));
+
 		builder.then(argument("module", new ModuleArgumentType()).executes(context -> {
 			ClientPlayerEntity player = mc.player;
 			assert player != null;
