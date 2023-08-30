@@ -1,5 +1,6 @@
 package dev.heliosclient.hud;
 
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -87,6 +88,15 @@ public class HudElement {
         }
 
         if (this.selected) {
+            if (dragging) {
+            if (distanceX == 0 && posX == 1) {
+                Renderer2D.drawRectangle(drawContext, drawContext.getScaledWindowWidth()/2-1, 0, 2, drawContext.getScaledWindowHeight(), 0xFFFF0000);
+            }
+            if (distanceY == 0 && posY == 1) {
+                Renderer2D.drawRectangle(drawContext, 0, drawContext.getScaledWindowHeight()/2-1, drawContext.getScaledWindowWidth(), 2, 0xFF00FF00);
+            }
+            }
+
             drawContext.fill(x-1 - width/2, y-1 - height/2, x- width/2, y+height/2+1, 0xFFFFFFFF);
             drawContext.fill(x-1 - width/2, y-1 -height/2, x+width+1- width/2 , y-height/2, 0xFFFFFFFF);
             drawContext.fill(x+width - width/2, y-1 - height/2, x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
@@ -99,11 +109,11 @@ public class HudElement {
     public void render(DrawContext drawContext, TextRenderer textRenderer) {
 
         if (posY == 0) {
-            y = Math.max(Math.min(distanceY, drawContext.getScaledWindowHeight()-height), 0);
+            y = Math.max(Math.min(distanceY, drawContext.getScaledWindowHeight()-height/2), height/2);
         } else if (posY == 1) {
-            y = Math.max(Math.min(drawContext.getScaledWindowHeight()/2- distanceY, drawContext.getScaledWindowHeight()-height), 0);
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight()/2- distanceY, drawContext.getScaledWindowHeight()-height/2), height/2);
         } else {
-            y = Math.max(Math.min(drawContext.getScaledWindowHeight()- distanceY, drawContext.getScaledWindowHeight()-height), 0);
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight()- distanceY, drawContext.getScaledWindowHeight()-height/2), height/2);
         }
 
         if (posX == 0) {
