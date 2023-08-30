@@ -14,7 +14,6 @@ public class BooleanSetting extends Setting
 {
     public boolean value;
     Module_ module;
-    String description;
 
     public BooleanSetting(String name, String description, Module_ module, boolean value)
     {

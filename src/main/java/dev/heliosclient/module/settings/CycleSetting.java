@@ -13,7 +13,6 @@ public class CycleSetting extends Setting
     public int value;
     public ArrayList<String> options;
     Module_ module;
-    String description;
 
     public CycleSetting(String name, String description, Module_ module, ArrayList<String> options, int value)
     {

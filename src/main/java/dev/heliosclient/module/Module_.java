@@ -10,6 +10,7 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.ui.ModulesListOverlay;
+import dev.heliosclient.util.ChatUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.MovementType;
@@ -48,7 +49,7 @@ public abstract class Module_ implements Listener {
         ModulesListOverlay.INSTANCE.update();
         if (chatFeedback.value) {
             assert mc.player != null;
-            mc.player.sendMessage(Text.literal("[§4Helios] " + this.name + " was enabled."));
+            ChatUtils.sendHeliosMsg(this.name + " was enabled.");
         }
         EventManager.register(this);
     }
@@ -60,7 +61,7 @@ public abstract class Module_ implements Listener {
         ModulesListOverlay.INSTANCE.update();
         if (chatFeedback.value) {
             assert mc.player != null;
-            mc.player.sendMessage(Text.literal("[§4Helios] " + this.name + " was disabled."));
+            ChatUtils.sendHeliosMsg(this.name + " was disabled.");
         }
         EventManager.unregister(this);
     }

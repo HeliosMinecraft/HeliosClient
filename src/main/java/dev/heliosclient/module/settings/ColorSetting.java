@@ -22,7 +22,6 @@ public class ColorSetting extends Setting
     boolean slidingBlue = false;
     boolean slidingAlpha = false;
     Module_ module;
-    String description;
     
 
     public ColorSetting(String name, String description, Module_ module, int value)

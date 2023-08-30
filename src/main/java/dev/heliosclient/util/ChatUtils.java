@@ -26,4 +26,7 @@ public class ChatUtils
 
         mc.inGameHud.getChatHud().addMessage(msg);
     }
+    public static void sendHeliosMsg(String message){
+        sendMsg(null,null,Text.of("["+ColorUtils.red + "Helios"+ColorUtils.white+"] "+ message));
+    }
 }
