@@ -14,13 +14,10 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 
 public class ListSettingScreen extends Screen {
-
-    //TODO: Fix the animation thingys.
-
-    private int hoverAnimationTimer = 0;
     private ListSetting listSetting;
     private Screen parentScreen;
     int x, x2, y, windowWidth = 180, windowHeight;
+    private int[] hoverAnimationTimers;
 
     public TextButton backButton = new TextButton("< Back");
     static int offsetY = 0;
@@ -30,6 +27,7 @@ public class ListSettingScreen extends Screen {
         this.listSetting = listSetting;
         this.parentScreen = parentScreen;
         offsetY = 0;
+        hoverAnimationTimers = new int[listSetting.options.size()];
     }
 
     @Override
@@ -53,7 +51,6 @@ public class ListSettingScreen extends Screen {
 
         x = Math.max(drawContext.getScaledWindowWidth() / 2 - windowWidth / 2, 0);
         x2 = x + windowWidth;
-
         Renderer2D.drawRoundedRectangle(drawContext, x, y, windowWidth, windowHeight, 5, 0xFF222222);
         Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, windowWidth, 18, 5, 0xFF1B1B1B);
         Renderer2D.drawRectangle(drawContext, x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
@@ -61,15 +58,17 @@ public class ListSettingScreen extends Screen {
         drawContext.drawText(textRenderer, "§o" + listSetting.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + listSetting.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
         backButton.render(drawContext, textRenderer, x + 4, y + 4, mouseX, mouseY);
         int yOffset = y + 55;
-        for (String string: listSetting.options) {
-            if (mouseX >= x && mouseX <= x2 && mouseY >= yOffset && mouseY <= yOffset + 25) {
-                hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 40);
+        for (int i = 0; i < listSetting.options.size(); i++) {
+            String string = listSetting.options.get(i);
+            int hitboxY = yOffset - 25 / 2 + 10 / 2;
+            if (mouseX >= x && mouseX <= x2 && mouseY >= hitboxY && mouseY <= hitboxY + 25) {
+                hoverAnimationTimers[i] = Math.min(hoverAnimationTimers[i] + 1, 40);
             } else {
-                hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
+                hoverAnimationTimers[i] = Math.max(hoverAnimationTimers[i] - 1, 0);
             }
-            int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
-            Renderer2D.drawRoundedRectangle(drawContext, x, yOffset, windowWidth, 25, 5, new Color(fillColor, fillColor, fillColor).getRGB());
-            drawContext.drawText(textRenderer, string, x + 16, yOffset, ColorManager.INSTANCE.defaultTextColor(), false);
+            int fillColor = (int)(34 + 0.85 * hoverAnimationTimers[i]);
+            Renderer2D.drawRoundedRectangle(drawContext, x, hitboxY, windowWidth, 25, 5, new Color(fillColor, fillColor, fillColor).getRGB());
+            drawContext.drawText(textRenderer, string, x + 16, yOffset + 2, ColorManager.INSTANCE.defaultTextColor(), false);
             drawContext.fill(x2 - 26, yOffset, x2 - 16, yOffset + 10, 0xFFFFFFFF);
             drawContext.fill(x2 - 25, yOffset + 1, x2 - 17, yOffset + 9, 0xFF222222);
             drawContext.fill(x2 - 24, yOffset + 2, x2 - 18, yOffset + 8, value(string) ? 0xFF55FFFF : 0xFF222222);
@@ -101,34 +100,20 @@ public class ListSettingScreen extends Screen {
         backButton.mouseClicked((int) mouseX, (int) mouseY);
         int yOffset = y + 55;
         for (String string: listSetting.options) {
-            if (mouseX >= x && mouseX <= x2 && mouseY >= yOffset && mouseY <= yOffset + 25) {
+            int hitboxY = yOffset - 25 / 2 + 10 / 2;
+            if (mouseX >= x && mouseX <= x2 && mouseY >= hitboxY && mouseY <= hitboxY + 25) {
                 toggleValue(string);
             }
             yOffset += 25;
         }
         return false;
     }
-
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             MinecraftClient.getInstance().setScreen(parentScreen);
         }
         return false;
-    }
-
-    @Override
-    public void mouseMoved(double mouseX, double mouseY) {
-        int yOffset = y + 55;
-        for (String string: listSetting.options) {
-            if (mouseX >= x && mouseX <= x2 && mouseY >= yOffset && mouseY <= yOffset + 25) {
-                hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 40);
-            } else {
-                hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
-            }
-            yOffset += 25;
-        }
-        super.mouseMoved(mouseX, mouseY);
     }
 
     @Override

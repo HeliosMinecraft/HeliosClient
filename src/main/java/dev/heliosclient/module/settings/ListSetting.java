@@ -25,7 +25,6 @@ public class ListSetting extends Setting {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-
         drawContext.drawText(textRenderer, name, x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
     }
 
