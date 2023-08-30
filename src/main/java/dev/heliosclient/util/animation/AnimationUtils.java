@@ -59,15 +59,14 @@ public class AnimationUtils {
 
     public void drawFadingAndPoppingBox(DrawContext context, int x, int y, int width, int height, int color, boolean RoundedBox, int radius) {
         if (fading) {
-            float t = alpha;
-            alpha = Easing.ease(easingType, t);
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
                 fading = false;
                 alpha = Math.max(0.0f, Math.min(1.0f, alpha));
             }
         }
-        int a = (int) (alpha * 255);
+        float t = Easing.ease(easingType,alpha);
+        int a = (int) (t * 255);
         int newColor = ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
         float scale = Easing.ease(easingType, alpha);
         context.getMatrices().push();
@@ -82,15 +81,15 @@ public class AnimationUtils {
 
     public void drawFadingAndPoppingText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int color, boolean shadow) {
         if (fading) {
-            float t = alpha;
-            alpha = Easing.ease(easingType, t);
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
                 fading = false;
                 alpha = Math.max(0.0f, Math.min(1.0f, alpha));
             }
         }
-        int a = (int) (alpha * 255);
+        float t = Easing.ease(easingType,alpha);
+        int a = (int) (t * 255);
+
         if(a>=255)
         {
             a=254; // 255 makes alpha of text to 0 for some reason

@@ -20,15 +20,14 @@ public abstract class KeyboardMixin {
 
 	@Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
+        if (key == GLFW.GLFW_KEY_RIGHT_SHIFT && !(HeliosClient.MC.currentScreen instanceof ChatScreen)) {
+            ClickGUIScreen.INSTANCE.onLoad();
+            MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
+        }
         KeyPressedEvent event = new KeyPressedEvent(window, key, scancode, action, modifiers);
         EventManager.postEvent(event);
         if (event.isCanceled()){
             info.cancel();
-        }
-
-        if (key == GLFW.GLFW_KEY_RIGHT_SHIFT && !(HeliosClient.MC.currentScreen instanceof ChatScreen)) {
-            ClickGUIScreen.INSTANCE.onLoad();
-            MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
         }
     }
 }

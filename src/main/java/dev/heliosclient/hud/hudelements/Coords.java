@@ -21,14 +21,14 @@ public class Coords extends HudElement {
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         int coordX, coordY, coordZ;
-        if (mc.player != null) {
-            coordX = (int) MathUtils.round(mc.player.getX(), 0);
-            coordY = (int) MathUtils.round(mc.player.getY(), 0);
-            coordZ = (int) MathUtils.round(mc.player.getZ(), 0);
-        } else {
+        if (mc.player == null) {
             coordX = 0;
             coordY = 0;
             coordZ = 0;
+        } else {
+            coordX = (int) MathUtils.round(mc.player.getX(), 0);
+            coordY = (int) MathUtils.round(mc.player.getY(), 0);
+            coordZ = (int) MathUtils.round(mc.player.getZ(), 0);
         }
 
         String text = "X: " + ColorUtils.gray + coordX + ColorUtils.reset +

@@ -17,7 +17,7 @@ public class HudElementButton {
     int x, y;
 
     DrawContext drawContext;
-    int count = 0;
+    public int count = 0;
     public HudElement hudElement;
 
     public HudElementButton(HudElement hudElement) {
@@ -55,5 +55,25 @@ public class HudElementButton {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public HudElement getHudElement() {
+        return hudElement;
     }
 }
