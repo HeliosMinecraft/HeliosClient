@@ -2,18 +2,19 @@ package dev.heliosclient.module.modules;
 
 import dev.heliosclient.event.*;
 import dev.heliosclient.event.events.*;
-import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
+import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.Renderer3D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Test extends Module_ {
@@ -23,6 +24,8 @@ public class Test extends Module_ {
     BooleanSetting Triangle = new BooleanSetting("Triangle","",this,false);
 
     BooleanSetting PartiallyRounded = new BooleanSetting("NotRounded","",this,false);
+
+    ListSetting listSetting = new ListSetting("List", "This is a very cool list setting.", null, new ArrayList<String>(List.of("item", "item2", "item3", "item4", "item5", "item6", "item7", "item8")), new ArrayList<String>(List.of("")));
     BooleanSetting Arc = new BooleanSetting("Arc","",this,false);
     BooleanSetting TracerLine = new BooleanSetting("TracerLine","",this,false);
     BooleanSetting blockOutlineAndFIll = new BooleanSetting("blockOutlineAndFIll","",this,false);
@@ -38,6 +41,7 @@ public class Test extends Module_ {
         settings.add(TracerLine);
         settings.add(blockOutlineAndFIll);
         settings.add(PartiallyRounded);
+        settings.add(listSetting);
         quickSettings.add(rectangle);
         quickSettings.add(rounded);
         quickSettings.add(Circle);
