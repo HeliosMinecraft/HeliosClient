@@ -8,7 +8,7 @@ import java.util.concurrent.ForkJoinPool;
 public class FriendManager {
     // Declare a list of friends
     private static HashSet<Friend> friends = new HashSet<>();
-    private static HashSet<String> friendsname = new HashSet<>();
+    private static HashSet<String> friendsName = new HashSet<>();
 
     // Create a static method that returns true if the friend is in the set, false otherwise
     public static boolean isFriend(Friend friend) {
@@ -30,11 +30,11 @@ public class FriendManager {
     }
     public FriendManager(){
         for (Friend friend: friends){
-            friendsname.add(friend.getPlayerName());
+            friendsName.add(friend.getPlayerName());
         }
     }
 
     public HashSet<String> getFriendsName() {
-        return friendsname;
+        return friendsName;
     }
 }

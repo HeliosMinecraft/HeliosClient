@@ -13,7 +13,6 @@ public class KeyBind extends Setting {
     public int value;
     public boolean listening = false;
     Module_ module;
-    String description;
 
     public KeyBind(String name, String description, Module_ module, Integer value) {
         this.module = module;

@@ -101,5 +101,13 @@ public abstract class Module_ implements Listener {
         settings.add(active);
     }
 
-    public void onSettingChange(Setting setting) {}
+    public void onSettingChange(Setting setting) {
+        if (setting == active) {
+            if (active.value == true) {
+                onEnable();
+            } else {
+                onDisable();
+            }
+        }
+    }
 }

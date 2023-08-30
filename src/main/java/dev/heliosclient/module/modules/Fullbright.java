@@ -1,30 +1,38 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.EventManager;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
+import dev.heliosclient.module.settings.DoubleSetting;
+import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.util.ISimpleOption;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 
 public class Fullbright extends Module_ 
 {
-    ArrayList<String> mode = new ArrayList<>(2);
-    CycleSetting setting;
+    ArrayList<String> modes = new ArrayList<String>(List.of("Gamma", "Night Vision"));
+    CycleSetting mode = new CycleSetting("Mode","Fullbright mode to apply",this,modes,0);
+    DoubleSetting gamma = new DoubleSetting("Gamma", "Desired gamma value", this, 15, 0, 15, 0) {
+        @Override
+        public boolean shouldRender() {
+            return mode.value == 0;
+        }
+    };
     public Fullbright()
     {
         super("Fullbright", "Allows you to see in the dark.",  Category.RENDER);
-        mode.add("Gamma");
-        mode.add("Night Vision");
-        setting = new CycleSetting("Mode","Fullbright mode to apply",this,mode,0);
-        settings.add(setting);
-        quickSettings.add(setting);
+        EventManager.register(this);
+        settings.add(mode);
+        settings.add(gamma);
+        quickSettings.add(mode);
+        quickSettings.add(gamma);
     }
 
     @Override
@@ -32,16 +40,18 @@ public class Fullbright extends Module_
         super.onEnable();
     }
 
-    @SubscribeEvent
-    public void onTick(TickEvent event)
-    {
-        if(Objects.equals(mode.get(setting.value), mode.get(0))) {
-            ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(100.0);
-            mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
-        } else if(mc.player!=null && Objects.equals(mode.get(setting.value), mode.get(1))){
-            mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION,1000,254,true,false,false));
+    @Override
+    public void onSettingChange(Setting setting) {
+        super.onSettingChange(setting);
+        if (active.value) {
+            if (mode.value == 0) {
+                ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(gamma.value);
+                assert mc.player != null;
+                mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
+            } else if (mc.player != null && mode.value == 1) {
+                mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 254, true, false, false));
+            }
         }
-
     }
 
     @Override

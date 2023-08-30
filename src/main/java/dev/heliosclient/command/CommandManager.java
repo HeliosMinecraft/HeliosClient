@@ -11,6 +11,7 @@ import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import dev.heliosclient.command.commands.*;
+import dev.heliosclient.module.Module_;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
@@ -23,6 +24,8 @@ public class CommandManager
     private final List<Command> commands = new ArrayList<>();
     private final Map<Class<? extends Command>, Command> commandInstances = new HashMap<>();
 
+    public static String prefix = ".";
+
     private CommandManager() {
     	add(new VClip());
         add(new Help());
@@ -31,6 +34,7 @@ public class CommandManager
         add(new Bind());
         add(new Reset());
         add(new Friend());
+        add(new Prefix());
         commands.sort(Comparator.comparing(Command::getName));
     }
 
@@ -70,6 +74,15 @@ public class CommandManager
         commandInstances.put(command.getClass(), command);
     }
 
+    public Command getCommandByName(String commandName) {
+        for (Command command : commands) {
+            if ((command.getName().trim().equalsIgnoreCase(commandName))) {
+                return command;
+            }
+        }
+        return null;
+    }
+
     public int getCount() {
         return commands.size();
     }
@@ -84,6 +97,6 @@ public class CommandManager
     }
 
 	public String getPrefix() {
-		return ".";
+		return prefix;
 	}
 }
