@@ -6,8 +6,6 @@ import dev.heliosclient.event.events.ItemDropEvent;
 import dev.heliosclient.event.events.PlayerDamageEvent;
 import dev.heliosclient.event.events.PlayerDeathEvent;
 import dev.heliosclient.event.events.TickEvent;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -51,10 +49,10 @@ public abstract class MixinPlayerEntity {
             cir.setReturnValue(event.isCanceled());
         }
     }
-    @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "tick", at = @At(value = "TAIL"), cancellable = true)
     public void onTick(CallbackInfo ci)
     {
-        if(this !=null && HeliosClient.MC.player!=null) {
+        if(HeliosClient.MC.player!=null) {
             TickEvent event = new TickEvent.PLAYER(HeliosClient.MC.player);
             EventManager.postEvent(event);
             if (event.isCanceled()) {

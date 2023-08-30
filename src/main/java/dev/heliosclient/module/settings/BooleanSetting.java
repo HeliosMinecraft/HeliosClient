@@ -25,7 +25,7 @@ public class BooleanSetting extends Setting {
         this.heightCompact = 18;
         this.value = value;
         CheckBoxAnimation.FADE_SPEED=0.07f;
-        CheckBoxAnimation.startFading(true, EasingType.QUADRATIC_OUT);
+        CheckBoxAnimation.startFading(true, EasingType.QUADRATIC_IN_OUT);
     }
 
     @Override

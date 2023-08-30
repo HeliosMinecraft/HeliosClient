@@ -1,6 +1,5 @@
 package dev.heliosclient.command.commands;
 
-// Import the necessary packages
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.heliosclient.command.Command;
@@ -9,9 +8,8 @@ import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import net.minecraft.command.CommandSource;
 
-// Define the command class and extend the Command class
 public class Friend extends Command {
-    // Create a constructor that takes the command name, description, and aliases
+
     public Friend() {
         super("friend", "Adds or removes friend",  "f");
     }

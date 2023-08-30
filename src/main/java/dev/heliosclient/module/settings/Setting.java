@@ -57,6 +57,7 @@ public abstract class Setting
 	public void mouseReleased(double mouseX, double mouseY, int button) { }
 
     public void keyPressed(int keyCode, int scanCode, int modifiers) { }
+    public void keyReleased(int keyCode,int scanCode,int modifiers){}
 
     protected boolean hovered(int mouseX, int mouseY) {
         if (quickSettings) {

@@ -3,6 +3,7 @@ package dev.heliosclient.ui.clickgui;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.ClickGUI;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.StringSetting;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
@@ -92,6 +93,14 @@ public class SettingsScreen extends Screen {
     }
 
     @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        for (Setting setting : module.settings) {
+            setting.keyReleased(keyCode,scanCode,modifiers);
+        }
+        return super.keyReleased(keyCode, scanCode, modifiers);
+    }
+
+    @Override
     public boolean keyPressed(int keyCode,int scanCode,int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE){
             MinecraftClient.getInstance().setScreen(parentScreen);
@@ -100,6 +109,17 @@ public class SettingsScreen extends Screen {
             setting.keyPressed(keyCode,scanCode,modifiers);
         }
         return super.keyPressed(keyCode,scanCode,modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        for (Setting setting : module.settings) {
+            if (setting instanceof StringSetting stringSetting) {
+                stringSetting.charTyped(chr, modifiers);
+                return true;
+            }
+        }
+        return super.charTyped(chr, modifiers);
     }
 
     @Override
