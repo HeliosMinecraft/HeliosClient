@@ -81,7 +81,7 @@ public class HeliosClient implements ModInitializer
             pi.put(c.category.name, po);
 		}
         CONFIG.config.put("panes", pi);
-		config.put("prefix", CommandManager.get().getPrefix());
+		CONFIG.config.put("prefix", CommandManager.get().getPrefix());
 		CONFIG.save();
 	}
 }
