@@ -18,14 +18,16 @@ import net.minecraft.text.Text;
 
 public class CommandArgumentType implements ArgumentType<Command>
 {
-	private static final Collection<String> EXAMPLES = new ArrayList<Command>(CommandManager.get().getAll())
+    private static final CommandManager INSTANCE = CommandManager.get();
+
+	private static final Collection<String> EXAMPLES = new ArrayList<Command>(INSTANCE.getAll())
 			.stream()
             .limit(3)
-            .map(command -> command.getName())
+            .map(command -> INSTANCE.getPrefix() + command.getName())
             .collect(Collectors.toList());
 
-    private static final DynamicCommandExceptionType NO_SUCH_COMMAND = new DynamicCommandExceptionType(o ->
-            Text.literal("Command with name " + o + " doesn't exist."));
+    private static final DynamicCommandExceptionType NO_SUCH_COMMAND = new DynamicCommandExceptionType(name ->
+            Text.literal("Command with name " + name + " doesn't exist."));
 
     public static CommandArgumentType command() 
     {
@@ -40,8 +42,8 @@ public class CommandArgumentType implements ArgumentType<Command>
     @Override
     public Command parse(StringReader reader) throws CommandSyntaxException 
     {
-        String argument = reader.readString();
-        Command command = CommandManager.get().getCommandByName(argument);
+        String argument = reader.readString().substring(INSTANCE.getPrefix().length());
+        Command command = INSTANCE.getCommandByName(argument);
 
         if (command == null) throw NO_SUCH_COMMAND.create(argument);
 
@@ -51,7 +53,7 @@ public class CommandArgumentType implements ArgumentType<Command>
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) 
     {
-        return CommandSource.suggestMatching(CommandManager.get().getAll().stream().map(command -> command.getName()), builder);
+        return CommandSource.suggestMatching(INSTANCE.getAll().stream().map(command -> INSTANCE.getPrefix() + command.getName()), builder);
     }
 
     @Override
