@@ -106,6 +106,14 @@ public class HudElement {
             y = Math.max(Math.min(drawContext.getScaledWindowHeight()- distanceY, drawContext.getScaledWindowHeight()-height), 0);
         }
 
+        if (posX == 0) {
+            x = Math.max(Math.min(distanceX, drawContext.getScaledWindowWidth()-width/2), width/2);
+        } else if (posX == 1) {
+            x = Math.max(Math.min(drawContext.getScaledWindowWidth()/2- distanceX, drawContext.getScaledWindowWidth()-width/2), width/2);
+        } else {
+            x = Math.max(Math.min(drawContext.getScaledWindowWidth()- distanceX, drawContext.getScaledWindowWidth()-width/2), width/2);
+        }
+
         renderElement(drawContext, textRenderer);
     }
 
