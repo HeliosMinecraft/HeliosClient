@@ -1,13 +1,7 @@
 package dev.heliosclient.hud;
 
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.module.Category;
-import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
-import dev.heliosclient.ui.clickgui.hudeditor.HudElementButton;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-
-import java.util.ArrayList;
 
 public class HudElement {
     public String name;
@@ -18,8 +12,10 @@ public class HudElement {
     public int y = 90;
     public boolean dragging;
     int startX, startY;
-    public double scaledX;
-    public int offsetX;
+    public int posY = 0;
+    public int posX = 0;
+    public int distanceY = 90;
+    public int distanceX = 90;
 
     public boolean selected = false;
 
@@ -32,60 +28,88 @@ public class HudElement {
         if (dragging) {
             x = mouseX - startX;
             y = mouseY - startY;
-            scaledX = Math.min(Math.max((double) x /drawContext.getScaledWindowWidth(), 0f), 1f);
 
-            if (scaledX < 0.33333) {
-                offsetX = 0;
-            } else if (scaledX >= 0.33333 && scaledX <= 0.66666) {
-                offsetX = width/2;
-            } else if (scaledX > 0.66666) {
-                offsetX = width;
+            if (drawContext.getScaledWindowHeight()/3 > y) {
+                posY = 0;
+            } else if ((drawContext.getScaledWindowHeight()/3)*2 > y) {
+                posY = 1;
+            } else {
+                posY = 2;
             }
+
+            if (drawContext.getScaledWindowWidth()/3 > x) {
+                posX = 0;
+            } else if ((drawContext.getScaledWindowWidth()/3)*2 > x) {
+                posX = 1;
+            } else {
+                posX = 2;
+            }
+
+            if (posX ==0)
+            {
+                distanceX = Math.max(x, 0);
+            }
+            else if (posX == 1)
+            {
+                distanceX = drawContext.getScaledWindowWidth()/2-x;
+            }
+            else {
+                distanceX = Math.max(drawContext.getScaledWindowWidth()-x, this.width/2);
+            }
+
+            if (posY ==0)
+            {
+                distanceY = Math.max(y, 0);
+            }
+            else if (posY == 1)
+            {
+                distanceY = drawContext.getScaledWindowHeight()/2-y;
+            }
+            else {
+                distanceY = Math.max(drawContext.getScaledWindowHeight()-y, this.height/2);
+            }
+
         }
-        x= (int) (drawContext.getScaledWindowWidth()*scaledX);
+        if (posX == 0) {
+            x = Math.max(Math.min(distanceX, drawContext.getScaledWindowWidth()-width/2), width/2);
+        } else if (posX == 1) {
+            x = Math.max(Math.min(drawContext.getScaledWindowWidth()/2- distanceX, drawContext.getScaledWindowWidth()-width/2), width/2);
+        } else {
+            x = Math.max(Math.min(drawContext.getScaledWindowWidth()- distanceX, drawContext.getScaledWindowWidth()-width/2), width/2);
+        }
+
+        if (posY == 0) {
+            y = Math.max(Math.min(distanceY, drawContext.getScaledWindowHeight()-height/2), height/2);
+        } else if (posY == 1) {
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight()/2- distanceY, drawContext.getScaledWindowHeight()-height/2), height/2);
+        } else {
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight()- distanceY, drawContext.getScaledWindowHeight()-height/2), height/2);
+        }
 
         if (this.selected) {
-            drawContext.fill(x-1, y-1, x, y+height+1, 0xFFFFFFFF);
-            drawContext.fill(x-1, y-1, x+width+1, y, 0xFFFFFFFF);
-            drawContext.fill(x+width, y-1, x+width+1, y+height+1, 0xFFFFFFFF);
-            drawContext.fill(x-1, y+height, x+width+1, y+height+1, 0xFFFFFFFF);
+            drawContext.fill(x-1 - width/2, y-1 - height/2, x- width/2, y+height/2+1, 0xFFFFFFFF);
+            drawContext.fill(x-1 - width/2, y-1 -height/2, x+width+1- width/2 , y-height/2, 0xFFFFFFFF);
+            drawContext.fill(x+width - width/2, y-1 - height/2, x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
+            drawContext.fill(x-1 - width/2, y+height/2 , x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
         }
 
-        if (scaledX < 0.33333) {
-            offsetX = 0;
-            renderLeft(drawContext, textRenderer);
-        } else if (scaledX >= 0.33333 && scaledX <= 0.66666) {
-            offsetX = width/2;
-            renderCenter(drawContext, textRenderer);
-        } else if (scaledX > 0.66666) {
-            offsetX = width;
-            renderRight(drawContext, textRenderer);
-        }
-
+        renderElement(drawContext, textRenderer);
     }
 
     public void render(DrawContext drawContext, TextRenderer textRenderer) {
-        x= (int) (drawContext.getScaledWindowWidth()*scaledX);
 
-        if (scaledX < 0.33333) {
-            renderLeft(drawContext, textRenderer);
-        } else if (scaledX >= 0.33333 && scaledX <= 0.66666) {
-            renderCenter(drawContext, textRenderer);
-        } else if (scaledX > 0.66666) {
-            renderRight(drawContext, textRenderer);
+        if (posY == 0) {
+            y = Math.max(Math.min(distanceY, drawContext.getScaledWindowHeight()-height), 0);
+        } else if (posY == 1) {
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight()/2- distanceY, drawContext.getScaledWindowHeight()-height), 0);
+        } else {
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight()- distanceY, drawContext.getScaledWindowHeight()-height), 0);
         }
+
+        renderElement(drawContext, textRenderer);
     }
 
-    public void renderLeft(DrawContext drawContext, TextRenderer textRenderer) {
-
-    }
-
-    public void renderCenter(DrawContext drawContext, TextRenderer textRenderer) {
-
-    }
-    public void renderRight(DrawContext drawContext, TextRenderer textRenderer) {
-
-    }
+    public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {}
 
     public void onLoad() {}
     public void onSettingChange() {}
@@ -99,7 +123,7 @@ public class HudElement {
     }
 
     public boolean hovered(double mouseX, double mouseY) {
-        return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height;
+        return mouseX > x - (double) width /2 && mouseX < x + (double) width /2 && mouseY > y - (double) height /2 && mouseY < y + (double) height /2;
     }
 
     public void mouseReleased(double mouseX, double mouseY, int button) {

@@ -19,7 +19,7 @@ public class Coords extends HudElement {
     }
 
     @Override
-    public void renderLeft(DrawContext drawContext, TextRenderer textRenderer) {
+    public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         if (mc.player == null) return;
         String text = "X: " + ColorUtils.gray + MathUtils.round(mc.player.getX(), 1) + ColorUtils.reset +
                 " Y: " + ColorUtils.gray + MathUtils.round(mc.player.getY(), 1) + ColorUtils.reset +
@@ -27,30 +27,7 @@ public class Coords extends HudElement {
 
         this.width = textRenderer.getWidth(text);
 
-        drawContext.drawText(textRenderer, text, this.x, this.y+3, HeliosClient.uiColorA, false);
+        drawContext.drawText(textRenderer, text, this.x-width/2, this.y+height/2-10, HeliosClient.uiColorA, false);
     }
 
-    @Override
-    public void renderCenter(DrawContext drawContext, TextRenderer textRenderer) {
-        if (mc.player == null) return;
-        String text = "X: " + ColorUtils.gray + MathUtils.round(mc.player.getX(), 1) + ColorUtils.reset +
-                " Y: " + ColorUtils.gray + MathUtils.round(mc.player.getY(), 1) + ColorUtils.reset +
-                " Z: " + ColorUtils.gray + MathUtils.round(mc.player.getZ(), 1);
-
-        this.width = textRenderer.getWidth(text);
-
-        drawContext.drawText(textRenderer, text, this.x-width/2, this.y+3, HeliosClient.uiColorA, false);
-    }
-
-    @Override
-    public void renderRight(DrawContext drawContext, TextRenderer textRenderer) {
-        if (mc.player == null) return;
-        String text = "X: " + ColorUtils.gray + MathUtils.round(mc.player.getX(), 1) + ColorUtils.reset +
-                " Y: " + ColorUtils.gray + MathUtils.round(mc.player.getY(), 1) + ColorUtils.reset +
-                " Z: " + ColorUtils.gray + MathUtils.round(mc.player.getZ(), 1);
-
-        this.width = textRenderer.getWidth(text);
-
-        drawContext.drawText(textRenderer, text, this.x-width, this.y+3, HeliosClient.uiColorA, false);
-    }
 }

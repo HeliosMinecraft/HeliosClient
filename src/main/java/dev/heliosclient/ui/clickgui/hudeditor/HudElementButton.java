@@ -16,6 +16,7 @@ import java.util.ArrayList;
 public class HudElementButton {
     int x, y;
 
+    DrawContext drawContext;
     int count = 0;
     public HudElement hudElement;
 
@@ -24,6 +25,7 @@ public class HudElementButton {
     }
 
     public void render(DrawContext drawContext, TextRenderer textRenderer, int x, int y, float delta) {
+        this.drawContext=drawContext;
         this.x = x;
         this.y = y;
         Renderer2D.drawRectangle(drawContext, x, y, 96, 14, 0xFF222222);
@@ -42,10 +44,14 @@ public class HudElementButton {
         return mouseX > x && mouseX < x + 96 && mouseY > y && mouseY < y + 14;
     }
 
-    public static <T extends HudElement> void addInstanceToList(Class<? extends T> clazz) {
+    public <T extends HudElement> void addInstanceToList(Class<? extends T> clazz) {
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
             HudManager.INSTANCE.hudElements.add(instance);
+            HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size()-1).posX = 1;
+            HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size()-1).posY = 1;
+            HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size()-1).distanceX = 0;
+            HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size()-1).distanceY = 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
