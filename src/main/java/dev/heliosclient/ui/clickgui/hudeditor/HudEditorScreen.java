@@ -45,7 +45,6 @@ public class HudEditorScreen extends Screen implements Listener {
         if (button == 0) {
         int lastHoveredIndex = -1;
         for (int i = HudManager.INSTANCE.hudElements.size()  - 1; i >= 0; i--) {
-            System.out.println(HudManager.INSTANCE.hudElements.get(i).hovered(mouseX, mouseY));
             if (HudManager.INSTANCE.hudElements.get(i).hovered(mouseX, mouseY)) {
                 HudManager.INSTANCE.hudElements.get(i).selected = true;
                 lastHoveredIndex = i;
