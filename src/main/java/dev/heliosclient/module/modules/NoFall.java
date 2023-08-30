@@ -34,9 +34,9 @@ public class NoFall extends Module_
         assert mc.player != null;
         if(mc.player.fallDistance >= fallHeight.value && !mc.player.isCreative()) {
             if (mode.value == 0) { 
-            mc.player.networkHandler.sendPacket(
-                    new PlayerMoveC2SPacket.OnGroundOnly(true)
-            );
+                mc.player.networkHandler.sendPacket(
+                        new PlayerMoveC2SPacket.OnGroundOnly(true)
+                );
             } else if (mode.value == 1) {
                 int distance = 0;
                 int y = (int) mc.player.getY();
@@ -48,8 +48,8 @@ public class NoFall extends Module_
                     distance++;
                 }
                 if (distance <= 2) {
-                assert mc.world != null;
-                mc.world.disconnect();
+                    assert mc.world != null;
+                    mc.world.disconnect();
                 }
             }
         }

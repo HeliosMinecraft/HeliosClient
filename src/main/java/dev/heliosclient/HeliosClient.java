@@ -1,5 +1,6 @@
 package dev.heliosclient;
 
+import dev.heliosclient.command.CommandManager;
 import dev.heliosclient.module.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.system.Config;
@@ -40,7 +41,7 @@ public class HeliosClient implements ModInitializer
 	public void loadConfig()
 	{
 		LOGGER.info("Loading config...");
-		if (CONFIG.doesConfigExist())
+		if (!CONFIG.doesConfigExist())
 		{
 			CONFIG.loadDefaultConfig(); 
 			CONFIG.save();
@@ -48,11 +49,12 @@ public class HeliosClient implements ModInitializer
 		CONFIG.load();
 		for (Module_ m : ModuleManager.INSTANCE.modules)
 		{
-			for (Setting s : m.settings)
-			{
-				s.value = ((Map<String, Object>)((Map<String, Object>)CONFIG.config.get("modules")).get(m.name)).get(s.name);
+			for (Setting s : m.settings) {
+				s.value = ((Map<String, Object>) ((Map<String, Object>) CONFIG.config.get("modules")).get(m.name))
+						.get(s.name);
 			}
 		}
+		CommandManager.prefix = (String) CONFIG.config.get("prefix");
 	}
 
 	public void saveConfig()
@@ -79,6 +81,7 @@ public class HeliosClient implements ModInitializer
             pi.put(c.category.name, po);
 		}
         CONFIG.config.put("panes", pi);
+		config.put("prefix", CommandManager.get().getPrefix());
 		CONFIG.save();
 	}
 }

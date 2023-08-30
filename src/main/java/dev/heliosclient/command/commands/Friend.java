@@ -27,15 +27,15 @@ public class Friend extends Command {
                                     String name = StringArgumentType.getString(context, "name");
 
                                         // Create a new friend object with the name
-                                        dev.heliosclient.system.Friend friend = new  dev.heliosclient.system.Friend(name);
+                                    dev.heliosclient.system.Friend friend = new dev.heliosclient.system.Friend(name);
                                             // Add the friend to the list
                                     if (FriendManager.isFriend(friend)) {
-                                        ChatUtils.sendHeliosMsg(ColorUtils.red+ "You are already friends with " + name);
+                                        ChatUtils.sendHeliosMsg(ColorUtils.red + "You are already friends with " + name);
                                     } else {
                                         FriendManager.addFriend(friend);
 
                                         // Send a feedback message that the friend is added
-                                        ChatUtils.sendHeliosMsg(ColorUtils.green +"You are now friends with " + name);
+                                        ChatUtils.sendHeliosMsg(ColorUtils.green + "You are now friends with " + name);
                                     }
 
                                     return SINGLE_SUCCESS;
@@ -52,11 +52,11 @@ public class Friend extends Command {
 
                                     if (FriendManager.isFriend(friend)) {
                                         // Send an error message that the friend is not in the list
-                                        ChatUtils.sendHeliosMsg(ColorUtils.red+"You are not friends with " + name);
+                                        ChatUtils.sendHeliosMsg(ColorUtils.red + "You are not friends with " + name);
                                     } else {
                                         // Remove the friend from the list
                                         FriendManager.removeFriend(friend);
-                                        ChatUtils.sendHeliosMsg(ColorUtils.green +"You are no longer friends with " + name);
+                                        ChatUtils.sendHeliosMsg(ColorUtils.green + "You are no longer friends with " + name);
 
                                     }
 
@@ -67,7 +67,7 @@ public class Friend extends Command {
                 .then(literal("list")
                         .executes(context -> {
                             FriendManager friendManager = new FriendManager();
-                             ChatUtils.sendHeliosMsg("You are friends with " +ColorUtils.green + friendManager.getFriendsName());
+                            ChatUtils.sendHeliosMsg("You are friends with " + ColorUtils.green + friendManager.getFriendsName());
                             return SINGLE_SUCCESS;
                         })
                 );

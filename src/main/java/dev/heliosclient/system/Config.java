@@ -30,23 +30,23 @@ public class Config
 
     public boolean doesConfigExist()
     {
-        return !Files.exists(configFile.toPath());
+        return Files.exists(configFile.toPath());
     }
 
     public void loadDefaultConfig()
     {
         ModuleManager.INSTANCE = new ModuleManager();
-        Map<String, Object> mi = new HashMap<>();
-        for (Module_ m : ModuleManager.INSTANCE.modules)
+        Map<String, Object> moduleConfig = new HashMap<>();
+        for (Module_ module : ModuleManager.INSTANCE.modules)
 		{
-			Map<String, Object> mo = new HashMap<>();
-			for (Setting s : m.settings)
+			Map<String, Object> singleModuleConfig = new HashMap<>();
+			for (Setting setting : module.settings)
 			{
-                mo.put(s.name, s.value);
+                singleModuleConfig.put(setting.name, setting.value);
 			}
-            mi.put(m.name, mo);
+            moduleConfig.put(module.name, singleModuleConfig);
 		}
-        config.put("modules", mi);
+        config.put("modules", moduleConfig);
         int xOffset = 4;
 		int yOffset = 4;
         Map<String, Object> pi = new HashMap<>();
@@ -65,6 +65,7 @@ public class Config
 			xOffset += 100;
 		}
         config.put("panes", pi);
+        config.put("prefix", ".");
         ClickGUIScreen.INSTANCE = new ClickGUIScreen();
     }
 

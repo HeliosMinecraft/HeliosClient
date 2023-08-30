@@ -24,6 +24,8 @@ public class CommandManager
     private final List<Command> commands = new ArrayList<>();
     private final Map<Class<? extends Command>, Command> commandInstances = new HashMap<>();
 
+    public static String prefix = ".";
+
     private CommandManager() {
     	add(new VClip());
         add(new Help());
@@ -32,6 +34,7 @@ public class CommandManager
         add(new Bind());
         add(new Reset());
         add(new Friend());
+        add(new Prefix());
         commands.sort(Comparator.comparing(Command::getName));
     }
 
@@ -94,6 +97,6 @@ public class CommandManager
     }
 
 	public String getPrefix() {
-		return ".";
+		return prefix;
 	}
 }

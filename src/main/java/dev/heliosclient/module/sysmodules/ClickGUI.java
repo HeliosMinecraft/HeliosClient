@@ -29,8 +29,8 @@ public class ClickGUI extends Module_ {
     CycleSetting TooltipPos = new CycleSetting("Tooltip position", "Position of fixed tooltip.", this, new ArrayList<>(List.of("Top-left", "Top-right", "Bottom-left", "Bottom-right", "Center")), 3) {
         @Override
         public boolean shouldRender() {
-             return TooltipMode.value == 1;
-         }
+            return TooltipMode.value == 1;
+        }
     };
 
     public static boolean pause = false;
