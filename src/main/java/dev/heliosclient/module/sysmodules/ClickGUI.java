@@ -59,6 +59,7 @@ public class ClickGUI extends Module_ {
 
     @Override
     public void onSettingChange(Setting setting) {
+        super.onSettingChange(setting);
         Tooltip.tooltip.mode = TooltipMode.value;
         Tooltip.tooltip.fixedPos = TooltipPos.value;
 
