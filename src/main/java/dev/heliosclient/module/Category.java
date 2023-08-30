@@ -9,7 +9,8 @@ public enum Category
 	RENDER("Render"),
 	WORLD("World"),
 	PLAYER("Player"),
-	CHAT("Chat");
+	CHAT("Chat"),
+	MISC("Misc");
 	
 	public String name;
 	
