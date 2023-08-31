@@ -131,6 +131,7 @@ public class InputBox {
                 selectionStart = cursorPosition;
                 selectionEnd = cursorPosition;
                 setText("");
+                selectedAll=false;
             }
             if (Screen.isCopy(keyCode)) {
                 selectedAll = false;

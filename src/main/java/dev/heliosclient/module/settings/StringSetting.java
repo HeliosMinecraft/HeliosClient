@@ -1,15 +1,16 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.KeyPressedEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
-import java.awt.*;
-
-public class StringSetting extends Setting {
+public class StringSetting extends Setting implements Listener {
     public String value;
     String description;
     private InputBox inputBox;
@@ -22,6 +23,7 @@ public class StringSetting extends Setting {
         this.height = 38;
         this.characterLimit=characterLimit;
         inputBox = new InputBox(180,13,value,characterLimit);
+        EventManager.register(this);
     }
 
 
@@ -33,16 +35,14 @@ public class StringSetting extends Setting {
     }
 
 
-    @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
-        super.keyPressed(keyCode, scanCode, modifiers);
-        inputBox.keyPressed(keyCode, scanCode,modifiers);
+    @SubscribeEvent
+    public void keyPressed(KeyPressedEvent keyPressedEvent) {
+        inputBox.keyPressed(keyPressedEvent.getKey(), keyPressedEvent.getScancode(),keyPressedEvent.getModifiers());
     }
 
     @Override
-    public void keyReleased(int keyCode, int scanCode, int modifiers) {
-        super.keyReleased(keyCode, scanCode, modifiers);
-        inputBox.keyReleased(keyCode,scanCode,modifiers);
+    public void keyReleased(int keyCode,int Scancode, int modifiers) {
+        inputBox.keyReleased(keyCode,Scancode,modifiers);
     }
 
     public void charTyped(char chr, int modifiers) {

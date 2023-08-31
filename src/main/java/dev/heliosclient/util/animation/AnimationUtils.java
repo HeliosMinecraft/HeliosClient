@@ -70,7 +70,7 @@ public class AnimationUtils {
         int newColor = ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
         float scale = Easing.ease(easingType, alpha);
         context.getMatrices().push();
-        context.getMatrices().translate(x + width / 2f, y + height / 2f,300);
+        context.getMatrices().translate(x + width / 2f, y + height / 2f,0);
         context.getMatrices().scale(scale, scale,0);
         if (!RoundedBox)
             Renderer2D.drawRectangle(context, (int) (-width / 2f), (int) (-height / 2f), width, height, newColor);
@@ -98,7 +98,7 @@ public class AnimationUtils {
         int newColor = ColorUtils.changeAlpha(nColor, a).getRGB();
         float scale = Easing.ease(easingType,alpha);
         context.getMatrices().push();
-        context.getMatrices().translate(x,y,301);
+        context.getMatrices().translate(x,y,0);
         context.getMatrices().scale(scale,scale,0);
         context.drawText(textRenderer,text,-textRenderer.getWidth(text)/2,-textRenderer.fontHeight/2,newColor,shadow);
         context.getMatrices().pop();
