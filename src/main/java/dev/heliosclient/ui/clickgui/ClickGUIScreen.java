@@ -3,6 +3,8 @@ package dev.heliosclient.ui.clickgui;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.modules.ClickGUI;
+import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.StringSetting;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.MathUtils;
 import net.minecraft.client.gui.DrawContext;
@@ -14,10 +16,9 @@ import java.util.Map;
 
 public class ClickGUIScreen extends Screen {
     public static ClickGUIScreen INSTANCE = new ClickGUIScreen();
-    public ArrayList<CategoryPane> categoryPanes;
-
     static int scrollX = 0;
     static int scrollY = 0;
+    public ArrayList<CategoryPane> categoryPanes;
 
     public ClickGUIScreen() {
         super(Text.literal("ClickGUI"));
@@ -29,7 +30,7 @@ public class ClickGUIScreen extends Screen {
             int xOffset = MathUtils.d2iSafe(((Map<String, Object>) panePos.get(category.name)).get("x"));
             int yOffset = MathUtils.d2iSafe(((Map<String, Object>) panePos.get(category.name)).get("y"));
             boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
-            categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed,this));
+            categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
         }
     }
 

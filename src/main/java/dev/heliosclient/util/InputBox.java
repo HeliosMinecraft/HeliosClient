@@ -1,5 +1,9 @@
 package dev.heliosclient.util;
 
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.KeyPressedEvent;
+import dev.heliosclient.event.listener.Listener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -12,7 +16,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InputBox {
+public class InputBox  implements Listener {
     public int x, y, width, height;
     private String value;
     private List<String> textSegments;
@@ -31,7 +35,7 @@ public class InputBox {
         this.value = value;
         this.characterLimit = characterLimit;
         this.textSegments = new ArrayList<>();
-        setText(value);
+        EventManager.register(this);
     }
 
     public void setText(String text) {
@@ -50,8 +54,13 @@ public class InputBox {
         }
     }
 
+    public void mouseClicked(double mouseX, double mouseY, int button) {
+        focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y + 10 + MinecraftClient.getInstance().textRenderer.fontHeight) && mouseY <= (y + 12 + MinecraftClient.getInstance().textRenderer.fontHeight + height) );
+        cursorPosition = value.length();
+    }
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         setText(value);
+
         this.x = x;
         this.y = y;
         Renderer2D.drawOutlineBox(drawContext, x + 1, y + 10 + textRenderer.fontHeight, width+2, height+2, 1, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
@@ -59,7 +68,7 @@ public class InputBox {
 
         if (focused) {
             scrollOffset = Math.max(0, Math.min(scrollOffset, value.length()));
-            cursorPosition = Math.max(0, Math.min(cursorPosition, value.length()));
+            cursorPosition = Math.max(0,Math.min(cursorPosition,value.length()));
 
             // Find the segment that contains the cursor
             int segmentIndex = 0;
@@ -105,18 +114,18 @@ public class InputBox {
         // Draw selection box
         if (focused && selecting && selectionStart != selectionEnd) {
             int startX = x + 4 + textRenderer.getWidth(value.substring(0, Math.min(selectionStart,value.length())));
-            int endX = x + 5 + textRenderer.getWidth(value.substring(0, Math.min(selectionEnd,value.length())));
+            int endX = x + 4 + textRenderer.getWidth(value.substring(0, Math.min(selectionEnd,value.length())));
             if (endX > x + width) {
                 endX = x + width;
             }
-            Renderer2D.drawRectangle(drawContext,startX,y + height/3 +  9 + textRenderer.fontHeight,endX-startX,textRenderer.fontHeight,new Color(0,0,255,64).getRGB());
+            Renderer2D.drawRectangle(drawContext,startX,y + height/3 +  9 + textRenderer.fontHeight,endX-startX + 1,textRenderer.fontHeight,new Color(0, 166,255,64).getRGB());
         }
     }
 
 
 
 
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    public void keyPressed(int keyCode,int scanCode, int modifier) {
         if (focused && canWrite()) {
             if (Screen.isSelectAll(keyCode)) {
                 selecting = true;
@@ -124,23 +133,24 @@ public class InputBox {
                 selectionStart = 0;
                 setCursorPos(value.length());
                 selectionEnd = cursorPosition;
-            } else {
-                selectedAll = false;
             }
-            if (selectedAll && GLFW.GLFW_KEY_DELETE == keyCode || GLFW.GLFW_KEY_BACKSPACE==keyCode){
+            if (selectedAll && (GLFW.GLFW_KEY_DELETE == keyCode || GLFW.GLFW_KEY_BACKSPACE==keyCode)){
                 selectionStart = cursorPosition;
                 selectionEnd = cursorPosition;
                 setText("");
                 selectedAll=false;
+                selecting=false;
             }
             if (Screen.isCopy(keyCode)) {
                 selectedAll = false;
+                selecting=false;
                 //selectionStart = cursorPosition;
                 selectionEnd = cursorPosition;
                 MinecraftClient.getInstance().keyboard.setClipboard(this.getTextToCopy());
             }
             if (Screen.isPaste(keyCode)) {
                 selectedAll = false;
+                selecting=false;
                 selectionStart = cursorPosition;
                 selectionEnd = cursorPosition;
                 paste();
@@ -153,6 +163,7 @@ public class InputBox {
                 setText("");
             }
             if (!selecting) {
+                selectedAll = false;
                 selectionStart = cursorPosition;
                 selectionEnd = cursorPosition;
             }
@@ -241,10 +252,6 @@ public class InputBox {
 
     public boolean canWrite() {
         return true; // You can modify this method to add conditions for when the user can write to the input box
-    }
-
-    public void mouseClicked(double mouseX, double mouseY, int button) {
-        focused = (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height);
     }
 
     public String getTextToCopy() {

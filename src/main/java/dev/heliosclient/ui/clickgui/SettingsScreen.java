@@ -3,6 +3,7 @@ package dev.heliosclient.ui.clickgui;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.ClickGUI;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.StringListSetting;
 import dev.heliosclient.module.settings.StringSetting;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.Renderer2D;
@@ -114,9 +115,11 @@ public class SettingsScreen extends Screen {
     @Override
     public boolean charTyped(char chr, int modifiers) {
         for (Setting setting : module.settings) {
+            if (setting instanceof StringListSetting stringListSetting){
+                stringListSetting.charTyped(chr,modifiers);
+            }
             if (setting instanceof StringSetting stringSetting) {
                 stringSetting.charTyped(chr, modifiers);
-                return true;
             }
         }
         return super.charTyped(chr, modifiers);
