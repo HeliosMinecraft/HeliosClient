@@ -19,6 +19,8 @@ public class HudElement {
     public int distanceX = 90;
 
     public boolean selected = false;
+    public boolean draggable = true;
+    public boolean renderOutLineBox = true;
 
     public HudElement(String name, String description) {
         this.name = name;
@@ -87,7 +89,7 @@ public class HudElement {
             y = Math.max(Math.min(drawContext.getScaledWindowHeight()- distanceY, drawContext.getScaledWindowHeight()-height/2), height/2);
         }
 
-        if (this.selected) {
+        if (this.selected && renderOutLineBox) {
             if (dragging) {
             if (distanceX == 0 && posX == 1) {
                 Renderer2D.drawRectangle(drawContext, drawContext.getScaledWindowWidth()/2-1, 0, 2, drawContext.getScaledWindowHeight(), 0xFFFF0000);
@@ -97,10 +99,12 @@ public class HudElement {
             }
             }
 
-            drawContext.fill(x-1 - width/2, y-1 - height/2, x- width/2, y+height/2+1, 0xFFFFFFFF);
-            drawContext.fill(x-1 - width/2, y-1 -height/2, x+width+1- width/2 , y-height/2, 0xFFFFFFFF);
-            drawContext.fill(x+width - width/2, y-1 - height/2, x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
-            drawContext.fill(x-1 - width/2, y+height/2 , x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
+            Renderer2D.drawOutlineBox(drawContext,x-1 - width/2,y-1 - height/2,width + 2,height,1,0xFFFFFFFF);
+
+           // drawContext.fill(x-1 - width/2, y-1 - height/2, x- width/2, y+height/2+1, 0xFFFFFFFF);
+            //drawContext.fill(x-1 - width/2, y-1 -height/2, x+width+1- width/2 , y-height/2, 0xFFFFFFFF);
+             //drawContext.fill(x+width - width/2, y-1 - height/2, x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
+               //drawContext.fill(x-1 - width/2, y+height/2 , x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
         }
 
         renderElement(drawContext, textRenderer);
@@ -133,7 +137,7 @@ public class HudElement {
     public void onSettingChange() {}
 
     public void  mouseClicked(double mouseX, double mouseY, int button) {
-        if (selected && button == 0) {
+        if (selected && button == 0 && draggable) {
             startX = (int) (mouseX - x);
             startY = (int) (mouseY - y);
             dragging = true;

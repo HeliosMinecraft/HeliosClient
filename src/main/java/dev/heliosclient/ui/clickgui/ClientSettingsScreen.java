@@ -1,11 +1,13 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.modules.ClickGUI;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.animation.Easing;
+import dev.heliosclient.util.animation.EasingType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -95,6 +97,6 @@ public class ClientSettingsScreen extends Screen {
     }
 
     public static void onScroll(double horizontal,double vertical) {
-        offsetY += vertical*7;
+        offsetY += vertical*(Easing.ease(EasingType.QUADRATIC_IN, (float) ClickGUI.ScrollSpeed.value));
     }
 }

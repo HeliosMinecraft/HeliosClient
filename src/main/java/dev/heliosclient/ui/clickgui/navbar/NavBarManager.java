@@ -1,7 +1,7 @@
 package dev.heliosclient.ui.clickgui.navbar;
 
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.modules.ClickGUI;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ClientSettingsScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;

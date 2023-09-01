@@ -7,7 +7,7 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.hud.HudManager;
-import dev.heliosclient.module.modules.ClickGUI;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;

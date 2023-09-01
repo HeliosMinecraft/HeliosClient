@@ -1,23 +1,16 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.sysmodules;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.ColorSetting;
-import dev.heliosclient.module.settings.CycleSetting;
-import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.ColorManager;
-import dev.heliosclient.ui.ModulesListOverlay;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.ColorUtils;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClickGUI extends Module_ {
+    static ClickGUI INSTANCE = new ClickGUI();
     BooleanSetting Pause = new BooleanSetting("Pause game", "Pause the game when Click GUI is on.", this,false);
     ColorSetting AccentColor = new ColorSetting("Accent color", "Accent color of Click GUI.", this, ColorManager.INSTANCE.clickGuiSecondary);
     BooleanSetting RainbowAccent = new BooleanSetting("Rainbow", "Rainbow effect for accent color.",this,false);
@@ -32,6 +25,7 @@ public class ClickGUI extends Module_ {
             return TooltipMode.value == 1;
         }
     };
+    public static DoubleSetting ScrollSpeed = new DoubleSetting("Scroll Speed","Change your scroll speed for the ClickGUI",INSTANCE,7,1,8,1);
 
     public static boolean pause = false;
 
@@ -42,6 +36,7 @@ public class ClickGUI extends Module_ {
         settings.add(Pause);
         settings.add(TooltipMode);
         settings.add(TooltipPos);
+        settings.add(ScrollSpeed);
         settings.add(AccentColor);
         settings.add(RainbowAccent);
         settings.add(PaneTextColor);

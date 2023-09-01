@@ -4,7 +4,7 @@ import dev.heliosclient.module.settings.ListSetting;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
-import dev.heliosclient.module.modules.ClickGUI;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.gui.DrawContext;

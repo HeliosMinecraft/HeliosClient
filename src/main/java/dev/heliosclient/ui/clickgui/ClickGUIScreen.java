@@ -2,9 +2,7 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
-import dev.heliosclient.module.modules.ClickGUI;
-import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.StringSetting;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.MathUtils;
 import net.minecraft.client.gui.DrawContext;

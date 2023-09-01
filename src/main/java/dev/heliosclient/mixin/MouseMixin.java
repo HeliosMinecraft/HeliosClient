@@ -1,9 +1,12 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ClientSettingsScreen;
 import dev.heliosclient.ui.clickgui.SettingsScreen;
+import dev.heliosclient.util.animation.Easing;
+import dev.heliosclient.util.animation.EasingType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import org.spongepowered.asm.mixin.Final;
