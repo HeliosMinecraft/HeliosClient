@@ -15,6 +15,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import dev.heliosclient.module.modules.ChatHighlight;
+import dev.heliosclient.util.ChatUtils;
+
 @Mixin(ServerPlayNetworkHandler.class)
 public class MixinServerPlayNetworkHandler {
     @Inject(method = "onPlayerInteractBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/BlockHitResult;getPos()Lnet/minecraft/util/math/Vec3d;"), cancellable = true)
@@ -29,8 +32,7 @@ public class MixinServerPlayNetworkHandler {
     }
     @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
     private void onGameMessage(ChatMessageC2SPacket packet, CallbackInfo ci) {
-        String message = packet.chatMessage();
-        ChatMessageEvent event = new ChatMessageEvent(message);
+        ChatMessageEvent event = new ChatMessageEvent(packet.chatMessage());
         EventManager.postEvent(event);
         if(event.isCanceled()){
             ci.cancel();

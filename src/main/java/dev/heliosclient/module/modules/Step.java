@@ -31,16 +31,14 @@ public class Step extends Module_
     @SubscribeEvent
     public void onTick(TickEvent event)
     {
-        if(mc.player == null) {return;}
+        if (mc.player == null) return;
         if (shiftSuppress.value) {
-        if (mc.options.sneakKey.isPressed()) {
-            mc.player.setStepHeight(0.5f);
-        } else
-        {
-            mc.player.setStepHeight((float)stepHeight.value);
-        }
-        } else
-        {
+            if (mc.options.sneakKey.isPressed()) {
+                mc.player.setStepHeight(0.5f);
+            } else {
+                mc.player.setStepHeight((float)stepHeight.value);
+            }
+        } else {
             mc.player.setStepHeight((float)stepHeight.value);
         }
     }

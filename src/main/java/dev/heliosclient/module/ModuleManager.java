@@ -18,7 +18,8 @@ public class ModuleManager {
                 new Speed(),
                 new ModulesList(),
                 new CustomFov(),
-                new Test()
+                new Test(),
+                new ChatHighlight()
         );
     }
 

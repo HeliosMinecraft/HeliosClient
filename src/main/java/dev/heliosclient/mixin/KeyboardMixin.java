@@ -13,10 +13,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
-
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.GameMenuScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 
 @Mixin(Keyboard.class)
 public abstract class KeyboardMixin {
+    private static MinecraftClient mc = MinecraftClient.getInstance();
 
 	@Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
@@ -28,6 +31,14 @@ public abstract class KeyboardMixin {
         EventManager.postEvent(event);
         if (event.isCanceled()){
             info.cancel();
+        }
+
+        if (key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+            if (!(mc.currentScreen instanceof ChatScreen) && !(mc.currentScreen instanceof AbstractInventoryScreen)
+                    && !(mc.currentScreen instanceof GameMenuScreen)) {
+                ClickGUIScreen.INSTANCE.onLoad();
+                mc.setScreen(ClickGUIScreen.INSTANCE);
+            }
         }
     }
 }
