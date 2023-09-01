@@ -12,6 +12,8 @@ import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.GameMenuScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 
 @Mixin(Keyboard.class)
 public abstract class KeyboardMixin {
@@ -26,7 +28,8 @@ public abstract class KeyboardMixin {
         }
 
         if (key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
-            if (!(mc.currentScreen instanceof ChatScreen)) {
+            if (!(mc.currentScreen instanceof ChatScreen) && !(mc.currentScreen instanceof AbstractInventoryScreen)
+                    && !(mc.currentScreen instanceof GameMenuScreen)) {
                 ClickGUIScreen.INSTANCE.onLoad();
                 mc.setScreen(ClickGUIScreen.INSTANCE);
             }
