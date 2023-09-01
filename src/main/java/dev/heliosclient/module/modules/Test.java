@@ -2,18 +2,19 @@ package dev.heliosclient.module.modules;
 
 import dev.heliosclient.event.*;
 import dev.heliosclient.event.events.*;
-import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
+import dev.heliosclient.module.settings.StringListSetting;
+import dev.heliosclient.module.settings.StringSetting;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.Renderer3D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 
 public class Test extends Module_ {
@@ -21,6 +22,9 @@ public class Test extends Module_ {
     BooleanSetting rounded = new BooleanSetting("Rounded","",this,false);
     BooleanSetting Circle = new BooleanSetting("Circle","",this,false);
     BooleanSetting Triangle = new BooleanSetting("Triangle","",this,false);
+    StringSetting num = new StringSetting("Enter a number","DESCRIPTION","E",100);
+    String[] list = new String[]{"1ST", "2ND", "3RD","LMAO"};
+    StringListSetting stringListSetting = new StringListSetting("Enter a number","DESCRIPTION",list,4,100);
 
     BooleanSetting PartiallyRounded = new BooleanSetting("NotRounded","",this,false);
     BooleanSetting Arc = new BooleanSetting("Arc","",this,false);
@@ -38,6 +42,9 @@ public class Test extends Module_ {
         settings.add(TracerLine);
         settings.add(blockOutlineAndFIll);
         settings.add(PartiallyRounded);
+        settings.add(num);
+        settings.add(stringListSetting);
+
         quickSettings.add(rectangle);
         quickSettings.add(rounded);
         quickSettings.add(Circle);
@@ -46,6 +53,8 @@ public class Test extends Module_ {
         quickSettings.add(TracerLine);
         quickSettings.add(blockOutlineAndFIll);
         quickSettings.add(PartiallyRounded);
+        quickSettings.add(num);
+
     }
 
     @Override

@@ -7,7 +7,7 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.hud.HudManager;
-import dev.heliosclient.module.modules.ClickGUI;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -53,7 +53,7 @@ public class HudEditorScreen extends Screen implements Listener {
         }
 
         for (int i = 0; i < HudManager.INSTANCE.hudElements.size(); i++) {
-            if (i != lastHoveredIndex || lastHoveredIndex == -1) {
+            if (i != lastHoveredIndex) {
                 HudManager.INSTANCE.hudElements.get(i).selected = false;
             }
                 HudManager.INSTANCE.hudElements.get(i).mouseClicked(mouseX, mouseY, button);
@@ -82,4 +82,5 @@ public class HudEditorScreen extends Screen implements Listener {
             }
         }
     }
+
 }

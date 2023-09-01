@@ -20,12 +20,22 @@ public class Coords extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
-        if (mc.player == null) return;
-        String text = "X: " + ColorUtils.gray + MathUtils.round(mc.player.getX(), 1) + ColorUtils.reset +
-                " Y: " + ColorUtils.gray + MathUtils.round(mc.player.getY(), 1) + ColorUtils.reset +
-                " Z: " + ColorUtils.gray + MathUtils.round(mc.player.getZ(), 1);
+        int coordX, coordY, coordZ;
+        if (mc.player == null) {
+            coordX = 0;
+            coordY = 0;
+            coordZ = 0;
+        } else {
+            coordX = (int) MathUtils.round(mc.player.getX(), 0);
+            coordY = (int) MathUtils.round(mc.player.getY(), 0);
+            coordZ = (int) MathUtils.round(mc.player.getZ(), 0);
+        }
 
-        this.width = textRenderer.getWidth(text);
+        String text = "X: " + ColorUtils.gray + coordX + ColorUtils.reset +
+                " Y: " + ColorUtils.gray + coordY + ColorUtils.reset +
+                " Z: " + ColorUtils.gray + coordZ;
+
+        this.width = textRenderer.getWidth(text) + 1;
 
         drawContext.drawText(textRenderer, text, this.x-width/2, this.y+height/2-10, HeliosClient.uiColorA, false);
     }

@@ -1,9 +1,6 @@
 package dev.heliosclient.system;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.ForkJoinPool;
 
 import dev.heliosclient.util.ChatUtils;
 import net.minecraft.client.MinecraftClient;
@@ -15,7 +12,6 @@ public class FriendManager {
     private static HashSet<Friend> friends = new HashSet<>();
     private static HashSet<String> friendsName = new HashSet<>();
 
-    // Create a static method that returns true if the friend is in the set, false otherwise
     public static boolean isFriend(Friend friend) {
         return friends.contains(friend);
     }
