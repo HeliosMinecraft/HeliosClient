@@ -26,6 +26,8 @@ public class HeliosClient implements ModInitializer
 	public static final Logger LOGGER = LoggerFactory.getLogger("Helios Client");
 	public static final String clientTag = ColorUtils.red + "Helios Client";
 	public static final String versionTag = ColorUtils.gray + "v0.dev";
+	public static final String MODID = "heliosclient";
+
 	public static Config CONFIG = new Config();
 	public static int uiColorA = 0xFF55FFFF;
 	public static int uiColor = 0x55FFFF;

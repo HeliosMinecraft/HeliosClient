@@ -11,6 +11,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class CategoryPane {
     public Category category;
@@ -19,18 +21,45 @@ public class CategoryPane {
     int startX, startY;
     boolean dragging = false;
     ArrayList<ModuleButton> moduleButtons;
+    private Screen parentScreen;
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
         this.category = category;
         this.x = initialX;
         this.y = initialY;
         this.collapsed = collapsed;
+        this.parentScreen=parentScreen;
         moduleButtons = new ArrayList<ModuleButton>();
         for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
             moduleButtons.add(new ModuleButton(m,parentScreen));
         }
         if (moduleButtons.size() == 0) collapsed = true;
         height = (moduleButtons.size() * 12) + 18;
+    }
+    public void addModule(List<Module_> moduleS){
+        for (Module_ module: moduleS){
+            boolean exists = false;
+            for(ModuleButton button: moduleButtons){
+                if(button.module == module){
+                    exists = true;
+                    break;
+                }
+            }
+            if(!exists){
+                ModuleButton moduleButton = new ModuleButton(module,parentScreen);
+                moduleButtons.add(moduleButton);
+            }
+        }
+    }
+    public void removeModule(Module_ module){
+        moduleButtons.removeIf(button -> button.module == module);
+    }
+    public void keepOnlyModule(Module_ module){
+        moduleButtons.removeIf(button -> button.module != module);
+    }
+
+    public void removeModules(){
+        moduleButtons.clear();
     }
 
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
@@ -45,13 +74,17 @@ public class CategoryPane {
         drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
 
         if (!collapsed) {
-            int buttonYOffset = y + 18;
+            int buttonYOffset = y + 18;;
+            if (category == Category.SEARCH) {
+                buttonYOffset = y + 35;
+            }
 
 
             for (ModuleButton m : moduleButtons) {
                 if(m.hasFaded()){
                    m.startFading();
                 }
+
                 m.setFaded(false);
                 m.render(drawContext, mouseX, mouseY, x, buttonYOffset, textRenderer);
                 buttonYOffset += 14;

@@ -2,7 +2,7 @@ package dev.heliosclient.module;
 
 import dev.heliosclient.module.modules.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class ModuleManager {
     public static ModuleManager INSTANCE = new ModuleManager();
@@ -41,6 +41,42 @@ public class ModuleManager {
         }
         return null;
     }
+    public ArrayList<Module_> getModuleByNameSearch(String moduleName) {
+        ArrayList<Module_> moduleS = new ArrayList<>();
+        for (Module_ module : modules) {
+            if (!moduleName.isEmpty() && module.name.trim().equalsIgnoreCase(moduleName.trim())){
+                moduleS.add(module);
+                return moduleS;
+            }
+            if (!moduleName.isEmpty() && module.name.trim().toLowerCase().startsWith(moduleName.trim().toLowerCase())) {
+                moduleS.add(module);
+            }
+        }
+        moduleS.sort((m1, m2) -> {
+            int m1Score = getRelevanceScore(m1.name, moduleName);
+            int m2Score = getRelevanceScore(m2.name, moduleName);
+            return Integer.compare(m1Score, m2Score);
+        });
+        return moduleS;
+    }
+
+    private int getRelevanceScore(String name, String query){
+        if(name.equalsIgnoreCase(query)){
+            return 3;
+        } else if(name.toLowerCase().startsWith(query.toLowerCase())){
+            return 2;
+        } else if(name.toLowerCase().contains(query.toLowerCase())){
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+
+
+
+
+
 
     public ArrayList<Module_> getModulesByCategory(Category category) {
         ArrayList<Module_> returnedModules = new ArrayList<>();

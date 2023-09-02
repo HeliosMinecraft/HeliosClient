@@ -29,7 +29,7 @@ public class Step extends Module_
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event)
+    public void onTick(TickEvent.PLAYER event)
     {
         if(mc.player == null) {return;}
         if (shiftSuppress.value) {

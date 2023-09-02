@@ -2,9 +2,13 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
+import dev.heliosclient.module.ModuleManager;
+import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
+import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -17,6 +21,7 @@ public class ClickGUIScreen extends Screen {
     static int scrollX = 0;
     static int scrollY = 0;
     public ArrayList<CategoryPane> categoryPanes;
+    public InputBox searchBox;
 
     public ClickGUIScreen() {
         super(Text.literal("ClickGUI"));
@@ -30,6 +35,7 @@ public class ClickGUIScreen extends Screen {
             boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
             categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
         }
+        searchBox = new InputBox(92,13,"", 20);
     }
 
     public static void onScroll(double horizontal, double vertical) {
@@ -44,6 +50,18 @@ public class ClickGUIScreen extends Screen {
             category.y += scrollY * 10;
             category.x += scrollX * 10;
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
+            if (category.category == Category.SEARCH && !category.collapsed){
+                Renderer2D.drawRectangle(drawContext,category.x, category.y + 18,96  , 18, 0xFF1B1B1B);
+                searchBox.render(drawContext, category.x,category.y,mouseX,mouseY,textRenderer);
+                System.out.println(ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()));
+                category.addModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()));
+                if (ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()).size() == 1){
+                    category.keepOnlyModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()).get(0));
+                }
+                if (searchBox.getValue().isEmpty()){
+                    category.removeModules();
+                }
+            }
         }
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
@@ -51,9 +69,13 @@ public class ClickGUIScreen extends Screen {
         scrollX = 0;
     }
 
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (CategoryPane category : categoryPanes) {
+            if (category.category == Category.SEARCH && !category.collapsed){
+                searchBox.mouseClicked(mouseX,mouseY,button);
+            }
             category.mouseClicked((int) mouseX, (int) mouseY, button);
         }
         NavBar.navBar.mouseClicked((int) mouseX, (int) mouseY, button);
@@ -66,6 +88,36 @@ public class ClickGUIScreen extends Screen {
             category.mouseReleased((int) mouseX, (int) mouseY, button);
         }
         return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        for (CategoryPane category : categoryPanes) {
+            if (category.category == Category.SEARCH && !category.collapsed){
+                searchBox.charTyped(chr, modifiers);
+            }
+        }
+        return super.charTyped(chr, modifiers);
+    }
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        for (CategoryPane category : categoryPanes) {
+            if (category.category == Category.SEARCH && !category.collapsed){
+                searchBox.keyReleased(keyCode,scanCode,modifiers);
+            }
+        }
+        return super.keyReleased(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        for (CategoryPane category : categoryPanes) {
+            if (category.category == Category.SEARCH && !category.collapsed){
+                searchBox.keyPressed(keyCode,scanCode,modifiers);
+            }
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

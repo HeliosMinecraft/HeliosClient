@@ -10,8 +10,10 @@ public enum Category
 	WORLD("World"),
 	PLAYER("Player"),
 	CHAT("Chat"),
-	MISC("Misc");
-	
+	MISC("Misc"),
+	SEARCH("Search");
+
+
 	public String name;
 	
 	Category(String name)

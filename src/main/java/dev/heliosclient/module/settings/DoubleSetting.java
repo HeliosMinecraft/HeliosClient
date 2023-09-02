@@ -66,7 +66,7 @@ public class DoubleSetting extends Setting
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-            drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+            drawContext.drawText(textRenderer, Text.literal(name.substring(0,Math.min(12,name.length())) + "..."), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
             double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
 
             if (sliding) {

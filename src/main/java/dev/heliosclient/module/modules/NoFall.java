@@ -29,7 +29,7 @@ public class NoFall extends Module_
         quickSettings.add(mode);
     }
     @SubscribeEvent
-    public void onTick(TickEvent event)
+    public void onTick(TickEvent.PLAYER event)
     {
         assert mc.player != null;
         if(mc.player.fallDistance >= fallHeight.value && !mc.player.isCreative()) {

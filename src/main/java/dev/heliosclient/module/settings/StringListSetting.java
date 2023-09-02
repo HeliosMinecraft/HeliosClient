@@ -43,6 +43,8 @@ public class StringListSetting extends Setting {
         int boxOffset = y;
         for (InputBox box : inputBox) {
             box.render(drawContext, x, boxOffset, mouseX, mouseY, textRenderer);
+
+            // Draw a '-' button next to the text
             Renderer2D.drawRectangle(drawContext, x + 165, boxOffset + 12 + textRenderer.fontHeight, 10, 11, Color.black.getRGB());
             drawContext.drawHorizontalLine(x + 168, x + 172, boxOffset + 17 + textRenderer.fontHeight, Color.RED.getRGB());
             Renderer2D.drawOutlineBox(drawContext, x + 165, boxOffset + 12 + textRenderer.fontHeight, 11, 11, 1, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());

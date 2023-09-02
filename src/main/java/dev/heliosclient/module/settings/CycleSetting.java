@@ -5,6 +5,7 @@ import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 
@@ -53,7 +54,7 @@ public class CycleSetting extends Setting
         if (options.size() == 0 || options.size() - 1 < value) {
             drawContext.drawText(textRenderer, "No option found!", x + 10, y + 28, 0xFFFF0000, false);
         }
-        drawContext.drawText(textRenderer, name + ": " + options.get(value), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
+        drawContext.drawText(textRenderer, name + ": " + options.get(value).substring(0,Math.min(12,options.get(value).length())) +  "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
