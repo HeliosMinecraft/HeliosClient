@@ -1,9 +1,19 @@
 <p align="center">
-    <img src="https://github.com/HeliosClient/HeliosClient/blob/main/.github/images/text.png?raw=true" height="100px">
+    <img src="https://github.com/HeliosClient/HeliosClient/blob/main/.github/images/text.png?raw=true" height="150px">
 </p>
-<h3 align="center">
-    Fabric anarchy focused utility mod at latest Minecraft version.
-</h3>
+<div align="center">
+    <h3>Fabric anarchy focused utility mod at latest Minecraft version.</h3>
+    <img src="https://img.shields.io/github/last-commit/HeliosClient/HeliosClient" alt="GitHub last commit"/>
+    <img src="https://img.shields.io/github/commit-activity/w/HeliosClient/HeliosClient" alt="GitHub commit activity"/>
+    <img src="https://img.shields.io/github/contributors/HeliosClient/HeliosClient" alt="GitHub contributors"/>
+</div>
+
+## Images
+<details>
+    <summary>Click to show</summary>
+    <p>Keep in mind that these images might be outdated as Helios is currently updating frequently!</p>
+    <img src="https://github.com/HeliosClient/HeliosClient/blob/main/.github/images/ClickGUI.png?raw=true" alt="Click GUI">
+</details>  
 
 ## Building
 
