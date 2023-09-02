@@ -22,7 +22,7 @@ public class ModuleArgumentType implements ArgumentType<Module_>
     private static final Collection<String> EXAMPLES = ModuleManager.INSTANCE.modules
             .stream()
             .limit(3)
-            .map(module -> module.name)
+            .map(module -> addQuotes(module.name))
             .collect(Collectors.toList());
 
     private static final DynamicCommandExceptionType NO_SUCH_MODULE = new DynamicCommandExceptionType(o ->
@@ -42,7 +42,7 @@ public class ModuleArgumentType implements ArgumentType<Module_>
     public Module_ parse(StringReader reader) throws CommandSyntaxException 
     {
         String argument = reader.readString();
-        Module_ module = ModuleManager.INSTANCE.getModuleByName(argument);
+        Module_ module = ModuleManager.INSTANCE.getModuleByName(argument.replace("\"", ""));
 
         if (module == null) throw NO_SUCH_MODULE.create(argument);
 
@@ -52,12 +52,20 @@ public class ModuleArgumentType implements ArgumentType<Module_>
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) 
     {
-        return CommandSource.suggestMatching(ModuleManager.INSTANCE.modules.stream().map(module -> module.name), builder);
+        return CommandSource.suggestMatching(ModuleManager.INSTANCE.modules.stream().map(module -> addQuotes(module.name)), builder);
     }
 
     @Override
     public Collection<String> getExamples() 
     {
         return EXAMPLES;
+    }
+
+    private static String addQuotes(String input) {
+        if (input.contains(" ")) {
+            return "\"" + input + "\"";
+        } else {
+            return input;
+        }
     }
 }
