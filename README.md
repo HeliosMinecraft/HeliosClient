@@ -36,6 +36,7 @@ To submit a bug open an issue in this repository. Before doing so please assure 
 - Settings can go off screen sometimes.
 - Colors code is a mess.
 - Unfinished/placeholder modules.
+- When new features are added, a crash is caused by an incomplete config file.
 
 ## Contributing
 
