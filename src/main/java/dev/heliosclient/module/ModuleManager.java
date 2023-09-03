@@ -2,7 +2,7 @@ package dev.heliosclient.module;
 
 import dev.heliosclient.module.modules.*;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class ModuleManager {
     public static ModuleManager INSTANCE = new ModuleManager();
@@ -19,6 +19,8 @@ public class ModuleManager {
                 new ModulesList(),
                 new CustomFov(),
                 new Test(),
+                new FTest(),
+                new FTest2(),
                 new ChatHighlight()
         );
     }
@@ -42,10 +44,11 @@ public class ModuleManager {
         }
         return null;
     }
+
     public ArrayList<Module_> getModuleByNameSearch(String moduleName) {
         ArrayList<Module_> moduleS = new ArrayList<>();
         for (Module_ module : modules) {
-            if (!moduleName.isEmpty() && module.name.trim().equalsIgnoreCase(moduleName.trim())){
+            if (!moduleName.isEmpty() && module.name.trim().equalsIgnoreCase(moduleName.trim())) {
                 moduleS.add(module);
                 return moduleS;
             }
@@ -61,22 +64,17 @@ public class ModuleManager {
         return moduleS;
     }
 
-    private int getRelevanceScore(String name, String query){
-        if(name.equalsIgnoreCase(query)){
+    private int getRelevanceScore(String name, String query) {
+        if (name.equalsIgnoreCase(query)) {
             return 3;
-        } else if(name.toLowerCase().startsWith(query.toLowerCase())){
+        } else if (name.toLowerCase().startsWith(query.toLowerCase())) {
             return 2;
-        } else if(name.toLowerCase().contains(query.toLowerCase())){
+        } else if (name.toLowerCase().contains(query.toLowerCase())) {
             return 1;
         } else {
             return 0;
         }
     }
-
-
-
-
-
 
 
     public ArrayList<Module_> getModulesByCategory(Category category) {

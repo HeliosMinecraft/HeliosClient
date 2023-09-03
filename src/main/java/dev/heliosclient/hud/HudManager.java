@@ -1,5 +1,11 @@
 package dev.heliosclient.hud;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.RenderEvent;
+import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.module.ModuleManager;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -7,16 +13,23 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.util.ArrayList;
 
-public class HudManager {
+public class HudManager implements Listener {
     public static HudManager INSTANCE = new HudManager();
 
     public ArrayList<HudElement> hudElements = new ArrayList<>();
 
     protected MinecraftClient mc = MinecraftClient.getInstance();
 
-    public void render(DrawContext drawContext, TextRenderer textRenderer) {
-        for (HudElement element : hudElements) {
-            element.render(drawContext, textRenderer);
+    public HudManager() {
+        EventManager.register(this);
+    }
+
+    @SubscribeEvent
+    public void render(RenderEvent event) {
+        if (ModuleManager.INSTANCE.getModuleByName("HUD").active.value && !(mc.currentScreen instanceof HudEditorScreen)) {
+            for (HudElement element : hudElements) {
+                element.render(event.getDrawContext(), HeliosClient.MC.textRenderer);
+            }
         }
     }
 

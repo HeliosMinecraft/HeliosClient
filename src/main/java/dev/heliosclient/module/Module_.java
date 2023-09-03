@@ -9,14 +9,8 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.ui.ModulesListOverlay;
 import dev.heliosclient.util.ChatUtils;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.entity.MovementType;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 
@@ -29,7 +23,6 @@ public abstract class Module_ implements Listener {
     public ArrayList<Setting> settings;
     public ArrayList<Setting> quickSettings;
     public boolean settingsOpen = false;
-
 
 
     public BooleanSetting chatFeedback = new BooleanSetting("Enable chat feedback", "Toggles feedback in chat.", this, false);
@@ -46,19 +39,18 @@ public abstract class Module_ implements Listener {
     }
 
     public void onEnable() {
-        ModulesListOverlay.INSTANCE.update();
         if (chatFeedback.value) {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was enabled.");
         }
         EventManager.register(this);
     }
-    public boolean isActive(){
+
+    public boolean isActive() {
         return active.value;
     }
 
     public void onDisable() {
-        ModulesListOverlay.INSTANCE.update();
         if (chatFeedback.value) {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
@@ -73,8 +65,9 @@ public abstract class Module_ implements Listener {
     @SubscribeEvent
     public void onTick(TickEvent event) {
     }
+
     @SubscribeEvent
-    public void render(RenderEvent event){
+    public void render(RenderEvent event) {
     }
 
     public void toggle() {
@@ -103,7 +96,7 @@ public abstract class Module_ implements Listener {
 
     public void onSettingChange(Setting setting) {
         if (setting == active) {
-            if (active.value == true) {
+            if (active.value) {
                 onEnable();
             } else {
                 onDisable();
