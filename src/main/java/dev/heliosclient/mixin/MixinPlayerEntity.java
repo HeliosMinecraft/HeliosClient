@@ -24,18 +24,20 @@ public abstract class MixinPlayerEntity {
     private void dropItem(ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
         ItemDropEvent event = new ItemDropEvent(stack);
         EventManager.postEvent(event);
-        if (event.isCanceled()){
+        if (event.isCanceled()) {
             cir.cancel();
         }
     }
+
     @Inject(method = "onDeath", at = @At("HEAD"), cancellable = true)
     private void onDeath(DamageSource damageSource, CallbackInfo ci) {
-            PlayerDeathEvent event = new PlayerDeathEvent(HeliosClient.MC.player);
-            EventManager.postEvent(event);
-            if (event.isCanceled()) {
-                ci.cancel();
-            }
+        PlayerDeathEvent event = new PlayerDeathEvent(HeliosClient.MC.player);
+        EventManager.postEvent(event);
+        if (event.isCanceled()) {
+            ci.cancel();
+        }
     }
+
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
     private void onPlayerDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         // This variable holds the event object
@@ -49,10 +51,10 @@ public abstract class MixinPlayerEntity {
             cir.setReturnValue(event.isCanceled());
         }
     }
+
     @Inject(method = "tick", at = @At(value = "TAIL"), cancellable = true)
-    public void onTick(CallbackInfo ci)
-    {
-        if(HeliosClient.MC.player!=null) {
+    public void onTick(CallbackInfo ci) {
+        if (HeliosClient.MC.player != null) {
             TickEvent event = new TickEvent.PLAYER(HeliosClient.MC.player);
             EventManager.postEvent(event);
             if (event.isCanceled()) {

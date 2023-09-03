@@ -1,23 +1,20 @@
 package dev.heliosclient.command;
 
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.command.CommandSource;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.CommandSource;
-
-public abstract class Command 
-{
+public abstract class Command {
     protected static MinecraftClient mc;
 
     private final String name;
@@ -39,6 +36,10 @@ public abstract class Command
 
     protected static LiteralArgumentBuilder<CommandSource> literal(final String name) {
         return LiteralArgumentBuilder.literal(name);
+    }
+
+    public static String nameToTitle(String name) {
+        return Arrays.stream(name.split("-")).map(StringUtils::capitalize).collect(Collectors.joining(" "));
     }
 
     public final void registerTo(CommandDispatcher<CommandSource> dispatcher) {
@@ -76,9 +77,5 @@ public abstract class Command
             base.append(' ').append(arg);
 
         return base.toString();
-    }
-    
-    public static String nameToTitle(String name) {
-        return Arrays.stream(name.split("-")).map(StringUtils::capitalize).collect(Collectors.joining(" "));
     }
 }

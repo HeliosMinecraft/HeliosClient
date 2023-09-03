@@ -1,11 +1,6 @@
 package dev.heliosclient.command.commands;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import dev.heliosclient.command.Command;
 import dev.heliosclient.command.CommandArgumentType;
 import dev.heliosclient.command.CommandManager;
@@ -17,64 +12,64 @@ import dev.heliosclient.util.ColorUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.CommandSource;
 
-public class Help extends Command
-{
-	public Help() 
-    {
-		super("help", "Gives you a list of all of the commands", "c", "commands", "h");
-	}
+import java.util.ArrayList;
+import java.util.List;
+
+public class Help extends Command {
+    public Help() {
+        super("help", "Gives you a list of all of the commands", "c", "commands", "h");
+    }
 
     @Override
-    public void build(LiteralArgumentBuilder<CommandSource> builder) 
-	{
-		builder.then(argument("command", new CommandArgumentType()).executes(context -> {
-			ClientPlayerEntity player = mc.player;
-			assert player != null;
-			
-			Command command = context.getArgument("command", Command.class);
+    public void build(LiteralArgumentBuilder<CommandSource> builder) {
+        builder.then(argument("command", new CommandArgumentType()).executes(context -> {
+            ClientPlayerEntity player = mc.player;
+            assert player != null;
 
-			ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + command.getName());
-			ChatUtils.sendMsg(command.getDescription());
+            Command command = context.getArgument("command", Command.class);
 
-			if (command.getAliases().size() > 0) {
-				ChatUtils.sendMsg(
-						ColorUtils.aqua + "Aliases" + ColorUtils.gray + ": " + String.join(", ", command.getAliases()));
-			}
+            ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + command.getName());
+            ChatUtils.sendMsg(command.getDescription());
 
-			return SINGLE_SUCCESS;
-		}));
+            if (command.getAliases().size() > 0) {
+                ChatUtils.sendMsg(
+                        ColorUtils.aqua + "Aliases" + ColorUtils.gray + ": " + String.join(", ", command.getAliases()));
+            }
 
-		builder.then(argument("module", new ModuleArgumentType()).executes(context -> {
-			ClientPlayerEntity player = mc.player;
-			assert player != null;
-			
-			Module_ module = context.getArgument("module", Module_.class);
+            return SINGLE_SUCCESS;
+        }));
 
-			ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + module.name);
-			ChatUtils.sendMsg(module.description);
-			ChatUtils.sendMsg("");
-			
-			for (Setting setting : module.settings) {
-				ChatUtils.sendMsg(ColorUtils.aqua + setting.name + ColorUtils.gray + ": " + setting.description);
-			}
+        builder.then(argument("module", new ModuleArgumentType()).executes(context -> {
+            ClientPlayerEntity player = mc.player;
+            assert player != null;
 
-			return SINGLE_SUCCESS;
-		}));
-        builder.executes(context -> 
-		{
-			ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + "Commands:");
+            Module_ module = context.getArgument("module", Module_.class);
 
-			for (Command cmd : CommandManager.get().getAll()) {
-				List<String> aliases = new ArrayList<>();
+            ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + module.name);
+            ChatUtils.sendMsg(module.description);
+            ChatUtils.sendMsg("");
 
-				for (String alias : cmd.getAliases()) aliases.add(alias);
-				aliases.add(0, ColorUtils.bold + ColorUtils.aqua + cmd.getName());
+            for (Setting setting : module.settings) {
+                ChatUtils.sendMsg(ColorUtils.aqua + setting.name + ColorUtils.gray + ": " + setting.description);
+            }
 
-				ChatUtils.sendMsg(ColorUtils.aqua + String.join(ColorUtils.reset + ", ", aliases) + ColorUtils.gray + ": " + cmd.getDescription());
-			}
-			return SINGLE_SUCCESS;
-		});
-        
+            return SINGLE_SUCCESS;
+        }));
+        builder.executes(context ->
+        {
+            ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + "Commands:");
+
+            for (Command cmd : CommandManager.get().getAll()) {
+                List<String> aliases = new ArrayList<>();
+
+                for (String alias : cmd.getAliases()) aliases.add(alias);
+                aliases.add(0, ColorUtils.bold + ColorUtils.aqua + cmd.getName());
+
+                ChatUtils.sendMsg(ColorUtils.aqua + String.join(ColorUtils.reset + ", ", aliases) + ColorUtils.gray + ": " + cmd.getDescription());
+            }
+            return SINGLE_SUCCESS;
+        });
+
     }
-    
+
 }

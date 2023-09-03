@@ -12,12 +12,11 @@ import net.minecraft.text.Text;
 
 public class HeliosClientInfoScreen extends Screen {
     public static HeliosClientInfoScreen INSTANCE = new HeliosClientInfoScreen();
+    private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
 
     protected HeliosClientInfoScreen() {
         super(Text.literal("Helios Client"));
     }
-
-    private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
 
     protected void init() {
         this.layout.addHeader(new TextWidget(this.getTitle(), this.textRenderer));

@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+
 public class Renderer3D extends DrawContext {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -18,98 +19,98 @@ public class Renderer3D extends DrawContext {
         super(client, vertexConsumers);
     }
 
-    public static void drawBlockOutline(DrawContext drawContext,BlockPos blockPos, float lineWidth, int color) {
-            Camera camera = mc.gameRenderer.getCamera();
-            Vec3d cameraPos = camera.getPos();
-            float x = (float) (blockPos.getX() - cameraPos.x);
-            float y = (float) (blockPos.getY() - cameraPos.y);
-            float z = (float) (blockPos.getZ() - cameraPos.z);
+    public static void drawBlockOutline(DrawContext drawContext, BlockPos blockPos, float lineWidth, int color) {
+        Camera camera = mc.gameRenderer.getCamera();
+        Vec3d cameraPos = camera.getPos();
+        float x = (float) (blockPos.getX() - cameraPos.x);
+        float y = (float) (blockPos.getY() - cameraPos.y);
+        float z = (float) (blockPos.getZ() - cameraPos.z);
 
-            Matrix4f matrix4f = drawContext.getMatrices().peek().getPositionMatrix();
-            RenderSystem.enableBlend();
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.disableDepthTest();
-            GL11.glLineWidth(lineWidth);
+        Matrix4f matrix4f = drawContext.getMatrices().peek().getPositionMatrix();
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableDepthTest();
+        GL11.glLineWidth(lineWidth);
 
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder bufferBuilder = tessellator.getBuffer();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-            float red = (float)(color >> 16 & 255) / 255.0F;
-            float green = (float)(color >> 8 & 255) / 255.0F;
-            float blue = (float)(color & 255) / 255.0F;
-            float alpha = (float)(color >> 24 & 255) / 255.0F;
+        float red = (float) (color >> 16 & 255) / 255.0F;
+        float green = (float) (color >> 8 & 255) / 255.0F;
+        float blue = (float) (color & 255) / 255.0F;
+        float alpha = (float) (color >> 24 & 255) / 255.0F;
 
-            bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-            bufferBuilder.vertex(matrix4f,x, y, z).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f,x + 1.0F, y, z).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f,x + 1.0F, y, z).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f,x + 1.0F, y + 1.0F, z).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f,x + 1.0F, y + 1.0F, z).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f,x, y + 1.0F, z).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f,x, y + 1.0F, z).color(red, green, blue,alpha).next();
-            bufferBuilder.vertex(matrix4f,x,y,z).color(red ,green ,blue ,alpha ).next ();
+        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        bufferBuilder.vertex(matrix4f, x, y, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y + 1.0F, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y + 1.0F, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y + 1.0F, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y + 1.0F, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y, z).color(red, green, blue, alpha).next();
 
-            bufferBuilder.vertex(matrix4f,x,y,z+1.0F).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x+1.0F,y,z+1.0F).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x+1.0F,y,z+1.0F).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x+1.0F,y+1.0F,z+1.0F).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x+1.0F,y+1.0F,z+1.0F).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x,y+1.0F,z+1.0F).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x,y+1.0F,z+1.0F).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x,y,z+1.0F).color(red ,green ,blue,alpha ).next ();
+        bufferBuilder.vertex(matrix4f, x, y, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y + 1.0F, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y + 1.0F, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y + 1.0F, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y + 1.0F, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y, z + 1.0F).color(red, green, blue, alpha).next();
 
-            //Vertical lines
-            bufferBuilder.vertex(matrix4f,x,y,z).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x,y,z+1.0F).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x,y+1.0F,z).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x,y+1.0F,z+1.0F).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x+1.0F,y,z).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x+1.0F,y,z+1.0F).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x+1.0F,y+1.0F,z).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,x+1.0F,y+1.0F,z+1.0F).color(red ,green ,blue,alpha ).next ();
+        //Vertical lines
+        bufferBuilder.vertex(matrix4f, x, y, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y + 1.0F, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y + 1.0F, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y, z + 1.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y + 1.0F, z).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + 1.0F, y + 1.0F, z + 1.0F).color(red, green, blue, alpha).next();
 
-            tessellator.draw();
+        tessellator.draw();
 
-            RenderSystem.enableDepthTest();
-            RenderSystem.disableBlend();
-        }
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableBlend();
+    }
 
-        public static void drawTracerLine(Entity entity, float lineWidth, int color, DrawContext drawContext) {
-            Camera camera = mc.gameRenderer.getCamera();
-            Vec3d cameraPos = camera.getPos();
-            Vec3d entityPos = entity.getPos();
+    public static void drawTracerLine(Entity entity, float lineWidth, int color, DrawContext drawContext) {
+        Camera camera = mc.gameRenderer.getCamera();
+        Vec3d cameraPos = camera.getPos();
+        Vec3d entityPos = entity.getPos();
 
-            float x = (float) (entityPos.x - cameraPos.x);
-            float y = (float) (entityPos.y + entity.getHeight() / 2.0F - cameraPos.y);
-            float z = (float) (entityPos.z - cameraPos.z);
+        float x = (float) (entityPos.x - cameraPos.x);
+        float y = (float) (entityPos.y + entity.getHeight() / 2.0F - cameraPos.y);
+        float z = (float) (entityPos.z - cameraPos.z);
 
-            Matrix4f matrix4f = drawContext.getMatrices().peek().getPositionMatrix();
-            RenderSystem.enableBlend();
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.disableDepthTest();
-            GL11.glLineWidth(lineWidth);
+        Matrix4f matrix4f = drawContext.getMatrices().peek().getPositionMatrix();
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableDepthTest();
+        GL11.glLineWidth(lineWidth);
 
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder bufferBuilder = tessellator.getBuffer();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-            float red = (float)(color >> 16 & 255) / 255.0F;
-            float green = (float)(color >> 8 & 255) / 255.0F;
-            float blue = (float)(color & 255) / 255.0F;
-            float alpha = (float)(color >> 24 & 255) / 255.0F;
+        float red = (float) (color >> 16 & 255) / 255.0F;
+        float green = (float) (color >> 8 & 255) / 255.0F;
+        float blue = (float) (color & 255) / 255.0F;
+        float alpha = (float) (color >> 24 & 255) / 255.0F;
 
-            bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-            bufferBuilder.vertex(matrix4f,0, 0, 0).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f,x, y, z).color(red, green, blue, alpha).next();
+        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        bufferBuilder.vertex(matrix4f, 0, 0, 0).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y, z).color(red, green, blue, alpha).next();
 
-            tessellator.draw();
+        tessellator.draw();
 
-            RenderSystem.enableDepthTest();
-            RenderSystem.disableBlend();
-        }
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableBlend();
+    }
 
-    public static void drawLineFromPlayer(DrawContext drawContext, Vec3d targetPos, int color, float thickness,float tickDelta) {
+    public static void drawLineFromPlayer(DrawContext drawContext, Vec3d targetPos, int color, float thickness, float tickDelta) {
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerEntity player = mc.player;
         if (player == null) return;
@@ -126,7 +127,7 @@ public class Renderer3D extends DrawContext {
 
         // Draw the line
         drawContext.getMatrices().push();
-      //  drawContext.getMatrices().translate(start.x, start.y, start.z);
+        //  drawContext.getMatrices().translate(start.x, start.y, start.z);
         RenderSystem.lineWidth(thickness);
 
         Tessellator tessellator = Tessellator.getInstance();
@@ -145,68 +146,68 @@ public class Renderer3D extends DrawContext {
         drawContext.getMatrices().pop();
     }
 
-    public static void drawFilledBox(DrawContext drawContext,BlockPos blockPos, int color) {
-            Camera camera=mc.gameRenderer.getCamera ();
-            Vec3d cameraPos=camera.getPos ();
+    public static void drawFilledBox(DrawContext drawContext, BlockPos blockPos, int color) {
+        Camera camera = mc.gameRenderer.getCamera();
+        Vec3d cameraPos = camera.getPos();
 
-            double x=blockPos.getX ()-cameraPos.x;
-            double y=blockPos.getY ()-cameraPos.y;
-            double z=blockPos.getZ ()-cameraPos.z;
+        double x = blockPos.getX() - cameraPos.x;
+        double y = blockPos.getY() - cameraPos.y;
+        double z = blockPos.getZ() - cameraPos.z;
 
-            MatrixStack matrixStack= drawContext.getMatrices();
-            matrixStack.translate(x,y,z);
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        MatrixStack matrixStack = drawContext.getMatrices();
+        matrixStack.translate(x, y, z);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
-            Matrix4f matrix4f=matrixStack.peek().getPositionMatrix();
+        Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();
 
-            Tessellator tessellator=Tessellator.getInstance ();
-            BufferBuilder bufferBuilder=tessellator.getBuffer ();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-            float red=(float)(color>>16&255)/255.0F;
-            float green=(float)(color>>8&255)/255.0F;
-            float blue=(float)(color&255)/255.0F;
-            float alpha=(float)(color>>24&255)/255.0F;
+        float red = (float) (color >> 16 & 255) / 255.0F;
+        float green = (float) (color >> 8 & 255) / 255.0F;
+        float blue = (float) (color & 255) / 255.0F;
+        float alpha = (float) (color >> 24 & 255) / 255.0F;
 
-            bufferBuilder.begin(VertexFormat.DrawMode.QUADS ,VertexFormats.POSITION_COLOR);
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-            //Down
-            bufferBuilder.vertex(matrix4f,1.0f,0.0f,1.0f).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,1.0f,0.0f,0.0f).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f,0.0f,0.0f,1.0f).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f, 0.0f, 0.0f, 0.0f).color(red, green, blue,alpha).next();
+        //Down
+        bufferBuilder.vertex(matrix4f, 1.0f, 0.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 1.0f, 0.0f, 0.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 0.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 0.0f, 0.0f).color(red, green, blue, alpha).next();
 
-            // Up
-            bufferBuilder.vertex(matrix4f, 1.0f, 1.0f, 1.0f).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f ,1.0f ,1.0f ,0.0f ).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f ,0.0f ,1.0f ,1.0f ).color(red ,green ,blue ,alpha ).next ();
-            bufferBuilder.vertex(matrix4f ,0.0f ,1.0f ,0.0f ).color(red ,green ,blue,alpha ).next ();
+        // Up
+        bufferBuilder.vertex(matrix4f, 1.0f, 1.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 1.0f, 1.0f, 0.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 1.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 1.0f, 0.0f).color(red, green, blue, alpha).next();
 
-            // North
-            bufferBuilder.vertex(matrix4f, 1.0f, 1.0f, 1.0f).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, 1.0f, 0.0f, 1.0f).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, 0.0f, 0.0f, 1.0f).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, 0.0f, 1.0f, 1.0f).color(red ,green ,blue ,alpha ).next ();
+        // North
+        bufferBuilder.vertex(matrix4f, 1.0f, 1.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 1.0f, 0.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 0.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 1.0f, 1.0f).color(red, green, blue, alpha).next();
 
-            //South
-            bufferBuilder.vertex(matrix4f ,1.0f ,1.0f ,0.0f ).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f ,1.0f ,0.0f ,0.0f ).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f ,0.0f ,0.0f ,0.0f ).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f ,0.0f ,1.0f ,0.0f ).color(red ,green ,blue,alpha ).next ();
+        //South
+        bufferBuilder.vertex(matrix4f, 1.0f, 1.0f, 0.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 1.0f, 0.0f, 0.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 0.0f, 0.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 1.0f, 0.0f).color(red, green, blue, alpha).next();
 
-            // East
-            bufferBuilder.vertex(matrix4f, 1.0f, 1.0f, 1.0f).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, 1.0f, 0.0f, 1.0f).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, 1.0f, 0.0f, 0.0f).color(red, green, blue,alpha).next();
-            bufferBuilder.vertex(matrix4f ,1.0f ,1.0f ,0.0f ).color(red ,green ,blue,alpha ).next ();
+        // East
+        bufferBuilder.vertex(matrix4f, 1.0f, 1.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 1.0f, 0.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 1.0f, 0.0f, 0.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 1.0f, 1.0f, 0.0f).color(red, green, blue, alpha).next();
 
-            //West
-            bufferBuilder.vertex(matrix4f ,0.0f ,1.0f ,1.0f ).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f ,0.0f ,0.0f ,1.0f ).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f ,0.0f ,0.0f ,0.0f ).color(red ,green ,blue,alpha ).next ();
-            bufferBuilder.vertex(matrix4f ,0.0f ,1.0f ,0.0f ).color(red ,green ,blue,alpha ).next ();
+        //West
+        bufferBuilder.vertex(matrix4f, 0.0f, 1.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 0.0f, 1.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 0.0f, 0.0f).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, 0.0f, 1.0f, 0.0f).color(red, green, blue, alpha).next();
 
-            tessellator.draw();
-            RenderSystem.enableDepthTest();
-            RenderSystem.disableBlend();
-        }
+        tessellator.draw();
+        RenderSystem.enableDepthTest();
+        RenderSystem.disableBlend();
+    }
 }

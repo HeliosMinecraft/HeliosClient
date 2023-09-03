@@ -12,14 +12,12 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NoFall extends Module_
-{
-    public DoubleSetting fallHeight = new DoubleSetting("Trigger height", "Height on which No Fall triggers", this,2.5, 2, 22, 1);
+public class NoFall extends Module_ {
+    protected static MinecraftClient mc = MinecraftClient.getInstance();
+    public DoubleSetting fallHeight = new DoubleSetting("Trigger height", "Height on which No Fall triggers", this, 2.5, 2, 22, 1);
     public CycleSetting mode = new CycleSetting("Mode", "Mode which should save player from fall height ", this, new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")), 0);
 
-    protected static MinecraftClient mc = MinecraftClient.getInstance();
-    public NoFall()
-    {
+    public NoFall() {
         super("NoFall", "Prevents you from taking fall damage.", Category.PLAYER);
 
         settings.add(fallHeight);
@@ -28,12 +26,12 @@ public class NoFall extends Module_
         quickSettings.add(fallHeight);
         quickSettings.add(mode);
     }
+
     @SubscribeEvent
-    public void onTick(TickEvent.PLAYER event)
-    {
+    public void onTick(TickEvent.PLAYER event) {
         assert mc.player != null;
-        if(mc.player.fallDistance >= fallHeight.value && !mc.player.isCreative()) {
-            if (mode.value == 0) { 
+        if (mc.player.fallDistance >= fallHeight.value && !mc.player.isCreative()) {
+            if (mode.value == 0) {
                 mc.player.networkHandler.sendPacket(
                         new PlayerMoveC2SPacket.OnGroundOnly(true)
                 );

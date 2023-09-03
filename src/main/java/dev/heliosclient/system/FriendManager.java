@@ -1,23 +1,25 @@
 package dev.heliosclient.system;
 
-import java.util.HashSet;
-
 import dev.heliosclient.util.ChatUtils;
 import net.minecraft.client.MinecraftClient;
 
+import java.util.HashSet;
+
 public class FriendManager {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    
+
     // Declare a list of friends
     private static HashSet<Friend> friends = new HashSet<>();
-    private static HashSet<String> friendsName = new HashSet<>();
+    private static final HashSet<String> friendsName = new HashSet<>();
+
+    public FriendManager() {
+        for (Friend friend : friends) {
+            friendsName.add(friend.getPlayerName());
+        }
+    }
 
     public static boolean isFriend(Friend friend) {
         return friends.contains(friend);
-    }
-
-    public static void setFriends(HashSet<Friend> friends) {
-        FriendManager.friends = friends;
     }
 
     public static void addFriend(Friend friend) {
@@ -35,10 +37,9 @@ public class FriendManager {
     public static HashSet<Friend> getFriends() {
         return friends;
     }
-    public FriendManager(){
-        for (Friend friend: friends){
-            friendsName.add(friend.getPlayerName());
-        }
+
+    public static void setFriends(HashSet<Friend> friends) {
+        FriendManager.friends = friends;
     }
 
     public HashSet<String> getFriendsName() {

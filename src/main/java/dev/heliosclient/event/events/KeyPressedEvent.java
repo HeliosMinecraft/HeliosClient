@@ -11,12 +11,12 @@ public class KeyPressedEvent extends Event {
     private final int action;
     private final int modifiers;
 
-    public KeyPressedEvent(long window, int key, int scancode, int action, int modifiers){
-        this.window=window;
-        this.key=key;
-        this.scancode=scancode;
-        this.action=action;
-        this.modifiers=modifiers;
+    public KeyPressedEvent(long window, int key, int scancode, int action, int modifiers) {
+        this.window = window;
+        this.key = key;
+        this.scancode = scancode;
+        this.action = action;
+        this.modifiers = modifiers;
 
     }
 

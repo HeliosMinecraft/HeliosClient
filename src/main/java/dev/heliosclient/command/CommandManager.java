@@ -1,33 +1,25 @@
 package dev.heliosclient.command;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import dev.heliosclient.command.commands.*;
-import dev.heliosclient.module.Module_;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 
-public class CommandManager 
-{
-    private static MinecraftClient mc = MinecraftClient.getInstance();
-	private final CommandDispatcher<CommandSource> DISPATCHER = new CommandDispatcher<>();
+import java.util.*;
+
+public class CommandManager {
+    public static String prefix = ".";
+    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private final CommandDispatcher<CommandSource> DISPATCHER = new CommandDispatcher<>();
     private final CommandSource COMMAND_SOURCE = new ChatCommandSource(mc);
     private final List<Command> commands = new ArrayList<>();
     private final Map<Class<? extends Command>, Command> commandInstances = new HashMap<>();
 
-    public static String prefix = ".";
-
     private CommandManager() {
-    	add(new VClip());
+        add(new VClip());
         add(new Help());
         add(new Toggle());
         add(new Teleport());
@@ -57,12 +49,6 @@ public class CommandManager
 
     public CommandSource getCommandSource() {
         return COMMAND_SOURCE;
-    }
-
-    private final static class ChatCommandSource extends ClientCommandSource {
-        public ChatCommandSource(MinecraftClient client) {
-            super(null, client);
-        }
     }
 
     public void add(Command command) {
@@ -96,7 +82,13 @@ public class CommandManager
         return (T) commandInstances.get(klass);
     }
 
-	public String getPrefix() {
-		return prefix;
-	}
+    public String getPrefix() {
+        return prefix;
+    }
+
+    private final static class ChatCommandSource extends ClientCommandSource {
+        public ChatCommandSource(MinecraftClient client) {
+            super(null, client);
+        }
+    }
 }

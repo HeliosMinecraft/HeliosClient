@@ -54,12 +54,11 @@ public class KeyBind extends Setting {
 
     @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (listening)
-        {
+        if (listening) {
             if (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_ESCAPE) {
                 this.value = 0;
             } else {
-            this.value = keyCode;
+                this.value = keyCode;
             }
             listening = false;
             module.onSettingChange(this);
@@ -67,10 +66,9 @@ public class KeyBind extends Setting {
     }
 
     @Override
-    public void mouseClicked(double mouseX, double mouseY, int button)
-    {
-        if (hovered((int)mouseX, (int)mouseY) && button == 0) {
+    public void mouseClicked(double mouseX, double mouseY, int button) {
+        if (hovered((int) mouseX, (int) mouseY) && button == 0) {
             listening = !listening;
-    }
+        }
     }
 }

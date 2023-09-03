@@ -11,7 +11,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class CategoryPane {
@@ -21,44 +20,47 @@ public class CategoryPane {
     int startX, startY;
     boolean dragging = false;
     ArrayList<ModuleButton> moduleButtons;
-    private Screen parentScreen;
+    private final Screen parentScreen;
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
         this.category = category;
         this.x = initialX;
         this.y = initialY;
         this.collapsed = collapsed;
-        this.parentScreen=parentScreen;
+        this.parentScreen = parentScreen;
         moduleButtons = new ArrayList<ModuleButton>();
         for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
-            moduleButtons.add(new ModuleButton(m,parentScreen));
+            moduleButtons.add(new ModuleButton(m, parentScreen));
         }
         if (moduleButtons.size() == 0) collapsed = true;
         height = (moduleButtons.size() * 12) + 18;
     }
-    public void addModule(List<Module_> moduleS){
-        for (Module_ module: moduleS){
+
+    public void addModule(List<Module_> moduleS) {
+        for (Module_ module : moduleS) {
             boolean exists = false;
-            for(ModuleButton button: moduleButtons){
-                if(button.module == module){
+            for (ModuleButton button : moduleButtons) {
+                if (button.module == module) {
                     exists = true;
                     break;
                 }
             }
-            if(!exists){
-                ModuleButton moduleButton = new ModuleButton(module,parentScreen);
+            if (!exists) {
+                ModuleButton moduleButton = new ModuleButton(module, parentScreen);
                 moduleButtons.add(moduleButton);
             }
         }
     }
-    public void removeModule(Module_ module){
+
+    public void removeModule(Module_ module) {
         moduleButtons.removeIf(button -> button.module == module);
     }
-    public void keepOnlyModule(Module_ module){
+
+    public void keepOnlyModule(Module_ module) {
         moduleButtons.removeIf(button -> button.module != module);
     }
 
-    public void removeModules(){
+    public void removeModules() {
         moduleButtons.clear();
     }
 
@@ -67,22 +69,22 @@ public class CategoryPane {
             x = mouseX - startX;
             y = mouseY - startY;
         }
-        Renderer2D.drawRoundedRectangle(drawContext,x, y, true,true,false,false, width, 16,3, 0xFF1B1B1B);
-        Renderer2D.drawRectangle(drawContext,x, y + 16, width,  2, ColorManager.INSTANCE.clickGuiSecondary());
+        Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, width, 16, 3, 0xFF1B1B1B);
+        Renderer2D.drawRectangle(drawContext, x, y + 16, width, 2, ColorManager.INSTANCE.clickGuiSecondary());
 
         drawContext.drawText(textRenderer, category.name, x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
 
         if (!collapsed) {
-            int buttonYOffset = y + 18;;
+            int buttonYOffset = y + 18;
             if (category == Category.SEARCH) {
                 buttonYOffset = y + 35;
             }
 
 
             for (ModuleButton m : moduleButtons) {
-                if(m.hasFaded()){
-                   m.startFading();
+                if (m.hasFaded()) {
+                    m.startFading();
                 }
 
                 m.setFaded(false);
@@ -93,8 +95,8 @@ public class CategoryPane {
                     for (Setting setting : m.module.quickSettings) {
                         if (!setting.shouldRender()) continue;
                         //setting.width=96;
-                        setting.quickSettings=m.settingsOpen;
-                        setting.renderCompact(drawContext,x, buttonYOffset,mouseX,mouseY,textRenderer);
+                        setting.quickSettings = m.settingsOpen;
+                        setting.renderCompact(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                         buttonYOffset += setting.heightCompact;
                     }
                 }
@@ -113,10 +115,10 @@ public class CategoryPane {
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
         for (ModuleButton moduleButton : moduleButtons) {
-            if (moduleButton.mouseClicked(mouseX, mouseY, button,collapsed)) return;
+            if (moduleButton.mouseClicked(mouseX, mouseY, button, collapsed)) return;
             if (moduleButton.settingsOpen) {
                 for (Setting setting : moduleButton.module.settings) {
-                    setting.mouseClicked(mouseX,mouseY,button);
+                    setting.mouseClicked(mouseX, mouseY, button);
                 }
             }
         }

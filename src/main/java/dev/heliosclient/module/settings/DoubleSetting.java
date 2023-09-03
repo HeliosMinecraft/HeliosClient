@@ -9,17 +9,15 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
-public class DoubleSetting extends Setting
-{
-    public double value;
+public class DoubleSetting extends Setting {
     private final double min, max;
     private final int roundingPlace;
+    public double value;
     Module_ module;
 
     boolean sliding = false;
 
-    public DoubleSetting(String name, String description, Module_ module, double value, double min, double max, int roundingPlace)
-    {
+    public DoubleSetting(String name, String description, Module_ module, double value, double min, double max, int roundingPlace) {
         this.name = name;
         this.description = description;
         this.value = value;
@@ -33,26 +31,26 @@ public class DoubleSetting extends Setting
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-            drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
-            double diff = Math.min(100, Math.max(0, (mouseX - x) / 1.9));
+        drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+        double diff = Math.min(100, Math.max(0, (mouseX - x) / 1.9));
 
-            if (sliding) {
-                if (diff == 0) {
-                    value = min;
-                } else {
-                    value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
-                }
-                module.onSettingChange(this);
+        if (sliding) {
+            if (diff == 0) {
+                value = min;
+            } else {
+                value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
             }
+            module.onSettingChange(this);
+        }
 
-            String valueString = "" + MathUtils.round(value, roundingPlace);
-            drawContext.drawText(textRenderer, Text.literal(valueString), (x + 190) - textRenderer.getWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
-            Renderer2D.drawRoundedRectangle(drawContext,x + 2,y+16 ,188 ,2 ,1 ,0xFFAAAAAA);
-            int scaledValue = (int) ((value - min) / (max - min) * 188) + 2;
-            Renderer2D.drawRoundedRectangle(drawContext,x+2,y+16,scaledValue,2 ,1 ,0xFF55FFFF);
-            Renderer2D.drawRoundedRectangle(drawContext,x+scaledValue,y+14,2, 6,1 ,0xFFFFFFFF);
+        String valueString = "" + MathUtils.round(value, roundingPlace);
+        drawContext.drawText(textRenderer, Text.literal(valueString), (x + 190) - textRenderer.getWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+        Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, 188, 2, 1, 0xFFAAAAAA);
+        int scaledValue = (int) ((value - min) / (max - min) * 188) + 2;
+        Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, scaledValue, 2, 1, 0xFF55FFFF);
+        Renderer2D.drawRoundedRectangle(drawContext, x + scaledValue, y + 14, 2, 6, 1, 0xFFFFFFFF);
 
-        if (hovered(mouseX,mouseY)) {
+        if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {
             hovertimer = 0;
@@ -66,25 +64,25 @@ public class DoubleSetting extends Setting
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-            drawContext.drawText(textRenderer, Text.literal(name.substring(0,Math.min(12,name.length())) + "..."), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
-            double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
+        drawContext.drawText(textRenderer, Text.literal(name.substring(0, Math.min(12, name.length())) + "..."), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+        double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
 
-            if (sliding) {
-                if (diff == 0) {
-                    value = min;
-                } else {
-                    value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
-                }
-                module.onSettingChange(this);
+        if (sliding) {
+            if (diff == 0) {
+                value = min;
+            } else {
+                value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
             }
+            module.onSettingChange(this);
+        }
 
-            String valueString = "" + MathUtils.round(value, roundingPlace);
-            drawContext.drawText(textRenderer, Text.literal(valueString), (x + moduleWidth - 10) - textRenderer.getWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
-            Renderer2D.drawRoundedRectangle(drawContext,x + 2, y + 16, moduleWidth - 8, 2, 1,0xFFAAAAAA);
-            int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 10)) + 2;
-            Renderer2D.drawRoundedRectangle(drawContext,x + 2, y + 16, scaledValue, 2,1 ,0xFF55FFFF);
-            Renderer2D.drawRoundedRectangle(drawContext,x + scaledValue,y+14,2,6 ,1 ,0xFFFFFFFF);
-        if (hovered(mouseX,mouseY)) {
+        String valueString = "" + MathUtils.round(value, roundingPlace);
+        drawContext.drawText(textRenderer, Text.literal(valueString), (x + moduleWidth - 10) - textRenderer.getWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+        Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, moduleWidth - 8, 2, 1, 0xFFAAAAAA);
+        int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 10)) + 2;
+        Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, scaledValue, 2, 1, 0xFF55FFFF);
+        Renderer2D.drawRoundedRectangle(drawContext, x + scaledValue, y + 14, 2, 6, 1, 0xFFFFFFFF);
+        if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {
             hovertimer = 0;
@@ -97,18 +95,15 @@ public class DoubleSetting extends Setting
 
 
     @Override
-	public void mouseClicked(double mouseX, double mouseY, int button) 
-    {
-		if (hovered((int)mouseX, (int)mouseY) && button == 0) 
-        {
-			this.sliding = true;
-		}
-	}
-	
-	@Override
-	public void mouseReleased(double mouseX, double mouseY, int button) 
-    {
-		sliding = false;
-	}
-    
+    public void mouseClicked(double mouseX, double mouseY, int button) {
+        if (hovered((int) mouseX, (int) mouseY) && button == 0) {
+            this.sliding = true;
+        }
+    }
+
+    @Override
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        sliding = false;
+    }
+
 }

@@ -10,29 +10,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClickGUI extends Module_ {
+    public static boolean pause = false;
     static ClickGUI INSTANCE = new ClickGUI();
-    BooleanSetting Pause = new BooleanSetting("Pause game", "Pause the game when Click GUI is on.", this,false);
+    public static DoubleSetting ScrollSpeed = new DoubleSetting("Scroll Speed", "Change your scroll speed for the ClickGUI", INSTANCE, 7, 1, 8, 1);
+    BooleanSetting Pause = new BooleanSetting("Pause game", "Pause the game when Click GUI is on.", this, false);
     ColorSetting AccentColor = new ColorSetting("Accent color", "Accent color of Click GUI.", this, ColorManager.INSTANCE.clickGuiSecondary);
-    BooleanSetting RainbowAccent = new BooleanSetting("Rainbow", "Rainbow effect for accent color.",this,false);
-    BooleanSetting RainbowPane = new BooleanSetting("Rainbow", "Rainbow effect for category panes.", this,false);
+    BooleanSetting RainbowAccent = new BooleanSetting("Rainbow", "Rainbow effect for accent color.", this, false);
+    BooleanSetting RainbowPane = new BooleanSetting("Rainbow", "Rainbow effect for category panes.", this, false);
     ColorSetting PaneTextColor = new ColorSetting("Category pane text color", "Color of pane text.", this, ColorManager.INSTANCE.clickGuiPaneText);
     ColorSetting TextColor = new ColorSetting("Text color", "Color of text all through out the client.", this, ColorManager.INSTANCE.defaultTextColor);
     CycleSetting TooltipMode = new CycleSetting("Tooltip mode", "Mode in what tooltips should be shown.", this, new ArrayList<String>(List.of("Normal", "Fixed", "Vanilla")), 0);
-
     CycleSetting TooltipPos = new CycleSetting("Tooltip position", "Position of fixed tooltip.", this, new ArrayList<>(List.of("Top-left", "Top-right", "Bottom-left", "Bottom-right", "Center")), 3) {
         @Override
         public boolean shouldRender() {
             return TooltipMode.value == 1;
         }
     };
-    public static DoubleSetting ScrollSpeed = new DoubleSetting("Scroll Speed","Change your scroll speed for the ClickGUI",INSTANCE,7,1,8,1);
-
-    public static boolean pause = false;
-
 
 
     public ClickGUI() {
-        super("ClickGUI", "ClickGui related stuff.",  Category.RENDER);
+        super("ClickGUI", "ClickGui related stuff.", Category.RENDER);
         settings.add(Pause);
         settings.add(TooltipMode);
         settings.add(TooltipPos);
@@ -49,7 +46,7 @@ public class ClickGUI extends Module_ {
         quickSettings.add(RainbowPane);
         quickSettings.add(RainbowAccent);
         quickSettings.add(TextColor);
-        active.value=true;
+        active.value = true;
     }
 
     @Override
@@ -89,5 +86,6 @@ public class ClickGUI extends Module_ {
     }
 
     @Override
-    public void toggle() {}
+    public void toggle() {
+    }
 }

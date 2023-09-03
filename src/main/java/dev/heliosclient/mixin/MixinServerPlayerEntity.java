@@ -16,15 +16,15 @@ public abstract class MixinServerPlayerEntity {
 
     @Inject(method = "sendPickup", at = @At("HEAD"), cancellable = true)
     private void onItemPickup(Entity item, int count, CallbackInfo info) {
-            if(item instanceof ItemEntity itemEntity) {
-                ItemStack stack = itemEntity.getStack();
-                ItemPickupEvent event = new ItemPickupEvent(stack);
-                EventManager.postEvent(event);
-                if (event.isCanceled()) {
-                    info.cancel();
-                }
-                //TODO: Future MobEntityPickUp Event
+        if (item instanceof ItemEntity itemEntity) {
+            ItemStack stack = itemEntity.getStack();
+            ItemPickupEvent event = new ItemPickupEvent(stack);
+            EventManager.postEvent(event);
+            if (event.isCanceled()) {
+                info.cancel();
             }
+            //TODO: Future MobEntityPickUp Event
+        }
     }
 }
 

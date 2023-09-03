@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StringListSetting extends Setting {
-    public String[] values;
-    String description;
     private final List<InputBox> inputBox = new ArrayList<>();
     private final int characterLimit;
+    public String[] values;
+    String description;
 
     public StringListSetting(String name, String description, String[] values, int defaultBoxes, int characterLimit) {
         this.name = name;

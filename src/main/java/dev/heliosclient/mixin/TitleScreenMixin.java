@@ -1,12 +1,16 @@
-    package dev.heliosclient.mixin;
+package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.ui.HeliosClientInfoScreen;
 import dev.heliosclient.ui.altmanager.AltManagerScreen;
-
-import net.minecraft.client.gui.screen.option.CreditsAndAttributionScreen;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.PressableTextWidget;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.Text;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,18 +19,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-
 @Mixin(TitleScreen.class)
-public abstract class TitleScreenMixin extends Screen 
-{ 
+public abstract class TitleScreenMixin extends Screen {
     @Shadow
     @Final
     private boolean doBackgroundFade;
@@ -35,19 +29,17 @@ public abstract class TitleScreenMixin extends Screen
     @Final
     private long backgroundFadeStart;
 
-    public TitleScreenMixin() 
-    {
+    public TitleScreenMixin() {
         super(null);
     }
 
     @ModifyArg(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/realms/gui/screen/RealmsNotificationsScreen;init(Lnet/minecraft/client/MinecraftClient;II)V"), method = "init", index = 2)
     private int adjustRealmsHeight(int height) {
-            return height - 51;
+        return height - 51;
     }
 
     @Inject(at = @At("TAIL"), method = "init")
-    private void clientTag(CallbackInfo ci)
-    {
+    private void clientTag(CallbackInfo ci) {
         float f = this.doBackgroundFade ? (Util.getMeasuringTimeMs() - this.backgroundFadeStart) / 1000.0F : 1.0F;
         float g = this.doBackgroundFade ? MathHelper.clamp(f - 1.0F, 0.0F, 1.0F) : 1.0F;
         int l = MathHelper.ceil(g * 255.0F) << 24;
@@ -60,16 +52,14 @@ public abstract class TitleScreenMixin extends Screen
     }
 
     @Inject(at = @At("TAIL"), method = "init")
-	private void altManagerButton(CallbackInfo callbackInfo) 
-    {
+    private void altManagerButton(CallbackInfo callbackInfo) {
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Alt Manager"), this::gotoAltManagerScreen)
-            .position(this.width - 102, 2)
-            .size(100, 20)
-            .build());
-	}
+                .position(this.width - 102, 2)
+                .size(100, 20)
+                .build());
+    }
 
-    private void gotoAltManagerScreen(ButtonWidget button)
-    {
+    private void gotoAltManagerScreen(ButtonWidget button) {
         MinecraftClient.getInstance().setScreen(AltManagerScreen.INSTANCE);
     }
 }

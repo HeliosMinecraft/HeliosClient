@@ -12,8 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MinecraftServer.class)
 public class MixinMinecraftServer {
     @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
-    public void onTick(CallbackInfo ci)
-    {
+    public void onTick(CallbackInfo ci) {
         MinecraftServer server = (MinecraftServer) (Object) this;
         if (server != null) {
 

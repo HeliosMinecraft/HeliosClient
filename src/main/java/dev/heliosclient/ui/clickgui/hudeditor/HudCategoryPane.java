@@ -2,7 +2,6 @@ package dev.heliosclient.ui.clickgui.hudeditor;
 
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementList;
-import dev.heliosclient.hud.HudManager;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
@@ -11,6 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 import java.util.ArrayList;
 
 public class HudCategoryPane {
+    public static HudCategoryPane INSTACE = new HudCategoryPane();
     public int x = 20;
     public int y = 20;
     public int startX, startY;
@@ -18,8 +18,6 @@ public class HudCategoryPane {
     public boolean dragging = false;
     public boolean collapsed = false;
     public ArrayList<HudElementButton> hudElementButtons = new ArrayList<HudElementButton>();
-
-    public static HudCategoryPane INSTACE = new HudCategoryPane();
 
     public HudCategoryPane() {
         for (HudElement element : HudElementList.INSTANCE.hudElements) {
@@ -34,7 +32,7 @@ public class HudCategoryPane {
         }
 
         Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, width, 16, 3, 0xFF1B1B1B);
-        Renderer2D.drawRectangle(drawContext, x, y+16, width, 2, ColorManager.INSTANCE.clickGuiSecondary());
+        Renderer2D.drawRectangle(drawContext, x, y + 16, width, 2, ColorManager.INSTANCE.clickGuiSecondary());
         drawContext.drawText(textRenderer, "Hud elements", x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
 
@@ -47,7 +45,7 @@ public class HudCategoryPane {
         }
     }
 
-    public void  mouseClicked(double mouseX, double mouseY, int button) {
+    public void mouseClicked(double mouseX, double mouseY, int button) {
         if (hovered(mouseX, mouseY) && button == 1) collapsed = !collapsed;
         else if (hovered(mouseX, mouseY) && button == 0) {
             startX = (int) (mouseX - x);
@@ -59,7 +57,8 @@ public class HudCategoryPane {
             elementButton.mouseClicked(mouseX, mouseY, button);
         }
     }
-    public void  mouseReleased(double mouseX, double mouseY, int button) {
+
+    public void mouseReleased(double mouseX, double mouseY, int button) {
         dragging = false;
     }
 

@@ -33,9 +33,9 @@ public class AnimationUtils {
         int a = (int) (t * 255);
         int newColor = ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
         if (!RoundedBox)
-            Renderer2D.drawRectangle(context,x, y, width, height, newColor);
+            Renderer2D.drawRectangle(context, x, y, width, height, newColor);
         else
-            Renderer2D.drawRoundedRectangle(context,x, y, width, height,radius, newColor);
+            Renderer2D.drawRoundedRectangle(context, x, y, width, height, radius, newColor);
     }
 
     public void drawFadingText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int color, boolean shadow) {
@@ -43,18 +43,17 @@ public class AnimationUtils {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
                 fading = false;
-                alpha = Math.max(0.0f, Math.min(1.0f,alpha));
+                alpha = Math.max(0.0f, Math.min(1.0f, alpha));
             }
         }
-        float t = Easing.ease(easingType,alpha);
+        float t = Easing.ease(easingType, alpha);
         int a = (int) (t * 255);
-        if(a>=255)
-        {
-            a=254; // 255 makes alpha of text to 0 for some reason
+        if (a >= 255) {
+            a = 254; // 255 makes alpha of text to 0 for some reason
         }
         Color nColor = ColorUtils.intToColor(color);
-        int newColor = ColorUtils.changeAlpha(nColor,a).getRGB();
-        context.drawText(textRenderer,text,x,y,newColor,shadow);
+        int newColor = ColorUtils.changeAlpha(nColor, a).getRGB();
+        context.drawText(textRenderer, text, x, y, newColor, shadow);
     }
 
     public void drawFadingAndPoppingBox(DrawContext context, int x, int y, int width, int height, int color, boolean RoundedBox, int radius) {
@@ -65,17 +64,17 @@ public class AnimationUtils {
                 alpha = Math.max(0.0f, Math.min(1.0f, alpha));
             }
         }
-        float t = Easing.ease(easingType,alpha);
+        float t = Easing.ease(easingType, alpha);
         int a = (int) (t * 255);
         int newColor = ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
         float scale = Easing.ease(easingType, alpha);
         context.getMatrices().push();
-        context.getMatrices().translate(x + width / 2f, y + height / 2f,0);
-        context.getMatrices().scale(scale, scale,0);
+        context.getMatrices().translate(x + width / 2f, y + height / 2f, 0);
+        context.getMatrices().scale(scale, scale, 0);
         if (!RoundedBox)
             Renderer2D.drawRectangle(context, (int) (-width / 2f), (int) (-height / 2f), width, height, newColor);
         else
-            Renderer2D.drawRoundedRectangle(context, (int) (-width / 2f), (int) (-height / 2f), width, height,radius, newColor);
+            Renderer2D.drawRoundedRectangle(context, (int) (-width / 2f), (int) (-height / 2f), width, height, radius, newColor);
         context.getMatrices().pop();
     }
 
@@ -87,20 +86,19 @@ public class AnimationUtils {
                 alpha = Math.max(0.0f, Math.min(1.0f, alpha));
             }
         }
-        float t = Easing.ease(easingType,alpha);
+        float t = Easing.ease(easingType, alpha);
         int a = (int) (t * 255);
 
-        if(a>=255)
-        {
-            a=254; // 255 makes alpha of text to 0 for some reason
+        if (a >= 255) {
+            a = 254; // 255 makes alpha of text to 0 for some reason
         }
         Color nColor = ColorUtils.intToColor(color);
         int newColor = ColorUtils.changeAlpha(nColor, a).getRGB();
-        float scale = Easing.ease(easingType,alpha);
+        float scale = Easing.ease(easingType, alpha);
         context.getMatrices().push();
-        context.getMatrices().translate(x,y,0);
-        context.getMatrices().scale(scale,scale,0);
-        context.drawText(textRenderer,text,-textRenderer.getWidth(text)/2,-textRenderer.fontHeight/2,newColor,shadow);
+        context.getMatrices().translate(x, y, 0);
+        context.getMatrices().scale(scale, scale, 0);
+        context.drawText(textRenderer, text, -textRenderer.getWidth(text) / 2, -textRenderer.fontHeight / 2, newColor, shadow);
         context.getMatrices().pop();
     }
 }

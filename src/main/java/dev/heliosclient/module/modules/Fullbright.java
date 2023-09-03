@@ -1,8 +1,6 @@
 package dev.heliosclient.module.modules;
 
 import dev.heliosclient.event.EventManager;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
@@ -15,19 +13,18 @@ import net.minecraft.entity.effect.StatusEffects;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Fullbright extends Module_ 
-{
+public class Fullbright extends Module_ {
     ArrayList<String> modes = new ArrayList<String>(List.of("Gamma", "Night Vision"));
-    CycleSetting mode = new CycleSetting("Mode","Fullbright mode to apply",this,modes,0);
+    CycleSetting mode = new CycleSetting("Mode", "Fullbright mode to apply", this, modes, 0);
     DoubleSetting gamma = new DoubleSetting("Gamma", "Desired gamma value", this, 15, 0, 15, 0) {
         @Override
         public boolean shouldRender() {
             return mode.value == 0;
         }
     };
-    public Fullbright()
-    {
-        super("Fullbright", "Allows you to see in the dark.",  Category.RENDER);
+
+    public Fullbright() {
+        super("Fullbright", "Allows you to see in the dark.", Category.RENDER);
         EventManager.register(this);
         settings.add(mode);
         settings.add(gamma);

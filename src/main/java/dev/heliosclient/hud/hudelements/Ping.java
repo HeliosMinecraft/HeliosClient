@@ -10,7 +10,7 @@ import net.minecraft.client.network.PlayerListEntry;
 
 public class Ping extends HudElement {
 
-    private static MinecraftClient mc = MinecraftClient.getInstance();
+    private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public Ping() {
         super("Ping", "Shows current player ping");
@@ -18,14 +18,8 @@ public class Ping extends HudElement {
         this.height = 13;
     }
 
-    @Override
-    public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
-        String text = "Ping: " + ColorUtils.gray + getPing() ;
-        this.width = textRenderer.getWidth(text) + 1;
-        drawContext.drawText(textRenderer, text, this.x-width/2 + 1, this.y+height/2-10, HeliosClient.uiColorA, false);
-    }
     public static int getPing() {
-        if (mc.player==null){
+        if (mc.player == null) {
             return 0;
         }
         PlayerListEntry entry = mc.player.networkHandler.getPlayerListEntry(mc.player.getUuid());
@@ -33,5 +27,12 @@ public class Ping extends HudElement {
             return entry.getLatency();
         }
         return 0;
+    }
+
+    @Override
+    public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
+        String text = "Ping: " + ColorUtils.gray + getPing();
+        this.width = textRenderer.getWidth(text) + 1;
+        drawContext.drawText(textRenderer, text, this.x - width / 2 + 1, this.y + height / 2 - 10, HeliosClient.uiColorA, false);
     }
 }

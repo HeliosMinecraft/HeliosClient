@@ -7,34 +7,31 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.util.ISimpleOption;
 
-public class CustomFov extends Module_
-{
+public class CustomFov extends Module_ {
     DoubleSetting FOV = new DoubleSetting("FOV", "Desired FOV.", this, 140, 1, 240, 0);
 
     private int previousFov = 100;
-    public CustomFov()
-    {
-        super("CustomFOV", "Allows you to set custom field of view.",  Category.RENDER);
+
+    public CustomFov() {
+        super("CustomFOV", "Allows you to set custom field of view.", Category.RENDER);
         settings.add(FOV);
         quickSettings.add(FOV);
         //quickSettings.add(RainbowPane);
     }
+
     @SubscribeEvent
-    public void onTick(TickEvent event)
-    {
-        ((ISimpleOption<Integer>)(Object)mc.options.getFov()).setValueUnrestricted((int)(FOV.value));
+    public void onTick(TickEvent event) {
+        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).setValueUnrestricted((int) (FOV.value));
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         super.onEnable();
         previousFov = mc.options.getFov().getValue();
     }
 
     @Override
-    public void onDisable()
-    {
+    public void onDisable() {
         super.onDisable();
         mc.options.getFov().setValue(previousFov);
     }

@@ -7,7 +7,7 @@ public class KeycodeToString {
     public static String translate(Integer keyCode) {
         String keyName = GLFW.glfwGetKeyName(keyCode, 0);
         if (keyName == null) {
-            switch (keyCode){
+            switch (keyCode) {
                 case GLFW.GLFW_KEY_RIGHT_SHIFT -> {
                     return "RIGHT_SHIFT";
                 }
@@ -168,7 +168,7 @@ public class KeycodeToString {
                     return "ENTER";
                 }
                 default -> {
-                    return "KEY_"+keyCode;
+                    return "KEY_" + keyCode;
                 }
             }
         }

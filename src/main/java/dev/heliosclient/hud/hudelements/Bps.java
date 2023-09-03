@@ -12,7 +12,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class Bps extends HudElement {
 
-    private MinecraftClient mc = MinecraftClient.getInstance();
+    private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public Bps() {
         super("Player Speed", "Shows player speed in blocks per second");
@@ -24,18 +24,18 @@ public class Bps extends HudElement {
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         String text = "Blocks Per Second: ";
         String value = ColorUtils.gray + MathUtils.round(moveSpeed(), 2);
-        this.width = textRenderer.getWidth(text)+ textRenderer.getWidth(value);
-        drawContext.drawText(textRenderer, text, this.x-width/2 + 1, this.y+height/2-10, HeliosClient.uiColorA, false);
-        drawContext.drawText(textRenderer, value, this.x-width/2 + 1 + textRenderer.getWidth(text), this.y+height/2-10, HeliosClient.uiColorA, false);
+        this.width = textRenderer.getWidth(text) + textRenderer.getWidth(value);
+        drawContext.drawText(textRenderer, text, this.x - width / 2 + 1, this.y + height / 2 - 10, HeliosClient.uiColorA, false);
+        drawContext.drawText(textRenderer, value, this.x - width / 2 + 1 + textRenderer.getWidth(text), this.y + height / 2 - 10, HeliosClient.uiColorA, false);
 
     }
-    private double moveSpeed()
-    {
-        if(mc.player==null){
+
+    private double moveSpeed() {
+        if (mc.player == null) {
             return 0D;
         }
         Vec3d move = new Vec3d(mc.player.getX() - mc.player.prevX, 0, mc.player.getZ() - mc.player.prevZ).multiply(20);
 
-        return Math.abs(MathUtils.length2D(move)) ;
+        return Math.abs(MathUtils.length2D(move));
     }
 }

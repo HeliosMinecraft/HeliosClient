@@ -10,8 +10,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
-import java.awt.*;
-
 public class BooleanSetting extends Setting {
     public boolean value;
     Module_ module;
@@ -24,7 +22,7 @@ public class BooleanSetting extends Setting {
         this.description = description;
         this.heightCompact = 18;
         this.value = value;
-        CheckBoxAnimation.FADE_SPEED=0.07f;
+        CheckBoxAnimation.FADE_SPEED = 0.07f;
         CheckBoxAnimation.startFading(true, EasingType.QUADRATIC_IN_OUT);
     }
 
@@ -32,8 +30,8 @@ public class BooleanSetting extends Setting {
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
-        Renderer2D.drawOutlineBox(drawContext,x + 175, y + 7, 10, 10,1, 0xFFFFFFFF);
-        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext,x + 177, y + 9, 6, 6,value ? 0xFF55FFFF : 0xFF222222,false,0);
+        Renderer2D.drawOutlineBox(drawContext, x + 175, y + 7, 10, 10, 1, 0xFFFFFFFF);
+        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + 177, y + 9, 6, 6, value ? 0xFF55FFFF : 0xFF222222, false, 0);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -49,11 +47,11 @@ public class BooleanSetting extends Setting {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        drawContext.drawText(textRenderer, Text.literal(name.substring(0,Math.min(12,name.length())) + "..."), x + 3, y + 5, ColorManager.INSTANCE.defaultTextColor(), false);
-        Renderer2D.drawOutlineBox(drawContext,x + moduleWidth - 14,y + 4,10,10 ,1,0xFFFFFFFF);
-        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext,x + moduleWidth - 12,y + 6 ,6 ,6,value ? 0xAA55FFFF : 0xFF222222,false ,0);
+        drawContext.drawText(textRenderer, Text.literal(name.substring(0, Math.min(12, name.length())) + "..."), x + 3, y + 5, ColorManager.INSTANCE.defaultTextColor(), false);
+        Renderer2D.drawOutlineBox(drawContext, x + moduleWidth - 14, y + 4, 10, 10, 1, 0xFFFFFFFF);
+        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + moduleWidth - 12, y + 6, 6, 6, value ? 0xAA55FFFF : 0xFF222222, false, 0);
 
-        if (hovered(mouseX,mouseY)) {
+        if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {
             hovertimer = 0;
@@ -65,11 +63,11 @@ public class BooleanSetting extends Setting {
     }
 
     @Override
-    public void mouseClicked(double mouseX,double mouseY,int button) {
-        if (hovered((int)mouseX,(int)mouseY) && button == 0) {
+    public void mouseClicked(double mouseX, double mouseY, int button) {
+        if (hovered((int) mouseX, (int) mouseY) && button == 0) {
             this.value = !value;
             module.onSettingChange(this);
-            CheckBoxAnimation.startFading(value,EasingType.QUADRATIC_OUT);
+            CheckBoxAnimation.startFading(value, EasingType.QUADRATIC_OUT);
         }
     }
 }

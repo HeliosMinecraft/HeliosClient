@@ -8,9 +8,9 @@ import net.minecraft.entity.player.PlayerEntity;
 @Cancelable
 public class PlayerDamageEvent extends Event {
 
-    private PlayerEntity player;
+    private final PlayerEntity player;
 
-    private DamageSource damageSource;
+    private final DamageSource damageSource;
 
     public PlayerDamageEvent(PlayerEntity player, DamageSource damageSource) {
         this.player = player;

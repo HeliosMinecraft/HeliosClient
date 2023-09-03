@@ -1,7 +1,5 @@
 package dev.heliosclient.event;
 
-import dev.heliosclient.event.Cancelable;
-
 // This abstract class is the base class for all events
 public abstract class Event {
     // This field indicates whether the event is canceled or not

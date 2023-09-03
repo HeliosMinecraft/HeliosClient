@@ -11,7 +11,7 @@ import net.minecraft.command.CommandSource;
 public class Friend extends Command {
 
     public Friend() {
-        super("friend", "Adds or removes friend",  "f");
+        super("friend", "Adds or removes friend", "f");
     }
 
     // Override the build method
@@ -24,16 +24,16 @@ public class Friend extends Command {
                                     // Get the command source and the name argument
                                     String name = StringArgumentType.getString(context, "name");
 
-                                        // Create a new friend object with the name
-                                        dev.heliosclient.system.Friend friend = new  dev.heliosclient.system.Friend(name);
-                                            // Add the friend to the list
+                                    // Create a new friend object with the name
+                                    dev.heliosclient.system.Friend friend = new dev.heliosclient.system.Friend(name);
+                                    // Add the friend to the list
                                     if (FriendManager.isFriend(friend)) {
-                                        ChatUtils.sendHeliosMsg(ColorUtils.red+ "You are already friends with " + name);
+                                        ChatUtils.sendHeliosMsg(ColorUtils.red + "You are already friends with " + name);
                                     } else {
                                         FriendManager.addFriend(friend);
 
                                         // Send a feedback message that the friend is added
-                                        ChatUtils.sendHeliosMsg(ColorUtils.green +"You are now friends with " + name);
+                                        ChatUtils.sendHeliosMsg(ColorUtils.green + "You are now friends with " + name);
                                     }
 
                                     return SINGLE_SUCCESS;
@@ -51,10 +51,10 @@ public class Friend extends Command {
                                     if (FriendManager.isFriend(friend)) {
                                         // Remove the friend from the list
                                         FriendManager.removeFriend(friend);
-                                        ChatUtils.sendHeliosMsg(ColorUtils.green +"You are no longer friends with " + name);
+                                        ChatUtils.sendHeliosMsg(ColorUtils.green + "You are no longer friends with " + name);
                                     } else {
                                         // Send an error message that the friend is not in the list
-                                        ChatUtils.sendHeliosMsg(ColorUtils.red+"You are not friends with " + name);
+                                        ChatUtils.sendHeliosMsg(ColorUtils.red + "You are not friends with " + name);
                                     }
                                     return SINGLE_SUCCESS;
                                 })

@@ -18,13 +18,13 @@ public class NavBarManager {
         clickGUI.onLoad();
 
         registerItems(
-            new NavBarItem("ClickGUI", "ClickGUI", ClickGUIScreen.INSTANCE),
-            new NavBarItem("Settings", "ClickGUI Setting", new ClientSettingsScreen(clickGUI)),
-            new NavBarItem("HudEditor", "HUD editor", new HudEditorScreen())
+                new NavBarItem("ClickGUI", "ClickGUI", ClickGUIScreen.INSTANCE),
+                new NavBarItem("Settings", "ClickGUI Setting", new ClientSettingsScreen(clickGUI)),
+                new NavBarItem("HudEditor", "HUD editor", new HudEditorScreen())
         );
     }
 
-    public void registerItems(NavBarItem ... items) {
+    public void registerItems(NavBarItem... items) {
         this.navBarItems.addAll(Arrays.asList(items));
     }
 }

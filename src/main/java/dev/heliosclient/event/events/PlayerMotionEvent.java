@@ -10,9 +10,9 @@ public class PlayerMotionEvent extends Event {
     private final MovementType type;
     private final Vec3d movement;
 
-    public PlayerMotionEvent(MovementType type, Vec3d movement){
-        this.type=type;
-        this.movement=movement;
+    public PlayerMotionEvent(MovementType type, Vec3d movement) {
+        this.type = type;
+        this.movement = movement;
     }
 
     public MovementType getType() {

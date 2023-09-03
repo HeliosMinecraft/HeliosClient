@@ -7,10 +7,10 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 public class StringSetting extends Setting {
-    public String value;
-    String description;
     private final InputBox inputBox;
     private final int characterLimit;
+    public String value;
+    String description;
 
     public StringSetting(String name, String description, String value, int characterLimit) {
         this.name = name;

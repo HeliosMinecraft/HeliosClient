@@ -14,13 +14,11 @@ public class Tooltip {
     public Integer mode = 0;
     public Integer fixedPos = 3;
 
-    public Tooltip()
-    {
+    public Tooltip() {
     }
 
-    public void render(DrawContext drawContext, TextRenderer textRenderer, int mouseX, int mouseY)
-    {
-        if (this.tooltipText!=null && !this.tooltipText.isEmpty()) {
+    public void render(DrawContext drawContext, TextRenderer textRenderer, int mouseX, int mouseY) {
+        if (this.tooltipText != null && !this.tooltipText.isEmpty()) {
             int windWidth = drawContext.getScaledWindowWidth();
             int winHeight = drawContext.getScaledWindowHeight();
             int textWidth = textRenderer.getWidth(this.tooltipText);
@@ -47,17 +45,17 @@ public class Tooltip {
             } else if (this.mode == 2) {
                 drawContext.drawTooltip(textRenderer, Text.of(this.tooltipText), mouseX, mouseY);
             }
-            }
+        }
         this.tooltipText = "";
-        }
+    }
 
 
-        private void renderTooltip(DrawContext drawContext, TextRenderer textRenderer, String text, int x, int y) {
-            int textWidth = textRenderer.getWidth(text);
-            Renderer2D.drawRectangle(drawContext,x, y-13, (textWidth + 4), 13, 0xAA000000);
-            Renderer2D.drawOutlineBox(drawContext,x-1, y-13, (textWidth + 5), 14,1, Color.GRAY.getRGB());
-            drawContext.drawText(textRenderer, text, x + 2, y - 10, ColorManager.INSTANCE.defaultTextColor(), true);
-        }
+    private void renderTooltip(DrawContext drawContext, TextRenderer textRenderer, String text, int x, int y) {
+        int textWidth = textRenderer.getWidth(text);
+        Renderer2D.drawRectangle(drawContext, x, y - 13, (textWidth + 4), 13, 0xAA000000);
+        Renderer2D.drawOutlineBox(drawContext, x - 1, y - 13, (textWidth + 5), 14, 1, Color.GRAY.getRGB());
+        drawContext.drawText(textRenderer, text, x + 2, y - 10, ColorManager.INSTANCE.defaultTextColor(), true);
+    }
 
     public void changeText(String str) {
         this.tooltipText = str;

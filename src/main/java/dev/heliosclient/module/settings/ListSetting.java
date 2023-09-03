@@ -10,11 +10,11 @@ import net.minecraft.client.gui.screen.Screen;
 import java.util.ArrayList;
 
 public class ListSetting extends Setting {
-    public ArrayList < String > value;
-    public ArrayList < String > options;
+    public ArrayList<String> value;
+    public ArrayList<String> options;
     Screen parentScreen;
 
-    public ListSetting(String name, String description, Screen parentScreen, ArrayList < String > options, ArrayList < String > value) {
+    public ListSetting(String name, String description, Screen parentScreen, ArrayList<String> options, ArrayList<String> value) {
         this.name = name;
         this.description = description;
         this.options = options;

@@ -10,7 +10,7 @@ import net.minecraft.client.gui.DrawContext;
 
 public class Coords extends HudElement {
 
-    private MinecraftClient mc = MinecraftClient.getInstance();
+    private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public Coords() {
         super("Coords", "Shows player coords");
@@ -37,7 +37,7 @@ public class Coords extends HudElement {
 
         this.width = textRenderer.getWidth(text) + 1;
 
-        drawContext.drawText(textRenderer, text, this.x-width/2, this.y+height/2-10, HeliosClient.uiColorA, false);
+        drawContext.drawText(textRenderer, text, this.x - width / 2, this.y + height / 2 - 10, HeliosClient.uiColorA, false);
     }
 
 }

@@ -1,8 +1,6 @@
 package dev.heliosclient.util;
 
 import dev.heliosclient.event.EventManager;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.KeyPressedEvent;
 import dev.heliosclient.event.listener.Listener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -16,7 +14,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InputBox  implements Listener {
+public class InputBox implements Listener {
     public int x, y, width, height;
     private String value;
     private List<String> textSegments;
@@ -55,20 +53,21 @@ public class InputBox  implements Listener {
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y + 10 + MinecraftClient.getInstance().textRenderer.fontHeight) && mouseY <= (y + 12 + MinecraftClient.getInstance().textRenderer.fontHeight + height) );
+        focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y + 10 + MinecraftClient.getInstance().textRenderer.fontHeight) && mouseY <= (y + 12 + MinecraftClient.getInstance().textRenderer.fontHeight + height));
         cursorPosition = value.length();
     }
+
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         setText(value);
 
         this.x = x;
         this.y = y;
-        Renderer2D.drawOutlineBox(drawContext, x + 1, y + 10 + textRenderer.fontHeight, width+2, height+2, 1, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
+        Renderer2D.drawOutlineBox(drawContext, x + 1, y + 10 + textRenderer.fontHeight, width + 2, height + 2, 1, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
         Renderer2D.drawRectangle(drawContext, x + 2, y + textRenderer.fontHeight + 11, width, height, Color.black.getRGB());
 
         if (focused) {
             scrollOffset = Math.max(0, Math.min(scrollOffset, value.length()));
-            cursorPosition = Math.max(0,Math.min(cursorPosition,value.length()));
+            cursorPosition = Math.max(0, Math.min(cursorPosition, value.length()));
 
             // Find the segment that contains the cursor
             int segmentIndex = 0;
@@ -87,7 +86,7 @@ public class InputBox  implements Listener {
                 drawContext.drawText(textRenderer,
                         Text.literal(displayValue),
                         x + 5,
-                        y + height/3 +  10 + textRenderer.fontHeight,
+                        y + height / 3 + 10 + textRenderer.fontHeight,
                         0xFFFFFFFF,
                         false);
 
@@ -95,9 +94,9 @@ public class InputBox  implements Listener {
                 int cursorX = x + 5 + textRenderer.getWidth(displayValue.substring(0, cursorPosition - segmentStartIndex));
                 Renderer2D.drawRectangle(drawContext,
                         cursorX,
-                        y + height/3 +  10 + textRenderer.fontHeight,
+                        y + height / 3 + 10 + textRenderer.fontHeight,
                         1,
-                        textRenderer.fontHeight-1,
+                        textRenderer.fontHeight - 1,
                         Color.LIGHT_GRAY.getRGB());
             }
         } else {
@@ -106,26 +105,24 @@ public class InputBox  implements Listener {
             drawContext.drawText(textRenderer,
                     Text.literal(displayValue),
                     x + 5,
-                    y + height/3 +  10 + textRenderer.fontHeight,
+                    y + height / 3 + 10 + textRenderer.fontHeight,
                     0xFFAAAAAA,
                     false);
         }
 
         // Draw selection box
         if (focused && selecting && selectionStart != selectionEnd) {
-            int startX = x + 4 + textRenderer.getWidth(value.substring(0, Math.min(selectionStart,value.length())));
-            int endX = x + 4 + textRenderer.getWidth(value.substring(0, Math.min(selectionEnd,value.length())));
+            int startX = x + 4 + textRenderer.getWidth(value.substring(0, Math.min(selectionStart, value.length())));
+            int endX = x + 4 + textRenderer.getWidth(value.substring(0, Math.min(selectionEnd, value.length())));
             if (endX > x + width) {
                 endX = x + width;
             }
-            Renderer2D.drawRectangle(drawContext,startX,y + height/3 +  9 + textRenderer.fontHeight,endX-startX + 1,textRenderer.fontHeight,new Color(0, 166,255,64).getRGB());
+            Renderer2D.drawRectangle(drawContext, startX, y + height / 3 + 9 + textRenderer.fontHeight, endX - startX + 1, textRenderer.fontHeight, new Color(0, 166, 255, 64).getRGB());
         }
     }
 
 
-
-
-    public void keyPressed(int keyCode,int scanCode, int modifier) {
+    public void keyPressed(int keyCode, int scanCode, int modifiers) {
         if (focused && canWrite()) {
             if (Screen.isSelectAll(keyCode)) {
                 selecting = true;
@@ -134,23 +131,23 @@ public class InputBox  implements Listener {
                 setCursorPos(value.length());
                 selectionEnd = cursorPosition;
             }
-            if (selectedAll && (GLFW.GLFW_KEY_DELETE == keyCode || GLFW.GLFW_KEY_BACKSPACE==keyCode)){
+            if (selectedAll && (GLFW.GLFW_KEY_DELETE == keyCode || GLFW.GLFW_KEY_BACKSPACE == keyCode)) {
                 selectionStart = cursorPosition;
                 selectionEnd = cursorPosition;
                 setText("");
-                selectedAll=false;
-                selecting=false;
+                selectedAll = false;
+                selecting = false;
             }
             if (Screen.isCopy(keyCode)) {
                 selectedAll = false;
-                selecting=false;
+                selecting = false;
                 //selectionStart = cursorPosition;
                 selectionEnd = cursorPosition;
                 MinecraftClient.getInstance().keyboard.setClipboard(this.getTextToCopy());
             }
             if (Screen.isPaste(keyCode)) {
                 selectedAll = false;
-                selecting=false;
+                selecting = false;
                 selectionStart = cursorPosition;
                 selectionEnd = cursorPosition;
                 paste();
@@ -241,7 +238,7 @@ public class InputBox  implements Listener {
     }
 
     public void charTyped(char chr, int modifiers) {
-        if(focused) {
+        if (focused) {
             insertCharacter(chr);
         }
     }

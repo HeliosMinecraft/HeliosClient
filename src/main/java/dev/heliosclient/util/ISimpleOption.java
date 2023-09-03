@@ -1,6 +1,5 @@
 package dev.heliosclient.util;
 
-public interface ISimpleOption<T>
-{
-	public void setValueUnrestricted(T value);
+public interface ISimpleOption<T> {
+    void setValueUnrestricted(T value);
 }

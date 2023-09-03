@@ -6,8 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
-public abstract class Setting
-{
+public abstract class Setting {
     public String name;
     public String description;
     public int height = 24;
@@ -15,34 +14,31 @@ public abstract class Setting
     public int heightCompact = 24;
     public int widthCompact = 96;
     public Object value;
-    private int hoverAnimationTimer = 0;
-    public boolean quickSettings=false;
-    protected int moduleWidth=96;
-
-
+    public boolean quickSettings = false;
+    protected int moduleWidth = 96;
     int x = 0, y = 0;
     int hovertimer = 0;
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer)
-    {
+    private int hoverAnimationTimer = 0;
+
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         this.x = x;
         this.y = y;
-        if(hovered(mouseX, mouseY)) {
-            hoverAnimationTimer = Math.min(hoverAnimationTimer+1, 40);
+        if (hovered(mouseX, mouseY)) {
+            hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 40);
         } else {
-            hoverAnimationTimer = Math.max(hoverAnimationTimer-1, 0);
+            hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
         }
         int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
         Renderer2D.drawRoundedRectangle(drawContext, x, y, width, height, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
     }
 
-    public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer)
-    {
+    public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         this.x = x;
         this.y = y;
-        if(hovered(mouseX, mouseY)) {
-            hoverAnimationTimer = Math.min(hoverAnimationTimer+1, 40);
+        if (hovered(mouseX, mouseY)) {
+            hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 40);
         } else {
-            hoverAnimationTimer = Math.max(hoverAnimationTimer-1, 0);
+            hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
         }
         int fillColor = (int) (40 + 0.85 * hoverAnimationTimer);
         Renderer2D.drawRoundedRectangle(drawContext, x, y, widthCompact, heightCompact, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
@@ -52,12 +48,17 @@ public abstract class Setting
         return true;
     }
 
-	public void mouseClicked(double mouseX, double mouseY, int button) { }
-	
-	public void mouseReleased(double mouseX, double mouseY, int button) { }
+    public void mouseClicked(double mouseX, double mouseY, int button) {
+    }
 
-    public void keyPressed(int keyCode, int scanCode, int modifiers) { }
-    public void keyReleased(int keyCode,int scanCode,int modifiers){}
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+    }
+
+    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    }
+
+    public void keyReleased(int keyCode, int scanCode, int modifiers) {
+    }
 
     protected boolean hovered(int mouseX, int mouseY) {
         if (quickSettings) {
