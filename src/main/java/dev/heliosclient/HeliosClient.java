@@ -8,11 +8,14 @@ import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.fontutils.FontLoader;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.FontManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +26,7 @@ public class HeliosClient implements ModInitializer {
     public static final String clientTag = ColorUtils.red + "Helios Client";
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
+    public static Font[] fonts;
 
     public static Config CONFIG = new Config();
     public static int uiColorA = 0xFF55FFFF;
@@ -42,6 +46,7 @@ public class HeliosClient implements ModInitializer {
             CONFIG.save();
         }
         CONFIG.load();
+        fonts = FontLoader.loadFonts();
         for (Module_ m : ModuleManager.INSTANCE.modules) {
             for (Setting s : m.settings) {
                 s.value = ((Map<String, Object>) ((Map<String, Object>) CONFIG.config.get("modules")).get(m.name))

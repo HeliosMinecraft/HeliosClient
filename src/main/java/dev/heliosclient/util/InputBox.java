@@ -1,7 +1,5 @@
 package dev.heliosclient.util;
 
-import dev.heliosclient.event.EventManager;
-import dev.heliosclient.event.listener.Listener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -14,7 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InputBox implements Listener {
+public class InputBox {
     public int x, y, width, height;
     private String value;
     private List<String> textSegments;
@@ -33,7 +31,6 @@ public class InputBox implements Listener {
         this.value = value;
         this.characterLimit = characterLimit;
         this.textSegments = new ArrayList<>();
-        EventManager.register(this);
     }
 
     public void setText(String text) {
@@ -52,9 +49,10 @@ public class InputBox implements Listener {
         }
     }
 
-    public void mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y + 10 + MinecraftClient.getInstance().textRenderer.fontHeight) && mouseY <= (y + 12 + MinecraftClient.getInstance().textRenderer.fontHeight + height));
         cursorPosition = value.length();
+        return focused;
     }
 
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
@@ -102,12 +100,7 @@ public class InputBox implements Listener {
         } else {
             // Display the first segment of the text
             String displayValue = !textSegments.isEmpty() ? textSegments.get(0) : "";
-            drawContext.drawText(textRenderer,
-                    Text.literal(displayValue),
-                    x + 5,
-                    y + height / 3 + 10 + textRenderer.fontHeight,
-                    0xFFAAAAAA,
-                    false);
+            drawContext.drawText(textRenderer,Text.literal(displayValue),x + 5,y + height / 3 + 10 + textRenderer.fontHeight,0xFFAAAAAA,false);
         }
 
         // Draw selection box
@@ -208,9 +201,11 @@ public class InputBox implements Listener {
     }
 
     public void keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+     /*   if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT) {
             selecting = false;
         }
+
+      */
     }
 
     private void insertCharacter(char chr) {
@@ -315,6 +310,10 @@ public class InputBox implements Listener {
 
     public String getValue() {
         return value;
+    }
+
+    public boolean isFocused() {
+        return focused;
     }
 
     public void setValue(String value) {

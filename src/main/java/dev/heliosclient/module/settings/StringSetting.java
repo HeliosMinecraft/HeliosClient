@@ -44,6 +44,7 @@ public class StringSetting extends Setting {
         inputBox.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    @Override
     public void charTyped(char chr, int modifiers) {
         inputBox.charTyped(chr, modifiers);
     }

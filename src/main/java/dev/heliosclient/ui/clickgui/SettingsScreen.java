@@ -121,12 +121,7 @@ public class SettingsScreen extends Screen {
     @Override
     public boolean charTyped(char chr, int modifiers) {
         for (Setting setting : module.settings) {
-            if (setting instanceof StringListSetting stringListSetting) {
-                stringListSetting.charTyped(chr, modifiers);
-            }
-            if (setting instanceof StringSetting stringSetting) {
-                stringSetting.charTyped(chr, modifiers);
-            }
+            setting.charTyped(chr, modifiers);
         }
         return super.charTyped(chr, modifiers);
     }

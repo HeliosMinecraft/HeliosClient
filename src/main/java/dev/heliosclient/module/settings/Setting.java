@@ -59,6 +59,8 @@ public abstract class Setting {
 
     public void keyReleased(int keyCode, int scanCode, int modifiers) {
     }
+    public void charTyped(char chr, int modifiers) {
+    }
 
     protected boolean hovered(int mouseX, int mouseY) {
         if (quickSettings) {

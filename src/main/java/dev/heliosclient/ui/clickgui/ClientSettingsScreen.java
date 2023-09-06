@@ -99,4 +99,12 @@ public class ClientSettingsScreen extends Screen {
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        for (Setting setting : module.settings) {
+            setting.charTyped(chr, modifiers);
+        }
+        return super.charTyped(chr, modifiers);
+    }
 }

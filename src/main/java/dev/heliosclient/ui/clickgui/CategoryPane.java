@@ -145,4 +145,13 @@ public class CategoryPane {
         }
         dragging = false;
     }
+    public void charTyped(char chr, int modifiers){
+        for (ModuleButton moduleButton : moduleButtons) {
+            if (moduleButton.settingsOpen) {
+                for (Setting setting : moduleButton.module.settings) {
+                    setting.charTyped(chr, modifiers);
+                }
+            }
+        }
+    }
 }

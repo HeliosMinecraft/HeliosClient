@@ -100,6 +100,7 @@ public class ClickGUIScreen extends Screen {
             if (category.category == Category.SEARCH && !category.collapsed) {
                 searchBox.charTyped(chr, modifiers);
             }
+            category.charTyped(chr, modifiers);
         }
         return super.charTyped(chr, modifiers);
     }

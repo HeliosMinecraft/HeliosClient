@@ -19,8 +19,6 @@ public class ModuleManager {
                 new ModulesList(),
                 new CustomFov(),
                 new Test(),
-                new FTest(),
-                new FTest2(),
                 new ChatHighlight()
         );
     }

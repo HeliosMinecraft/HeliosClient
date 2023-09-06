@@ -94,6 +94,7 @@ public class StringListSetting extends Setting {
         }
     }
 
+    @Override
     public void charTyped(char chr, int modifiers) {
         for (InputBox box : inputBox) {
             box.charTyped(chr, modifiers);
