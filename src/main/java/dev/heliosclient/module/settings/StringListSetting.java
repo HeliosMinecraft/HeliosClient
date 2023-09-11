@@ -79,27 +79,6 @@ public class StringListSetting extends Setting {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
     }
 
-    @Override
-    public void keyReleased(int keyCode, int scanCode, int modifiers) {
-        for (InputBox box : inputBox) {
-            box.keyReleased(keyCode, scanCode, modifiers);
-        }
-    }
-
-    @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
-        super.keyPressed(keyCode, scanCode, modifiers);
-        for (InputBox box : inputBox) {
-            box.keyPressed(keyCode, scanCode, modifiers);
-        }
-    }
-
-    @Override
-    public void charTyped(char chr, int modifiers) {
-        for (InputBox box : inputBox) {
-            box.charTyped(chr, modifiers);
-        }
-    }
 
     public int getCharacterLimit() {
         return characterLimit;

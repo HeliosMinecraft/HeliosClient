@@ -119,7 +119,7 @@ public class DoubleSetting extends Setting {
     @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         super.keyPressed(keyCode, scanCode, modifiers);
-        inputBox.keyPressed(keyCode, scanCode, modifiers);
+       // inputBox.keyPressed(keyCode, scanCode, modifiers);
         if (keyCode == GLFW.GLFW_KEY_KP_ENTER || keyCode == GLFW.GLFW_KEY_ENTER) {
             try {
                 double newVal = Double.parseDouble(inputBox.getValue());
@@ -138,15 +138,9 @@ public class DoubleSetting extends Setting {
     }
 
     @Override
-    public void keyReleased(int keyCode, int scanCode, int modifiers) {
-        super.keyReleased(keyCode, scanCode, modifiers);
-        inputBox.keyReleased(keyCode, scanCode, modifiers);
-    }
-
-    @Override
     public void charTyped(char chr, int modifiers) {
         super.charTyped(chr, modifiers);
-        inputBox.charTyped(chr, modifiers);
+      //  inputBox.charTyped(chr, modifiers);
         if (!inputBox.isFocused()) {
             try {
                 double newVal = Double.parseDouble(inputBox.getValue());

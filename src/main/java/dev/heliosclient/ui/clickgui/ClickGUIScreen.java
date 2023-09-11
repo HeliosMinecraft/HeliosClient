@@ -98,7 +98,7 @@ public class ClickGUIScreen extends Screen {
     public boolean charTyped(char chr, int modifiers) {
         for (CategoryPane category : categoryPanes) {
             if (category.category == Category.SEARCH && !category.collapsed) {
-                searchBox.charTyped(chr, modifiers);
+              //  searchBox.charTyped(chr, modifiers);
             }
             category.charTyped(chr, modifiers);
         }
@@ -119,7 +119,7 @@ public class ClickGUIScreen extends Screen {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         for (CategoryPane category : categoryPanes) {
             if (category.category == Category.SEARCH && !category.collapsed) {
-                searchBox.keyPressed(keyCode, scanCode, modifiers);
+             //   searchBox.keyPressed(keyCode, scanCode, modifiers);
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);

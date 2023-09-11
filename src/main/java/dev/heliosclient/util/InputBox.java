@@ -1,5 +1,10 @@
 package dev.heliosclient.util;
 
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.CharTypedEvent;
+import dev.heliosclient.event.events.KeyPressedEvent;
+import dev.heliosclient.event.listener.Listener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -12,7 +17,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InputBox {
+public class InputBox implements Listener {
     public int x, y, width, height;
     private String value;
     private List<String> textSegments;
@@ -31,6 +36,7 @@ public class InputBox {
         this.value = value;
         this.characterLimit = characterLimit;
         this.textSegments = new ArrayList<>();
+        EventManager.register(this);
     }
 
     public void setText(String text) {
@@ -115,83 +121,74 @@ public class InputBox {
     }
 
 
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    @SubscribeEvent
+    public void keyPressed(KeyPressedEvent event) {
+        int keyCode = event.getKey();
         if (focused && canWrite()) {
             if (Screen.isSelectAll(keyCode)) {
                 selecting = true;
                 selectedAll = true;
                 selectionStart = 0;
-                setCursorPos(value.length());
-                selectionEnd = cursorPosition;
+                selectionEnd = value.length();
             }
             if (selectedAll && (GLFW.GLFW_KEY_DELETE == keyCode || GLFW.GLFW_KEY_BACKSPACE == keyCode)) {
-                selectionStart = cursorPosition;
-                selectionEnd = cursorPosition;
-                setText("");
+                value = "";
                 selectedAll = false;
                 selecting = false;
             }
             if (Screen.isCopy(keyCode)) {
                 selectedAll = false;
                 selecting = false;
-                //selectionStart = cursorPosition;
-                selectionEnd = cursorPosition;
                 MinecraftClient.getInstance().keyboard.setClipboard(this.getTextToCopy());
+                selectionStart=0;
+                selectionEnd=0;
             }
             if (Screen.isPaste(keyCode)) {
                 selectedAll = false;
                 selecting = false;
-                selectionStart = cursorPosition;
-                selectionEnd = cursorPosition;
                 paste();
             }
             if (Screen.isCut(keyCode)) {
                 selectedAll = false;
-                //electionStart = cursorPosition;
-                selectionEnd = cursorPosition;
+                selecting = false;
                 MinecraftClient.getInstance().keyboard.setClipboard(this.getTextToCopy());
-                setText("");
-            }
-            if (!selecting) {
-                selectedAll = false;
-                selectionStart = cursorPosition;
-                selectionEnd = cursorPosition;
+                value = "";
             }
 
             switch (keyCode) {
                 case GLFW.GLFW_KEY_BACKSPACE -> {
                     if (!value.isEmpty() && cursorPosition > 0) {
-                        if (selecting && selectionEnd > 0) {
-                            selectionEnd--;
-                        }
                         value = value.substring(0, cursorPosition - 1) + value.substring(cursorPosition);
-                        setText(value);
                         cursorPosition--;
                     }
                 }
                 case GLFW.GLFW_KEY_DELETE -> {
                     if (!value.isEmpty() && cursorPosition < value.length()) {
                         value = value.substring(0, cursorPosition) + value.substring(cursorPosition + 1);
-                        setText(value);
                     }
                 }
-
                 case GLFW.GLFW_KEY_LEFT -> {
                     moveCursor(-1);
                     if (Screen.hasShiftDown()) {
-                        selecting = true;
-                        if (cursorPosition > 0) {
-                            selectionEnd = cursorPosition;
+                        if (!selecting) {
+                            selecting = true;
+                            selectionEnd = cursorPosition + 1;
                         }
+                        selectionStart = cursorPosition;
+                    } else {
+                        selecting = false;
                     }
                 }
                 case GLFW.GLFW_KEY_RIGHT -> {
                     moveCursor(1);
                     if (Screen.hasShiftDown()) {
-                        selecting = true;
-                        if (cursorPosition < value.length()) {
-                            selectionEnd = cursorPosition;
+                        if (!selecting) {
+                            selecting = true;
+                            selectionStart = cursorPosition - 1;
                         }
+                        selectionEnd = cursorPosition;
+                    } else {
+                        selecting = false;
                     }
                 }
                 case GLFW.GLFW_KEY_ENTER,
@@ -216,23 +213,13 @@ public class InputBox {
         }
     }
 
-    public void paste() {
-        // Get the text from the system clipboard
-        String clipboardText = MinecraftClient.getInstance().keyboard.getClipboard();
-
-        // Insert the clipboard text into the value field at the current cursor position
-        value = value.substring(0, cursorPosition) + clipboardText + value.substring(cursorPosition);
-        setText(value);
-
-        // Move the cursor to the end of the pasted text
-        cursorPosition += clipboardText.length();
-    }
-
     public void moveCursor(int offset) {
         this.setCursorPos(this.cursorPosition + offset);
     }
 
-    public void charTyped(char chr, int modifiers) {
+    @SubscribeEvent
+    public void charTyped(CharTypedEvent event) {
+        char chr = event.getI();
         if (focused) {
             insertCharacter(chr);
         }
@@ -244,6 +231,30 @@ public class InputBox {
 
     public boolean canWrite() {
         return true; // You can modify this method to add conditions for when the user can write to the input box
+    }
+
+    public void paste() {
+        // Get the text from the system clipboard
+        String clipboardText = MinecraftClient.getInstance().keyboard.getClipboard();
+
+        // If text is selected, replace it with the clipboard text
+        // Otherwise, insert the clipboard text at the cursor position
+        int start = Math.min(selectionStart, selectionEnd);
+        int end = Math.max(selectionStart, selectionEnd);
+        if (start != end) {
+            StringBuilder builder = new StringBuilder(value);
+            builder.replace(start, end, clipboardText);
+            value = builder.toString();
+            cursorPosition = start + clipboardText.length();
+        } else {
+            StringBuilder builder = new StringBuilder(value);
+            builder.insert(cursorPosition, clipboardText);
+            value = builder.toString();
+            cursorPosition += clipboardText.length();
+        }
+
+        // Clear the selection
+        selectionStart = selectionEnd = cursorPosition;
     }
 
     public String getTextToCopy() {

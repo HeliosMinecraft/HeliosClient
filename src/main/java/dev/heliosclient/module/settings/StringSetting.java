@@ -18,7 +18,7 @@ public class StringSetting extends Setting {
         this.description = description;
         this.height = 38;
         this.characterLimit = characterLimit;
-        inputBox = new InputBox(180, 13, value, characterLimit);
+        inputBox = new InputBox(180, 13, value,characterLimit);
     }
 
 
@@ -32,21 +32,6 @@ public class StringSetting extends Setting {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-    }
-
-    @Override
-    public void keyReleased(int keyCode, int scanCode, int modifiers) {
-        inputBox.keyReleased(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public void keyPressed(int keyCode, int scanCode, int modifiers) {
-        inputBox.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public void charTyped(char chr, int modifiers) {
-        inputBox.charTyped(chr, modifiers);
     }
 
     @Override
