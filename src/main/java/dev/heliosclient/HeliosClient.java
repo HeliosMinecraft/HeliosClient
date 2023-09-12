@@ -1,6 +1,8 @@
 package dev.heliosclient;
 
 import dev.heliosclient.command.CommandManager;
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;

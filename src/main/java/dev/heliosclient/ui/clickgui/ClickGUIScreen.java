@@ -1,6 +1,10 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.KeyPressedEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.ModuleManager;
 import dev.heliosclient.module.sysmodules.ClickGUI;
@@ -34,7 +38,7 @@ public class ClickGUIScreen extends Screen {
             boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
             categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
         }
-        searchBox = new InputBox(92, 13, "", 20);
+        searchBox = new InputBox(92, 13, "", 20, InputBox.InputMode.DIGITS_AND_CHARACTERS_AND_WHITESPACE);
     }
 
     public static void onScroll(double horizontal, double vertical) {
@@ -97,32 +101,9 @@ public class ClickGUIScreen extends Screen {
     @Override
     public boolean charTyped(char chr, int modifiers) {
         for (CategoryPane category : categoryPanes) {
-            if (category.category == Category.SEARCH && !category.collapsed) {
-              //  searchBox.charTyped(chr, modifiers);
-            }
             category.charTyped(chr, modifiers);
         }
         return super.charTyped(chr, modifiers);
-    }
-
-    @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        for (CategoryPane category : categoryPanes) {
-            if (category.category == Category.SEARCH && !category.collapsed) {
-                searchBox.keyReleased(keyCode, scanCode, modifiers);
-            }
-        }
-        return super.keyReleased(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (CategoryPane category : categoryPanes) {
-            if (category.category == Category.SEARCH && !category.collapsed) {
-             //   searchBox.keyPressed(keyCode, scanCode, modifiers);
-            }
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

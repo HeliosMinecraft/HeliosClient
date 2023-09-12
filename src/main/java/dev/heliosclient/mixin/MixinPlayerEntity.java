@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PlayerEntity.class)
+@Mixin( PlayerEntity.class)
 public abstract class MixinPlayerEntity {
 
 
@@ -49,17 +49,6 @@ public abstract class MixinPlayerEntity {
         // This line checks if the event is canceled and returns false if so
         if (event.isCanceled()) {
             cir.setReturnValue(event.isCanceled());
-        }
-    }
-
-    @Inject(method = "tick", at = @At(value = "TAIL"), cancellable = true)
-    public void onTick(CallbackInfo ci) {
-        if (HeliosClient.MC.player != null) {
-            TickEvent event = new TickEvent.PLAYER(HeliosClient.MC.player);
-            EventManager.postEvent(event);
-            if (event.isCanceled()) {
-                ci.cancel();
-            }
         }
     }
 }

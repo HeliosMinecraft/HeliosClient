@@ -7,6 +7,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.StringListSetting;
 import dev.heliosclient.module.settings.StringSetting;
+import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.Renderer3D;
 import net.minecraft.client.gui.DrawContext;
@@ -21,9 +22,9 @@ public class Test extends Module_ {
     BooleanSetting rounded = new BooleanSetting("Rounded", "", this, false);
     BooleanSetting Circle = new BooleanSetting("Circle", "", this, false);
     BooleanSetting Triangle = new BooleanSetting("Triangle", "", this, false);
-    StringSetting num = new StringSetting("Enter a number", "DESCRIPTION", "E", 100);
+    StringSetting num = new StringSetting("Enter a number", "DESCRIPTION", "E", 100, InputBox.InputMode.ALL);
     String[] list = new String[]{"1ST", "2ND", "3RD", "LMAO"};
-    StringListSetting stringListSetting = new StringListSetting("Enter a number", "DESCRIPTION", list, 4, 100);
+    StringListSetting stringListSetting = new StringListSetting("Enter a number", "DESCRIPTION", list, 4, 100, InputBox.InputMode.DIGITS_AND_CHARACTERS);
 
     BooleanSetting PartiallyRounded = new BooleanSetting("NotRounded", "", this, false);
     BooleanSetting Arc = new BooleanSetting("Arc", "", this, false);
@@ -71,7 +72,7 @@ public class Test extends Module_ {
         // Draw a 2D rectangle using the CustomRenderer class
         DrawContext drawContext = event.getDrawContext();
         if (rectangle.value)
-            Renderer2D.fill(drawContext, 10, 10, 100, 50, 0xFFFF0000);
+            Renderer2D.drawRectangle(drawContext, 10, 10, 100, 50, 0xFFFF0000);
 
         // Draw a 2D rounded rectangle using the CustomRenderer class
         if (rounded.value)
@@ -87,7 +88,7 @@ public class Test extends Module_ {
 
         // Draw a 2D arc using the CustomRenderer class
         if (Arc.value)
-            Renderer2D.drawArc(drawContext, 165, 35, 50, 0, 90, Color.WHITE.getRGB());
+            Renderer2D.drawArc(drawContext, 165, 35, 50,1f, Color.WHITE.getRGB(), 0, 90);
 
         //Not so rounded rectange
         if (PartiallyRounded.value)

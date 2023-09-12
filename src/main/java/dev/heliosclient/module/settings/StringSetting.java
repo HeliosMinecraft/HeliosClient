@@ -12,13 +12,13 @@ public class StringSetting extends Setting {
     public String value;
     String description;
 
-    public StringSetting(String name, String description, String value, int characterLimit) {
+    public StringSetting(String name, String description, String value, int characterLimit, InputBox.InputMode inputMode) {
         this.name = name;
         this.value = value;
         this.description = description;
         this.height = 38;
         this.characterLimit = characterLimit;
-        inputBox = new InputBox(180, 13, value,characterLimit);
+        inputBox = new InputBox(180, 13, value,characterLimit,inputMode);
     }
 
 

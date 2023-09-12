@@ -1,6 +1,7 @@
 package dev.heliosclient.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.heliosclient.HeliosClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
@@ -13,40 +14,7 @@ public class Renderer2D extends DrawContext {
         super(client, vertexConsumers);
     }
 
-    public static void fill(DrawContext drawContext, int x1, int y1, int x2, int y2, int color) {
-        int i;
-        if (x1 < x2) {
-            i = x1;
-            x1 = x2;
-            x2 = i;
-        }
-
-        if (y1 < y2) {
-            i = y1;
-            y1 = y2;
-            y2 = i;
-        }
-
-        float f = (float) (color >> 24 & 255) / 255.0F;
-        float g = (float) (color >> 16 & 255) / 255.0F;
-        float h = (float) (color >> 8 & 255) / 255.0F;
-        float j = (float) (color & 255) / 255.0F;
-        Matrix4f matrix4f = drawContext.getMatrices().peek().getPositionMatrix();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-        RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.defaultBlendFunc();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        bufferBuilder.vertex(matrix4f, (float) x1, (float) y2, 0.0F).color(g, h, j, f).next();
-        bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, 0.0F).color(g, h, j, f).next();
-        bufferBuilder.vertex(matrix4f, (float) x2, (float) y1, 0.0F).color(g, h, j, f).next();
-        bufferBuilder.vertex(matrix4f, (float) x1, (float) y1, 0.0F).color(g, h, j, f).next();
-        tessellator.draw();
-        RenderSystem.disableBlend();
-    }
-
-    public static void drawRectangle(DrawContext drawContext, int x, int y, int width, int height, int color) {
+    public static void drawRectangle(DrawContext drawContext, float x, float y, float width, float height, int color) {
         float red = (float) (color >> 16 & 255) / 255.0F;
         float green = (float) (color >> 8 & 255) / 255.0F;
         float blue = (float) (color & 255) / 255.0F;
@@ -64,13 +32,17 @@ public class Renderer2D extends DrawContext {
 
         bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(red, green, blue, alpha).next();
         bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f,x + width,y ,0.0F).color(red ,green ,blue ,alpha ).next();
+        bufferBuilder.vertex(matrix4f,x ,y ,0.0F).color(red ,green ,blue ,alpha ).next();
+
         tessellator.draw();
+
         RenderSystem.disableBlend();
     }
 
-    public static void drawRoundedRectangle(DrawContext drawContext, int x, int y, int width, int height, int radius, int color) {
+
+
+    public static void drawRoundedRectangle(DrawContext drawContext, float x, float y, float width, float height, int radius, int color) {
         drawRectangle(drawContext, x + radius, y, width - radius * 2, height, color);
         drawRectangle(drawContext, x, y + radius, width, height - radius * 2, color);
 
@@ -81,7 +53,7 @@ public class Renderer2D extends DrawContext {
         drawFilledCircle(drawContext, x + radius, y + height - radius, radius, color);
     }
 
-    public static void drawRoundedRectangle(DrawContext drawContext, int x, int y, boolean TL, boolean TR, boolean BL, boolean BR, int width, int height, int radius, int color) {
+    public static void drawRoundedRectangle(DrawContext drawContext, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, int radius, int color) {
         drawRectangle(drawContext, x + radius, y, width - radius * 2, height, color);
         drawRectangle(drawContext, x, y + radius, width, height - radius * 2, color);
 
@@ -157,7 +129,7 @@ public class Renderer2D extends DrawContext {
         RenderSystem.disableBlend();
     }
 
-    public static void drawFilledCircle(DrawContext drawContext, int xCenter, int yCenter, int radius, int color) {
+    public static void drawFilledCircle(DrawContext drawContext, float xCenter, float yCenter, float radius, int color) {
         float red = (float) (color >> 16 & 255) / 255.0F;
         float green = (float) (color >> 8 & 255) / 255.0F;
         float blue = (float) (color & 255) / 255.0F;
@@ -182,8 +154,52 @@ public class Renderer2D extends DrawContext {
         tessellator.draw();
         RenderSystem.disableBlend();
     }
+    public static void drawOutlineRoundedBox(DrawContext drawContext, float x, float y, float width, float height, float radius, float thickness, int color) {
+        // Draw the rectangles for the outline
+        drawRectangle(drawContext, x + radius, y, width - radius * 2, thickness, color); // Top rectangle
+        drawRectangle(drawContext, x + radius, y + height - thickness, width - radius * 2, thickness, color); // Bottom rectangle
+        drawRectangle(drawContext, x, y + radius, thickness, height - radius * 2, color); // Left rectangle
+        drawRectangle(drawContext, x + width - thickness, y + radius, thickness, height - radius * 2, color); // Right rectangle
 
-    public static void drawFilledQuadrant(DrawContext drawContext, int xCenter, int yCenter, int radius, int color, int quadrant) {
+        // Draw the arcs at the corners for the outline
+        drawArc(drawContext,x + radius,y + radius,radius ,thickness ,color ,180 ,270 ); // Top-left arc
+        drawArc(drawContext,x + width - radius,y + radius,radius ,thickness ,color ,90 ,180 ); // Top-right arc
+        drawArc(drawContext,x + width - radius,y + height - radius,radius ,thickness ,color ,0 ,90 ); // Bottom-right arc
+        drawArc(drawContext,x + radius,y + height - radius,radius ,thickness ,color ,270 ,360 ); // Bottom-left arc
+    }
+
+    public static void drawArc(DrawContext drawContext,float xCenter,float yCenter,float radius,float thickness,int color,int startAngle,int endAngle ){
+        float red = (float) (color >> 16 & 255) / 255.0F;
+        float green = (float) (color >> 8 & 255) / 255.0F;
+        float blue = (float) (color & 255) / 255.0F;
+        float alpha = (float) (color >> 24 & 255) / 255.0F;
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_STRIP ,VertexFormats.POSITION_COLOR);
+        RenderSystem.enableBlend();
+
+        for(int i =startAngle;i <=endAngle;i++){
+            double innerX = xCenter + Math.sin(Math.toRadians(i)) * (radius-thickness);
+            double innerY = yCenter + Math.cos(Math.toRadians(i)) * (radius-thickness);
+            double outerX = xCenter + Math.sin(Math.toRadians(i)) * radius;
+            double outerY = yCenter + Math.cos(Math.toRadians(i)) * radius;
+
+            bufferBuilder.vertex(drawContext.getMatrices().peek().getPositionMatrix(),(float)innerX ,(float)innerY ,0).color(red ,green ,blue ,alpha ).next();
+            bufferBuilder.vertex(drawContext.getMatrices().peek().getPositionMatrix(),(float)outerX ,(float)outerY ,0).color(red ,green ,blue ,alpha ).next();
+        }
+
+        tessellator.draw();
+
+        RenderSystem.disableBlend();
+    }
+
+
+
+
+    public static void drawFilledQuadrant(DrawContext drawContext, float xCenter, float yCenter, float radius, int color, int quadrant) {
         float red = (float) (color >> 16 & 255) / 255.0F;
         float green = (float) (color >> 8 & 255) / 255.0F;
         float blue = (float) (color & 255) / 255.0F;
@@ -226,28 +242,9 @@ public class Renderer2D extends DrawContext {
         tessellator.draw();
     }
 
-    public static void drawArc(DrawContext drawContext, int xCenter, int yCenter, int radius, double startAngle, double endAngle, int color) {
-        float red = (float) (color >> 16 & 255) / 255.0F;
-        float green = (float) (color >> 8 & 255) / 255.0F;
-        float blue = (float) (color & 255) / 255.0F;
-        float alpha = (float) (color >> 24 & 255) / 255.0F;
-
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-
-        for (double i = startAngle; i <= endAngle; i++) {
-            double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
-            double y = yCenter + Math.cos(Math.toRadians(i)) * radius;
-            bufferBuilder.vertex(drawContext.getMatrices().peek().getPositionMatrix(), (float) x, (float) y, 0).color(red, green, blue, alpha).next();
-        }
-
-        tessellator.draw();
-    }
 
 
-    public static void drawQuadrant(DrawContext drawContext, int xCenter, int yCenter, int radius, int quadrant, int color) {
+    public static void drawQuadrant(DrawContext drawContext, float xCenter, float yCenter, float radius, int quadrant, int color) {
         int startAngle = 0;
         int endAngle = 0;
 
@@ -265,7 +262,7 @@ public class Renderer2D extends DrawContext {
             endAngle = 90;
         }
 
-        drawArc(drawContext, xCenter, yCenter, radius, startAngle, endAngle, color);
+        drawArc(drawContext, xCenter, yCenter, radius,1f, color,startAngle, endAngle);
     }
 
     public static void drawLine(DrawContext drawContext, int x1, int y1, int x2, int y2, int color) {
@@ -308,7 +305,7 @@ public class Renderer2D extends DrawContext {
     }
 
 
-    public static void drawOutlineBox(DrawContext drawContext, int x, int y, int width, int height, int thickness, int color) {
+    public static void drawOutlineBox(DrawContext drawContext, float x, float y, float width, float height, float thickness, int color) {
         drawRectangle(drawContext, x, y, width, thickness, color);
         drawRectangle(drawContext, x, y + height - thickness, width, thickness, color);
         drawRectangle(drawContext, x, y + thickness, thickness, height - thickness * 2, color);

@@ -17,15 +17,17 @@ public class StringListSetting extends Setting {
     private final int characterLimit;
     public String[] values;
     String description;
+    private InputBox.InputMode inputMode;
 
-    public StringListSetting(String name, String description, String[] values, int defaultBoxes, int characterLimit) {
+    public StringListSetting(String name, String description, String[] values, int defaultBoxes, int characterLimit, InputBox.InputMode inputMode) {
         this.name = name;
         this.values = values;
         this.description = description;
         this.height = 26 + defaultBoxes * 15;
         this.characterLimit = characterLimit;
+        this.inputMode = inputMode;
         for (int i = 0; i < defaultBoxes; i++) {
-            inputBox.add(new InputBox(160, 13, values[i], characterLimit));
+            inputBox.add(new InputBox(160, 13, values[i], characterLimit,inputMode));
         }
     }
 
@@ -37,7 +39,7 @@ public class StringListSetting extends Setting {
         drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 5, ColorManager.INSTANCE.defaultTextColor(), false);
         // Draw a '+' button next to the text
         Renderer2D.drawRectangle(drawContext, x + 165, y + 5, 11, 11, Color.black.getRGB());
-        Renderer2D.drawOutlineBox(drawContext, x + 165, y + 5, 11, 11, 1, (hoveredOverAdd(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+        Renderer2D.drawOutlineBox(drawContext, x + 165, y + 5, 11, 11, 0.4f, (hoveredOverAdd(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
         drawContext.drawHorizontalLine(x + 167, x + 173, y + 10, Color.GREEN.getRGB());
         drawContext.drawVerticalLine(x + 170, y + 6, y + 14, Color.GREEN.getRGB());
         int boxOffset = y;
@@ -45,9 +47,9 @@ public class StringListSetting extends Setting {
             box.render(drawContext, x, boxOffset, mouseX, mouseY, textRenderer);
 
             // Draw a '-' button next to the text
-            Renderer2D.drawRectangle(drawContext, x + 165, boxOffset + 12 + textRenderer.fontHeight, 10, 11, Color.black.getRGB());
+            Renderer2D.drawRectangle(drawContext, x + 165, boxOffset + 12 + textRenderer.fontHeight, 11, 11, Color.black.getRGB());
             drawContext.drawHorizontalLine(x + 168, x + 172, boxOffset + 17 + textRenderer.fontHeight, Color.RED.getRGB());
-            Renderer2D.drawOutlineBox(drawContext, x + 165, boxOffset + 12 + textRenderer.fontHeight, 11, 11, 1, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+            Renderer2D.drawOutlineBox(drawContext, x + 165, boxOffset + 12 + textRenderer.fontHeight, 11, 11, 0.4f, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
             boxOffset += 16;
         }
     }
@@ -59,7 +61,7 @@ public class StringListSetting extends Setting {
         int boxOffset = y;
         // Use a regular for loop with an index variable
         if (hoveredOverAdd(mouseX, mouseY)) {
-            inputBox.add(new InputBox(160, 13, "", characterLimit)); // Add a new empty box to the list
+            inputBox.add(new InputBox(160, 13, "", characterLimit,inputMode)); // Add a new empty box to the list
         }
         for (int i = 0; i < inputBox.size(); i++) {
             InputBox box = inputBox.get(i); // Get the box at the current index

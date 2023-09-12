@@ -79,5 +79,4 @@ public class HudEditorScreen extends Screen implements Listener {
             }
         }
     }
-
 }

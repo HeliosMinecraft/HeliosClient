@@ -29,7 +29,7 @@ public class DoubleSetting extends Setting {
         this.heightCompact = 24;
         this.module = module;
         this.roundingPlace = roundingPlace;
-        inputBox = new InputBox(String.valueOf(max).length() * 6 + 5,11,String.valueOf(value),10);
+        inputBox = new InputBox(String.valueOf(max).length() * 6 + 5,11,String.valueOf(value),10, InputBox.InputMode.DIGITS);
     }
 
     @Override

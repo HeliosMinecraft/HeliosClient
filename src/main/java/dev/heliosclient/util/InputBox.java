@@ -29,14 +29,16 @@ public class InputBox implements Listener {
     private int characterLimit = 0;
     private boolean selecting = false;
     private boolean selectedAll = false;
+    private final InputMode inputMode;
 
-    public InputBox(int width, int height, String value, int characterLimit) {
+    public InputBox(int width, int height, String value, int characterLimit, InputMode inputMode) {
         this.width = width;
         this.height = height;
         this.value = value;
         this.characterLimit = characterLimit;
         this.textSegments = new ArrayList<>();
         EventManager.register(this);
+        this.inputMode = inputMode;
     }
 
     public void setText(String text) {
@@ -66,8 +68,9 @@ public class InputBox implements Listener {
 
         this.x = x;
         this.y = y;
-        Renderer2D.drawOutlineBox(drawContext, x + 1, y + 10 + textRenderer.fontHeight, width + 2, height + 2, 1, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
-        Renderer2D.drawRectangle(drawContext, x + 2, y + textRenderer.fontHeight + 11, width, height, Color.black.getRGB());
+        Renderer2D.drawOutlineRoundedBox(drawContext, x + 1.2f, y + 10.2f + textRenderer.fontHeight, width + 1.5f, height + 1.5f, 3, 0.5f, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
+        //  Renderer2D.drawRectangle(drawContext, x + 2, y + textRenderer.fontHeight + 11, width, height, Color.black.getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + textRenderer.fontHeight + 11, width, height, 2, Color.BLACK.getRGB());
 
         if (focused) {
             scrollOffset = Math.max(0, Math.min(scrollOffset, value.length()));
@@ -97,16 +100,16 @@ public class InputBox implements Listener {
                 // Draw the cursor
                 int cursorX = x + 5 + textRenderer.getWidth(displayValue.substring(0, cursorPosition - segmentStartIndex));
                 Renderer2D.drawRectangle(drawContext,
-                        cursorX,
-                        y + height / 3 + 10 + textRenderer.fontHeight,
-                        1,
-                        textRenderer.fontHeight - 1,
-                        Color.LIGHT_GRAY.getRGB());
+                        cursorX-0.4f ,
+                        y + height / 3 + 9 + textRenderer.fontHeight,
+                        0.6f,
+                        textRenderer.fontHeight+0.1f,
+                        ColorUtils.rgbaToInt(150,150,150,255));
             }
         } else {
             // Display the first segment of the text
             String displayValue = !textSegments.isEmpty() ? textSegments.get(0) : "";
-            drawContext.drawText(textRenderer,Text.literal(displayValue),x + 5,y + height / 3 + 10 + textRenderer.fontHeight,0xFFAAAAAA,false);
+            drawContext.drawText(textRenderer, Text.literal(displayValue), x + 5, y + height / 3 + 10 + textRenderer.fontHeight, 0xFFAAAAAA, false);
         }
 
         // Draw selection box
@@ -140,8 +143,8 @@ public class InputBox implements Listener {
                 selectedAll = false;
                 selecting = false;
                 MinecraftClient.getInstance().keyboard.setClipboard(this.getTextToCopy());
-                selectionStart=0;
-                selectionEnd=0;
+                selectionStart = 0;
+                selectionEnd = 0;
             }
             if (Screen.isPaste(keyCode)) {
                 selectedAll = false;
@@ -221,9 +224,37 @@ public class InputBox implements Listener {
     public void charTyped(CharTypedEvent event) {
         char chr = event.getI();
         if (focused) {
-            insertCharacter(chr);
+            switch (inputMode) {
+                case DIGITS -> {
+                    if (Character.isDigit(chr) || Character.toString(chr).equals(".")) {
+                        insertCharacter(chr);
+                    }
+                }
+                case CHARACTERS -> {
+                    if (Character.isLetter(chr)) {
+                        insertCharacter(chr);
+                    }
+                }
+                case CHARACTERS_AND_WHITESPACE -> {
+                    if (Character.isLetter(chr) || Character.isWhitespace(chr)) {
+                        insertCharacter(chr);
+                    }
+                }
+                case DIGITS_AND_CHARACTERS_AND_WHITESPACE -> {
+                    if (Character.isLetterOrDigit(chr) || Character.isWhitespace(chr)) {
+                        insertCharacter(chr);
+                    }
+                }
+                case DIGITS_AND_CHARACTERS -> {
+                    if (Character.isLetterOrDigit(chr)) {
+                        insertCharacter(chr);
+                    }
+                }
+                case ALL -> insertCharacter(chr);
+            }
         }
     }
+
 
     public void setCursorPos(int pos) {
         this.cursorPosition = MathHelper.clamp(pos, 0, this.value.length());
@@ -279,10 +310,6 @@ public class InputBox implements Listener {
         this.y = y;
     }
 
-    public void setFocused(boolean focused) {
-        this.focused = focused;
-    }
-
     public void setScrollOffset(int scrollOffset) {
         this.scrollOffset = scrollOffset;
     }
@@ -323,12 +350,29 @@ public class InputBox implements Listener {
         return value;
     }
 
+    public void setValue(String value) {
+        this.value = value;
+    }
+
     public boolean isFocused() {
         return focused;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setFocused(boolean focused) {
+        this.focused = focused;
+    }
+
+    public InputMode getInputMode() {
+        return inputMode;
+    }
+
+    public enum InputMode {
+        DIGITS,
+        CHARACTERS,
+        CHARACTERS_AND_WHITESPACE,
+        DIGITS_AND_CHARACTERS,
+        DIGITS_AND_CHARACTERS_AND_WHITESPACE,
+        ALL
     }
 }
 
