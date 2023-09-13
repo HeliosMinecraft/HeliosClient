@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.*;
 import dev.heliosclient.module.Category;
@@ -9,10 +10,12 @@ import dev.heliosclient.module.settings.StringListSetting;
 import dev.heliosclient.module.settings.StringSetting;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.Renderer3D;
+import me.x150.renderer.render.Renderer3d;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 
@@ -93,22 +96,22 @@ public class Test extends Module_ {
         //Not so rounded rectange
         if (PartiallyRounded.value)
             Renderer2D.drawRoundedRectangle(drawContext, 20, 20, false, true, true, false, 120, 120, 10, 0xFF00FF00);
+    }
+    @SubscribeEvent
+    public void renderer3d(Render3DEvent event) {
+        Renderer3d.renderThroughWalls();
+        PlayerEntity player = HeliosClient.MC.player;
+        Vec3d start = new Vec3d(player.getX() + 2,player.getY() + 1,player.getZ() - 3);
+        Vec3d start2 = new Vec3d(player.getX() - 3,player.getY() - 1,player.getZ() + 2);
+        Vec3d start3 = new Vec3d(player.getX() - 5,player.getY() + 2,player.getZ() +6);
 
-        Entity entity = mc.player;
-        // Draw a 3D block outline using the CustomRenderer3D class
-        if (entity != null) {
-            BlockPos blockPos = new BlockPos(entity.getBlockX() + 5, entity.getBlockY(), entity.getBlockZ() - 5);
-            if (blockOutlineAndFIll.value) {
-                Renderer3D.drawBlockOutline(drawContext, blockPos, 2.0f, 0xFF0000FF);
-                //Renderer3D.drawFilledBox(drawContext, blockPos, 0xFF0000FF);
-                //  Renderer3D.drawTracerLine(blockPos,2.0f, Color.WHITE.getRGB(),drawContext);
-            }
-            // Draw a tracer line towards an entity using the CustomRenderer3D class
-            if (TracerLine.value) {
-                System.out.println("drawing at" + blockPos);
-                Renderer3D.drawLineFromPlayer(drawContext, blockPos.toCenterPos(), Color.WHITE.getRGB(), 5.0f, event.getTickDelta());
-            }
-        }
+
+        Vec3d dimenstions = new Vec3d(1,1,1);
+        Renderer3d.renderOutline(event.getMatrices(),Color.WHITE,start,dimenstions);
+        Renderer3d.renderLine(event.getMatrices(),Color.yellow,start,player.getEyePos());
+        Renderer3d.renderFilled(event.getMatrices(),Color.GREEN,start2,dimenstions);
+        Renderer3d.renderEdged(event.getMatrices(),Color.CYAN,Color.BLACK,start3,dimenstions);
+
     }
 
 
@@ -116,12 +119,10 @@ public class Test extends Module_ {
         System.out.println("Client Tick");
     }
 
-    @SubscribeEvent
     public void atServerTick(TickEvent.WORLD event) {
         System.out.println("World Tick");
     }
 
-    @SubscribeEvent
     public void atPlayerTick(TickEvent.PLAYER event) {
         System.out.println("Player Tick");
     }

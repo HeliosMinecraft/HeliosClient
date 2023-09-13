@@ -14,6 +14,7 @@
     "ChatInputSuggestorMixin",
     "ClientConnectionMixin",
     "ClientPlayerEntityMixin",
+    "GameRendererMixin",
     "InGameHudMixin",
     "KeyboardMixin",
     "MinecraftClientMixin",

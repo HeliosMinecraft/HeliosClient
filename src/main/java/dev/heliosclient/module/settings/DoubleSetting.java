@@ -29,7 +29,7 @@ public class DoubleSetting extends Setting {
         this.heightCompact = 24;
         this.module = module;
         this.roundingPlace = roundingPlace;
-        inputBox = new InputBox(String.valueOf(max).length() * 6 + 5,11,String.valueOf(value),10, InputBox.InputMode.DIGITS);
+        inputBox = new InputBox(String.valueOf(max).length() * 6,11,String.valueOf(value),10, InputBox.InputMode.DIGITS);
     }
 
     @Override
@@ -48,7 +48,8 @@ public class DoubleSetting extends Setting {
         }
 
 
-        inputBox.render(drawContext,(x + 190) - ((max + ".0").length() * 6 + 10),y - 18,mouseX,mouseY,textRenderer);
+        inputBox.render(drawContext,(x + 180) - (Math.max(String.valueOf(value).length(),String.valueOf(max).length()) * 7),y - 18,mouseX,mouseY,textRenderer);
+        inputBox.setWidth(Math.max(String.valueOf(value).length(),String.valueOf(max).length()) * 7);
 
         Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, 188, 2, 1, 0xFFAAAAAA);
 

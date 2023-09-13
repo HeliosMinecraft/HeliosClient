@@ -12,10 +12,14 @@ import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
+import me.x150.renderer.font.FontRenderer;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -75,6 +79,7 @@ public class ClickGUIScreen extends Screen {
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
         scrollY = 0;
         scrollX = 0;
+        //HeliosClient.fontRenderer.drawString(drawContext.getMatrices(),"This is testing font", (float) client.getWindow().getScaledWidth() /2,client.getWindow().getScaledWidth()-10, 255,255 , 255, 255);
     }
 
 

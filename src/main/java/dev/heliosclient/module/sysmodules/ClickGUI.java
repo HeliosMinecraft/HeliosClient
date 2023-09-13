@@ -1,11 +1,16 @@
 package dev.heliosclient.module.sysmodules;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.util.InputBox;
+import me.x150.renderer.font.FontRenderer;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +18,7 @@ public class ClickGUI extends Module_ {
     public static boolean pause = false;
     static ClickGUI INSTANCE = new ClickGUI();
     public static DoubleSetting ScrollSpeed = new DoubleSetting("Scroll Speed", "Change your scroll speed for the ClickGUI", INSTANCE, 7, 1, 8, 1);
+    DoubleSetting FontSize = new DoubleSetting("FontSize", "Change your FontSize", INSTANCE, 8, 1, 15, 1);
     BooleanSetting Pause = new BooleanSetting("Pause game", "Pause the game when Click GUI is on.", this, false);
     ColorSetting AccentColor = new ColorSetting("Accent color", "Accent color of Click GUI.", this, ColorManager.INSTANCE.clickGuiSecondary);
     BooleanSetting RainbowAccent = new BooleanSetting("Rainbow", "Rainbow effect for accent color.", this, false);
@@ -26,6 +32,7 @@ public class ClickGUI extends Module_ {
             return TooltipMode.value == 1;
         }
     };
+    StringSetting Font = new StringSetting("Font", "Font for the client", "", 100, InputBox.InputMode.CHARACTERS_AND_WHITESPACE);
 
 
     public ClickGUI() {
@@ -34,6 +41,8 @@ public class ClickGUI extends Module_ {
         settings.add(TooltipMode);
         settings.add(TooltipPos);
         settings.add(ScrollSpeed);
+        settings.add(Font);
+        settings.add(FontSize);
         settings.add(AccentColor);
         settings.add(RainbowAccent);
         settings.add(PaneTextColor);
@@ -65,6 +74,9 @@ public class ClickGUI extends Module_ {
         ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
         ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
         pause = Pause.value;
+
+        HeliosClient.fonts[0]=new Font(Font.getValue(), java.awt.Font.PLAIN,8);
+        HeliosClient.fontRenderer = new FontRenderer(HeliosClient.fonts,(int) FontSize.value);
     }
 
     @Override

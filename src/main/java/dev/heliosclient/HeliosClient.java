@@ -11,6 +11,7 @@ import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.fontutils.FontLoader;
+import me.x150.renderer.font.FontRenderer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.FontManager;
@@ -18,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +32,7 @@ public class HeliosClient implements ModInitializer {
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
     public static Font[] fonts;
-
+    public static FontRenderer fontRenderer;
     public static Config CONFIG = new Config();
     public static int uiColorA = 0xFF55FFFF;
     public static int uiColor = 0x55FFFF;
@@ -37,8 +40,10 @@ public class HeliosClient implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("Helios Client loading...");
+        LOGGER.info("Helios Client loading...");;
         loadConfig();
+        if(MinecraftClient.getInstance().getWindow()!=null)
+        fontRenderer  = new FontRenderer(fonts,8);
     }
 
     public void loadConfig() {
