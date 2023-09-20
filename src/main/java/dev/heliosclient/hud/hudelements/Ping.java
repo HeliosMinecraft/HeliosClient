@@ -33,6 +33,7 @@ public class Ping extends HudElement {
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         String text = "Ping: " + ColorUtils.gray + getPing();
         this.width = textRenderer.getWidth(text) + 1;
-        drawContext.drawText(textRenderer, text, this.x - width / 2 + 1, this.y + height / 2 - 10, HeliosClient.uiColorA, false);
+        HeliosClient.fontRenderer.drawString(drawContext.getMatrices(),text, this.x - width / 2 + 1, this.y + height / 2 - 10,1,1,1,1);
+        //drawContext.drawText(textRenderer, text, this.x - width / 2 + 1, this.y + height / 2 - 10, HeliosClient.uiColorA, false);
     }
 }

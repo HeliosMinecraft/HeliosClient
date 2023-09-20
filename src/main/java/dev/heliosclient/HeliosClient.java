@@ -2,6 +2,8 @@ package dev.heliosclient;
 
 import dev.heliosclient.command.CommandManager;
 import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.ModuleManager;
 import dev.heliosclient.module.Module_;
@@ -21,10 +23,11 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HeliosClient implements ModInitializer {
+public class HeliosClient implements ModInitializer, Listener {
     public static final HeliosClient INSTANCE = new HeliosClient();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
     public static final Logger LOGGER = LoggerFactory.getLogger("Helios Client");
@@ -32,6 +35,10 @@ public class HeliosClient implements ModInitializer {
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
     public static Font[] fonts;
+    public static  Font[] Orignalfonts;
+
+    public static int fontSize = 8;
+    public static ArrayList<String> fontNames = new ArrayList<>();
     public static FontRenderer fontRenderer;
     public static Config CONFIG = new Config();
     public static int uiColorA = 0xFF55FFFF;
@@ -41,9 +48,15 @@ public class HeliosClient implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Helios Client loading...");;
+        EventManager.register(this);
         loadConfig();
-        if(MinecraftClient.getInstance().getWindow()!=null)
-        fontRenderer  = new FontRenderer(fonts,8);
+    }
+    @SubscribeEvent
+    public void onTick(TickEvent.CLIENT event){
+        if(MinecraftClient.getInstance().getWindow()!=null) {
+            fontRenderer = new FontRenderer(fonts, fontSize);
+            EventManager.unregister(this);
+        }
     }
 
     public void loadConfig() {
@@ -54,6 +67,10 @@ public class HeliosClient implements ModInitializer {
         }
         CONFIG.load();
         fonts = FontLoader.loadFonts();
+        Orignalfonts = fonts;
+        for (Font font: fonts){
+            fontNames.add(font.getName());
+        }
         for (Module_ m : ModuleManager.INSTANCE.modules) {
             for (Setting s : m.settings) {
                 s.value = ((Map<String, Object>) ((Map<String, Object>) CONFIG.config.get("modules")).get(m.name))

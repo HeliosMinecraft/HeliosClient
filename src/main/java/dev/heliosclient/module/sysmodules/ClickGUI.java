@@ -1,24 +1,31 @@
 package dev.heliosclient.module.sysmodules;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.EventManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.fontutils.FontLoader;
+import dev.heliosclient.util.fontutils.FontUtils;
 import me.x150.renderer.font.FontRenderer;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
     static ClickGUI INSTANCE = new ClickGUI();
     public static DoubleSetting ScrollSpeed = new DoubleSetting("Scroll Speed", "Change your scroll speed for the ClickGUI", INSTANCE, 7, 1, 8, 1);
-    DoubleSetting FontSize = new DoubleSetting("FontSize", "Change your FontSize", INSTANCE, 8, 1, 15, 1);
+    public static DoubleSetting FontSize = new DoubleSetting("Font Size", "Change your FontSize", INSTANCE, 8, 1, 15, 1);
     BooleanSetting Pause = new BooleanSetting("Pause game", "Pause the game when Click GUI is on.", this, false);
     ColorSetting AccentColor = new ColorSetting("Accent color", "Accent color of Click GUI.", this, ColorManager.INSTANCE.clickGuiSecondary);
     BooleanSetting RainbowAccent = new BooleanSetting("Rainbow", "Rainbow effect for accent color.", this, false);
@@ -32,8 +39,8 @@ public class ClickGUI extends Module_ {
             return TooltipMode.value == 1;
         }
     };
-    StringSetting Font = new StringSetting("Font", "Font for the client", "", 100, InputBox.InputMode.CHARACTERS_AND_WHITESPACE);
-
+    public static CycleSetting Font = new CycleSetting("Font", "Font for the client", ClickGUI.INSTANCE,HeliosClient.fontNames, 0);
+    ButtonSetting loadFonts = new ButtonSetting("Font");
 
     public ClickGUI() {
         super("ClickGUI", "ClickGui related stuff.", Category.RENDER);
@@ -43,6 +50,8 @@ public class ClickGUI extends Module_ {
         settings.add(ScrollSpeed);
         settings.add(Font);
         settings.add(FontSize);
+        settings.add(loadFonts);
+
         settings.add(AccentColor);
         settings.add(RainbowAccent);
         settings.add(PaneTextColor);
@@ -56,6 +65,15 @@ public class ClickGUI extends Module_ {
         quickSettings.add(RainbowAccent);
         quickSettings.add(TextColor);
         active.value = true;
+        loadFonts.addButton("Load Fonts",() -> {
+            HeliosClient.fonts = FontLoader.loadFonts();
+            HeliosClient.Orignalfonts = FontLoader.loadFonts();
+            HeliosClient.fontNames.clear();
+            for(Font font: HeliosClient.fonts) {
+                HeliosClient.fontNames.add(font.getName());
+            }
+            Font.setOptions(HeliosClient.fontNames);
+        });
     }
 
     @Override
@@ -64,19 +82,20 @@ public class ClickGUI extends Module_ {
         Tooltip.tooltip.mode = TooltipMode.value;
         Tooltip.tooltip.fixedPos = TooltipPos.value;
 
-        ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getA();
-        ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
-        ColorManager.INSTANCE.clickGuiSecondaryRainbow = RainbowAccent.value;
+        if (!(setting instanceof DoubleSetting)) {
+            ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getA();
+            ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
+            ColorManager.INSTANCE.clickGuiSecondaryRainbow = RainbowAccent.value;
 
-        ColorManager.INSTANCE.defaultTextColor = TextColor.value;
+            ColorManager.INSTANCE.defaultTextColor = TextColor.value;
 
-        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getA();
-        ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
-        ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
+            ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getA();
+            ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
+            ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
+        }
         pause = Pause.value;
-
-        HeliosClient.fonts[0]=new Font(Font.getValue(), java.awt.Font.PLAIN,8);
-        HeliosClient.fontRenderer = new FontRenderer(HeliosClient.fonts,(int) FontSize.value);
+        HeliosClient.fonts = FontUtils.rearrangeFontsArray(HeliosClient.Orignalfonts, HeliosClient.Orignalfonts[Font.value]);
+        HeliosClient.fontRenderer = new FontRenderer(HeliosClient.fonts,HeliosClient.fontSize);
     }
 
     @Override
@@ -95,6 +114,9 @@ public class ClickGUI extends Module_ {
         ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
         ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
         pause = Pause.value;
+        HeliosClient.fontSize = ((int) FontSize.value);
+        HeliosClient.fonts = FontUtils.rearrangeFontsArray(HeliosClient.Orignalfonts, HeliosClient.Orignalfonts[Font.value]);
+        HeliosClient.fontRenderer = new FontRenderer(HeliosClient.fonts,HeliosClient.fontSize);
     }
 
     @Override

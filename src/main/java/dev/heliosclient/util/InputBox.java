@@ -181,6 +181,7 @@ public class InputBox implements Listener {
                     } else {
                         selecting = false;
                     }
+                    selectedAll = false;
                 }
                 case GLFW.GLFW_KEY_RIGHT -> {
                     moveCursor(1);
@@ -193,6 +194,8 @@ public class InputBox implements Listener {
                     } else {
                         selecting = false;
                     }
+                    selectedAll = false;
+
                 }
                 case GLFW.GLFW_KEY_ENTER,
                         GLFW.GLFW_KEY_KP_ENTER -> focused = false;

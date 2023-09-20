@@ -27,14 +27,13 @@ public class FontLoader {
         if (!fontsDir.exists()) {
             fontsDir.mkdirs();
         }
-      // Copy the default font file from the assets folder to the fonts directory
-        File defaultFontFile = new File(fontsDir, DEFAULT_FONT);
-        try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/" + DEFAULT_FONT)) {
-            assert inputStream != null;
-            Files.copy(inputStream, defaultFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            // Copy the default font file from the assets folder to the fonts directory
+            File defaultFontFile = new File(fontsDir, DEFAULT_FONT);
+            try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/" + DEFAULT_FONT)) {
+                assert inputStream != null;
+                Files.copy(inputStream, defaultFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException ignored) {
+            }
 
         // Load all font files from the fonts directory
         List<Font> fonts = new ArrayList<>();

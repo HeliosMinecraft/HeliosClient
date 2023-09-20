@@ -1,5 +1,6 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.system.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
@@ -54,7 +55,9 @@ public class DoubleSetting extends Setting {
         Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, 188, 2, 1, 0xFFAAAAAA);
 
         int scaledValue = (int) ((value - min) / (max - min) * 188) + 2;
-        Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, scaledValue, 2, 1, 0xFF55FFFF);
+        // Slider background
+        Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, scaledValue, 2, 1, ColorManager.INSTANCE.clickGuiSecondary());
+        // Slider
         Renderer2D.drawRoundedRectangle(drawContext, x + scaledValue, y + 14, 2, 6, 1, 0xFFFFFFFF);
 
         if (hovered(mouseX, mouseY)) {
@@ -109,6 +112,9 @@ public class DoubleSetting extends Setting {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.mouseClicked(mouseX, mouseY, button)) {
             this.sliding = true;
+        }
+        if(!inputBox.mouseClicked(mouseX,mouseY,button)){
+            inputBox.setFocused(false);
         }
     }
 
