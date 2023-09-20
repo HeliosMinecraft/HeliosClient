@@ -67,7 +67,7 @@ public class ClickGUI extends Module_ {
         active.value = true;
         loadFonts.addButton("Load Fonts",() -> {
             HeliosClient.fonts = FontLoader.loadFonts();
-            HeliosClient.Orignalfonts = FontLoader.loadFonts();
+            HeliosClient.Orignalfonts =  HeliosClient.fonts;
             HeliosClient.fontNames.clear();
             for(Font font: HeliosClient.fonts) {
                 HeliosClient.fontNames.add(font.getName());
@@ -82,7 +82,7 @@ public class ClickGUI extends Module_ {
         Tooltip.tooltip.mode = TooltipMode.value;
         Tooltip.tooltip.fixedPos = TooltipPos.value;
 
-        if (!(setting instanceof DoubleSetting)) {
+        if (!(setting instanceof CycleSetting) && !(setting instanceof DoubleSetting)) {
             ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getA();
             ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
             ColorManager.INSTANCE.clickGuiSecondaryRainbow = RainbowAccent.value;

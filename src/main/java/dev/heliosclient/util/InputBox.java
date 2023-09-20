@@ -161,12 +161,26 @@ public class InputBox implements Listener {
             switch (keyCode) {
                 case GLFW.GLFW_KEY_BACKSPACE -> {
                     if (!value.isEmpty() && cursorPosition > 0) {
-                        value = value.substring(0, cursorPosition - 1) + value.substring(cursorPosition);
-                        cursorPosition--;
+                        if (selecting) {
+                            value = value.substring(0, selectionStart) + value.substring(selectionEnd);
+                            cursorPosition = selectionStart;
+                            selecting = false;
+                            selectionStart=0;
+                            selectionEnd =0;
+                        } else {
+                            value = value.substring(0, cursorPosition - 1) + value.substring(cursorPosition);
+                            cursorPosition--;
+                        }
                     }
                 }
                 case GLFW.GLFW_KEY_DELETE -> {
-                    if (!value.isEmpty() && cursorPosition < value.length()) {
+                    if (selecting) {
+                        value = value.substring(0, selectionStart) + value.substring(selectionEnd);
+                        cursorPosition = selectionStart;
+                        selecting = false;
+                        selectionStart=0;
+                        selectionEnd =0;
+                    } else {
                         value = value.substring(0, cursorPosition) + value.substring(cursorPosition + 1);
                     }
                 }
