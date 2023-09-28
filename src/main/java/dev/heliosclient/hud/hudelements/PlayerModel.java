@@ -23,20 +23,18 @@ public class PlayerModel extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
+        this.width = 30;
+        this.height = 55;
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) {
-            Renderer2D.drawRectangle(drawContext, x - width / 2, y - height / 2, width, height - 2, Color.BLACK.getRGB());
+            Renderer2D.drawRectangle(drawContext, this.x - (float) width/2, this.y - height/2, width, height - 1, Color.BLACK.getRGB());
         } else {
             float yaw = MathHelper.wrapDegrees(player.prevYaw + (player.getYaw() - player.prevYaw) * mc.getTickDelta());
             float pitch = player.getPitch();
             int x = this.x;
             int y = this.y;
-            InventoryScreen.drawEntity(drawContext, x, y + height / 2 - 3, 25, -yaw, -pitch, player);
+            InventoryScreen.drawEntity(drawContext, x, y + height - 3, 25, -yaw, -pitch, player);
         }
-
-        //this.width = 25;
-
-        //drawContext.drawText(textRenderer, text, this.x-width/2, this.y+height/2-10, HeliosClient.uiColorA, false);
     }
 
 }

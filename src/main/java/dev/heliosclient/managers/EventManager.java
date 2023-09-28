@@ -1,5 +1,7 @@
-package dev.heliosclient.event;
+package dev.heliosclient.managers;
 
+import dev.heliosclient.event.Event;
+import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.listener.Listener;
 
 import java.lang.reflect.Method;

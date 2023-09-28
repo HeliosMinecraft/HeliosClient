@@ -2,6 +2,7 @@ package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import net.minecraft.client.MinecraftClient;
@@ -24,15 +25,14 @@ public class Bps extends HudElement {
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         String text = "Blocks Per Second: ";
         String value = ColorUtils.gray + MathUtils.round(moveSpeed(), 2);
-        this.width = textRenderer.getWidth(text) + textRenderer.getWidth(value);
-        drawContext.drawText(textRenderer, text, this.x - width / 2 + 1, this.y + height / 2 - 10, HeliosClient.uiColorA, false);
-        drawContext.drawText(textRenderer, value, this.x - width / 2 + 1 + textRenderer.getWidth(text), this.y + height / 2 - 10, HeliosClient.uiColorA, false);
+        this.width = (int) FontManager.fontRenderer.getStringWidth(text+value);
+        FontManager.fontRenderer.drawString(drawContext.getMatrices(),text, this.x - (float) width / 2, this.y - (float) height / 2,256 - ColorUtils.getRed(HeliosClient.uiColorA),256 - ColorUtils.getGreen(HeliosClient.uiColorA),256 - ColorUtils.getBlue(HeliosClient.uiColorA),256 - ColorUtils.getAlpha(HeliosClient.uiColorA));
 
     }
 
     private double moveSpeed() {
         if (mc.player == null) {
-            return 0D;
+            return 0;
         }
         Vec3d move = new Vec3d(mc.player.getX() - mc.player.prevX, 0, mc.player.getZ() - mc.player.prevZ).multiply(20);
 

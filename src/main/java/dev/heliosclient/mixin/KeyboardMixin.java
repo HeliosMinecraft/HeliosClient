@@ -1,7 +1,7 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.EventManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.events.CharTypedEvent;
 import dev.heliosclient.event.events.KeyPressedEvent;
 import dev.heliosclient.event.events.KeyReleasedEvent;

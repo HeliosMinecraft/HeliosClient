@@ -4,7 +4,7 @@ import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.system.Friend;
-import dev.heliosclient.system.FriendManager;
+import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import net.minecraft.client.MinecraftClient;

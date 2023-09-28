@@ -1,10 +1,13 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Category;
-import dev.heliosclient.module.ModuleManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -69,16 +72,29 @@ public class CategoryPane {
             x = mouseX - startX;
             y = mouseY - startY;
         }
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, width, 16, 3, 0xFF1B1B1B);
-        Renderer2D.drawRectangle(drawContext, x, y + 16, width, 2, ColorManager.INSTANCE.clickGuiSecondary());
+        int maxWidth = 0;
+        for (ModuleButton m : moduleButtons) {
+            maxWidth = Math.max(maxWidth, m.width);
+        }
+        if(maxWidth<92) {
+            maxWidth = 92;
+        }
+        // Get the width and height of the category name
+        int categoryNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(category.name);
 
-        drawContext.drawText(textRenderer, category.name, x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
-        drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
+        // Adjust the rectangle size based on the text dimensions
+        Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, width, categoryNameHeight + 8, 3, 0xFF1B1B1B);
+        Renderer2D.drawRectangle(drawContext, x, y + categoryNameHeight + 8, width, 2, ColorManager.INSTANCE.clickGuiSecondary());
+
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), category.name, x + 4, y + 4,256 - ColorUtils.getRed(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.clickGuiPaneText()));
+       // drawContext.drawText(textRenderer, category.name, x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), collapsed ? "+" : "-", x + width - 11, y + 4,256 - ColorUtils.getRed(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.clickGuiPaneText()));
+      //  drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
 
         if (!collapsed) {
-            int buttonYOffset = y + 18;
+            int buttonYOffset = y + 10 + categoryNameHeight;
             if (category == Category.SEARCH) {
-                buttonYOffset = y + 35;
+                buttonYOffset = y + 26 + categoryNameHeight;
             }
 
 
@@ -88,8 +104,8 @@ public class CategoryPane {
                 }
 
                 m.setFaded(false);
-                m.render(drawContext, mouseX, mouseY, x, buttonYOffset, textRenderer);
-                buttonYOffset += 14;
+                m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth);
+                buttonYOffset += categoryNameHeight + 6;
                 // Draw the settings for this module if they are open
                 if (m.settingsOpen) {
                     for (Setting setting : m.module.quickSettings) {
@@ -110,7 +126,8 @@ public class CategoryPane {
     }
 
     public boolean hovered(double mouseX, double mouseY) {
-        return mouseX > x + 2 && mouseX < x + (width - 2) && mouseY > y + 2 && mouseY < y + 14;
+        int categoryNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(category.name);
+        return mouseX > x + 2 && mouseX < x + (width - 2) && mouseY > y + 2 && mouseY < y + categoryNameHeight + 14;
     }
 
     public void mouseClicked(int mouseX, int mouseY, int button) {

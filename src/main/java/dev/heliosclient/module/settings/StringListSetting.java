@@ -1,7 +1,9 @@
 package dev.heliosclient.module.settings;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
@@ -36,13 +38,15 @@ public class StringListSetting extends Setting {
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         this.height = 26 + inputBox.size() * 16;
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 5, ColorManager.INSTANCE.defaultTextColor(), false);
+        int defaultColor = ColorManager.INSTANCE.defaultTextColor();
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor,10f);
+
         // Draw a '+' button next to the text
         Renderer2D.drawRectangle(drawContext, x + 165, y + 5, 11, 11, Color.black.getRGB());
         Renderer2D.drawOutlineBox(drawContext, x + 165, y + 5, 11, 11, 0.4f, (hoveredOverAdd(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
         drawContext.drawHorizontalLine(x + 167, x + 173, y + 10, Color.GREEN.getRGB());
         drawContext.drawVerticalLine(x + 170, y + 6, y + 14, Color.GREEN.getRGB());
-        int boxOffset = y;
+        int boxOffset = y + 15;
         for (InputBox box : inputBox) {
             box.render(drawContext, x, boxOffset, mouseX, mouseY, textRenderer);
 
@@ -79,6 +83,7 @@ public class StringListSetting extends Setting {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
+        this.render(drawContext,x,y,mouseX,mouseY,textRenderer);
     }
 
 

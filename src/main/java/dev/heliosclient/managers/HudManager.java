@@ -1,11 +1,10 @@
-package dev.heliosclient.hud;
+package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.EventManager;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.module.ModuleManager;
+import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

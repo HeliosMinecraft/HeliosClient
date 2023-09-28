@@ -1,7 +1,7 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.EventManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.events.BlockInteractEvent;
 import dev.heliosclient.event.events.ChatMessageEvent;
 import dev.heliosclient.event.events.PlayerLeaveEvent;

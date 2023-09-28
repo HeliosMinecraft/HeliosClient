@@ -1,6 +1,6 @@
 package dev.heliosclient.mixin;
 
-import dev.heliosclient.event.EventManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.events.RenderEvent;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;

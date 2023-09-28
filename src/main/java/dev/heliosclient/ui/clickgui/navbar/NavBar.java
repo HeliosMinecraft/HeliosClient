@@ -1,5 +1,8 @@
 package dev.heliosclient.ui.clickgui.navbar;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.managers.NavBarManager;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -12,7 +15,7 @@ public class NavBar {
     public void render(DrawContext drawContext, TextRenderer textRenderer, int mouseX, int mouseY) {
         int width = 2;
         for (NavBarItem item : NavBarManager.INSTANCE.navBarItems) {
-            width += textRenderer.getWidth(item.name) + 4;
+            width += Math.round(FontManager.fxfontRenderer.getStringWidth(item.name)) + 4;
         }
         int x = drawContext.getScaledWindowWidth() / 2 - width / 2;
         int textX = x + 4;

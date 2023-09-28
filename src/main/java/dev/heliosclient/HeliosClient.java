@@ -1,11 +1,12 @@
 package dev.heliosclient;
 
-import dev.heliosclient.command.CommandManager;
-import dev.heliosclient.event.EventManager;
+import dev.heliosclient.managers.CommandManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.module.ModuleManager;
+import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.system.Config;
@@ -13,52 +14,37 @@ import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.fontutils.FontLoader;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.FontManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HeliosClient implements ModInitializer, Listener {
+public class HeliosClient implements ModInitializer {
     public static final HeliosClient INSTANCE = new HeliosClient();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
     public static final Logger LOGGER = LoggerFactory.getLogger("Helios Client");
     public static final String clientTag = ColorUtils.red + "Helios Client";
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
-    public static Font[] fonts;
-    public static  Font[] Orignalfonts;
 
-    public static int fontSize = 8;
-    public static ArrayList<String> fontNames = new ArrayList<>();
-    public static FontRenderer fontRenderer;
     public static Config CONFIG = new Config();
     public static int uiColorA = 0xFF55FFFF;
     public static int uiColor = 0x55FFFF;
+    public static FontManager fontManager = new FontManager();
 
 
     @Override
     public void onInitialize() {
         LOGGER.info("Helios Client loading...");;
-        EventManager.register(this);
         loadConfig();
     }
-    @SubscribeEvent
-    public void onTick(TickEvent.CLIENT event){
-        if(MinecraftClient.getInstance().getWindow()!=null) {
-            fontRenderer = new FontRenderer(fonts, fontSize);
-            EventManager.unregister(this);
-        }
-    }
-
     public void loadConfig() {
         LOGGER.info("Loading config...");
         if (!CONFIG.doesConfigExist()) {
@@ -66,11 +52,7 @@ public class HeliosClient implements ModInitializer, Listener {
             CONFIG.save();
         }
         CONFIG.load();
-        fonts = FontLoader.loadFonts();
-        Orignalfonts = fonts;
-        for (Font font: fonts){
-            fontNames.add(font.getName());
-        }
+        EventManager.register(fontManager);
         for (Module_ m : ModuleManager.INSTANCE.modules) {
             for (Setting s : m.settings) {
                 s.value = ((Map<String, Object>) ((Map<String, Object>) CONFIG.config.get("modules")).get(m.name))

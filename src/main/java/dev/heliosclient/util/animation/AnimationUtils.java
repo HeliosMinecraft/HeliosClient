@@ -1,9 +1,12 @@
 package dev.heliosclient.util.animation;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
 
@@ -38,7 +41,7 @@ public class AnimationUtils {
             Renderer2D.drawRoundedRectangle(context, x, y, width, height, radius, newColor);
     }
 
-    public void drawFadingText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int color, boolean shadow) {
+    public void drawFadingText(MatrixStack matrixStack, String text, int x, int y, int color , boolean fixedSize) {
         if (fading) {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
@@ -52,10 +55,13 @@ public class AnimationUtils {
             a = 254; // 255 makes alpha of text to 0 for some reason
         }
         Color nColor = ColorUtils.intToColor(color);
-        int newColor = ColorUtils.changeAlpha(nColor, a).getRGB();
-        context.drawText(textRenderer, text, x, y, newColor, shadow);
+        Color newColor = ColorUtils.changeAlpha(nColor, a);
+        if(fixedSize){
+            FontManager.fxfontRenderer.drawString(matrixStack, text, x, y, 256 - newColor.getRed(), 256 - nColor.getGreen(), 256 - newColor.getBlue(), 256 - newColor.getAlpha());
+        }else {
+            FontManager.fontRenderer.drawString(matrixStack, text, x, y, 256 - newColor.getRed(), 256 - nColor.getGreen(), 256 - newColor.getBlue(), 256 - newColor.getAlpha());
+        }
     }
-
     public void drawFadingAndPoppingBox(DrawContext context, int x, int y, int width, int height, int color, boolean RoundedBox, int radius) {
         if (fading) {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
@@ -78,7 +84,7 @@ public class AnimationUtils {
         context.getMatrices().pop();
     }
 
-    public void drawFadingAndPoppingText(DrawContext context, TextRenderer textRenderer, String text, int x, int y, int color, boolean shadow) {
+    public void drawFadingAndPoppingText(DrawContext context, String text, int x, int y, int color, boolean fixedSize) {
         if (fading) {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
@@ -93,12 +99,17 @@ public class AnimationUtils {
             a = 254; // 255 makes alpha of text to 0 for some reason
         }
         Color nColor = ColorUtils.intToColor(color);
-        int newColor = ColorUtils.changeAlpha(nColor, a).getRGB();
+        Color newColor = ColorUtils.changeAlpha(nColor, a);
         float scale = Easing.ease(easingType, alpha);
         context.getMatrices().push();
         context.getMatrices().translate(x, y, 0);
         context.getMatrices().scale(scale, scale, 0);
-        context.drawText(textRenderer, text, -textRenderer.getWidth(text) / 2, -textRenderer.fontHeight / 2, newColor, shadow);
+        if(fixedSize) {
+            FontManager.fxfontRenderer.drawString(context.getMatrices(), text, -FontManager.fontRenderer.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, 256 - newColor.getRed(), 256 - nColor.getGreen(), 256 - newColor.getBlue(), 256 - newColor.getAlpha());
+        }
+        else {
+            FontManager.fontRenderer.drawString(context.getMatrices(), text, -FontManager.fontRenderer.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, 256 - newColor.getRed(), 256 - nColor.getGreen(), 256 - newColor.getBlue(), 256 - newColor.getAlpha());
+        }
         context.getMatrices().pop();
     }
 }

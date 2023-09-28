@@ -1,6 +1,9 @@
 package dev.heliosclient.module.settings;
 
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -25,13 +28,16 @@ public class StringSetting extends Setting {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 5, ColorManager.INSTANCE.defaultTextColor(), false);
-        inputBox.render(drawContext, x, y, mouseX, mouseY, textRenderer);
+        int defaultColor = ColorManager.INSTANCE.defaultTextColor();
+
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor,10f);
+        inputBox.render(drawContext, x, y + 15, mouseX, mouseY, textRenderer);
     }
 
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
+        this.render(drawContext,x,y,mouseX,mouseY,textRenderer);
     }
 
     @Override

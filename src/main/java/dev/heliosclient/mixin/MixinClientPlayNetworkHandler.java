@@ -2,7 +2,7 @@ package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
-import dev.heliosclient.event.EventManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.events.PlayerJoinEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;

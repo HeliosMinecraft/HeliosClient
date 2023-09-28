@@ -2,10 +2,8 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.StringListSetting;
-import dev.heliosclient.module.settings.StringSetting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;

@@ -1,10 +1,10 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.EventManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.events.PlayerMotionEvent;
 import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.module.ModuleManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;

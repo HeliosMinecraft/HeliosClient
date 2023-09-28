@@ -1,25 +1,17 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.EventManager;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.KeyPressedEvent;
-import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Category;
-import dev.heliosclient.module.ModuleManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
-import me.x150.renderer.font.FontRenderer;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -59,9 +51,9 @@ public class ClickGUIScreen extends Screen {
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
             if (category.category == Category.SEARCH && !category.collapsed) {
 
-                Renderer2D.drawRectangle(drawContext, category.x, category.y + 18, 96, 18, 0xFF1B1B1B);
+                Renderer2D.drawRectangle(drawContext, category.x, category.y + 19, 96, 18, 0xFF1B1B1B);
 
-                searchBox.render(drawContext, category.x, category.y, mouseX, mouseY, textRenderer);
+                searchBox.render(drawContext, category.x, (int) (category.y + 21), mouseX, mouseY, textRenderer);
 
                 category.addModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()));
 

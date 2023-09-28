@@ -1,6 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

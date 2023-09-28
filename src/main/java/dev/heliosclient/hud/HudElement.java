@@ -1,14 +1,16 @@
 package dev.heliosclient.hud;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.Renderer2D;
+import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class HudElement {
     public String name;
     public String description;
-    public int height = 8;
+    public int height = FontManager.fontSize;
     public int width = 10;
     public int x = 90;
     public int y = 90;
@@ -84,20 +86,21 @@ public class HudElement {
         if (this.selected && renderOutLineBox) {
             if (dragging) {
                 if (distanceX == 0 && posX == 1) {
-                    Renderer2D.drawRectangle(drawContext, drawContext.getScaledWindowWidth() / 2 - 1, 0, 2, drawContext.getScaledWindowHeight(), 0xFFFF0000);
+                    Renderer2D.drawRectangle(drawContext, (float) drawContext.getScaledWindowWidth() / 2 - 1, 0, 2, drawContext.getScaledWindowHeight(), 0xFFFF0000);
                 }
                 if (distanceY == 0 && posY == 1) {
-                    Renderer2D.drawRectangle(drawContext, 0, drawContext.getScaledWindowHeight() / 2 - 1, drawContext.getScaledWindowWidth(), 2, 0xFF00FF00);
+                    Renderer2D.drawRectangle(drawContext, 0, (float) drawContext.getScaledWindowHeight() / 2 - 1, drawContext.getScaledWindowWidth(), 2, 0xFF00FF00);
                 }
             }
 
-            Renderer2D.drawOutlineBox(drawContext, x - 1 - width / 2, y - 1 - height / 2, width + 2, height, 1, 0xFFFFFFFF);
+            Renderer2D.drawOutlineBox(drawContext, x - 1 - (float) width / 2, y - 1 - (float) height / 2, width + 2, height + 2, 0.4f, 0xFFFFFFFF);
 
             // drawContext.fill(x-1 - width/2, y-1 - height/2, x- width/2, y+height/2+1, 0xFFFFFFFF);
             //drawContext.fill(x-1 - width/2, y-1 -height/2, x+width+1- width/2 , y-height/2, 0xFFFFFFFF);
             //drawContext.fill(x+width - width/2, y-1 - height/2, x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
             //drawContext.fill(x-1 - width/2, y+height/2 , x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
         }
+        this.height = Math.round(FontManager.fontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"));
 
         renderElement(drawContext, textRenderer);
     }

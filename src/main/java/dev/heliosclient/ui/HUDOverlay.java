@@ -1,7 +1,7 @@
 package dev.heliosclient.ui;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.module.ModuleManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.HUDModule;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;

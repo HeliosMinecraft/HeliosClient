@@ -1,24 +1,19 @@
 package dev.heliosclient.module.sysmodules;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.EventManager;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.fontutils.FontLoader;
 import dev.heliosclient.util.fontutils.FontUtils;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ClickGUI extends Module_ {
@@ -39,7 +34,7 @@ public class ClickGUI extends Module_ {
             return TooltipMode.value == 1;
         }
     };
-    public static CycleSetting Font = new CycleSetting("Font", "Font for the client", ClickGUI.INSTANCE,HeliosClient.fontNames, 0);
+    public static CycleSetting Font = new CycleSetting("Font", "Font for the client", ClickGUI.INSTANCE,FontManager.fontNames, 0);
     ButtonSetting loadFonts = new ButtonSetting("Font");
 
     public ClickGUI() {
@@ -66,13 +61,8 @@ public class ClickGUI extends Module_ {
         quickSettings.add(TextColor);
         active.value = true;
         loadFonts.addButton("Load Fonts",() -> {
-            HeliosClient.fonts = FontLoader.loadFonts();
-            HeliosClient.Orignalfonts =  HeliosClient.fonts;
-            HeliosClient.fontNames.clear();
-            for(Font font: HeliosClient.fonts) {
-                HeliosClient.fontNames.add(font.getName());
-            }
-            Font.setOptions(HeliosClient.fontNames);
+            HeliosClient.fontManager = new FontManager();
+            Font.setOptions(FontManager.fontNames);
         });
     }
 
@@ -94,8 +84,10 @@ public class ClickGUI extends Module_ {
             ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
         }
         pause = Pause.value;
-        HeliosClient.fonts = FontUtils.rearrangeFontsArray(HeliosClient.Orignalfonts, HeliosClient.Orignalfonts[Font.value]);
-        HeliosClient.fontRenderer = new FontRenderer(HeliosClient.fonts,HeliosClient.fontSize);
+
+        FontManager.fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
+        FontManager.fontRenderer = new FontRenderer(FontManager.fonts,FontManager.fontSize);
+        FontManager.fxfontRenderer = new fxFontRenderer(FontManager.fonts,8.5f);
     }
 
     @Override
@@ -114,9 +106,10 @@ public class ClickGUI extends Module_ {
         ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
         ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
         pause = Pause.value;
-        HeliosClient.fontSize = ((int) FontSize.value);
-        HeliosClient.fonts = FontUtils.rearrangeFontsArray(HeliosClient.Orignalfonts, HeliosClient.Orignalfonts[Font.value]);
-        HeliosClient.fontRenderer = new FontRenderer(HeliosClient.fonts,HeliosClient.fontSize);
+
+        FontManager.fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
+        FontManager.fontRenderer = new FontRenderer(FontManager.fonts,FontManager.fontSize);
+        FontManager.fxfontRenderer = new fxFontRenderer(FontManager.fonts,8.5f);
     }
 
     @Override

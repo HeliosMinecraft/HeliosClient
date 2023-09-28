@@ -1,8 +1,11 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -25,14 +28,15 @@ public class KeyBind extends Setting {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
+        int defaultColor = ColorManager.INSTANCE.defaultTextColor();
+
         if (listening) {
-            drawContext.drawText(textRenderer, name + ": §lLISTENING", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
+            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": §lLISTENING", x + 2, y + 8,defaultColor,10f);
         } else if (value == 0) {
-            drawContext.drawText(textRenderer, name + ": None", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
+            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": None", x + 2, y + 8,defaultColor,10f);
         } else {
             String keyName = KeycodeToString.translate(value);
-
-            drawContext.drawText(textRenderer, name + ": " + keyName, x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
+            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": "+keyName, x + 2, y + 8,defaultColor,10f);
         }
 
         if (hovered(mouseX, mouseY)) {

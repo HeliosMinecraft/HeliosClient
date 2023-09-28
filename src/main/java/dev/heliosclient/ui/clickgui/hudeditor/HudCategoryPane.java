@@ -1,8 +1,10 @@
 package dev.heliosclient.ui.clickgui.hudeditor;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementList;
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -33,8 +35,8 @@ public class HudCategoryPane {
 
         Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, width, 16, 3, 0xFF1B1B1B);
         Renderer2D.drawRectangle(drawContext, x, y + 16, width, 2, ColorManager.INSTANCE.clickGuiSecondary());
-        drawContext.drawText(textRenderer, "Hud elements", x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
-        drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Hud elements", x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(),10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(),10f);
 
         int offsetY = y + 18;
         if (!collapsed) {

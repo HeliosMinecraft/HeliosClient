@@ -1,6 +1,6 @@
 package dev.heliosclient.module;
 
-import dev.heliosclient.event.EventManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.PlayerMotionEvent;
 import dev.heliosclient.event.events.RenderEvent;

@@ -1,8 +1,11 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
@@ -63,15 +66,23 @@ public class ColorSetting extends Setting {
 
         value = new Color(r, g, b, a).getRGB();
 
+        int defaultColor = ColorManager.INSTANCE.defaultTextColor();
+
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 2,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
 
 
-        drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, 0xFFFFFF, false);
-        drawContext.drawText(textRenderer, Text.literal("Red: " + r), x + 130, y + 15, ColorManager.INSTANCE.defaultTextColor(), false);
-        drawContext.drawText(textRenderer, Text.literal("Green: " + g), x + 130, y + 29, ColorManager.INSTANCE.defaultTextColor(), false);
-        drawContext.drawText(textRenderer, Text.literal("Blue: " + b), x + 130, y + 43, ColorManager.INSTANCE.defaultTextColor(), false);
-        drawContext.drawText(textRenderer, Text.literal("Alpha: " + a), x + 130, y + 57, ColorManager.INSTANCE.defaultTextColor(), false);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 2,256 - ColorUtils.getRed(0xFFFFFF),256 - ColorUtils.getGreen(0xFFFFFF),256 - ColorUtils.getBlue(0xFFFFFF),256 - ColorUtils.getAlpha(0xFFFFFF),10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Red: " + r, x + 130, y + 15,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Green: " + g, x + 130, y + 29,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Blue: " + b, x + 130, y + 43,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Alpha: " + a, x + 130, y + 57,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
+
+        // drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, 0xFFFFFF, false);
+        //drawContext.drawText(textRenderer, Text.literal("Red: " + r), x + 130, y + 15, defaultColor, false);
+        //drawContext.drawText(textRenderer, Text.literal("Green: " + g), x + 130, y + 29, defaultColor, false);
+        //drawContext.drawText(textRenderer, Text.literal("Blue: " + b), x + 130, y + 43, defaultColor, false);
+        //drawContext.drawText(textRenderer, Text.literal("Alpha: " + a), x + 130, y + 57, defaultColor, false);
         drawContext.fillGradient(x + 65, y + 14, x + 77, y + 74, 0xFFDDDDDD, 0x00DDDDDD);
         drawContext.fillGradient(x + 80, y + 14, x + 92, y + 74, 0xFFFF0000, 0xFF000000);
         drawContext.fillGradient(x + 95, y + 14, x + 107, y + 74, 0xFF00FF00, 0xFF000000);
@@ -121,9 +132,10 @@ public class ColorSetting extends Setting {
         }
 
         value = new Color(r, g, b, a).getRGB();
+        int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 2,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
 
 
         drawContext.fill(x + moduleWidth - boxSize - 2, y + 2, x + moduleWidth - 2, y + boxSize + 2, value);

@@ -3,7 +3,7 @@ package dev.heliosclient.command.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.heliosclient.command.Command;
 import dev.heliosclient.command.CommandArgumentType;
-import dev.heliosclient.command.CommandManager;
+import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.command.ModuleArgumentType;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;

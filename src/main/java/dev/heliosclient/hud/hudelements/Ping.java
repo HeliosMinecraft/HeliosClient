@@ -2,6 +2,7 @@ package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.ColorUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -32,8 +33,8 @@ public class Ping extends HudElement {
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         String text = "Ping: " + ColorUtils.gray + getPing();
-        this.width = textRenderer.getWidth(text) + 1;
-        HeliosClient.fontRenderer.drawString(drawContext.getMatrices(),text, this.x - width / 2 + 1, this.y + height / 2 - 10,1,1,1,1);
+        this.width = (int) (FontManager.fontRenderer.getStringWidth(text) + 1);
+        FontManager.fontRenderer.drawString(drawContext.getMatrices(),text, this.x - (float) width / 2, this.y - (float) height / 2,256 - ColorUtils.getRed(HeliosClient.uiColorA),256 - ColorUtils.getGreen(HeliosClient.uiColorA),256 - ColorUtils.getBlue(HeliosClient.uiColorA),256 - ColorUtils.getAlpha(HeliosClient.uiColorA));
         //drawContext.drawText(textRenderer, text, this.x - width / 2 + 1, this.y + height / 2 - 10, HeliosClient.uiColorA, false);
     }
 }

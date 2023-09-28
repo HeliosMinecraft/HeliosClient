@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import dev.heliosclient.module.ModuleManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import net.minecraft.command.CommandSource;
 import net.minecraft.text.Text;

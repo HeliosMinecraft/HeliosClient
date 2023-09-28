@@ -1,7 +1,9 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
 import net.minecraft.client.MinecraftClient;
@@ -26,7 +28,7 @@ public class ModuleButton {
 
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
-        this.width = 96;
+        this.width = (int) FontManager.fxfontRenderer.getStringWidth(module.name) + 4;
         this.height = 14;
         this.parentScreen = parentScreen;
         BackgroundAnimation.FADE_SPEED = 0.2f;
@@ -47,7 +49,7 @@ public class ModuleButton {
         return faded;
     }
 
-    public void render(DrawContext drawContext, int mouseX, int mouseY, int x, int y, TextRenderer textRenderer) {
+    public void render(DrawContext drawContext, int mouseX, int mouseY, int x, int y,int maxWidth) {
         this.x = x;
         this.y = y;
 
@@ -56,13 +58,18 @@ public class ModuleButton {
         } else {
             hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
         }
+        // Get the width and height of the module name
+        int moduleNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(module.name);
 
+        // Adjust the button size based on the text dimensions
+        this.height = moduleNameHeight + 6;
+        this.width = maxWidth;
 
         int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
         Color fill = new Color(fillColor, fillColor, fillColor, alpha);
 
-        BackgroundAnimation.drawFadingBox(drawContext, x, y, width, height, fill.getRGB(), false, 0);
-        TextAnimation.drawFadingText(drawContext, textRenderer, module.name, x + 3, y + 3, module.active.value ? ColorManager.INSTANCE.clickGuiSecondary() : ColorManager.INSTANCE.defaultTextColor(), false);
+        BackgroundAnimation.drawFadingBox(drawContext, x, y, maxWidth + 4 , height, fill.getRGB(), false, 0);
+        TextAnimation.drawFadingText(drawContext.getMatrices(),  module.name, x + 3, y + moduleNameHeight/4 + 1, module.active.value ? ColorManager.INSTANCE.clickGuiSecondary() : ColorManager.INSTANCE.defaultTextColor(),true);
         if (hovered(mouseX, mouseY)) {
             Tooltip.tooltip.changeText(module.description);
         }

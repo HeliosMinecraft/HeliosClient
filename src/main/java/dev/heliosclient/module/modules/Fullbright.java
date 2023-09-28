@@ -1,6 +1,6 @@
 package dev.heliosclient.module.modules;
 
-import dev.heliosclient.event.EventManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;

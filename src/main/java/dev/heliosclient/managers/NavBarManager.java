@@ -1,10 +1,11 @@
-package dev.heliosclient.ui.clickgui.navbar;
+package dev.heliosclient.managers;
 
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ClientSettingsScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
+import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;

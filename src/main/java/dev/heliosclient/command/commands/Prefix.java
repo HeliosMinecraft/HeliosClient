@@ -3,7 +3,7 @@ package dev.heliosclient.command.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.heliosclient.command.Command;
-import dev.heliosclient.command.CommandManager;
+import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import net.minecraft.client.network.ClientPlayerEntity;

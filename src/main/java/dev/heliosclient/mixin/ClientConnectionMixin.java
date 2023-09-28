@@ -1,7 +1,7 @@
 package dev.heliosclient.mixin;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.heliosclient.command.CommandManager;
+import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.util.ChatUtils;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.Packet;

@@ -1,5 +1,6 @@
-package dev.heliosclient.system;
+package dev.heliosclient.managers;
 
+import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ChatUtils;
 import net.minecraft.client.MinecraftClient;
 

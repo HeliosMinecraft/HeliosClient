@@ -1,8 +1,11 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.system.ColorManager;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
@@ -29,7 +32,8 @@ public class BooleanSetting extends Setting {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 8,256 - ColorUtils.getRed(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.defaultTextColor()),10f);
+        //drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
         Renderer2D.drawOutlineBox(drawContext, x + 175, y + 7, 10, 10, 1, 0xFFFFFFFF);
         CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + 177, y + 9, 6, 6, value ? 0xFF55FFFF : 0xFF222222, false, 0);
 
@@ -47,7 +51,8 @@ public class BooleanSetting extends Setting {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        drawContext.drawText(textRenderer, Text.literal(name.substring(0, Math.min(12, name.length())) + "..."), x + 3, y + 5, ColorManager.INSTANCE.defaultTextColor(), false);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 5,256 - ColorUtils.getRed(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.defaultTextColor()),10f);
+        //drawContext.drawText(textRenderer, Text.literal(name.substring(0, Math.min(12, name.length())) + "..."), x + 3, y + 5, ColorManager.INSTANCE.defaultTextColor(), false);
         Renderer2D.drawOutlineBox(drawContext, x + moduleWidth - 14, y + 4, 10, 10, 1, 0xFFFFFFFF);
         CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + moduleWidth - 12, y + 6, 6, 6, value ? 0xAA55FFFF : 0xFF222222, false, 0);
 

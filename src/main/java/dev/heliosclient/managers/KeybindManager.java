@@ -1,10 +1,10 @@
-package dev.heliosclient.system;
+package dev.heliosclient.managers;
 
-import dev.heliosclient.event.EventManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.module.ModuleManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;

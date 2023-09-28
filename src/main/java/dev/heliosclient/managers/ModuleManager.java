@@ -1,5 +1,7 @@
-package dev.heliosclient.module;
+package dev.heliosclient.managers;
 
+import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.*;
 
 import java.util.ArrayList;

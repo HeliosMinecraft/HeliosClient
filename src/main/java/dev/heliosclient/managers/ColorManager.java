@@ -1,4 +1,4 @@
-package dev.heliosclient.system;
+package dev.heliosclient.managers;
 
 import dev.heliosclient.util.ColorUtils;
 

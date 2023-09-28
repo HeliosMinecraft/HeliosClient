@@ -1,6 +1,9 @@
 package dev.heliosclient.module.settings;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -31,7 +34,8 @@ public class ButtonSetting extends Setting {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
       //  super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        drawContext.drawText(textRenderer,ButtonCategoryText, HeliosClient.MC.getWindow().getScaledWidth()/2 - textRenderer.getWidth(ButtonCategoryText)/2 + 1, y + 2,Color.WHITE.getRGB(),true);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),ButtonCategoryText, (float) HeliosClient.MC.getWindow().getScaledWidth() /2 - (float) textRenderer.getWidth(ButtonCategoryText) /2 + 1, y + 2,256 - ColorUtils.getRed(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.defaultTextColor()),10f);
+        //drawContext.drawText(textRenderer,ButtonCategoryText, HeliosClient.MC.getWindow().getScaledWidth()/2 - textRenderer.getWidth(ButtonCategoryText)/2 + 1, y + 2,Color.WHITE.getRGB(),true);
 
         int buttonX = x + 2;
         int buttonY = y + textRenderer.fontHeight + 10;
@@ -67,13 +71,15 @@ public class ButtonSetting extends Setting {
             this.y = y;
             int fillColor = Color.DARK_GRAY.getRGB();
             int borderColor = hovered(mouseX, mouseY) ? Color.WHITE.getRGB() : Color.BLACK.getRGB();
-            Renderer2D.drawRoundedRectangle(drawContext, x, y, width - 4, 18 - 4, 2, fillColor);
-            Renderer2D.drawOutlineRoundedBox(drawContext, x, y, width - 4, 18 - 4,2, 0.7f,borderColor);
+            Renderer2D.drawRoundedRectangle(drawContext, x, y, width - 4, 14, 2, fillColor);
+            Renderer2D.drawOutlineRoundedBox(drawContext, x, y, width - 4, 14,2, 0.7f,borderColor);
 
             // Render button text
-            int textX = x + (width - textRenderer.getWidth(text)) / 2;
-            int textY = y + 3;
-            drawContext.drawText(textRenderer,text,textX,textY,Color.WHITE.getRGB(),false);
+            int textX = Math.round(x + (width - FontManager.fxfontRenderer.getStringWidth(text)) / 2);
+            float textHeight = FontManager.fxfontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+            float textY = y + (14 - textHeight) / 2; // Center the text vertically
+            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),text,textX,textY,256 -Color.WHITE.getRed(),256 - Color.WHITE.getGreen(),256 - Color.WHITE.getBlue(),256 - Color.WHITE.getAlpha(),10f);
+            //drawContext.drawText(textRenderer,text,textX,textY,Color.WHITE.getRGB(),false);
         }
 
         private boolean hovered(int mouseX, int mouseY) {

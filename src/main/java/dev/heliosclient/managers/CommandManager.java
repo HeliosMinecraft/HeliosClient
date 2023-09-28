@@ -1,8 +1,9 @@
-package dev.heliosclient.command;
+package dev.heliosclient.managers;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.heliosclient.command.Command;
 import dev.heliosclient.command.commands.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommandSource;
