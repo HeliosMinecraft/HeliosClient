@@ -18,10 +18,12 @@ import java.util.List;
 
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
+    public static boolean keybinds = false;
     static ClickGUI INSTANCE = new ClickGUI();
     public static DoubleSetting ScrollSpeed = new DoubleSetting("Scroll Speed", "Change your scroll speed for the ClickGUI", INSTANCE, 7, 1, 8, 1);
     public static DoubleSetting FontSize = new DoubleSetting("Font Size", "Change your FontSize", INSTANCE, 8, 1, 15, 1);
     BooleanSetting Pause = new BooleanSetting("Pause game", "Pause the game when Click GUI is on.", this, false);
+    BooleanSetting Keybinds = new BooleanSetting("Show Keybinds", "Show keybinds in the Module Button.", this, true);
     ColorSetting AccentColor = new ColorSetting("Accent color", "Accent color of Click GUI.", this, ColorManager.INSTANCE.clickGuiSecondary);
     BooleanSetting RainbowAccent = new BooleanSetting("Rainbow", "Rainbow effect for accent color.", this, false);
     BooleanSetting RainbowPane = new BooleanSetting("Rainbow", "Rainbow effect for category panes.", this, false);
@@ -40,6 +42,7 @@ public class ClickGUI extends Module_ {
     public ClickGUI() {
         super("ClickGUI", "ClickGui related stuff.", Category.RENDER);
         settings.add(Pause);
+        settings.add(Keybinds);
         settings.add(TooltipMode);
         settings.add(TooltipPos);
         settings.add(ScrollSpeed);
@@ -84,6 +87,7 @@ public class ClickGUI extends Module_ {
             ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
         }
         pause = Pause.value;
+        keybinds = Keybinds.value;
 
         FontManager.fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
         FontManager.fontRenderer = new FontRenderer(FontManager.fonts,FontManager.fontSize);
@@ -106,6 +110,7 @@ public class ClickGUI extends Module_ {
         ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
         ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
         pause = Pause.value;
+        keybinds = Keybinds.value;
 
         FontManager.fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
         FontManager.fontRenderer = new FontRenderer(FontManager.fonts,FontManager.fontSize);

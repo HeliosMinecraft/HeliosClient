@@ -3,7 +3,9 @@ package dev.heliosclient.ui.clickgui;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
 import net.minecraft.client.MinecraftClient;
@@ -72,6 +74,10 @@ public class ModuleButton {
         TextAnimation.drawFadingText(drawContext.getMatrices(),  module.name, x + 3, y + moduleNameHeight/4 + 1, module.active.value ? ColorManager.INSTANCE.clickGuiSecondary() : ColorManager.INSTANCE.defaultTextColor(),true);
         if (hovered(mouseX, mouseY)) {
             Tooltip.tooltip.changeText(module.description);
+        }
+        if(module.keyBind.value != 0 && ClickGUI.keybinds) {
+            String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
+            TextAnimation.drawFadingText(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - FontManager.fxfontRenderer.getStringWidth(keyName)), y + moduleNameHeight/4 + 1, ColorManager.INSTANCE.defaultTextColor, true);
         }
     }
 
