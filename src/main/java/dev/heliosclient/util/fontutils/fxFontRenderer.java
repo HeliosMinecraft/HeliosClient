@@ -37,7 +37,7 @@ public class fxFontRenderer extends FontRenderer {
     }
     public void drawString(MatrixStack matrixStack, String text, float x, float y, int color, float desiredSize) {
         // Get the default size of the font
-        float defaultSize = 10f; // This is the default size of Minecraft's font
+        float defaultSize = 10f; // Default font size of minecraft
 
         // Calculate the scale factor
         float scaleFactor = desiredSize / defaultSize;

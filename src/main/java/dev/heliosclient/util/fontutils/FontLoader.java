@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class FontLoader {
     private static final String FONTS_FOLDER = "heliosclient/fonts";
-    private static final String DEFAULT_FONT = "Comfortaa.ttf";
+    private static final String[] DEFAULT_FONT = {"Minecraft.ttf","Comfortaa.ttf","JetBrainsMono.ttf","Nunito.ttf",};
 
     public static Font[] loadFonts() {
         // Get the Minecraft game directory
@@ -28,17 +28,20 @@ public class FontLoader {
             fontsDir.mkdirs();
         }
             // Copy the default font file from the assets folder to the fonts directory
-            File defaultFontFile = new File(fontsDir, DEFAULT_FONT);
-            try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/" + DEFAULT_FONT)) {
+        for (String s : DEFAULT_FONT) {
+            File defaultFontFile = new File(fontsDir, s);
+            try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/fonts/" + s)) {
                 assert inputStream != null;
                 Files.copy(inputStream, defaultFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+        }
 
         // Load all font files from the fonts directory
         List<Font> fonts = new ArrayList<>();
         for (File file : Objects.requireNonNull(fontsDir.listFiles())) {
-            if (file.isFile() && file.getName().endsWith(".ttf")) {
+            if (file.isFile() && (file.getName().toLowerCase().endsWith(".ttf") || file.getName().toLowerCase().endsWith(".otf"))) {
                 try {
                     Font[] fontArray = Font.createFonts(file);
                     Collections.addAll(fonts, fontArray);
