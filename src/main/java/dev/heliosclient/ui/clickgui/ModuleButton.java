@@ -5,6 +5,7 @@ import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
@@ -67,7 +68,7 @@ public class ModuleButton {
         //this.height = moduleNameHeight + 6;
         this.width = maxWidth;
 
-        int fillColor = module.isActive()? new Color(ColorManager.INSTANCE.clickGuiSecondary()).getRGB() : new Color(17,18,19,200).getRGB() ;
+        int fillColor = module.isActive()? new Color(ColorManager.INSTANCE.clickGuiSecondary()).getRGB() :  ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),200).getRGB() ;
 
         BackgroundAnimation.drawFadingBox(drawContext, x + 1 , y, maxWidth , height, fillColor, true, 2);
         int textY = y + 1 + (height - moduleNameHeight) / 2; // Center the text vertically

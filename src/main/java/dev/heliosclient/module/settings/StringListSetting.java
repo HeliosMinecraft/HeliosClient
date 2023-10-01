@@ -29,7 +29,7 @@ public class StringListSetting extends Setting {
         this.characterLimit = characterLimit;
         this.inputMode = inputMode;
         for (int i = 0; i < defaultBoxes; i++) {
-            inputBox.add(new InputBox(160, 13, values[i], characterLimit,inputMode));
+            inputBox.add(new InputBox(160, 12, values[i], characterLimit,inputMode));
         }
     }
 
@@ -46,14 +46,14 @@ public class StringListSetting extends Setting {
         Renderer2D.drawOutlineBox(drawContext, x + 165, y + 5, 11, 11, 0.4f, (hoveredOverAdd(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
         drawContext.drawHorizontalLine(x + 167, x + 173, y + 10, Color.GREEN.getRGB());
         drawContext.drawVerticalLine(x + 170, y + 6, y + 14, Color.GREEN.getRGB());
-        int boxOffset = y + 15;
+        int boxOffset = y + 20;
         for (InputBox box : inputBox) {
             box.render(drawContext, x, boxOffset, mouseX, mouseY, textRenderer);
 
             // Draw a '-' button next to the text
-            Renderer2D.drawRectangle(drawContext, x + 165, boxOffset + 12 + textRenderer.fontHeight, 11, 11, Color.black.getRGB());
-            drawContext.drawHorizontalLine(x + 168, x + 172, boxOffset + 17 + textRenderer.fontHeight, Color.RED.getRGB());
-            Renderer2D.drawOutlineBox(drawContext, x + 165, boxOffset + 12 + textRenderer.fontHeight, 11, 11, 0.4f, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+            Renderer2D.drawRectangle(drawContext, x + 165, boxOffset, 11, 11, Color.black.getRGB());
+            drawContext.drawHorizontalLine(x + 168, x + 172, boxOffset + 5, Color.RED.getRGB());
+            Renderer2D.drawOutlineBox(drawContext, x + 165, boxOffset, 11, 11, 0.4f, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
             boxOffset += 16;
         }
     }
@@ -82,8 +82,8 @@ public class StringListSetting extends Setting {
 
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        this.render(drawContext,x,y,mouseX,mouseY,textRenderer);
+       // super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
+       // this.render(drawContext,x,y,mouseX,mouseY,textRenderer);
     }
 
 

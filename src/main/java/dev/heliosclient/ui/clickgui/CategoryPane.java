@@ -86,25 +86,24 @@ public class CategoryPane {
         }
 
         height = maxHeight;
+        if(!collapsed && height>=10) {
+            if (category != Category.SEARCH) {
+                Renderer2D.drawRoundedRectangle(drawContext, x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+            }
+            else{
+                Renderer2D.drawRoundedRectangle(drawContext, x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+            }
+        }
 
         if (dragging) {
             x = mouseX - startX;
             y = mouseY - startY;
         }
-        if(!collapsed && height>=10) {
-            Renderer2D.drawRoundedRectangle(drawContext, x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, height, 3, new Color(17,18 ,19, 100).brighter().getRGB());
-        }
-      //0xFF1B1B1B
-        Renderer2D.drawRoundedRectangle(drawContext, x - 2, y,  width + 4.5f , categoryNameHeight + 8, 3,new Color(17,18 ,19, 255).getRGB());
-       // Renderer2D.drawRectangle(drawContext, x-2, y + categoryNameHeight + 8, width + 4.5f, 2, ColorManager.INSTANCE.clickGuiSecondary());
-
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), category.name, (float) (x + (CategoryPane.getWidth()-4)/2 - FontManager.fxfontRenderer.getStringWidth(category.name)/2), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText(), (float) (10f));
-       // FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), collapsed ? "+" : "-", (float) (x + width - 11), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText(), (float) (10f));
-
         if (!collapsed) {
             int buttonYOffset = y + 10 + categoryNameHeight;
             if (category == Category.SEARCH) {
-                buttonYOffset = y + 20 + categoryNameHeight;
+                buttonYOffset = y + 25 + categoryNameHeight;
+
             }
 
 
@@ -123,7 +122,10 @@ public class CategoryPane {
                         //setting.width=96;
                         setting.quickSettings = m.settingsOpen;
                         setting.renderCompact(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
-                        buttonYOffset += setting.heightCompact;
+                        buttonYOffset += setting.heightCompact + 1;
+                    }
+                    if(!m.module.quickSettings.isEmpty()) {
+                        buttonYOffset += 2;
                     }
                 }
             }
@@ -133,6 +135,13 @@ public class CategoryPane {
                 m.setFaded(true);
             }
         }
+        //0xFF1B1B1B
+        Renderer2D.drawRoundedRectangle(drawContext, x - 2, y,  width + 4.5f , categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),255).getRGB());
+        // Renderer2D.drawRectangle(drawContext, x-2, y + categoryNameHeight + 8, width + 4.5f, 2, ColorManager.INSTANCE.clickGuiSecondary());
+
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), category.name, (float) (x + (CategoryPane.getWidth()-4)/2 - FontManager.fxfontRenderer.getStringWidth(category.name)/2), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText(), (float) (10f));
+        // FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), collapsed ? "+" : "-", (float) (x + width - 11), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText(), (float) (10f));
+
     }
 
     public boolean hovered(double mouseX, double mouseY) {

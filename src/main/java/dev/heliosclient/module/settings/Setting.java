@@ -1,6 +1,8 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.CategoryPane;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -13,7 +15,7 @@ public abstract class Setting {
     public int height = 24;
     public int width = 192;
     public int heightCompact = 24;
-    public int widthCompact = 96;
+    public int widthCompact = CategoryPane.getWidth();
     public Object value;
     public boolean quickSettings = false;
     protected int moduleWidth = CategoryPane.getWidth();
@@ -29,8 +31,9 @@ public abstract class Setting {
         } else {
             hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
         }
-        int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, width, height, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
+       // int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
+        int fillColor =  ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),  181).getRGB();
+        Renderer2D.drawRoundedRectangle(drawContext, x, y, width, height, 2,fillColor);
     }
 
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
@@ -41,8 +44,8 @@ public abstract class Setting {
         } else {
             hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
         }
-        int fillColor = (int) (40 + 0.85 * hoverAnimationTimer);
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, widthCompact, heightCompact, 2, new Color(fillColor, fillColor, fillColor, 255).getRGB());
+        int fillColor =  ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),  200).getRGB();
+        Renderer2D.drawRoundedRectangle(drawContext, x, y, widthCompact, heightCompact, 2,fillColor);
     }
 
     public boolean shouldRender() {
@@ -56,6 +59,8 @@ public abstract class Setting {
     }
 
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
+    }
+    public void mouseDragged(double mouseX, double mouseY, int button,double deltaX, double deltaY) {
     }
 
     public void keyReleased(int keyCode, int scanCode, int modifiers) {

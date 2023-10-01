@@ -55,9 +55,9 @@ public class CycleSetting extends Setting {
 
         if (options.isEmpty() || options.size() - 1 < value) {
           //  drawContext.drawText(textRenderer, "No option found!", x + 10, y + 28, 0xFFFF0000, false);
-            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"No option found!", x + 10, y + 28, 0xFFFF0000,10f);
+            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"No option found!", x + 10, y + 28, 0xFFFF0000,8f);
         }
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": " + options.get(value).substring(0, Math.min(12, options.get(value).length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(),10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": " + options.get(value).substring(0, Math.min(12, options.get(value).length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(),8f);
         //drawContext.drawText(textRenderer, name + ": " + options.get(value).substring(0, Math.min(12, options.get(value).length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
 
         if (hovered(mouseX, mouseY)) {

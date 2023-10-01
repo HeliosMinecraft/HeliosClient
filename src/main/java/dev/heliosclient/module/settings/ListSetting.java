@@ -30,7 +30,7 @@ public class ListSetting extends Setting {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 8,defaultColor,10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 8,defaultColor,8f);
     }
 
     @Override

@@ -4,6 +4,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
@@ -12,6 +13,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
+
+import java.awt.*;
 
 public class SettingsScreen extends Screen {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
@@ -56,8 +59,8 @@ public class SettingsScreen extends Screen {
 
         x = Math.max(drawContext.getScaledWindowWidth() / 2 - windowWidth / 2, 0);
 
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, windowWidth, windowHeight, 5, 0xFF222222);
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, windowWidth, 18, 5, 0xFF1B1B1B);
+        Renderer2D.drawRoundedRectangle(drawContext, x, y, windowWidth, windowHeight, 5, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary),180).getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, windowWidth, 18, 5,  ColorManager.INSTANCE.clickGuiPrimary);
         Renderer2D.drawRectangle(drawContext, x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
         drawContext.drawText(textRenderer, module.name, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + module.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
@@ -84,6 +87,7 @@ public class SettingsScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         backButton.mouseClicked((int) mouseX, (int) mouseY);
         for (Setting setting : module.settings) {
+            if (!setting.shouldRender()) continue;
             setting.mouseClicked(mouseX, mouseY, button);
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -92,6 +96,7 @@ public class SettingsScreen extends Screen {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         for (Setting setting : module.settings) {
+            if (!setting.shouldRender()) continue;
             setting.mouseReleased(mouseX, mouseY, button);
         }
         return super.mouseReleased(mouseX, mouseY, button);
@@ -100,6 +105,7 @@ public class SettingsScreen extends Screen {
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         for (Setting setting : module.settings) {
+            if (!setting.shouldRender()) continue;
             setting.keyReleased(keyCode, scanCode, modifiers);
         }
         return super.keyReleased(keyCode, scanCode, modifiers);
@@ -111,9 +117,19 @@ public class SettingsScreen extends Screen {
             MinecraftClient.getInstance().setScreen(parentScreen);
         }
         for (Setting setting : module.settings) {
+            if (!setting.shouldRender()) continue;
             setting.keyPressed(keyCode, scanCode, modifiers);
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        for (Setting setting : module.settings) {
+            if (!setting.shouldRender()) continue;
+            setting.mouseDragged(mouseX,mouseY,button,deltaX,deltaY);
+        }
+        return false;
     }
 
     @Override

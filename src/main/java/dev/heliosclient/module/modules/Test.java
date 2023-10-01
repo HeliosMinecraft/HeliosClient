@@ -6,6 +6,7 @@ import dev.heliosclient.event.events.*;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
+import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.StringListSetting;
 import dev.heliosclient.module.settings.StringSetting;
 import dev.heliosclient.util.InputBox;
@@ -33,6 +34,7 @@ public class Test extends Module_ {
     BooleanSetting Arc = new BooleanSetting("Arc", "", this, false);
     BooleanSetting TracerLine = new BooleanSetting("TracerLine", "", this, false);
     BooleanSetting blockOutlineAndFIll = new BooleanSetting("blockOutlineAndFIll", "", this, false);
+    RGBASetting color = new RGBASetting("color", "color", Color.WHITE);
 
 
     public Test() {
@@ -47,6 +49,8 @@ public class Test extends Module_ {
         settings.add(PartiallyRounded);
         settings.add(num);
         settings.add(stringListSetting);
+        settings.add(color);
+
 
         quickSettings.add(rectangle);
         quickSettings.add(rounded);

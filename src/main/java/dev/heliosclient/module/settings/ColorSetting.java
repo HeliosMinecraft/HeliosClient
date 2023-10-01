@@ -135,7 +135,7 @@ public class ColorSetting extends Setting {
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 2,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 2,defaultColor,8f);
 
 
         drawContext.fill(x + moduleWidth - boxSize - 2, y + 2, x + moduleWidth - 2, y + boxSize + 2, value);

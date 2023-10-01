@@ -51,10 +51,10 @@ public class BooleanSetting extends Setting {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 5,256 - ColorUtils.getRed(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.defaultTextColor()),10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 5,256 - ColorUtils.getRed(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.defaultTextColor()),8f);
         //drawContext.drawText(textRenderer, Text.literal(name.substring(0, Math.min(12, name.length())) + "..."), x + 3, y + 5, ColorManager.INSTANCE.defaultTextColor(), false);
-        Renderer2D.drawOutlineBox(drawContext, x + moduleWidth - 14, y + 4, 10, 10, 1, 0xFFFFFFFF);
-        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + moduleWidth - 12, y + 6, 6, 6, value ? 0xAA55FFFF : 0xFF222222, false, 0);
+        Renderer2D.drawOutlineBox(drawContext, x + moduleWidth - 12, y + 4, 10, 10, 1, 0xFFFFFFFF);
+        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + moduleWidth - 10, y + 6, 6, 6, value ? 0xAA55FFFF : 0xFF222222, false, 0);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;

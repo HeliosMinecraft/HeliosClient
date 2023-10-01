@@ -84,7 +84,7 @@ public class DoubleSetting extends Setting {
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
       //  inputBox = null;
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name.substring(0, Math.min(12, name.length())) + "...",x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(),10f);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name.substring(0, Math.min(12, name.length())) + "...",x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(),8f);
         double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
 
         if (sliding) {
@@ -97,7 +97,7 @@ public class DoubleSetting extends Setting {
         }
 
         String valueString = "" + MathUtils.round(value, roundingPlace);
-        drawContext.drawText(textRenderer, Text.literal(valueString), (x + moduleWidth - 10) - textRenderer.getWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),valueString,(x + moduleWidth - 10) - FontManager.fxfontRenderer.getStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor(),8f);
         Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, moduleWidth - 8, 2, 1, 0xFFAAAAAA);
         int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 10)) + 2;
         Renderer2D.drawRoundedRectangle(drawContext, x + 2, y + 16, scaledValue, 2, 1, 0xFF55FFFF);

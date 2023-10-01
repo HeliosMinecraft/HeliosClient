@@ -38,7 +38,7 @@ public class ButtonSetting extends Setting {
         //drawContext.drawText(textRenderer,ButtonCategoryText, HeliosClient.MC.getWindow().getScaledWidth()/2 - textRenderer.getWidth(ButtonCategoryText)/2 + 1, y + 2,Color.WHITE.getRGB(),true);
 
         int buttonX = x + 2;
-        int buttonY = y + textRenderer.fontHeight + 10;
+        int buttonY = (int) (y + FontManager.fxfontRenderer.getStringHeight(ButtonCategoryText) + 10);
 
         for (Button button : buttons) {
             button.render(drawContext, buttonX, buttonY, mouseX, mouseY, textRenderer);

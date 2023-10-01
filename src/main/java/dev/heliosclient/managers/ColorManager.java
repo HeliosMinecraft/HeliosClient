@@ -2,6 +2,8 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.util.ColorUtils;
 
+import java.awt.*;
+
 public class ColorManager {
 
     public static final ColorManager INSTANCE = new ColorManager();
@@ -9,7 +11,12 @@ public class ColorManager {
     //Global
     public int defaultTextColor = 0xFFFFFFFF;
     //ClickGui
+    public final int clickGuiPrimary = new Color(17,18,19,255).getRGB();
+    public int clickGuiPrimaryAlpha = 255;
+
     public boolean clickGuiSecondaryRainbow = false;
+    public boolean clickGuiPrimaryRainbow = false;
+
     public int clickGuiSecondary = 0xffff6e78;
     public int clickGuiSecondaryAlpha = 255;
     public boolean clickGuiPaneTextRainbow = false;
@@ -25,6 +32,13 @@ public class ColorManager {
             return ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), clickGuiSecondaryAlpha).getRGB();
         } else {
             return clickGuiSecondary;
+        }
+    }
+    public int ClickGuiPrimary() {
+        if (clickGuiPrimaryRainbow) {
+            return ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), clickGuiPrimaryAlpha).getRGB();
+        } else {
+            return clickGuiPrimary;
         }
     }
 
