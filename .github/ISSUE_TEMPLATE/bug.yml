@@ -15,14 +15,22 @@ body:
         Describe the bug as concisely and clearly as possible.
     validations:
       required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How do you replicate this bug?
+      description: |
+        Please write step by step guide to trigger this bug.
+    validations:
+      required: true
   - type: dropdown
     id: version
     attributes:
       label: Version
       description: What version of our software are you running?
       options:
-        - Current stable build
-        - Developer build
+        - Current stable release
+        - Latest developer build
         - Older version (Please specify)
       default: 0
     validations:
@@ -32,8 +40,36 @@ body:
     attributes:
       label: What operating system are you using?
       options:
-        - macOS
         - Windows
+        - macOS
         - Linux
+      default: 0
     validations:
       required: true
+  - type: input
+    id: links
+    attributes:
+      label: Links
+      description: Any links you want to add eg. screenshots, crash reports.
+    validations:
+      required: false
+  - type: input
+    id: other
+    attributes:
+      label: Anything else you want to add
+    validations:
+      required: false
+  - type: checkboxes
+    id: requirements
+    attributes:
+      label: Check before sumitting
+      options:
+        - label: |
+            I'm sure that this bug wasn't already reported.
+          required: true
+        - label: |
+            I'm sure that this bug wasn't already patched (I'm able to reproduce this on the latest build).
+          required: true
+        - label: |
+            This bug isn't cause by incompatibility with other mods (I'm able to reproduce this without any other mod installed). Doesn't apply for incompatibility with mods that this client is expected to be working with eg. sodium, mod menu. 
+          required: true
