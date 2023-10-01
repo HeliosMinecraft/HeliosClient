@@ -1,8 +1,6 @@
 package dev.heliosclient.system;
 
-// Define a class for a friend
 public class Friend {
-    // Declare a field for the player name
     private final String playerName;
 
     // Create a constructor that takes a player name as an argument

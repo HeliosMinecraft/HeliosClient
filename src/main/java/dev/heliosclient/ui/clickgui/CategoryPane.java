@@ -7,18 +7,23 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryPane {
     public Category category;
-    public int x, y, height, width = 96;
+    public int x;
+    public int y;
+    public int height;
+    public static int width = 80;
     public boolean collapsed = false;
     int startX, startY;
     boolean dragging = false;
@@ -36,7 +41,7 @@ public class CategoryPane {
             moduleButtons.add(new ModuleButton(m, parentScreen));
         }
         if (moduleButtons.size() == 0) collapsed = true;
-        height = (moduleButtons.size() * 12) + 18;
+        height = Math.round((moduleButtons.size() * (5 +  FontManager.fxfontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))));
     }
 
     public void addModule(List<Module_> moduleS) {
@@ -68,33 +73,38 @@ public class CategoryPane {
     }
 
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
+        int categoryNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(category.name);
+
+        int maxWidth = 0;
+        int maxHeight = 4;
+        for (ModuleButton m : moduleButtons) {
+            maxWidth = Math.max(maxWidth, m.width);
+            maxHeight += categoryNameHeight + 10;
+        }
+        if(maxWidth<getWidth() - 3 ) {
+            maxWidth = getWidth() - 3;
+        }
+
+        height = maxHeight;
+
         if (dragging) {
             x = mouseX - startX;
             y = mouseY - startY;
         }
-        int maxWidth = 0;
-        for (ModuleButton m : moduleButtons) {
-            maxWidth = Math.max(maxWidth, m.width);
+        if(!collapsed && height>=10) {
+            Renderer2D.drawRoundedRectangle(drawContext, x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, height, 3, new Color(17,18 ,19, 100).brighter().getRGB());
         }
-        if(maxWidth<92) {
-            maxWidth = 92;
-        }
-        // Get the width and height of the category name
-        int categoryNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(category.name);
+      //0xFF1B1B1B
+        Renderer2D.drawRoundedRectangle(drawContext, x - 2, y,  width + 4.5f , categoryNameHeight + 8, 3,new Color(17,18 ,19, 255).getRGB());
+       // Renderer2D.drawRectangle(drawContext, x-2, y + categoryNameHeight + 8, width + 4.5f, 2, ColorManager.INSTANCE.clickGuiSecondary());
 
-        // Adjust the rectangle size based on the text dimensions
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, width, categoryNameHeight + 8, 3, 0xFF1B1B1B);
-        Renderer2D.drawRectangle(drawContext, x, y + categoryNameHeight + 8, width, 2, ColorManager.INSTANCE.clickGuiSecondary());
-
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), category.name, x + 4, y + 4,256 - ColorUtils.getRed(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.clickGuiPaneText()));
-       // drawContext.drawText(textRenderer, category.name, x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), collapsed ? "+" : "-", x + width - 11, y + 4,256 - ColorUtils.getRed(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.clickGuiPaneText()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.clickGuiPaneText()));
-      //  drawContext.drawText(textRenderer, collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
+        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), category.name, (float) (x + (CategoryPane.getWidth()-4)/2 - FontManager.fxfontRenderer.getStringWidth(category.name)/2), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText(), (float) (10f));
+       // FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), collapsed ? "+" : "-", (float) (x + width - 11), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText(), (float) (10f));
 
         if (!collapsed) {
             int buttonYOffset = y + 10 + categoryNameHeight;
             if (category == Category.SEARCH) {
-                buttonYOffset = y + 26 + categoryNameHeight;
+                buttonYOffset = y + 20 + categoryNameHeight;
             }
 
 
@@ -105,7 +115,7 @@ public class CategoryPane {
 
                 m.setFaded(false);
                 m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth);
-                buttonYOffset += categoryNameHeight + 6;
+                buttonYOffset += categoryNameHeight + 10;
                 // Draw the settings for this module if they are open
                 if (m.settingsOpen) {
                     for (Setting setting : m.module.quickSettings) {
@@ -170,5 +180,9 @@ public class CategoryPane {
                 }
             }
         }
+    }
+
+    public static int getWidth() {
+        return width;
     }
 }

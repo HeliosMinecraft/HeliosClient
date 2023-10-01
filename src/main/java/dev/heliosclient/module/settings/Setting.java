@@ -1,5 +1,6 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -15,7 +16,7 @@ public abstract class Setting {
     public int widthCompact = 96;
     public Object value;
     public boolean quickSettings = false;
-    protected int moduleWidth = 96;
+    protected int moduleWidth = CategoryPane.getWidth();
     int x = 0, y = 0;
     int hovertimer = 0;
     private int hoverAnimationTimer = 0;

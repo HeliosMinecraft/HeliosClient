@@ -30,8 +30,8 @@ public class ModuleButton {
 
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
-        this.width = (int) FontManager.fxfontRenderer.getStringWidth(module.name) + 4;
-        this.height = 14;
+        this.width = CategoryPane.getWidth()-2;
+        this.height = 16;
         this.parentScreen = parentScreen;
         BackgroundAnimation.FADE_SPEED = 0.2f;
         TextAnimation.FADE_SPEED = 0.2f;
@@ -61,28 +61,29 @@ public class ModuleButton {
             hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
         }
         // Get the width and height of the module name
-        int moduleNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(module.name);
+        int moduleNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(module.name) - 1;
 
         // Adjust the button size based on the text dimensions
-        this.height = moduleNameHeight + 6;
+        //this.height = moduleNameHeight + 6;
         this.width = maxWidth;
 
-        int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
-        Color fill = new Color(fillColor, fillColor, fillColor, alpha);
+        int fillColor = module.isActive()? new Color(ColorManager.INSTANCE.clickGuiSecondary()).getRGB() : new Color(17,18,19,200).getRGB() ;
 
-        BackgroundAnimation.drawFadingBox(drawContext, x, y, maxWidth + 4 , height, fill.getRGB(), false, 0);
-        TextAnimation.drawFadingText(drawContext.getMatrices(),  module.name, x + 3, y + moduleNameHeight/4 + 1, module.active.value ? ColorManager.INSTANCE.clickGuiSecondary() : ColorManager.INSTANCE.defaultTextColor(),true);
+        BackgroundAnimation.drawFadingBox(drawContext, x + 1 , y, maxWidth , height, fillColor, true, 2);
+        int textY = y + 1 + (height - moduleNameHeight) / 2; // Center the text vertically
+
+        TextAnimation.drawFadingText(drawContext.getMatrices(),  module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor(),true,8f);
         if (hovered(mouseX, mouseY)) {
             Tooltip.tooltip.changeText(module.description);
         }
         if(module.keyBind.value != 0 && ClickGUI.keybinds) {
             String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
-            TextAnimation.drawFadingText(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - FontManager.fxfontRenderer.getStringWidth(keyName)), y + moduleNameHeight/4 + 1, ColorManager.INSTANCE.defaultTextColor, true);
+            TextAnimation.drawFadingText(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - FontManager.fxfontRenderer.getStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor, true,8f);
         }
     }
 
     public boolean hovered(double mouseX, double mouseY) {
-        return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height;
+        return mouseX > x && mouseX < x + width-3 && mouseY > y && mouseY < y + height;
     }
 
     public boolean mouseClicked(int mouseX, int mouseY, int button, boolean collapsed) {

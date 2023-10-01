@@ -1,5 +1,6 @@
 package dev.heliosclient.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import net.minecraft.client.MinecraftClient;
@@ -25,8 +26,9 @@ public class Renderer2D extends DrawContext {
         BufferBuilder bufferBuilder = tessellator.getBuffer();
 
         RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
@@ -43,37 +45,49 @@ public class Renderer2D extends DrawContext {
 
 
     public static void drawRoundedRectangle(DrawContext drawContext, float x, float y, float width, float height, int radius, int color) {
-        drawRectangle(drawContext, x + radius, y, width - radius * 2, height, color);
-        drawRectangle(drawContext, x, y + radius, width, height - radius * 2, color);
+        // Draw the main rectangle
+        drawRectangle(drawContext, x + radius, y + radius, width - 2 * radius, height - 2 * radius, color);
+
+        // Draw rectangles at the sides
+        drawRectangle(drawContext, x + radius, y, width - 2 * radius, radius, color); // top
+        drawRectangle(drawContext, x + radius, y + height - radius, width - 2 * radius, radius, color); // bottom
+        drawRectangle(drawContext, x, y + radius, radius, height - 2 * radius, color); // left
+        drawRectangle(drawContext, x + width - radius, y + radius, radius, height - 2 * radius, color); // right
 
         // Draw circles at the corners
-        drawFilledCircle(drawContext, x + radius, y + radius, radius, color);
-        drawFilledCircle(drawContext, x + width - radius, y + radius, radius, color);
-        drawFilledCircle(drawContext, x + width - radius, y + height - radius, radius, color);
-        drawFilledCircle(drawContext, x + radius, y + height - radius, radius, color);
+        drawFilledQuadrant(drawContext, x + radius, y + radius, radius, color,2);
+        drawFilledQuadrant(drawContext, x + width - radius, y + radius, radius, color,1);
+        drawFilledQuadrant(drawContext, x + radius, y + height - radius, radius, color,3);
+        drawFilledQuadrant(drawContext, x + width - radius, y + height - radius, radius, color,4);
     }
 
     public static void drawRoundedRectangle(DrawContext drawContext, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, int radius, int color) {
-        drawRectangle(drawContext, x + radius, y, width - radius * 2, height, color);
-        drawRectangle(drawContext, x, y + radius, width, height - radius * 2, color);
+        // Draw the main rectangle
+        drawRectangle(drawContext, x + radius, y + radius, width - 2 * radius, height - 2 * radius, color);
+
+        // Draw rectangles at the sides
+        drawRectangle(drawContext, x + radius, y, width - 2 * radius, radius, color); // top
+        drawRectangle(drawContext, x + radius, y + height - radius, width - 2 * radius, radius, color); // bottom
+        drawRectangle(drawContext, x, y + radius, radius, height - 2 * radius, color); // left
+        drawRectangle(drawContext, x + width - radius, y + radius, radius, height - 2 * radius, color); // right
 
         if (TL) {
-            drawFilledCircle(drawContext, x + radius, y + radius, radius, color);
+            drawFilledQuadrant(drawContext, x + radius, y + radius, radius, color,2);
         } else {
             drawRectangle(drawContext, x, y, radius, radius, color);
         }
         if (TR) {
-            drawFilledCircle(drawContext, x + width - radius, y + radius, radius, color);
+            drawFilledQuadrant(drawContext, x + width - radius, y + radius, radius, color,1);
         } else {
             drawRectangle(drawContext, x + width - radius, y, radius, radius, color);
         }
         if (BL) {
-            drawFilledCircle(drawContext, x + radius, y + height - radius, radius, color);
+            drawFilledQuadrant(drawContext, x + radius, y + height - radius, radius, color,3);
         } else {
             drawRectangle(drawContext, x, y + height - radius, radius, radius, color);
         }
         if (BR) {
-            drawFilledCircle(drawContext, x + width - radius, y + height - radius, radius, color);
+            drawFilledQuadrant(drawContext, x + width - radius, y + height - radius, radius, color,4);
         } else {
             drawRectangle(drawContext, x + width - radius, y + height - radius, radius, radius, color);
         }
@@ -141,6 +155,8 @@ public class Renderer2D extends DrawContext {
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
 
 
         bufferBuilder.vertex(drawContext.getMatrices().peek().getPositionMatrix(), xCenter, yCenter, 0).color(red, green, blue, alpha).next();
@@ -195,8 +211,6 @@ public class Renderer2D extends DrawContext {
 
         RenderSystem.disableBlend();
     }
-
-
 
 
     public static void drawFilledQuadrant(DrawContext drawContext, float xCenter, float yCenter, float radius, int color, int quadrant) {
