@@ -1,12 +1,39 @@
-name: Bug
-description: Bug report.
+name: Bug report
+description: Submit a bug report.
+title: "[Bug]: "
 labels: [ bug ]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping us make this project better!
   - type: textarea
     id: description
     attributes:
-      label: Description of the bug
+      label: What happened?
       description: |
         Describe the bug as concisely and clearly as possible.
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: What version of our software are you running?
+      options:
+        - Current stable build
+        - Developer build
+        - Older version (Please specify)
+      default: 0
+      validations:
+        required: true
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: What operating system are you using?
+      options:
+        - macOS
+        - Windows
+        - Linux
     validations:
       required: true
