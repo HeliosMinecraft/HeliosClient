@@ -5,10 +5,7 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.*;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.RGBASetting;
-import dev.heliosclient.module.settings.StringListSetting;
-import dev.heliosclient.module.settings.StringSetting;
+import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
 import me.x150.renderer.render.Renderer3d;
@@ -19,6 +16,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class Test extends Module_ {
@@ -34,7 +33,7 @@ public class Test extends Module_ {
     BooleanSetting Arc = new BooleanSetting("Arc", "", this, false);
     BooleanSetting TracerLine = new BooleanSetting("TracerLine", "", this, false);
     BooleanSetting blockOutlineAndFIll = new BooleanSetting("blockOutlineAndFIll", "", this, false);
-    RGBASetting color = new RGBASetting("color", "color", Color.WHITE);
+    RGBASetting color = new RGBASetting("Color", "color", Color.WHITE);
 
 
     public Test() {
@@ -61,6 +60,7 @@ public class Test extends Module_ {
         quickSettings.add(blockOutlineAndFIll);
         quickSettings.add(PartiallyRounded);
         quickSettings.add(num);
+        quickSettings.add(color);
 
     }
 
