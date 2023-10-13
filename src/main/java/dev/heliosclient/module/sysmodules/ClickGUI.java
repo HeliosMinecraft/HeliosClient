@@ -63,9 +63,12 @@ public class ClickGUI extends Module_ {
         quickSettings.add(RainbowAccent);
         quickSettings.add(TextColor);
         active.value = true;
-        loadFonts.addButton("Load Fonts",() -> {
+
+        loadFonts.addButton("Load Fonts", () -> {
             HeliosClient.fontManager = new FontManager();
             Font.setOptions(FontManager.fontNames);
+
+            System.out.println("Reloaded fonts successfully!");
         });
     }
 
@@ -86,6 +89,7 @@ public class ClickGUI extends Module_ {
             ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
             ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
         }
+
         pause = Pause.value;
         keybinds = Keybinds.value;
 
@@ -109,6 +113,7 @@ public class ClickGUI extends Module_ {
         ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getA();
         ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
         ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
+
         pause = Pause.value;
         keybinds = Keybinds.value;
 
