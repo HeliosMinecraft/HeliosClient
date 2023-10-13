@@ -30,7 +30,7 @@ public class HeliosClient implements ModInitializer {
     public static final HeliosClient INSTANCE = new HeliosClient();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
     public static final Logger LOGGER = LoggerFactory.getLogger("Helios Client");
-    public static final String clientTag = ColorUtils.red + "Helios Client";
+    public static final String clientTag = ColorUtils.yellow + "Helios" + ColorUtils.white + "Client";
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
 

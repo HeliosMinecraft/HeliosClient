@@ -1,5 +1,6 @@
 package dev.heliosclient.ui;
 
+import dev.heliosclient.util.ColorUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ConfirmLinkScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,7 +16,7 @@ public class HeliosClientInfoScreen extends Screen {
     private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
 
     protected HeliosClientInfoScreen() {
-        super(Text.literal("Helios Client"));
+        super(Text.literal(ColorUtils.yellow + "Helios" + ColorUtils.white + "Client"));
     }
 
     protected void init() {
