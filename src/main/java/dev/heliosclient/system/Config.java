@@ -1,8 +1,8 @@
 package dev.heliosclient.system;
 
 import com.google.gson.Gson;
-import dev.heliosclient.module.Category;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;

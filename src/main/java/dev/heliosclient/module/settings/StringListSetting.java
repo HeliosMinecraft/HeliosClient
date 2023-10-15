@@ -1,14 +1,10 @@
 package dev.heliosclient.module.settings;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -29,7 +25,7 @@ public class StringListSetting extends Setting {
         this.characterLimit = characterLimit;
         this.inputMode = inputMode;
         for (int i = 0; i < defaultBoxes; i++) {
-            inputBox.add(new InputBox(160, 12, values[i], characterLimit,inputMode));
+            inputBox.add(new InputBox(160, 12, values[i], characterLimit, inputMode));
         }
     }
 
@@ -39,7 +35,7 @@ public class StringListSetting extends Setting {
         this.height = 26 + inputBox.size() * 16;
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
-        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 5, defaultColor);
 
         // Draw a '+' button next to the text
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, y + 5, 11, 11, Color.black.getRGB());
@@ -65,7 +61,7 @@ public class StringListSetting extends Setting {
         int boxOffset = y;
         // Use a regular for loop with an index variable
         if (hoveredOverAdd(mouseX, mouseY)) {
-            inputBox.add(new InputBox(160, 13, "", characterLimit,inputMode)); // Add a new empty box to the list
+            inputBox.add(new InputBox(160, 13, "", characterLimit, inputMode)); // Add a new empty box to the list
         }
         for (int i = 0; i < inputBox.size(); i++) {
             InputBox box = inputBox.get(i); // Get the box at the current index
@@ -82,8 +78,8 @@ public class StringListSetting extends Setting {
 
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-       // super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-       // this.render(drawContext,x,y,mouseX,mouseY,textRenderer);
+        // super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
+        // this.render(drawContext,x,y,mouseX,mouseY,textRenderer);
     }
 
 
@@ -100,7 +96,7 @@ public class StringListSetting extends Setting {
     }
 
     public boolean hoveredOverRemove(double mouseX, double mouseY, int boxOffset) {
-        return mouseX >= x + 165 && mouseX <= x + 176 && mouseY >= boxOffset  && mouseY <= boxOffset + 11;
+        return mouseX >= x + 165 && mouseX <= x + 176 && mouseY >= boxOffset && mouseY <= boxOffset + 11;
     }
 
     public boolean hoveredOverAdd(double mouseX, double mouseY) {

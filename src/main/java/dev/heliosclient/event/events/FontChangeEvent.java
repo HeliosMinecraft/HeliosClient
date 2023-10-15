@@ -7,7 +7,8 @@ import java.awt.*;
 public class FontChangeEvent extends Event {
 
     private Font[] fonts;
-    public FontChangeEvent(Font[] fonts){
+
+    public FontChangeEvent(Font[] fonts) {
         this.fonts = fonts;
     }
 

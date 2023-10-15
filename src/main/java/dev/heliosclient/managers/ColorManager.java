@@ -11,7 +11,7 @@ public class ColorManager {
     //Global
     public int defaultTextColor = 0xFFFFFFFF;
     //ClickGui
-    public final int clickGuiPrimary = new Color(17,18,19,255).getRGB();
+    public final int clickGuiPrimary = new Color(17, 18, 19, 255).getRGB();
     public int clickGuiPrimaryAlpha = 255;
 
     public boolean clickGuiSecondaryRainbow = false;
@@ -34,6 +34,7 @@ public class ColorManager {
             return clickGuiSecondary;
         }
     }
+
     public int ClickGuiPrimary() {
         if (clickGuiPrimaryRainbow) {
             return ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), clickGuiPrimaryAlpha).getRGB();

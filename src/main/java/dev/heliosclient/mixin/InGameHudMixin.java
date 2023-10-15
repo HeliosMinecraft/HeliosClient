@@ -1,7 +1,7 @@
 package dev.heliosclient.mixin;
 
-import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.events.RenderEvent;
+import dev.heliosclient.managers.EventManager;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import org.spongepowered.asm.mixin.Mixin;

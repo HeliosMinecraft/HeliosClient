@@ -5,20 +5,19 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.*;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.*;
+import dev.heliosclient.module.settings.BooleanSetting;
+import dev.heliosclient.module.settings.RGBASetting;
+import dev.heliosclient.module.settings.StringListSetting;
+import dev.heliosclient.module.settings.StringSetting;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
 import me.x150.renderer.render.Renderer3d;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class Test extends Module_ {
@@ -112,32 +111,33 @@ public class Test extends Module_ {
 
         // Draw a 2D arc using the CustomRenderer class
         if (Arc.value)
-            Renderer2D.drawArc(drawContext.getMatrices().peek().getPositionMatrix(), 165, 35, 50,1f, Color.WHITE.getRGB(), 0, 90);
+            Renderer2D.drawArc(drawContext.getMatrices().peek().getPositionMatrix(), 165, 35, 50, 1f, Color.WHITE.getRGB(), 0, 90);
 
         //Not so rounded rectange
         if (PartiallyRounded.value)
             Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 20, 20, false, true, true, false, 120, 120, 10, 0xFF00FF00);
 
         if (GradientRounded.value)
-            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(),Color.BLUE,Color.WHITE, Color.BLACK,Color.GRAY, 22, 20, 40,40,2);
+            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 22, 20, 40, 40, 2);
 
         if (Gradient.value)
-            Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), 20, 20, 40,40,ColorUtils.getRainbowColor().getRGB(),Color.WHITE.getRGB());
+            Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), 20, 20, 40, 40, ColorUtils.getRainbowColor().getRGB(), Color.WHITE.getRGB());
     }
+
     @SubscribeEvent
     public void renderer3d(Render3DEvent event) {
         Renderer3d.renderThroughWalls();
         PlayerEntity player = HeliosClient.MC.player;
-        Vec3d start = new Vec3d(player.getX() + 2,player.getY() + 1,player.getZ() - 3);
-        Vec3d start2 = new Vec3d(50,player.getY() - 1,player.getZ() + 2);
-        Vec3d start3 = new Vec3d(player.getX() - 5,player.getY() + 2,player.getZ() +6);
+        Vec3d start = new Vec3d(player.getX() + 2, player.getY() + 1, player.getZ() - 3);
+        Vec3d start2 = new Vec3d(50, player.getY() - 1, player.getZ() + 2);
+        Vec3d start3 = new Vec3d(player.getX() - 5, player.getY() + 2, player.getZ() + 6);
 
 
-        Vec3d dimenstions = new Vec3d(1,1,1);
-        Renderer3d.renderOutline(event.getMatrices(),Color.WHITE,start,dimenstions);
-        Renderer3d.renderLine(event.getMatrices(),Color.yellow,start,player.getEyePos());
-        Renderer3d.renderFilled(event.getMatrices(),Color.GREEN,start2,dimenstions);
-        Renderer3d.renderEdged(event.getMatrices(),Color.CYAN,Color.BLACK,start3,dimenstions);
+        Vec3d dimenstions = new Vec3d(1, 1, 1);
+        Renderer3d.renderOutline(event.getMatrices(), Color.WHITE, start, dimenstions);
+        Renderer3d.renderLine(event.getMatrices(), Color.yellow, start, player.getEyePos());
+        Renderer3d.renderFilled(event.getMatrices(), Color.GREEN, start2, dimenstions);
+        Renderer3d.renderEdged(event.getMatrices(), Color.CYAN, Color.BLACK, start3, dimenstions);
 
     }
 

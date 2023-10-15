@@ -2,10 +2,22 @@ package dev.heliosclient.util;
 
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Utils for working with GLFW keycodes.
+ */
 public class KeycodeToString {
 
+    /**
+     * Translates GLFW keycode to readable string.
+     *
+     * @param keyCode Target GLFW keycode integer.
+     * @return Translated string.
+     */
     public static String translate(Integer keyCode) {
+        //Automatic translation. Works for simple keys like numbers or letters.
         String keyName = GLFW.glfwGetKeyName(keyCode, 0);
+
+        //If automatic translation doesn't work convert to manual.
         if (keyName == null) {
             switch (keyCode) {
                 case GLFW.GLFW_KEY_RIGHT_SHIFT -> {
@@ -168,6 +180,7 @@ public class KeycodeToString {
                     return "ENTER";
                 }
                 default -> {
+                    //If none of the translation methods work return in format of KEY_KEYCODE
                     return "KEY_" + keyCode;
                 }
             }
@@ -175,6 +188,12 @@ public class KeycodeToString {
         return keyName;
     }
 
+    /**
+     * Translates GLFW keycode to readable string. Shortened version for certain uses.
+     *
+     * @param keyCode Target GLFW keycode integer.
+     * @return Translated string.
+     */
     public static String translateShort(Integer keyCode) {
         String keyName = GLFW.glfwGetKeyName(keyCode, 0);
         if (keyName == null) {

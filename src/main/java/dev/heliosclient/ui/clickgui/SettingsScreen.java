@@ -1,9 +1,9 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.Easing;
@@ -59,8 +59,8 @@ public class SettingsScreen extends Screen {
 
         x = Math.max(drawContext.getScaledWindowWidth() / 2 - windowWidth / 2, 0);
 
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, windowWidth, windowHeight, 5, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary),180).getRGB());
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, true, true, false, false, windowWidth, 18, 5,  ColorManager.INSTANCE.clickGuiPrimary);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, windowWidth, windowHeight, 5, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 180).getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, true, true, false, false, windowWidth, 18, 5, ColorManager.INSTANCE.clickGuiPrimary);
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
         drawContext.drawText(textRenderer, module.name, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + module.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
@@ -127,7 +127,7 @@ public class SettingsScreen extends Screen {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         for (Setting setting : module.settings) {
             if (!setting.shouldRender()) continue;
-            setting.mouseDragged(mouseX,mouseY,button,deltaX,deltaY);
+            setting.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         }
         return false;
     }

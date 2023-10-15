@@ -1,15 +1,10 @@
 package dev.heliosclient.module.settings;
 
-import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
 public class StringSetting extends Setting {
     private InputBox inputBox;
@@ -28,8 +23,8 @@ public class StringSetting extends Setting {
         this.heightCompact = 32;
         this.characterLimit = characterLimit;
         this.inputMode = inputMode;
-        inputBox = new InputBox(180, 13, value,characterLimit,inputMode);
-        inputBoxCompact = new InputBox(widthCompact - 4, 12, value,characterLimit,inputMode);
+        inputBox = new InputBox(180, 13, value, characterLimit, inputMode);
+        inputBoxCompact = new InputBox(widthCompact - 4, 12, value, characterLimit, inputMode);
     }
 
 
@@ -38,7 +33,7 @@ public class StringSetting extends Setting {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 5, defaultColor);
         inputBox.render(drawContext, x, y + 15, mouseX, mouseY, textRenderer);
     }
 
@@ -47,7 +42,7 @@ public class StringSetting extends Setting {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 5, defaultColor);
         inputBoxCompact.render(drawContext, x, y + 16, mouseX, mouseY, textRenderer);
     }
 

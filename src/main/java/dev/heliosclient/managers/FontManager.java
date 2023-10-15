@@ -23,14 +23,14 @@ public class FontManager implements Listener {
         fontNames.clear();
         fonts = FontLoader.loadFonts();
         Originalfonts = fonts;
-        for (Font font: fonts){
+        for (Font font : fonts) {
             fontNames.add(font.getName());
         }
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent.CLIENT event){
-        if(HeliosClient.MC.getWindow()!=null) {
+    public void onTick(TickEvent.CLIENT event) {
+        if (HeliosClient.MC.getWindow() != null) {
             fontRenderer = new FontRenderer(fonts, fontSize);
             fxfontRenderer = new fxFontRenderer(fonts, 8f);
             EventManager.unregister(this);

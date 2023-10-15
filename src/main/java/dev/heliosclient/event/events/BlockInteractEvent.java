@@ -5,6 +5,9 @@ import dev.heliosclient.event.Event;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
+/**
+ * Event fired on block interaction.
+ */
 @Cancelable
 public class BlockInteractEvent extends Event {
     private final BlockPos pos;
@@ -15,10 +18,16 @@ public class BlockInteractEvent extends Event {
         this.state = state;
     }
 
+    /**
+     * @return Position of BlockInteractEvent
+     */
     public BlockPos getPos() {
         return pos;
     }
 
+    /**
+     * @return State of interacted block.
+     */
     public BlockState getState() {
         return state;
     }

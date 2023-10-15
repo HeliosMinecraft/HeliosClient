@@ -36,7 +36,7 @@ public class fxFontRenderer extends FontRenderer {
         int b = 256 - ColorUtils.getBlue(color);
         int a = 256 - ColorUtils.getAlpha(color);
 
-        super.drawCenteredString(stack, s, x , y, r, g, b, a);
+        super.drawCenteredString(stack, s, x, y, r, g, b, a);
     }
 
 }

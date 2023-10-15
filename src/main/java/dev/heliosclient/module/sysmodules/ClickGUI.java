@@ -2,23 +2,24 @@ package dev.heliosclient.module.sysmodules;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.events.FontChangeEvent;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.fontutils.FontLoader;
 import dev.heliosclient.util.fontutils.FontUtils;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Setting for ClickGUI.
+ */
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
@@ -38,14 +39,14 @@ public class ClickGUI extends Module_ {
             return TooltipMode.value == 1;
         }
     };
-    public static CycleSetting FontRenderer = new CycleSetting("Font Renderer", "Font Rendering for the client", ClickGUI.INSTANCE,new ArrayList<>(List.of("Custom","Vanilla")), 0);
-    public static CycleSetting Font = new CycleSetting("Font", "Font for the client", ClickGUI.INSTANCE,FontManager.fontNames, 0){
+    public static CycleSetting FontRenderer = new CycleSetting("Font Renderer", "Font Rendering for the client", ClickGUI.INSTANCE, new ArrayList<>(List.of("Custom", "Vanilla")), 0);
+    public static CycleSetting Font = new CycleSetting("Font", "Font for the client", ClickGUI.INSTANCE, FontManager.fontNames, 0) {
         @Override
         public boolean shouldRender() {
             return FontRenderer.value == 0;
         }
     };
-    public static DoubleSetting FontSize = new DoubleSetting("Font Size", "Change your FontSize", INSTANCE, 8, 1, 15, 1){
+    public static DoubleSetting FontSize = new DoubleSetting("Font Size", "Change your FontSize", INSTANCE, 8, 1, 15, 1) {
         @Override
         public boolean shouldRender() {
             return FontRenderer.value == 0;
@@ -78,7 +79,7 @@ public class ClickGUI extends Module_ {
         quickSettings.add(RainbowAccent);
         quickSettings.add(TextColor);
         active.value = true;
-        loadFonts.addButton("Load Fonts",() -> {
+        loadFonts.addButton("Load Fonts", () -> {
             HeliosClient.fontManager = new FontManager();
             Font.setOptions(FontManager.fontNames);
         });
@@ -106,8 +107,8 @@ public class ClickGUI extends Module_ {
         keybinds = Keybinds.value;
 
         FontManager.fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
-        FontManager.fontRenderer = new FontRenderer(FontManager.fonts,FontManager.fontSize);
-        FontManager.fxfontRenderer = new fxFontRenderer(FontManager.fonts,8f);
+        FontManager.fontRenderer = new FontRenderer(FontManager.fonts, FontManager.fontSize);
+        FontManager.fxfontRenderer = new fxFontRenderer(FontManager.fonts, 8f);
         EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
     }
 
@@ -131,8 +132,8 @@ public class ClickGUI extends Module_ {
         keybinds = Keybinds.value;
 
         FontManager.fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
-        FontManager.fontRenderer = new FontRenderer(FontManager.fonts,FontManager.fontSize);
-        FontManager.fxfontRenderer = new fxFontRenderer(FontManager.fonts,8f);
+        FontManager.fontRenderer = new FontRenderer(FontManager.fonts, FontManager.fontSize);
+        FontManager.fxfontRenderer = new fxFontRenderer(FontManager.fonts, 8f);
         EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
     }
 

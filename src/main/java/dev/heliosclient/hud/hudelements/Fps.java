@@ -2,7 +2,6 @@ package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
-import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
@@ -24,7 +23,7 @@ public class Fps extends HudElement {
         String text = "FPS: " + ColorUtils.gray + mc.getCurrentFps();
         this.width = Math.round(Renderer2D.getStringWidth(text));
         this.height = 10;
-        Renderer2D.drawString(drawContext.getMatrices(),text, this.x - (float) width / 2, this.y - ((float) height / 2),HeliosClient.uiColorA);
+        Renderer2D.drawString(drawContext.getMatrices(), text, this.x - (float) width / 2, this.y - ((float) height / 2), HeliosClient.uiColorA);
     }
 
 }

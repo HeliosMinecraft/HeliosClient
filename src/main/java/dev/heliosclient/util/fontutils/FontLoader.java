@@ -2,8 +2,7 @@ package dev.heliosclient.util.fontutils;
 
 import net.minecraft.client.MinecraftClient;
 
-import java.awt.Font;
-import java.awt.FontFormatException;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +15,7 @@ import java.util.Objects;
 
 public class FontLoader {
     private static final String FONTS_FOLDER = "heliosclient/fonts";
-    private static final String[] DEFAULT_FONT = {"Minecraft.ttf","Comfortaa.ttf","JetBrainsMono.ttf","Nunito.ttf",};
+    private static final String[] DEFAULT_FONT = {"Minecraft.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf",};
 
     public static Font[] loadFonts() {
         // Get the Minecraft game directory
@@ -27,7 +26,7 @@ public class FontLoader {
         if (!fontsDir.exists()) {
             fontsDir.mkdirs();
         }
-            // Copy the default font file from the assets folder to the fonts directory
+        // Copy the default font file from the assets folder to the fonts directory
         for (String s : DEFAULT_FONT) {
             File defaultFontFile = new File(fontsDir, s);
             try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/fonts/" + s)) {

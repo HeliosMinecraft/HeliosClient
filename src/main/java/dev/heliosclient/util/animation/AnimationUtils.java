@@ -1,10 +1,8 @@
 package dev.heliosclient.util.animation;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 
@@ -41,7 +39,7 @@ public class AnimationUtils {
             Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(), x, y, width, height, radius, newColor);
     }
 
-    public void drawFadingText(MatrixStack matrixStack, String text, int x, int y, int color , boolean fixedSize) {
+    public void drawFadingText(MatrixStack matrixStack, String text, int x, int y, int color, boolean fixedSize) {
         if (fading) {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
@@ -56,12 +54,13 @@ public class AnimationUtils {
         }
         Color nColor = ColorUtils.intToColor(color);
         Color newColor = ColorUtils.changeAlpha(nColor, a);
-        if(fixedSize){
-            Renderer2D.drawFixedString(matrixStack, text, x, y,newColor.getRGB());
-        }else {
+        if (fixedSize) {
+            Renderer2D.drawFixedString(matrixStack, text, x, y, newColor.getRGB());
+        } else {
             Renderer2D.drawString(matrixStack, text, x, y, newColor.getRGB());
         }
     }
+
     public void drawFadingAndPoppingBox(DrawContext drawContext, int x, int y, int width, int height, int color, boolean RoundedBox, int radius) {
         if (fading) {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
@@ -104,10 +103,9 @@ public class AnimationUtils {
         context.getMatrices().push();
         context.getMatrices().translate(x, y, 0);
         context.getMatrices().scale(scale, scale, 0);
-        if(fixedSize) {
+        if (fixedSize) {
             Renderer2D.drawFixedString(context.getMatrices(), text, -Renderer2D.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, newColor.getRGB());
-        }
-        else {
+        } else {
             Renderer2D.drawString(context.getMatrices(), text, -Renderer2D.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, newColor.getRGB());
         }
         context.getMatrices().pop();

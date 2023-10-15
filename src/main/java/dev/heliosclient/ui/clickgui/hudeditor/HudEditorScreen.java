@@ -1,10 +1,10 @@
 package dev.heliosclient.ui.clickgui.hudeditor;
 
-import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.KeyPressedEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;

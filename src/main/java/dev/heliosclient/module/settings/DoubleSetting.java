@@ -1,17 +1,13 @@
 package dev.heliosclient.module.settings;
 
-import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.module.Module_;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 public class DoubleSetting extends Setting {
@@ -32,7 +28,7 @@ public class DoubleSetting extends Setting {
         this.heightCompact = 24;
         this.module = module;
         this.roundingPlace = roundingPlace;
-        inputBox = new InputBox(String.valueOf(max).length() * 6,11,String.valueOf(value),10, InputBox.InputMode.DIGITS);
+        inputBox = new InputBox(String.valueOf(max).length() * 6, 11, String.valueOf(value), 10, InputBox.InputMode.DIGITS);
     }
 
     @Override
@@ -40,8 +36,8 @@ public class DoubleSetting extends Setting {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(),name,x + 2, y + 2, defaultColor);
-     //   drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
+        //   drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
         double diff = Math.min(100, Math.max(0, (mouseX - x) / 1.9));
 
         if (sliding) {
@@ -55,7 +51,7 @@ public class DoubleSetting extends Setting {
 
         float valueWidth = Renderer2D.getFxStringWidth(value + ".00") + 3;
 
-        inputBox.render(drawContext,(x + 180) - Math.round(valueWidth),y + 2,mouseX,mouseY,textRenderer);
+        inputBox.render(drawContext, (x + 180) - Math.round(valueWidth), y + 2, mouseX, mouseY, textRenderer);
         // Calculate the width of the input box based on the width of the value
         inputBox.setWidth(Math.round(valueWidth));
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, 188, 2, 1, 0xFFAAAAAA);
@@ -75,7 +71,7 @@ public class DoubleSetting extends Setting {
         if (hovertimer >= 150) {
             Tooltip.tooltip.changeText(description);
         }
-        if(!inputBox.isFocused()) {
+        if (!inputBox.isFocused()) {
             inputBox.setValue(String.valueOf(value));
         }
     }
@@ -83,8 +79,8 @@ public class DoubleSetting extends Setting {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-      //  inputBox = null;
-        Renderer2D.drawFixedString(drawContext.getMatrices(),name.substring(0, Math.min(12, name.length())) + "...",x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
+        //  inputBox = null;
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
         double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
 
         if (sliding) {
@@ -97,7 +93,7 @@ public class DoubleSetting extends Setting {
         }
 
         String valueString = "" + MathUtils.round(value, roundingPlace);
-        Renderer2D.drawFixedString(drawContext.getMatrices(),valueString,(x + moduleWidth - 10) - Renderer2D.getFxStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), valueString, (x + moduleWidth - 10) - Renderer2D.getFxStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, moduleWidth - 8, 2, 1, 0xFFAAAAAA);
         int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 10)) + 2;
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, scaledValue, 2, 1, 0xFF55FFFF);
@@ -119,7 +115,7 @@ public class DoubleSetting extends Setting {
         if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.mouseClicked(mouseX, mouseY, button)) {
             this.sliding = true;
         }
-        if(!inputBox.mouseClicked(mouseX,mouseY,button)){
+        if (!inputBox.mouseClicked(mouseX, mouseY, button)) {
             inputBox.setFocused(false);
         }
     }
@@ -132,7 +128,7 @@ public class DoubleSetting extends Setting {
     @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         super.keyPressed(keyCode, scanCode, modifiers);
-       // inputBox.keyPressed(keyCode, scanCode, modifiers);
+        // inputBox.keyPressed(keyCode, scanCode, modifiers);
         if (keyCode == GLFW.GLFW_KEY_KP_ENTER || keyCode == GLFW.GLFW_KEY_ENTER) {
             try {
                 double newVal = Double.parseDouble(inputBox.getValue());
@@ -153,7 +149,7 @@ public class DoubleSetting extends Setting {
     @Override
     public void charTyped(char chr, int modifiers) {
         super.charTyped(chr, modifiers);
-      //  inputBox.charTyped(chr, modifiers);
+        //  inputBox.charTyped(chr, modifiers);
         if (inputBox.isFocused()) {
             try {
                 double newVal = Double.parseDouble(inputBox.getValue());

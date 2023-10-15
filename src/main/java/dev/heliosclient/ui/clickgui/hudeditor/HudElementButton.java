@@ -1,10 +1,8 @@
 package dev.heliosclient.ui.clickgui.hudeditor;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
-import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -24,7 +22,7 @@ public class HudElementButton {
         this.x = x;
         this.y = y;
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, 96, 14, 0xFF222222);
-        Renderer2D.drawFixedString(drawContext.getMatrices(),hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor());
         //drawContext.drawText(textRenderer, hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor(), false);
     }
 

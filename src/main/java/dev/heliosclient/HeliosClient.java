@@ -2,9 +2,6 @@ package dev.heliosclient;
 
 import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
@@ -14,17 +11,11 @@ import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.fontutils.FontLoader;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
-import me.x150.renderer.font.FontRenderer;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,9 +36,11 @@ public class HeliosClient implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("Helios Client loading...");;
+        LOGGER.info("Helios Client loading...");
+        ;
         loadConfig();
     }
+
     public void loadConfig() {
         LOGGER.info("Loading config...");
         if (!CONFIG.doesConfigExist()) {

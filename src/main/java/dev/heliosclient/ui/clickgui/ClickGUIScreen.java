@@ -1,14 +1,13 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.module.Category;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.Category;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -35,7 +34,7 @@ public class ClickGUIScreen extends Screen {
             boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
             categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
         }
-        searchBox = new InputBox(CategoryPane.getWidth()-4, 12, "", 20, InputBox.InputMode.DIGITS_AND_CHARACTERS_AND_WHITESPACE);
+        searchBox = new InputBox(CategoryPane.getWidth() - 4, 12, "", 20, InputBox.InputMode.DIGITS_AND_CHARACTERS_AND_WHITESPACE);
     }
 
     public static void onScroll(double horizontal, double vertical) {
@@ -52,7 +51,7 @@ public class ClickGUIScreen extends Screen {
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
             if (category.category == Category.SEARCH && !category.collapsed) {
 
-                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), category.x , category.y + 17, CategoryPane.getWidth(), 18, 0xFF1B1B1B);
+                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), category.x, category.y + 17, CategoryPane.getWidth(), 18, 0xFF1B1B1B);
 
                 searchBox.render(drawContext, category.x, (int) (category.y + 19), mouseX, mouseY, textRenderer);
 

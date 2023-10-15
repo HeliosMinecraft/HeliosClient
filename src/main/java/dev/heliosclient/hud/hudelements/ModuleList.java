@@ -1,12 +1,11 @@
 package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
-import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.util.ColorUtils;
@@ -55,7 +54,7 @@ public class ModuleList extends HudElement implements Listener {
 
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2 - (float) width / 2 + width, this.y - (float) height / 2, 2, yOffset + Math.round(Renderer2D.getStringHeight()) + 3, HeliosClient.uiColorA);
 
-            Renderer2D.drawString(drawContext.getMatrices(), m.name, x - 2 + width / 2 - nameWidth, this.y + 1 - (float) height / 2 + yOffset, ColorUtils.rgbaToInt(255,255,255,255));
+            Renderer2D.drawString(drawContext.getMatrices(), m.name, x - 2 + width / 2 - nameWidth, this.y + 1 - (float) height / 2 + yOffset, ColorUtils.rgbaToInt(255, 255, 255, 255));
             //drawContext.drawText(mc.textRenderer, m.name, x - 2 + width / 2 - nameWidth, y - height / 2 + yOffset + 2, 0xFFFFFFFF, false);
             yOffset += Math.round(Renderer2D.getStringHeight()) + 2;
         }

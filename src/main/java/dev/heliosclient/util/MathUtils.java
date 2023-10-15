@@ -7,6 +7,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class MathUtils {
+
+    /**
+     * Rounding to given number of palces.
+     *
+     * @param value  Target double.
+     * @param places Number of rounding places.
+     * @return Rounded double.
+     */
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
 

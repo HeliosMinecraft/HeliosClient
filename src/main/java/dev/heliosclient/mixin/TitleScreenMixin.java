@@ -52,10 +52,12 @@ public abstract class TitleScreenMixin extends Screen {
             this.client.setScreen(HeliosClientInfoScreen.INSTANCE);
         }, this.textRenderer));
     }
+
     @Inject(at = @At("TAIL"), method = "render")
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         Renderer2D.setDrawContext(context);
     }
+
     @Inject(at = @At("TAIL"), method = "init")
     private void altManagerButton(CallbackInfo callbackInfo) {
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Alt Manager"), this::gotoAltManagerScreen)

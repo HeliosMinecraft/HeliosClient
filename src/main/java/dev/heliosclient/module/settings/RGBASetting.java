@@ -5,16 +5,16 @@ import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
+
 public class RGBASetting extends Setting implements Listener {
 
     private RGBASettingScreen screen = new RGBASettingScreen(this);
@@ -95,7 +95,7 @@ public class RGBASetting extends Setting implements Listener {
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 3, y + 2, -1);
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, color.getRGB());
 
-        if(rainbow){
+        if (rainbow) {
             color = ColorUtils.getRainbowColor();
         }
     }
@@ -152,7 +152,7 @@ public class RGBASetting extends Setting implements Listener {
         // Draw the handles
         Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), gradientBoxX + handleX, gradientBoxY + handleY, 1, -1);
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), alphaSliderX - 2, alphaSliderY + alphaHandleY, sliderWidth + 4, 3, -1);
-        Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), brightnessSaturationBoxX + shadeHandleX, brightnessSaturationBoxY+ shadeHandleY, 1, -1);
+        Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), brightnessSaturationBoxX + shadeHandleX, brightnessSaturationBoxY + shadeHandleY, 1, -1);
 
         // Draw the preview box
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 20, 10, 2, color.getRGB());
@@ -170,7 +170,6 @@ public class RGBASetting extends Setting implements Listener {
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, boxWidth + 2, boxHeight - 50 + 2, 1, 1, color);
     }
-
 
 
     public void drawAlphaSlider(DrawContext drawContext, int x, int y, int color3) {
@@ -198,19 +197,19 @@ public class RGBASetting extends Setting implements Listener {
 
 
     public boolean hoveredOverRainbowBool(double mouseX, double mouseY) {
-        return mouseX >gradientBoxX - 1 && mouseX < gradientBoxX - 1 + Renderer2D.getFxStringWidth("Rainbow ") + 3 && mouseY > y + boxHeight - 26 && mouseY < y + boxHeight - 26 + Renderer2D.getFxStringHeight("Rainbow ") + 2;
+        return mouseX > gradientBoxX - 1 && mouseX < gradientBoxX - 1 + Renderer2D.getFxStringWidth("Rainbow ") + 3 && mouseY > y + boxHeight - 26 && mouseY < y + boxHeight - 26 + Renderer2D.getFxStringHeight("Rainbow ") + 2;
     }
 
     public boolean hoveredOverGradientBox(double mouseX, double mouseY) {
-        return mouseX >gradientBoxX && mouseX < gradientBoxX + gradientBoxWidth && mouseY > gradientBoxY && mouseY <gradientBoxY + gradientBoxHeight;
+        return mouseX > gradientBoxX && mouseX < gradientBoxX + gradientBoxWidth && mouseY > gradientBoxY && mouseY < gradientBoxY + gradientBoxHeight;
     }
 
     public boolean hoveredOverAlphaSlider(double mouseX, double mouseY) {
-        return mouseX >alphaSliderX && mouseX < alphaSliderX + alphaSliderWidth && mouseY > alphaSliderY && mouseY <alphaSliderY + alphaSliderHeight;
+        return mouseX > alphaSliderX && mouseX < alphaSliderX + alphaSliderWidth && mouseY > alphaSliderY && mouseY < alphaSliderY + alphaSliderHeight;
     }
 
     public boolean hoveredOverBrightnessSaturationBox(double mouseX, double mouseY) {
-        return mouseX > brightnessSaturationBoxX && mouseX <brightnessSaturationBoxX + brightnessSaturationBoxWidth && mouseY >brightnessSaturationBoxY && mouseY < brightnessSaturationBoxY + brightnessSaturationBoxHeight;
+        return mouseX > brightnessSaturationBoxX && mouseX < brightnessSaturationBoxX + brightnessSaturationBoxWidth && mouseY > brightnessSaturationBoxY && mouseY < brightnessSaturationBoxY + brightnessSaturationBoxHeight;
     }
 
     @Override
@@ -219,7 +218,7 @@ public class RGBASetting extends Setting implements Listener {
         Renderer2D.drawFixedString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 2, -1);
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 71, y + 2, 10, 10, 2, color.getRGB());
 
-        if(rainbow){
+        if (rainbow) {
             color = ColorUtils.getRainbowColor();
         }
     }
@@ -262,7 +261,7 @@ public class RGBASetting extends Setting implements Listener {
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
-        if(hovered((int) mouseX, (int) mouseY)){
+        if (hovered((int) mouseX, (int) mouseY)) {
             MinecraftClient.getInstance().setScreen(screen);
         }
     }

@@ -1,8 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -25,24 +23,24 @@ public class Tooltip {
             int winHeight = drawContext.getScaledWindowHeight();
             int textWidth = Math.round(Renderer2D.getFxStringWidth(this.tooltipText));
             if (this.mode == 0) {
-                this.renderTooltip(drawContext,  tooltipText, mouseX + 1, mouseY - 1);
+                this.renderTooltip(drawContext, tooltipText, mouseX + 1, mouseY - 1);
             } else if (this.mode == 1) {
                 switch (fixedPos) {
                     case 0 ->
                         //Top-left
-                            this.renderTooltip(drawContext,  tooltipText, 0, 13);
+                            this.renderTooltip(drawContext, tooltipText, 0, 13);
                     case 1 ->
                         //Top-right
-                            this.renderTooltip(drawContext,  tooltipText, windWidth - textWidth - 4, 13);
+                            this.renderTooltip(drawContext, tooltipText, windWidth - textWidth - 4, 13);
                     case 2 ->
                         //Bottom-left
-                            this.renderTooltip(drawContext,  tooltipText, 0, winHeight);
+                            this.renderTooltip(drawContext, tooltipText, 0, winHeight);
                     case 3 ->
                         //Bottom-right
-                            this.renderTooltip(drawContext,  tooltipText, windWidth - textWidth - 4, winHeight);
+                            this.renderTooltip(drawContext, tooltipText, windWidth - textWidth - 4, winHeight);
                     case 4 ->
                         //Center
-                            this.renderTooltip(drawContext,  tooltipText, windWidth / 2 - (textWidth - 4) / 2, winHeight);
+                            this.renderTooltip(drawContext, tooltipText, windWidth / 2 - (textWidth - 4) / 2, winHeight);
                 }
             } else if (this.mode == 2) {
                 drawContext.drawTooltip(textRenderer, Text.of(this.tooltipText), mouseX, mouseY);

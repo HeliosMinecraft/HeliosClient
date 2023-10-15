@@ -1,16 +1,12 @@
 package dev.heliosclient.module.settings;
 
-import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.module.Module_;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
 
 import java.awt.*;
 
@@ -69,14 +65,14 @@ public class ColorSetting extends Setting {
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 2,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
 
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 2,defaultColor);
-        Renderer2D.drawFixedString(drawContext.getMatrices(),"Red: " + r, x + 130, y + 15,defaultColor);
-        Renderer2D.drawFixedString(drawContext.getMatrices(),"Green: " + g, x + 130, y + 29,defaultColor);
-        Renderer2D.drawFixedString(drawContext.getMatrices(),"Blue: " + b, x + 130, y + 43,defaultColor);
-        Renderer2D.drawFixedString(drawContext.getMatrices(),"Alpha: " + a, x + 130, y + 57,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Red: " + r, x + 130, y + 15, defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Green: " + g, x + 130, y + 29, defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Blue: " + b, x + 130, y + 43, defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Alpha: " + a, x + 130, y + 57, defaultColor);
 
         drawContext.fillGradient(x + 65, y + 14, x + 77, y + 74, 0xFFDDDDDD, 0x00DDDDDD);
         drawContext.fillGradient(x + 80, y + 14, x + 92, y + 74, 0xFFFF0000, 0xFF000000);
@@ -130,7 +126,7 @@ public class ColorSetting extends Setting {
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 2,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
 
 
         drawContext.fill(x + moduleWidth - boxSize - 2, y + 2, x + moduleWidth - 2, y + boxSize + 2, value);

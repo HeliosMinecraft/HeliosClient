@@ -4,13 +4,13 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.module.Category;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
@@ -47,10 +47,10 @@ public class CategoryPane implements Listener {
         }
         if (moduleButtons.size() == 0) collapsed = true;
         EventManager.register(this);
-        if(HeliosClient.MC.getWindow()!=null) {
+        if (HeliosClient.MC.getWindow() != null) {
             fxFontRenderer = new fxFontRenderer(FontManager.fonts, 8f);
         }
-        height = Math.round((moduleButtons.size() * (5 +  Renderer2D.getStringHeight())));
+        height = Math.round((moduleButtons.size() * (5 + Renderer2D.getStringHeight())));
     }
 
     public void addModule(List<Module_> moduleS) {
@@ -90,16 +90,15 @@ public class CategoryPane implements Listener {
             maxWidth = Math.max(maxWidth, m.width);
             maxHeight += categoryNameHeight + 10;
         }
-        if(maxWidth<getWidth() - 3 ) {
+        if (maxWidth < getWidth() - 3) {
             maxWidth = getWidth() - 3;
         }
 
         height = maxHeight;
-        if(!collapsed && height>=10) {
+        if (!collapsed && height >= 10) {
             if (category != Category.SEARCH) {
                 Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
-            }
-            else{
+            } else {
                 Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
             }
         }
@@ -133,7 +132,7 @@ public class CategoryPane implements Listener {
                         setting.renderCompact(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                         buttonYOffset += setting.heightCompact + 1;
                     }
-                    if(!m.module.quickSettings.isEmpty()) {
+                    if (!m.module.quickSettings.isEmpty()) {
                         buttonYOffset += 2;
                     }
                 }
@@ -144,9 +143,9 @@ public class CategoryPane implements Listener {
                 m.setFaded(true);
             }
         }
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y,  width + 4.5f , categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),255).getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 255).getRGB());
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, (float) (x + (CategoryPane.getWidth()-4)/2 - Renderer2D.getFxStringWidth(category.name)/2), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, (float) (x + (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2), (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
     }
 
     public boolean hovered(double mouseX, double mouseY) {
@@ -186,7 +185,8 @@ public class CategoryPane implements Listener {
         }
         dragging = false;
     }
-    public void charTyped(char chr, int modifiers){
+
+    public void charTyped(char chr, int modifiers) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.settingsOpen) {
                 for (Setting setting : moduleButton.module.settings) {
@@ -199,8 +199,9 @@ public class CategoryPane implements Listener {
     public static int getWidth() {
         return width;
     }
+
     @SubscribeEvent
-    public void onFontChange(FontChangeEvent fontChangeEvent){
+    public void onFontChange(FontChangeEvent fontChangeEvent) {
         fxFontRenderer = new fxFontRenderer(fontChangeEvent.getFonts(), 8f);
     }
 }

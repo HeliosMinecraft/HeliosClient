@@ -1,17 +1,14 @@
 package dev.heliosclient.util;
 
-import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.CharTypedEvent;
 import dev.heliosclient.event.events.KeyPressedEvent;
 import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.managers.EventManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
@@ -70,11 +67,11 @@ public class InputBox implements Listener {
 
         this.x = x;
         this.y = y;
-        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 1.2f, y -0.5f, width + 1.5f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 1.2f, y - 0.5f, width + 1.5f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y, width, height, 2, Color.BLACK.getRGB());
         float textHeight = Renderer2D.getFxStringHeight();
-        if(Renderer2D.isVanillaRenderer()){
-            textHeight-=3;
+        if (Renderer2D.isVanillaRenderer()) {
+            textHeight -= 3;
         }
         float textY = y + (height - textHeight) / 2; // Center the text vertically
 
@@ -97,21 +94,21 @@ public class InputBox implements Listener {
                 // Display the segment that contains the cursor
                 String displayValue = textSegments.get(segmentIndex);
                 // drawContext.drawText(textRenderer,Text.literal(displayValue),x + 5,y + height / 3 + 10 + textRenderer.fontHeight,0xFFFFFFFF,false);
-                Renderer2D.drawFixedString(drawContext.getMatrices(),(displayValue), x + 5, textY ,0xFFFFFFFF);
+                Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, textY, 0xFFFFFFFF);
 
                 // Draw the cursor
-                int cursorX = (int) (x + 5 +Renderer2D.getFxStringWidth(displayValue.substring(0, cursorPosition - segmentStartIndex)));
+                int cursorX = (int) (x + 5 + Renderer2D.getFxStringWidth(displayValue.substring(0, cursorPosition - segmentStartIndex)));
                 Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
-                        cursorX-0.4f ,
+                        cursorX - 0.4f,
                         textY,
                         0.6f,
                         textHeight,
-                        ColorUtils.rgbaToInt(150,150,150,255));
+                        ColorUtils.rgbaToInt(150, 150, 150, 255));
             }
         } else {
             // Display the first segment of the text
             String displayValue = !textSegments.isEmpty() ? textSegments.get(0) : "";
-            Renderer2D.drawFixedString(drawContext.getMatrices(),(displayValue), x + 5, textY ,0xFFAAAAAA);            //drawContext.drawText(textRenderer, Text.literal(displayValue), x + 5, y + height / 3 + 10 + textRenderer.fontHeight, 0xFFAAAAAA, false);
+            Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, textY, 0xFFAAAAAA);            //drawContext.drawText(textRenderer, Text.literal(displayValue), x + 5, y + height / 3 + 10 + textRenderer.fontHeight, 0xFFAAAAAA, false);
         }
 
         // Draw selection box
@@ -121,7 +118,7 @@ public class InputBox implements Listener {
             if (endX > x + width) {
                 endX = x + width;
             }
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, textY, endX - startX + 1,textHeight, new Color(0, 166, 255, 64).getRGB());
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, textY, endX - startX + 1, textHeight, new Color(0, 166, 255, 64).getRGB());
         }
     }
 
@@ -167,8 +164,8 @@ public class InputBox implements Listener {
                             value = value.substring(0, selectionStart) + value.substring(selectionEnd);
                             cursorPosition = selectionStart;
                             selecting = false;
-                            selectionStart=0;
-                            selectionEnd =0;
+                            selectionStart = 0;
+                            selectionEnd = 0;
                         } else {
                             value = value.substring(0, cursorPosition - 1) + value.substring(cursorPosition);
                             cursorPosition--;
@@ -180,8 +177,8 @@ public class InputBox implements Listener {
                         value = value.substring(0, selectionStart) + value.substring(selectionEnd);
                         cursorPosition = selectionStart;
                         selecting = false;
-                        selectionStart=0;
-                        selectionEnd =0;
+                        selectionStart = 0;
+                        selectionEnd = 0;
                     } else {
                         value = value.substring(0, cursorPosition) + value.substring(cursorPosition + 1);
                     }

@@ -1,11 +1,10 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.Easing;
@@ -70,7 +69,7 @@ public class ClientSettingsScreen extends Screen {
         }
         navBar.render(drawContext, textRenderer, mouseX, mouseY);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-        FontManager.fontSize = ((int)ClickGUI.FontSize.value);
+        FontManager.fontSize = ((int) ClickGUI.FontSize.value);
     }
 
     @Override

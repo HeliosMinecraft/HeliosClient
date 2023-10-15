@@ -2,7 +2,6 @@ package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
-import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
@@ -26,9 +25,9 @@ public class Bps extends HudElement {
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         String text = "Blocks Per Second: ";
         String value = ColorUtils.gray + MathUtils.round(moveSpeed(), 2);
-        this.width =  Math.round(Renderer2D.getStringWidth(text+value));
+        this.width = Math.round(Renderer2D.getStringWidth(text + value));
         this.height = 10;
-        Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x - (float) width / 2, this.y - ((float) height / 2),HeliosClient.uiColorA);
+        Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x - (float) width / 2, this.y - ((float) height / 2), HeliosClient.uiColorA);
 
     }
 

@@ -1,7 +1,5 @@
 package dev.heliosclient.ui.clickgui.navbar;
 
-import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.managers.NavBarManager;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
