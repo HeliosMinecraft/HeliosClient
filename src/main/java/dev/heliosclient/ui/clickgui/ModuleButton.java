@@ -68,7 +68,7 @@ public class ModuleButton {
         //this.height = moduleNameHeight + 6;
         this.width = maxWidth;
 
-        int fillColor = module.isActive()? new Color(ColorManager.INSTANCE.clickGuiSecondary()).getRGB() :  ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),200).getRGB() ;
+        int fillColor = module.isActive()? new Color(ColorManager.INSTANCE.clickGuiSecondary()).getRGB() :  ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),100).getRGB() ;
 
         BackgroundAnimation.drawFadingBox(drawContext, x + 1 , y, maxWidth , height, fillColor, true, 2);
         int textY = y + 1 + (height - moduleNameHeight) / 2; // Center the text vertically
