@@ -136,7 +136,7 @@ public class CategoryPane {
             }
         }
         //0xFF1B1B1B
-        Renderer2D.drawRoundedRectangle(drawContext, x - 2, y,  width + 4.5f , categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),255).getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext, x - 2, y,  width + 4.5f , categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),200).getRGB());
         // Renderer2D.drawRectangle(drawContext, x-2, y + categoryNameHeight + 8, width + 4.5f, 2, ColorManager.INSTANCE.clickGuiSecondary());
 
         FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), category.name, (float) (x + (CategoryPane.getWidth()-4)/2 - FontManager.fxfontRenderer.getStringWidth(category.name)/2), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText(), (float) (10f));
