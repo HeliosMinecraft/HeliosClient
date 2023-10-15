@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class FontManager implements Listener {
+    public static FontManager INSTANCE = new FontManager();
     public static Font[] fonts;
     public static Font[] Originalfonts;
     public static int fontSize = 8;

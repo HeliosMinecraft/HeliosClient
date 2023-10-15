@@ -1,6 +1,5 @@
 package dev.heliosclient.module.sysmodules;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
@@ -80,7 +79,7 @@ public class ClickGUI extends Module_ {
         quickSettings.add(TextColor);
         active.value = true;
         loadFonts.addButton("Load Fonts", () -> {
-            HeliosClient.fontManager = new FontManager();
+            FontManager.INSTANCE = new FontManager();
             Font.setOptions(FontManager.fontNames);
         });
     }

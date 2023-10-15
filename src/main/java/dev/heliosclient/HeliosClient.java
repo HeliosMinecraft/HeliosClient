@@ -1,16 +1,12 @@
 package dev.heliosclient;
 
-import dev.heliosclient.managers.CommandManager;
-import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.Renderer2D;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
@@ -30,14 +26,10 @@ public class HeliosClient implements ModInitializer {
     public static Config CONFIG = new Config();
     public static int uiColorA = 0xFF55FFFF;
     public static int uiColor = 0x55FFFF;
-    public static FontManager fontManager = new FontManager();
-    public static Renderer2D Renderer2D = new Renderer2D();
-
 
     @Override
     public void onInitialize() {
         LOGGER.info("Helios Client loading...");
-        ;
         loadConfig();
     }
 
@@ -48,8 +40,10 @@ public class HeliosClient implements ModInitializer {
             CONFIG.save();
         }
         CONFIG.load();
-        EventManager.register(fontManager);
-        EventManager.register(Renderer2D);
+        EventManager.register(FontManager.INSTANCE);
+        EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
+        EventManager.register(KeybindManager.INSTANCE);
+
         for (Module_ m : ModuleManager.INSTANCE.modules) {
             for (Setting s : m.settings) {
                 s.value = ((Map<String, Object>) ((Map<String, Object>) CONFIG.config.get("modules")).get(m.name))

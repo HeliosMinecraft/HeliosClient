@@ -20,8 +20,8 @@ import java.awt.*;
 
 public class Renderer2D implements Listener {
 
+    public static Renderer2D INSTANCE = new Renderer2D();
     public static DrawContext drawContext;
-
     public static Renderers renderer = Renderers.CUSTOM;
 
     @SubscribeEvent
@@ -348,7 +348,6 @@ public class Renderer2D implements Listener {
         float endBlue = (float) (endColor & 255) / 255.0F;
         float endAlpha = (float) (endColor >> 24 & 255) / 255.0F;
 
-        ;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
 

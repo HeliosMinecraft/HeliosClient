@@ -10,6 +10,7 @@ import net.minecraft.client.util.InputUtil;
 import java.util.ArrayList;
 
 public class KeybindManager implements Listener {
+    public static KeybindManager INSTANCE = new KeybindManager();
     public static ArrayList<Integer> wasPressed = new ArrayList<>();
     protected static MinecraftClient mc = MinecraftClient.getInstance();
 
