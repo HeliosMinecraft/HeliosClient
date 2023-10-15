@@ -5,6 +5,7 @@ import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -16,7 +17,7 @@ public class Coords extends HudElement {
     public Coords() {
         super("Coords", "Shows player coords");
         this.width = 50;
-        this.height = 13;
+        this.height = 10;
     }
 
     @Override
@@ -36,8 +37,9 @@ public class Coords extends HudElement {
                 " Y: " + ColorUtils.gray + coordY + ColorUtils.reset +
                 " Z: " + ColorUtils.gray + coordZ;
 
-        this.width = (int) (FontManager.fontRenderer.getStringWidth(text) + 1);
-        FontManager.fontRenderer.drawString(drawContext.getMatrices(),text, this.x - (float) width / 2, this.y - (float) height / 2,256 - ColorUtils.getRed(HeliosClient.uiColorA),256 - ColorUtils.getGreen(HeliosClient.uiColorA),256 - ColorUtils.getBlue(HeliosClient.uiColorA),256 - ColorUtils.getAlpha(HeliosClient.uiColorA));
+        this.width = Math.round(Renderer2D.getStringWidth(text) + 1);
+        this.height = 10;
+        Renderer2D.drawString(drawContext.getMatrices(),text, this.x - (float) width / 2, this.y - ((float) height / 2),HeliosClient.uiColorA);
     }
 
 }

@@ -9,6 +9,7 @@ import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -39,9 +40,9 @@ public class ModuleList extends HudElement implements Listener {
         // Calculate the maximum width of the module names
         for (Module_ m : ModuleManager.INSTANCE.modules) {
             if (!m.showInModulesList.value) continue;
-            int nameWidth = Math.round(FontManager.fontRenderer.getStringWidth(m.name));
+            int nameWidth = Math.round(Renderer2D.getStringWidth(m.name));
             maxWidth = Math.max(maxWidth, nameWidth);
-            totalY += Math.round(FontManager.fontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")) + 2;
+            totalY += Math.round(Renderer2D.getStringHeight()) + 2;
         }
 
         Collections.sort(enabledModules, Comparator.comparing(module -> module.name.length(), Comparator.reverseOrder()));
@@ -49,14 +50,14 @@ public class ModuleList extends HudElement implements Listener {
         this.height = totalY + 2;
         for (Module_ m : enabledModules) {
             if (!m.showInModulesList.value) continue;
-            float nameWidth = FontManager.fontRenderer.getStringWidth(m.name);
-            Renderer2D.drawRectangle(drawContext, x - 4 - (float) width / 2 + width - nameWidth, this.y - (float) height / 2 + yOffset, nameWidth + 2, Math.round(FontManager.fontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")) + 2, 0x66222222);
+            float nameWidth = Renderer2D.getStringWidth(m.name);
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 4 - (float) width / 2 + width - nameWidth, this.y - (float) height / 2 + yOffset, nameWidth + 2, Math.round(Renderer2D.getStringHeight()) + 2, 0x66222222);
 
-            Renderer2D.drawRectangle(drawContext, x - 2 - (float) width / 2 + width, this.y - (float) height / 2, 2, yOffset - 1 + Math.round(FontManager.fontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")) + 2, HeliosClient.uiColorA);
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2 - (float) width / 2 + width, this.y - (float) height / 2, 2, yOffset + Math.round(Renderer2D.getStringHeight()) + 3, HeliosClient.uiColorA);
 
-            FontManager.fontRenderer.drawString(drawContext.getMatrices(), m.name, x - 2 + width / 2 - nameWidth, this.y + 1 - (float) height / 2 + yOffset, 1,1,1,1);
+            Renderer2D.drawString(drawContext.getMatrices(), m.name, x - 2 + width / 2 - nameWidth, this.y + 1 - (float) height / 2 + yOffset, ColorUtils.rgbaToInt(255,255,255,255));
             //drawContext.drawText(mc.textRenderer, m.name, x - 2 + width / 2 - nameWidth, y - height / 2 + yOffset + 2, 0xFFFFFFFF, false);
-            yOffset += Math.round(FontManager.fontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")) + 2;
+            yOffset += Math.round(Renderer2D.getStringHeight()) + 2;
         }
     }
 

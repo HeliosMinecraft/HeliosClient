@@ -39,11 +39,11 @@ public class StringListSetting extends Setting {
         this.height = 26 + inputBox.size() * 16;
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor,10f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor);
 
         // Draw a '+' button next to the text
-        Renderer2D.drawRectangle(drawContext, x + 165, y + 5, 11, 11, Color.black.getRGB());
-        Renderer2D.drawOutlineBox(drawContext, x + 165, y + 5, 11, 11, 0.4f, (hoveredOverAdd(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, y + 5, 11, 11, Color.black.getRGB());
+        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, y + 5, 11, 11, 0.4f, (hoveredOverAdd(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
         drawContext.drawHorizontalLine(x + 167, x + 173, y + 10, Color.GREEN.getRGB());
         drawContext.drawVerticalLine(x + 170, y + 6, y + 14, Color.GREEN.getRGB());
         int boxOffset = y + 20;
@@ -51,9 +51,9 @@ public class StringListSetting extends Setting {
             box.render(drawContext, x, boxOffset, mouseX, mouseY, textRenderer);
 
             // Draw a '-' button next to the text
-            Renderer2D.drawRectangle(drawContext, x + 165, boxOffset, 11, 11, Color.black.getRGB());
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, boxOffset, 11, 11, Color.black.getRGB());
             drawContext.drawHorizontalLine(x + 168, x + 172, boxOffset + 5, Color.RED.getRGB());
-            Renderer2D.drawOutlineBox(drawContext, x + 165, boxOffset, 11, 11, 0.4f, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, boxOffset, 11, 11, 0.4f, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
             boxOffset += 16;
         }
     }
@@ -100,7 +100,7 @@ public class StringListSetting extends Setting {
     }
 
     public boolean hoveredOverRemove(double mouseX, double mouseY, int boxOffset) {
-        return mouseX >= x + 165 && mouseX <= x + 175 && mouseY >= boxOffset + 13 + HeliosClient.MC.textRenderer.fontHeight && mouseY <= boxOffset + 23 + HeliosClient.MC.textRenderer.fontHeight;
+        return mouseX >= x + 165 && mouseX <= x + 176 && mouseY >= boxOffset  && mouseY <= boxOffset + 11;
     }
 
     public boolean hoveredOverAdd(double mouseX, double mouseY) {

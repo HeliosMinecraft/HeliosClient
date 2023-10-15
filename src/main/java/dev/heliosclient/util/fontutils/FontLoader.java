@@ -33,8 +33,7 @@ public class FontLoader {
             try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/fonts/" + s)) {
                 assert inputStream != null;
                 Files.copy(inputStream, defaultFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ignored) {
             }
         }
 

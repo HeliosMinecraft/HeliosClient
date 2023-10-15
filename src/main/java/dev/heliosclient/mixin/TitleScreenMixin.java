@@ -3,7 +3,9 @@ package dev.heliosclient.mixin;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.ui.HeliosClientInfoScreen;
 import dev.heliosclient.ui.altmanager.AltManagerScreen;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -50,7 +52,10 @@ public abstract class TitleScreenMixin extends Screen {
             this.client.setScreen(HeliosClientInfoScreen.INSTANCE);
         }, this.textRenderer));
     }
-
+    @Inject(at = @At("TAIL"), method = "render")
+    private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        Renderer2D.setDrawContext(context);
+    }
     @Inject(at = @At("TAIL"), method = "init")
     private void altManagerButton(CallbackInfo callbackInfo) {
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Alt Manager"), this::gotoAltManagerScreen)

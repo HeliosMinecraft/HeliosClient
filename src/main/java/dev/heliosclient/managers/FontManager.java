@@ -32,7 +32,7 @@ public class FontManager implements Listener {
     public void onTick(TickEvent.CLIENT event){
         if(HeliosClient.MC.getWindow()!=null) {
             fontRenderer = new FontRenderer(fonts, fontSize);
-            fxfontRenderer = new fxFontRenderer(fonts, 8.5f);
+            fxfontRenderer = new fxFontRenderer(fonts, 8f);
             EventManager.unregister(this);
         }
     }

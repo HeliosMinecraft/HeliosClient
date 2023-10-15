@@ -23,7 +23,7 @@ public class Tooltip {
         if (this.tooltipText != null && !this.tooltipText.isEmpty()) {
             int windWidth = drawContext.getScaledWindowWidth();
             int winHeight = drawContext.getScaledWindowHeight();
-            int textWidth = Math.round(FontManager.fxfontRenderer.getStringWidth(this.tooltipText));
+            int textWidth = Math.round(Renderer2D.getFxStringWidth(this.tooltipText));
             if (this.mode == 0) {
                 this.renderTooltip(drawContext,  tooltipText, mouseX + 1, mouseY - 1);
             } else if (this.mode == 1) {
@@ -53,12 +53,13 @@ public class Tooltip {
 
 
     private void renderTooltip(DrawContext drawContext, String text, int x, int y) {
-        int textWidth = Math.round(FontManager.fxfontRenderer.getStringWidth(text));
-        float textHeight = FontManager.fxfontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+        int textWidth = Math.round(Renderer2D.getFxStringWidth(text));
+        float textHeight = Renderer2D.getFxStringHeight();
         float textY = y - textHeight; // Center the text vertically
-        Renderer2D.drawRectangle(drawContext, x, y - 13, (textWidth + 4), 13, 0xAA000000);
-        Renderer2D.drawOutlineBox(drawContext, x - 1, y - 13, (textWidth + 5), 14, 1, Color.GRAY.getRGB());
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), text, x + 2, textY, ColorManager.INSTANCE.defaultTextColor(),10f);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y - 13, (textWidth + 4), 13, 0xAA000000);
+        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 13, (textWidth + 5), 14, 1, Color.GRAY.getRGB());
+
+        Renderer2D.drawFixedString(drawContext.getMatrices(), text, x + 2, textY, ColorManager.INSTANCE.defaultTextColor());
         //drawContext.drawText(textRenderer, text, x + 2, y - 10, ColorManager.INSTANCE.defaultTextColor(), true);
     }
 

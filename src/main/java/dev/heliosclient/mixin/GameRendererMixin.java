@@ -1,5 +1,6 @@
 package dev.heliosclient.mixin;
 
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.event.events.Render3DEvent;
 import net.minecraft.client.MinecraftClient;
@@ -14,6 +15,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import static net.minecraft.client.MinecraftClient.getInstance;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
@@ -31,5 +34,4 @@ public abstract class GameRendererMixin {
         Render3DEvent event = new Render3DEvent(matrices,  tickDelta, camera.getPos().x, camera.getPos().y, camera.getPos().z);
         EventManager.postEvent(event);
     }
-
 }

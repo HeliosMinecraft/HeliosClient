@@ -28,6 +28,7 @@ public abstract class MinecraftClientMixin {
         }
     }
 
+
     @Inject(at = @At("TAIL"), method = "scheduleStop")
     public void onShutdown(CallbackInfo ci) {
         HeliosClient.INSTANCE.saveConfig();

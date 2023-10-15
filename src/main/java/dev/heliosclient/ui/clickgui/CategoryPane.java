@@ -1,15 +1,19 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.FontChangeEvent;
+import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -18,17 +22,18 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryPane {
+public class CategoryPane implements Listener {
     public Category category;
     public int x;
     public int y;
     public int height;
-    public static int width = 80;
+    public static int width = 83;
     public boolean collapsed = false;
     int startX, startY;
     boolean dragging = false;
     ArrayList<ModuleButton> moduleButtons;
     private final Screen parentScreen;
+    private fxFontRenderer fxFontRenderer;
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
         this.category = category;
@@ -41,7 +46,11 @@ public class CategoryPane {
             moduleButtons.add(new ModuleButton(m, parentScreen));
         }
         if (moduleButtons.size() == 0) collapsed = true;
-        height = Math.round((moduleButtons.size() * (5 +  FontManager.fxfontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))));
+        EventManager.register(this);
+        if(HeliosClient.MC.getWindow()!=null) {
+            fxFontRenderer = new fxFontRenderer(FontManager.fonts, 8f);
+        }
+        height = Math.round((moduleButtons.size() * (5 +  Renderer2D.getStringHeight())));
     }
 
     public void addModule(List<Module_> moduleS) {
@@ -88,10 +97,10 @@ public class CategoryPane {
         height = maxHeight;
         if(!collapsed && height>=10) {
             if (category != Category.SEARCH) {
-                Renderer2D.drawRoundedRectangle(drawContext, x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
             }
             else{
-                Renderer2D.drawRoundedRectangle(drawContext, x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
             }
         }
 
@@ -135,13 +144,9 @@ public class CategoryPane {
                 m.setFaded(true);
             }
         }
-        //0xFF1B1B1B
-        Renderer2D.drawRoundedRectangle(drawContext, x - 2, y,  width + 4.5f , categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),200).getRGB());
-        // Renderer2D.drawRectangle(drawContext, x-2, y + categoryNameHeight + 8, width + 4.5f, 2, ColorManager.INSTANCE.clickGuiSecondary());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y,  width + 4.5f , categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),255).getRGB());
 
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), category.name, (float) (x + (CategoryPane.getWidth()-4)/2 - FontManager.fxfontRenderer.getStringWidth(category.name)/2), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText(), (float) (10f));
-        // FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), collapsed ? "+" : "-", (float) (x + width - 11), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText(), (float) (10f));
-
+        Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, (float) (x + (CategoryPane.getWidth()-4)/2 - Renderer2D.getFxStringWidth(category.name)/2), (float) (y + 4),ColorManager.INSTANCE.clickGuiPaneText());
     }
 
     public boolean hovered(double mouseX, double mouseY) {
@@ -193,5 +198,9 @@ public class CategoryPane {
 
     public static int getWidth() {
         return width;
+    }
+    @SubscribeEvent
+    public void onFontChange(FontChangeEvent fontChangeEvent){
+        fxFontRenderer = new fxFontRenderer(fontChangeEvent.getFonts(), 8f);
     }
 }

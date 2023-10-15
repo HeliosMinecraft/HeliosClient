@@ -33,7 +33,7 @@ public abstract class Setting {
         }
        // int fillColor = (int) (34 + 0.85 * hoverAnimationTimer);
         int fillColor =  ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),  181).getRGB();
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, width, height, 2,fillColor);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width, height, 2,fillColor);
     }
 
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
@@ -45,7 +45,7 @@ public abstract class Setting {
             hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
         }
         int fillColor =  ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()),  200).getRGB();
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, widthCompact, heightCompact, 2,fillColor);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, widthCompact, heightCompact, 2,fillColor);
     }
 
     public boolean shouldRender() {

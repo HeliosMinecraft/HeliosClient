@@ -36,12 +36,12 @@ public class AnimationUtils {
         int a = (int) (t * ColorUtils.getAlpha(color));
         int newColor = ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
         if (!RoundedBox)
-            Renderer2D.drawRectangle(context, x, y, width, height, newColor);
+            Renderer2D.drawRectangle(context.getMatrices().peek().getPositionMatrix(), x, y, width, height, newColor);
         else
-            Renderer2D.drawRoundedRectangle(context, x, y, width, height, radius, newColor);
+            Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(), x, y, width, height, radius, newColor);
     }
 
-    public void drawFadingText(MatrixStack matrixStack, String text, int x, int y, int color , boolean fixedSize, float size) {
+    public void drawFadingText(MatrixStack matrixStack, String text, int x, int y, int color , boolean fixedSize) {
         if (fading) {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
@@ -57,12 +57,12 @@ public class AnimationUtils {
         Color nColor = ColorUtils.intToColor(color);
         Color newColor = ColorUtils.changeAlpha(nColor, a);
         if(fixedSize){
-            FontManager.fxfontRenderer.drawString(matrixStack, text, x, y,newColor.getRGB() ,size);
+            Renderer2D.drawFixedString(matrixStack, text, x, y,newColor.getRGB());
         }else {
-            FontManager.fontRenderer.drawString(matrixStack, text, x, y, 256 - newColor.getRed(), 256 - nColor.getGreen(), 256 - newColor.getBlue(), 256 - newColor.getAlpha());
+            Renderer2D.drawString(matrixStack, text, x, y, newColor.getRGB());
         }
     }
-    public void drawFadingAndPoppingBox(DrawContext context, int x, int y, int width, int height, int color, boolean RoundedBox, int radius) {
+    public void drawFadingAndPoppingBox(DrawContext drawContext, int x, int y, int width, int height, int color, boolean RoundedBox, int radius) {
         if (fading) {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
@@ -74,17 +74,17 @@ public class AnimationUtils {
         int a = (int) (t * 255);
         int newColor = ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
         float scale = Easing.ease(easingType, alpha);
-        context.getMatrices().push();
-        context.getMatrices().translate(x + width / 2f, y + height / 2f, 0);
-        context.getMatrices().scale(scale, scale, 0);
+        drawContext.getMatrices().push();
+        drawContext.getMatrices().translate(x + width / 2f, y + height / 2f, 0);
+        drawContext.getMatrices().scale(scale, scale, 0);
         if (!RoundedBox)
-            Renderer2D.drawRectangle(context, (int) (-width / 2f), (int) (-height / 2f), width, height, newColor);
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (int) (-width / 2f), (int) (-height / 2f), width, height, newColor);
         else
-            Renderer2D.drawRoundedRectangle(context, (int) (-width / 2f), (int) (-height / 2f), width, height, radius, newColor);
-        context.getMatrices().pop();
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (int) (-width / 2f), (int) (-height / 2f), width, height, radius, newColor);
+        drawContext.getMatrices().pop();
     }
 
-    public void drawFadingAndPoppingText(DrawContext context, String text, int x, int y, int color, boolean fixedSize,  float size) {
+    public void drawFadingAndPoppingText(DrawContext context, String text, int x, int y, int color, boolean fixedSize) {
         if (fading) {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
@@ -105,10 +105,10 @@ public class AnimationUtils {
         context.getMatrices().translate(x, y, 0);
         context.getMatrices().scale(scale, scale, 0);
         if(fixedSize) {
-            FontManager.fxfontRenderer.drawString(context.getMatrices(), text, -FontManager.fontRenderer.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, newColor.getRGB(),size);
+            Renderer2D.drawFixedString(context.getMatrices(), text, -Renderer2D.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, newColor.getRGB());
         }
         else {
-            FontManager.fontRenderer.drawString(context.getMatrices(), text, -FontManager.fontRenderer.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, 256 - newColor.getRed(), 256 - nColor.getGreen(), 256 - newColor.getBlue(), 256 - newColor.getAlpha());
+            Renderer2D.drawString(context.getMatrices(), text, -Renderer2D.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, newColor.getRGB());
         }
         context.getMatrices().pop();
     }

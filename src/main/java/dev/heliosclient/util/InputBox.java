@@ -51,7 +51,7 @@ public class InputBox implements Listener {
         int startIndex = 0;
         while (startIndex < text.length()) {
             int endIndex = startIndex + 1;
-            while (endIndex < text.length() && FontManager.fxfontRenderer.getStringWidth(text.substring(startIndex, endIndex)) <= maxWidth) {
+            while (endIndex < text.length() && Renderer2D.getFxStringWidth(text.substring(startIndex, endIndex)) <= maxWidth) {
                 endIndex++;
             }
             this.textSegments.add(text.substring(startIndex, endIndex));
@@ -70,9 +70,12 @@ public class InputBox implements Listener {
 
         this.x = x;
         this.y = y;
-        Renderer2D.drawOutlineRoundedBox(drawContext, x + 1.2f, y -0.5f, width + 1.5f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
-        Renderer2D.drawRoundedRectangle(drawContext, x + 2, y, width, height, 2, Color.BLACK.getRGB());
-        float textHeight = FontManager.fxfontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 1.2f, y -0.5f, width + 1.5f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y, width, height, 2, Color.BLACK.getRGB());
+        float textHeight = Renderer2D.getFxStringHeight();
+        if(Renderer2D.isVanillaRenderer()){
+            textHeight-=3;
+        }
         float textY = y + (height - textHeight) / 2; // Center the text vertically
 
         if (focused) {
@@ -94,11 +97,11 @@ public class InputBox implements Listener {
                 // Display the segment that contains the cursor
                 String displayValue = textSegments.get(segmentIndex);
                 // drawContext.drawText(textRenderer,Text.literal(displayValue),x + 5,y + height / 3 + 10 + textRenderer.fontHeight,0xFFFFFFFF,false);
-                FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),(displayValue), x + 5, textY ,0xFFFFFFFF,10f);
+                Renderer2D.drawFixedString(drawContext.getMatrices(),(displayValue), x + 5, textY ,0xFFFFFFFF);
 
                 // Draw the cursor
-                int cursorX = (int) (x + 5 +FontManager.fxfontRenderer.getStringWidth(displayValue.substring(0, cursorPosition - segmentStartIndex)));
-                Renderer2D.drawRectangle(drawContext,
+                int cursorX = (int) (x + 5 +Renderer2D.getFxStringWidth(displayValue.substring(0, cursorPosition - segmentStartIndex)));
+                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
                         cursorX-0.4f ,
                         textY,
                         0.6f,
@@ -108,17 +111,17 @@ public class InputBox implements Listener {
         } else {
             // Display the first segment of the text
             String displayValue = !textSegments.isEmpty() ? textSegments.get(0) : "";
-            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),(displayValue), x + 5, textY ,0xFFAAAAAA,10f);            //drawContext.drawText(textRenderer, Text.literal(displayValue), x + 5, y + height / 3 + 10 + textRenderer.fontHeight, 0xFFAAAAAA, false);
+            Renderer2D.drawFixedString(drawContext.getMatrices(),(displayValue), x + 5, textY ,0xFFAAAAAA);            //drawContext.drawText(textRenderer, Text.literal(displayValue), x + 5, y + height / 3 + 10 + textRenderer.fontHeight, 0xFFAAAAAA, false);
         }
 
         // Draw selection box
         if (focused && selecting && selectionStart != selectionEnd) {
-            int startX = (int) (x + 4 + FontManager.fxfontRenderer.getStringWidth(value.substring(0, Math.min(selectionStart, value.length()))));
-            int endX = (int) (x + 4 + FontManager.fxfontRenderer.getStringWidth(value.substring(0, Math.min(selectionEnd, value.length()))));
+            int startX = (int) (x + 4 + Renderer2D.getFxStringWidth(value.substring(0, Math.min(selectionStart, value.length()))));
+            int endX = (int) (x + 4 + Renderer2D.getFxStringWidth(value.substring(0, Math.min(selectionEnd, value.length()))));
             if (endX > x + width) {
                 endX = x + width;
             }
-            Renderer2D.drawRectangle(drawContext, startX, textY, endX - startX + 1,textHeight, new Color(0, 166, 255, 64).getRGB());
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, textY, endX - startX + 1,textHeight, new Color(0, 166, 255, 64).getRGB());
         }
     }
 

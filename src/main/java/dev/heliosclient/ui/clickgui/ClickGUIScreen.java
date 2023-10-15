@@ -52,7 +52,7 @@ public class ClickGUIScreen extends Screen {
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
             if (category.category == Category.SEARCH && !category.collapsed) {
 
-                Renderer2D.drawRectangle(drawContext, category.x , category.y + 17, CategoryPane.getWidth(), 18, 0xFF1B1B1B);
+                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), category.x , category.y + 17, CategoryPane.getWidth(), 18, 0xFF1B1B1B);
 
                 searchBox.render(drawContext, category.x, (int) (category.y + 19), mouseX, mouseY, textRenderer);
 

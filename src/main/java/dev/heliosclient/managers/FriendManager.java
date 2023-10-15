@@ -5,6 +5,7 @@ import dev.heliosclient.util.ChatUtils;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.HashSet;
+import java.util.Objects;
 
 public class FriendManager {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
@@ -24,7 +25,7 @@ public class FriendManager {
     }
 
     public static void addFriend(Friend friend) {
-        if (friend.getPlayerName() == mc.getSession().getUsername()) {
+        if (Objects.equals(friend.getPlayerName(), mc.getSession().getUsername())) {
             ChatUtils.sendHeliosMsg("You can't befriend yourself.");
         } else {
             friends.add(friend);

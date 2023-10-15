@@ -53,9 +53,9 @@ public class ListSettingScreen extends Screen {
 
         x = Math.max(drawContext.getScaledWindowWidth() / 2 - windowWidth / 2, 0);
         x2 = x + windowWidth;
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, windowWidth, windowHeight, 5, 0xFF222222);
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, windowWidth, 18, 5, 0xFF1B1B1B);
-        Renderer2D.drawRectangle(drawContext, x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, windowWidth, windowHeight, 5, 0xFF222222);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, true, true, false, false, windowWidth, 18, 5, 0xFF1B1B1B);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
         drawContext.drawText(textRenderer, listSetting.name, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth(listSetting.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, "§o" + listSetting.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + listSetting.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
         backButton.render(drawContext, textRenderer, x + 4, y + 4, mouseX, mouseY);
@@ -69,7 +69,7 @@ public class ListSettingScreen extends Screen {
                 hoverAnimationTimers[i] = Math.max(hoverAnimationTimers[i] - 1, 0);
             }
             int fillColor = (int) (34 + 0.85 * hoverAnimationTimers[i]);
-            Renderer2D.drawRoundedRectangle(drawContext, x, hitboxY, windowWidth, 25, 5, new Color(fillColor, fillColor, fillColor).getRGB());
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, hitboxY, windowWidth, 25, 5, new Color(fillColor, fillColor, fillColor).getRGB());
             drawContext.drawText(textRenderer, string, x + 16, yOffset + 2, ColorManager.INSTANCE.defaultTextColor(), false);
             drawContext.fill(x2 - 26, yOffset, x2 - 16, yOffset + 10, 0xFFFFFFFF);
             drawContext.fill(x2 - 25, yOffset + 1, x2 - 17, yOffset + 9, 0xFF222222);

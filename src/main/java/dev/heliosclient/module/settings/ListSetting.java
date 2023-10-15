@@ -5,6 +5,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.ui.clickgui.ListSettingScreen;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -30,7 +31,7 @@ public class ListSetting extends Setting {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 8,defaultColor,8f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 8,defaultColor);
     }
 
     @Override

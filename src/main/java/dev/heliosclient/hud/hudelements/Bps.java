@@ -5,6 +5,7 @@ import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -18,15 +19,16 @@ public class Bps extends HudElement {
     public Bps() {
         super("Player Speed", "Shows player speed in blocks per second");
         this.width = 40;
-        this.height = 13;
+        this.height = 10;
     }
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         String text = "Blocks Per Second: ";
         String value = ColorUtils.gray + MathUtils.round(moveSpeed(), 2);
-        this.width = (int) FontManager.fontRenderer.getStringWidth(text+value);
-        FontManager.fontRenderer.drawString(drawContext.getMatrices(), text + value, this.x - (float) width / 2, this.y - (float) height / 2,256 - ColorUtils.getRed(HeliosClient.uiColorA),256 - ColorUtils.getGreen(HeliosClient.uiColorA),256 - ColorUtils.getBlue(HeliosClient.uiColorA),256 - ColorUtils.getAlpha(HeliosClient.uiColorA));
+        this.width =  Math.round(Renderer2D.getStringWidth(text+value));
+        this.height = 10;
+        Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x - (float) width / 2, this.y - ((float) height / 2),HeliosClient.uiColorA);
 
     }
 

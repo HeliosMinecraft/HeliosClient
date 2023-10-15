@@ -69,20 +69,15 @@ public class ColorSetting extends Setting {
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 2,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 2,defaultColor);
 
 
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 2,256 - ColorUtils.getRed(0xFFFFFF),256 - ColorUtils.getGreen(0xFFFFFF),256 - ColorUtils.getBlue(0xFFFFFF),256 - ColorUtils.getAlpha(0xFFFFFF),10f);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Red: " + r, x + 130, y + 15,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Green: " + g, x + 130, y + 29,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Blue: " + b, x + 130, y + 43,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Alpha: " + a, x + 130, y + 57,256 - ColorUtils.getRed(defaultColor),256 - ColorUtils.getGreen(defaultColor),256 - ColorUtils.getBlue(defaultColor),256 - ColorUtils.getAlpha(defaultColor),10f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 2,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),"Red: " + r, x + 130, y + 15,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),"Green: " + g, x + 130, y + 29,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),"Blue: " + b, x + 130, y + 43,defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),"Alpha: " + a, x + 130, y + 57,defaultColor);
 
-        // drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, 0xFFFFFF, false);
-        //drawContext.drawText(textRenderer, Text.literal("Red: " + r), x + 130, y + 15, defaultColor, false);
-        //drawContext.drawText(textRenderer, Text.literal("Green: " + g), x + 130, y + 29, defaultColor, false);
-        //drawContext.drawText(textRenderer, Text.literal("Blue: " + b), x + 130, y + 43, defaultColor, false);
-        //drawContext.drawText(textRenderer, Text.literal("Alpha: " + a), x + 130, y + 57, defaultColor, false);
         drawContext.fillGradient(x + 65, y + 14, x + 77, y + 74, 0xFFDDDDDD, 0x00DDDDDD);
         drawContext.fillGradient(x + 80, y + 14, x + 92, y + 74, 0xFFFF0000, 0xFF000000);
         drawContext.fillGradient(x + 95, y + 14, x + 107, y + 74, 0xFF00FF00, 0xFF000000);
@@ -91,11 +86,11 @@ public class ColorSetting extends Setting {
         int scaledValueRed = (int) ((double) (255 - r) / 255 * 60);
         int scaledValueGreen = (int) ((double) (255 - g) / 255 * 60);
         int scaledValueBlue = (int) ((double) (255 - b) / 255 * 60);
-        Renderer2D.drawRectangle(drawContext, x + 64, y + 13 + scaledValueAlpha, 14, 2, 0xFFAAAAAA);
-        Renderer2D.drawRectangle(drawContext, x + 79, y + 13 + scaledValueRed, 14, 2, 0xFFAAAAAA);
-        Renderer2D.drawRectangle(drawContext, x + 94, y + 13 + scaledValueGreen, 14, 2, 0xFFAAAAAA);
-        Renderer2D.drawRectangle(drawContext, x + 109, y + 13 + scaledValueBlue, 14, 2, 0xFFAAAAAA);
-        Renderer2D.drawRectangle(drawContext, x + 2, y + 14, 60, 60, value);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 64, y + 13 + scaledValueAlpha, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 79, y + 13 + scaledValueRed, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 94, y + 13 + scaledValueGreen, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 109, y + 13 + scaledValueBlue, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 14, 60, 60, value);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -135,7 +130,7 @@ public class ColorSetting extends Setting {
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 2,defaultColor,8f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 2,defaultColor);
 
 
         drawContext.fill(x + moduleWidth - boxSize - 2, y + 2, x + moduleWidth - 2, y + boxSize + 2, value);
@@ -148,10 +143,10 @@ public class ColorSetting extends Setting {
         int scaledValueRed = (int) ((double) (255 - r) / 255 * 60);
         int scaledValueGreen = (int) ((double) (255 - g) / 255 * 60);
         int scaledValueBlue = (int) ((double) (255 - b) / 255 * 60);
-        Renderer2D.drawRectangle(drawContext, x + 14, y + 13 + scaledValueAlpha, 14, 2, 0xFFAAAAAA);
-        Renderer2D.drawRectangle(drawContext, x + 29, y + 13 + scaledValueRed, 14, 2, 0xFFAAAAAA);
-        Renderer2D.drawRectangle(drawContext, x + 44, y + 13 + scaledValueGreen, 14, 2, 0xFFAAAAAA);
-        Renderer2D.drawRectangle(drawContext, x + 59, y + 13 + scaledValueBlue, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 14, y + 13 + scaledValueAlpha, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 29, y + 13 + scaledValueRed, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 44, y + 13 + scaledValueGreen, 14, 2, 0xFFAAAAAA);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 59, y + 13 + scaledValueBlue, 14, 2, 0xFFAAAAAA);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;

@@ -7,6 +7,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
@@ -31,12 +32,12 @@ public class KeyBind extends Setting {
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         if (listening) {
-            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": §lLISTENING", x + 2, y + 8,defaultColor,10f);
+            Renderer2D.drawFixedString(drawContext.getMatrices(),name + ": §lLISTENING", x + 2, y + 8,defaultColor);
         } else if (value == 0) {
-            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": None", x + 2, y + 8,defaultColor,10f);
+            Renderer2D.drawFixedString(drawContext.getMatrices(),name + ": None", x + 2, y + 8,defaultColor);
         } else {
             String keyName = KeycodeToString.translate(value);
-            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": "+keyName, x + 2, y + 8,defaultColor,10f);
+            Renderer2D.drawFixedString(drawContext.getMatrices(),name + ": "+keyName, x + 2, y + 8,defaultColor);
         }
 
         if (hovered(mouseX, mouseY)) {

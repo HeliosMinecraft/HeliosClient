@@ -23,8 +23,8 @@ public class HudElementButton {
         this.drawContext = drawContext;
         this.x = x;
         this.y = y;
-        Renderer2D.drawRectangle(drawContext, x, y, 96, 14, 0xFF222222);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor(),10f);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, 96, 14, 0xFF222222);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor());
         //drawContext.drawText(textRenderer, hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor(), false);
     }
 

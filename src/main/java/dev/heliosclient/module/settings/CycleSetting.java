@@ -5,6 +5,7 @@ import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -34,9 +35,9 @@ public class CycleSetting extends Setting {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         if (options.isEmpty() || options.size() - 1 < value) {
-            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"No option found!", x + 10, y + 28, 0xFFFF0000,10f);
+            Renderer2D.drawFixedString(drawContext.getMatrices(),"No option found!", x + 10, y + 28, 0xFFFF0000);
         }
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": " + options.get(value), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(),10f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),name + ": " + options.get(value), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -55,9 +56,9 @@ public class CycleSetting extends Setting {
 
         if (options.isEmpty() || options.size() - 1 < value) {
           //  drawContext.drawText(textRenderer, "No option found!", x + 10, y + 28, 0xFFFF0000, false);
-            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"No option found!", x + 10, y + 28, 0xFFFF0000,8f);
+            Renderer2D.drawFixedString(drawContext.getMatrices(),"No option found!", x + 10, y + 28, 0xFFFF0000);
         }
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name + ": " + options.get(value).substring(0, Math.min(12, options.get(value).length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(),8f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),name + ": " + options.get(value).substring(0, Math.min(12, options.get(value).length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
         //drawContext.drawText(textRenderer, name + ": " + options.get(value).substring(0, Math.min(12, options.get(value).length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
 
         if (hovered(mouseX, mouseY)) {

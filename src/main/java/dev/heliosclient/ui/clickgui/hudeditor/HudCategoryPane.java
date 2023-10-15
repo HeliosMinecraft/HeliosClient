@@ -33,10 +33,10 @@ public class HudCategoryPane {
             y = mouseY - startY;
         }
 
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, width, 16, 3, 0xFF1B1B1B);
-        Renderer2D.drawRectangle(drawContext, x, y + 16, width, 2, ColorManager.INSTANCE.clickGuiSecondary());
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),"Hud elements", x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText(),10f);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(), collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText(),10f);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, true, true, false, false, width, 16, 3, 0xFF1B1B1B);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 16, width, 2, ColorManager.INSTANCE.clickGuiSecondary());
+        Renderer2D.drawFixedString(drawContext.getMatrices(),"Hud elements", x + 4, y + 4, ColorManager.INSTANCE.clickGuiPaneText());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), collapsed ? "+" : "-", x + width - 11, y + 4, ColorManager.INSTANCE.clickGuiPaneText());
 
         int offsetY = y + 18;
         if (!collapsed) {

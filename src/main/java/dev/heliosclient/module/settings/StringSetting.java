@@ -6,6 +6,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
@@ -37,7 +38,7 @@ public class StringSetting extends Setting {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor,10f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor);
         inputBox.render(drawContext, x, y + 15, mouseX, mouseY, textRenderer);
     }
 
@@ -46,7 +47,7 @@ public class StringSetting extends Setting {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor,8f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),name, x + 2, y + 5,defaultColor);
         inputBoxCompact.render(drawContext, x, y + 16, mouseX, mouseY, textRenderer);
     }
 

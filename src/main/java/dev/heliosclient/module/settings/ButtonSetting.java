@@ -34,7 +34,7 @@ public class ButtonSetting extends Setting {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
       //  super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),ButtonCategoryText, (float) HeliosClient.MC.getWindow().getScaledWidth() /2 - (float) textRenderer.getWidth(ButtonCategoryText) /2 + 1, y + 2,256 - ColorUtils.getRed(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getGreen(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getBlue(ColorManager.INSTANCE.defaultTextColor()),256 - ColorUtils.getAlpha(ColorManager.INSTANCE.defaultTextColor()),10f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(),ButtonCategoryText, (float) HeliosClient.MC.getWindow().getScaledWidth() /2 - (float) textRenderer.getWidth(ButtonCategoryText) /2 + 1, y + 2,ColorManager.INSTANCE.defaultTextColor());
         //drawContext.drawText(textRenderer,ButtonCategoryText, HeliosClient.MC.getWindow().getScaledWidth()/2 - textRenderer.getWidth(ButtonCategoryText)/2 + 1, y + 2,Color.WHITE.getRGB(),true);
 
         int buttonX = x + 2;
@@ -71,15 +71,17 @@ public class ButtonSetting extends Setting {
             this.y = y;
             int fillColor = Color.DARK_GRAY.getRGB();
             int borderColor = hovered(mouseX, mouseY) ? Color.WHITE.getRGB() : Color.BLACK.getRGB();
-            Renderer2D.drawRoundedRectangle(drawContext, x, y, width - 4, 14, 2, fillColor);
-            Renderer2D.drawOutlineRoundedBox(drawContext, x, y, width - 4, 14,2, 0.7f,borderColor);
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width - 4, 14, 2, fillColor);
+            Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width - 4, 14,2, 0.7f,borderColor);
 
             // Render button text
-            int textX = Math.round(x + (width - FontManager.fxfontRenderer.getStringWidth(text)) / 2);
-            float textHeight = FontManager.fxfontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+            int textX = Math.round(x + (width - Renderer2D.getFxStringWidth(text)) / 2);
+            float textHeight = Renderer2D.getFxStringHeight();
             float textY = y + (14 - textHeight) / 2; // Center the text vertically
-            FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),text,textX,textY,256 -Color.WHITE.getRed(),256 - Color.WHITE.getGreen(),256 - Color.WHITE.getBlue(),256 - Color.WHITE.getAlpha(),10f);
-            //drawContext.drawText(textRenderer,text,textX,textY,Color.WHITE.getRGB(),false);
+            if(Renderer2D.isVanillaRenderer()){
+                textY+=1;
+            }
+            Renderer2D.drawFixedString(drawContext.getMatrices(),text,textX,textY,Color.WHITE.getRGB());
         }
 
         private boolean hovered(int mouseX, int mouseY) {

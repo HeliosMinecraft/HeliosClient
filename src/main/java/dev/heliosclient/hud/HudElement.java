@@ -86,21 +86,17 @@ public class HudElement {
         if (this.selected && renderOutLineBox) {
             if (dragging) {
                 if (distanceX == 0 && posX == 1) {
-                    Renderer2D.drawRectangle(drawContext, (float) drawContext.getScaledWindowWidth() / 2 - 1, 0, 2, drawContext.getScaledWindowHeight(), 0xFFFF0000);
+                    Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) drawContext.getScaledWindowWidth() / 2 - 1, 0, 2, drawContext.getScaledWindowHeight(), 0xFFFF0000);
                 }
                 if (distanceY == 0 && posY == 1) {
-                    Renderer2D.drawRectangle(drawContext, 0, (float) drawContext.getScaledWindowHeight() / 2 - 1, drawContext.getScaledWindowWidth(), 2, 0xFF00FF00);
+                    Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 0, (float) drawContext.getScaledWindowHeight() / 2 - 1, drawContext.getScaledWindowWidth(), 2, 0xFF00FF00);
                 }
             }
 
-            Renderer2D.drawOutlineBox(drawContext, x - 1 - (float) width / 2, y - 1 - (float) height / 2, width + 2, height + 2, 0.4f, 0xFFFFFFFF);
+            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1 - (float) width / 2, y - 1 - (float) height / 2, width + 2, height + 2, 0.4f, 0xFFFFFFFF);
 
-            // drawContext.fill(x-1 - width/2, y-1 - height/2, x- width/2, y+height/2+1, 0xFFFFFFFF);
-            //drawContext.fill(x-1 - width/2, y-1 -height/2, x+width+1- width/2 , y-height/2, 0xFFFFFFFF);
-            //drawContext.fill(x+width - width/2, y-1 - height/2, x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
-            //drawContext.fill(x-1 - width/2, y+height/2 , x+width+1- width/2, y+height/2+1, 0xFFFFFFFF);
         }
-        this.height = Math.round(FontManager.fontRenderer.getStringHeight("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"));
+        this.height = Math.round(Renderer2D.getStringHeight());
 
         renderElement(drawContext, textRenderer);
     }
