@@ -12,13 +12,14 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class FontManager implements Listener {
-    public static FontManager INSTANCE = new FontManager();
     public static Font[] fonts;
     public static Font[] Originalfonts;
     public static int fontSize = 8;
     public static ArrayList<String> fontNames = new ArrayList<>();
     public static FontRenderer fontRenderer;
     public static fxFontRenderer fxfontRenderer;
+
+    public static FontManager INSTANCE = new FontManager();
 
     public FontManager() {
         fontNames.clear();

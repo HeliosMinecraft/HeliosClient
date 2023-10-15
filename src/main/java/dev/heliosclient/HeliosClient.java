@@ -26,6 +26,7 @@ public class HeliosClient implements ModInitializer {
     public static Config CONFIG = new Config();
     public static int uiColorA = 0xFF55FFFF;
     public static int uiColor = 0x55FFFF;
+    public static FontManager fontManager = new FontManager();
 
     @Override
     public void onInitialize() {
@@ -40,7 +41,7 @@ public class HeliosClient implements ModInitializer {
             CONFIG.save();
         }
         CONFIG.load();
-        EventManager.register(FontManager.INSTANCE);
+        EventManager.register(fontManager);
         EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
         EventManager.register(KeybindManager.INSTANCE);
 
