@@ -10,6 +10,8 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.function.BooleanSupplier;
+
 public class DoubleSetting extends Setting {
     private final double min, max;
     private final int roundingPlace;
@@ -17,9 +19,10 @@ public class DoubleSetting extends Setting {
     Module_ module;
 
     boolean sliding = false;
-    private InputBox inputBox;
+    private final InputBox inputBox;
 
-    public DoubleSetting(String name, String description, Module_ module, double value, double min, double max, int roundingPlace) {
+    public DoubleSetting(String name, String description, Module_ module, double value, double min, double max, int roundingPlace, BooleanSupplier shouldRender) {
+        super(shouldRender);
         this.name = name;
         this.description = description;
         this.value = value;
@@ -165,6 +168,41 @@ public class DoubleSetting extends Setting {
             } catch (NumberFormatException e) {
                 value = value;
             }
+        }
+    }
+
+    public static class Builder extends SettingBuilder<Builder, Double, DoubleSetting> {
+        Module_ module;
+        double min, max;
+        int roundingPlace;
+
+        public Builder() {
+            super(0.0D);
+        }
+
+        public Builder module(Module_ module) {
+            this.module = module;
+            return this;
+        }
+
+        public Builder roundingPlace(int roundingPlace) {
+            this.roundingPlace = roundingPlace;
+            return this;
+        }
+
+        public Builder min(double min) {
+            this.min = min;
+            return this;
+        }
+
+        public Builder max(double max) {
+            this.max = max;
+            return this;
+        }
+
+        @Override
+        public DoubleSetting build() {
+            return new DoubleSetting(name, description, module, value, min, max, roundingPlace, shouldRender);
         }
     }
 }

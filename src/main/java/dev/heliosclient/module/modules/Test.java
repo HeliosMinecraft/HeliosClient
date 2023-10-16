@@ -5,10 +5,7 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.*;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.RGBASetting;
-import dev.heliosclient.module.settings.StringListSetting;
-import dev.heliosclient.module.settings.StringSetting;
+import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
@@ -21,62 +18,30 @@ import java.awt.*;
 
 
 public class Test extends Module_ {
-    BooleanSetting rectangle = new BooleanSetting("Rectangle", "", this, false);
-    BooleanSetting rounded = new BooleanSetting("Rounded", "", this, false);
-    BooleanSetting Circle = new BooleanSetting("Circle", "", this, false);
-    BooleanSetting Triangle = new BooleanSetting("Triangle", "", this, false);
-    StringSetting num = new StringSetting("Enter a number", "DESCRIPTION", "E", 100, InputBox.InputMode.ALL);
+    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    BooleanSetting rectangle = sgGeneral.add(new BooleanSetting("Rectangle", "", this, false, () -> true));
+    BooleanSetting rounded = sgGeneral.add(new BooleanSetting("Rounded", "", this, false, () -> true));
+    BooleanSetting Circle = sgGeneral.add(new BooleanSetting("Circle", "", this, false, () -> true));
+    BooleanSetting Triangle = sgGeneral.add(new BooleanSetting("Triangle", "", this, false, () -> true));
+    StringSetting num = sgGeneral.add(new StringSetting("Enter a number", "DESCRIPTION", "E", 100, InputBox.InputMode.ALL, () -> true));
     String[] list = new String[]{"1ST", "2ND", "3RD", "LMAO"};
-    StringListSetting stringListSetting = new StringListSetting("Enter a number", "DESCRIPTION", list, 4, 100, InputBox.InputMode.DIGITS_AND_CHARACTERS);
+    StringListSetting stringListSetting = sgGeneral.add(new StringListSetting("Enter a number", "DESCRIPTION", list, 4, 100, InputBox.InputMode.DIGITS_AND_CHARACTERS, () -> true));
 
-    BooleanSetting PartiallyRounded = new BooleanSetting("NotRounded", "", this, false);
-    BooleanSetting GradientRounded = new BooleanSetting("gradientrounded", "", this, false);
-    BooleanSetting Gradient = new BooleanSetting("Gradient", "", this, false);
+    BooleanSetting PartiallyRounded = sgGeneral.add(new BooleanSetting("NotRounded", "", this, false, () -> true));
+    BooleanSetting GradientRounded = sgGeneral.add(new BooleanSetting("gradientrounded", "", this, false, () -> true));
+    BooleanSetting Gradient = sgGeneral.add(new BooleanSetting("Gradient", "", this, false, () -> true));
 
-    BooleanSetting Arc = new BooleanSetting("Arc", "", this, false);
-    BooleanSetting TracerLine = new BooleanSetting("TracerLine", "", this, false);
-    BooleanSetting blockOutlineAndFIll = new BooleanSetting("blockOutlineAndFIll", "", this, false);
-    RGBASetting color = new RGBASetting("Color", "color", Color.WHITE);
-    RGBASetting color2 = new RGBASetting("Color1", "color", Color.WHITE);
-    RGBASetting color3 = new RGBASetting("Color2", "color", Color.WHITE);
-    RGBASetting color4 = new RGBASetting("Color3", "color", Color.WHITE);
-    RGBASetting color5 = new RGBASetting("Color4", "color", Color.WHITE);
-    RGBASetting color6 = new RGBASetting("Color5", "color", Color.WHITE);
+    BooleanSetting Arc = sgGeneral.add(new BooleanSetting("Arc", "", this, false, () -> true));
+    BooleanSetting TracerLine = sgGeneral.add(new BooleanSetting("TracerLine", "", this, false, () -> true));
+    BooleanSetting blockOutlineAndFIll = sgGeneral.add(new BooleanSetting("blockOutlineAndFIll", "", this, false, () -> true));
+    RGBASetting color = sgGeneral.add(new RGBASetting("Color", "color", Color.WHITE, () -> true));
 
 
     public Test() {
         super("Test", "Render Test", Category.RENDER);
-        settings.add(rectangle);
-        settings.add(rounded);
-        settings.add(Circle);
-        settings.add(Arc);
-        settings.add(Triangle);
-        settings.add(TracerLine);
-        settings.add(blockOutlineAndFIll);
-        settings.add(PartiallyRounded);
-        settings.add(num);
-        settings.add(stringListSetting);
-        settings.add(color);
-        settings.add(color2);
-        settings.add(color3);
-        settings.add(color4);
-        settings.add(color5);
-        settings.add(color6);
 
-        settings.add(GradientRounded);
-        settings.add(Gradient);
-
-
-        quickSettings.add(rectangle);
-        quickSettings.add(rounded);
-        quickSettings.add(Circle);
-        quickSettings.add(Arc);
-        quickSettings.add(Triangle);
-        quickSettings.add(TracerLine);
-        quickSettings.add(blockOutlineAndFIll);
-        quickSettings.add(PartiallyRounded);
-        quickSettings.add(num);
-        quickSettings.add(color);
+        settingBuilders.add(sgGeneral);
+        quickSettingsBuilder.add(sgGeneral);
 
     }
 

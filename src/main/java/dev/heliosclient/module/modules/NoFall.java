@@ -6,6 +6,7 @@ import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
@@ -14,17 +15,32 @@ import java.util.List;
 
 public class NoFall extends Module_ {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    public DoubleSetting fallHeight = new DoubleSetting("Trigger height", "Height on which No Fall triggers", this, 2.5, 2, 22, 1);
-    public CycleSetting mode = new CycleSetting("Mode", "Mode which should save player from fall height ", this, new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")), 0);
+    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    DoubleSetting fallHeight = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Trigger height")
+            .description("Height on which No Fall triggers")
+            .module(this)
+            .value(2.5)
+            .min(2)
+            .max(22)
+            .roundingPlace(1)
+            .build()
+    );
+    CycleSetting mode = sgGeneral.add(new CycleSetting.Builder()
+            .name("Mode")
+            .description("Mode which should save player from fall height ")
+            .module(this)
+            .value(new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")))
+            .listValue(0)
+            .build()
+    );
 
     public NoFall() {
         super("NoFall", "Prevents you from taking fall damage.", Category.PLAYER);
 
-        settings.add(fallHeight);
-        settings.add(mode);
+        settingBuilders.add(sgGeneral);
 
-        quickSettings.add(fallHeight);
-        quickSettings.add(mode);
+        quickSettingsBuilder.add(sgGeneral);
     }
 
     @SubscribeEvent

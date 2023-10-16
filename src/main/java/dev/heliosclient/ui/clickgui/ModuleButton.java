@@ -1,7 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.util.ColorUtils;
@@ -61,7 +60,7 @@ public class ModuleButton {
             hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
         }
         // Get the width and height of the module name
-        int moduleNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(module.name) - 1;
+        int moduleNameHeight = (int) Renderer2D.getFxStringHeight(module.name) - 1;
 
         // Adjust the button size based on the text dimensions
         //this.height = moduleNameHeight + 6;

@@ -6,20 +6,36 @@ import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import net.minecraft.client.MinecraftClient;
 
 public class Step extends Module_ {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    DoubleSetting stepHeight = new DoubleSetting("Height", "Height which step should step up at.", this, 1, 1, 10, 1);
-    BooleanSetting shiftSuppress = new BooleanSetting("Crouch suppress", "Disables step when crouch key is pressed.", this, true);
+    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    DoubleSetting stepHeight = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Height")
+            .description("Height which step should step up at.")
+            .module(this)
+            .value(1.0)
+            .min(1.0)
+            .max(10)
+            .roundingPlace(1)
+            .build()
+    );
+    BooleanSetting shiftSuppress = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Crouch suppress")
+            .description("Disables step when crouch key is pressed.")
+            .module(this)
+            .value(true)
+            .build()
+    );
 
     public Step() {
         super("Step", "Allows you to step up full blocks.", Category.MOVEMENT);
-        settings.add(stepHeight);
-        settings.add(shiftSuppress);
 
-        quickSettings.add(stepHeight);
-        quickSettings.add(shiftSuppress);
+        settingBuilders.add(sgGeneral);
+
+        quickSettingsBuilder.add(sgGeneral);
     }
 
     @SubscribeEvent

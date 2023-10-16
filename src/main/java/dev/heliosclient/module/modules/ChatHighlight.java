@@ -4,6 +4,7 @@ import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
@@ -15,19 +16,28 @@ public class ChatHighlight extends Module_ {
 
     protected static MinecraftClient mc = MinecraftClient.getInstance();
     public HashSet<String> highlightList = new HashSet<String>();
-    BooleanSetting highlightUsername = new BooleanSetting("Highlight Username",
-            "Whether to highlight your username or not.", this, true);
-    BooleanSetting highlightFriends = new BooleanSetting("Highlight Friends",
-            "Whether to highlight your friend's usernames or not.", this, false);
+    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    BooleanSetting highlightUsername = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Highlight Username")
+            .description("Whether to highlight your username or not.")
+            .module(this)
+            .value(true)
+            .build()
+    );
+    BooleanSetting highlightFriends = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Highlight Friends")
+            .description("Whether to highlight friend's username or not.")
+            .module(this)
+            .value(false)
+            .build()
+    );
 
     public ChatHighlight() {
         super("Chat Highlighter", "Highlights specified words in chat messages.", Category.CHAT);
 
-        settings.add(highlightUsername);
-        settings.add(highlightFriends);
+        settingBuilders.add(sgGeneral);
 
-        quickSettings.add(highlightUsername);
-        quickSettings.add(highlightFriends);
+        quickSettingsBuilder.add(sgGeneral);
 
         this.highlightList.add("ElBe_Gaming");
         ChatUtils.sendHeliosMsg("" + this.highlightList);

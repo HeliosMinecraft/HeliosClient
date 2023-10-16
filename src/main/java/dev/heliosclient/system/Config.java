@@ -5,6 +5,7 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import net.minecraft.client.MinecraftClient;
 
@@ -34,8 +35,10 @@ public class Config {
         Map<String, Object> moduleConfig = new HashMap<>();
         for (Module_ module : ModuleManager.INSTANCE.modules) {
             Map<String, Object> singleModuleConfig = new HashMap<>();
-            for (Setting setting : module.settings) {
-                singleModuleConfig.put(setting.name, setting.value);
+            for (SettingBuilder settingBuilder : module.settingBuilders) {
+                for (Setting setting : settingBuilder.getSettings()) {
+                    singleModuleConfig.put(setting.name, setting.value);
+                }
             }
             moduleConfig.put(module.name, singleModuleConfig);
         }

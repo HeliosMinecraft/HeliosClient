@@ -8,13 +8,15 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 
 public class CycleSetting extends Setting {
     public int value;
     public ArrayList<String> options;
     Module_ module;
 
-    public CycleSetting(String name, String description, Module_ module, ArrayList<String> options, int value) {
+    public CycleSetting(String name, String description, Module_ module, ArrayList<String> options, int value, BooleanSupplier shouldRender) {
+        super(shouldRender);
         this.name = name;
         this.description = description;
         this.options = options;
@@ -81,6 +83,30 @@ public class CycleSetting extends Setting {
                 value++;
             }
             module.onSettingChange(this);
+        }
+    }
+
+    public static class Builder extends SettingBuilder<Builder, ArrayList<String>, CycleSetting> {
+        Module_ module;
+        int listValue;
+
+        public Builder() {
+            super(new ArrayList<>());
+        }
+
+        public Builder module(Module_ module) {
+            this.module = module;
+            return this;
+        }
+
+        public Builder listValue(int listValue) {
+            this.listValue = listValue;
+            return this;
+        }
+
+        @Override
+        public CycleSetting build() {
+            return new CycleSetting(name, description, module, value, listValue, shouldRender);
         }
     }
 }

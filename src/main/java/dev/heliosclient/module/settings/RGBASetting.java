@@ -14,10 +14,11 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
+import java.util.function.BooleanSupplier;
 
 public class RGBASetting extends Setting implements Listener {
 
-    private RGBASettingScreen screen = new RGBASettingScreen(this);
+    private final RGBASettingScreen screen = new RGBASettingScreen(this);
     private Color color;
     private float hue, saturation, brightness, alpha;
     private int handleX, handleY, alphaHandleY, shadeHandleX, shadeHandleY;
@@ -27,8 +28,8 @@ public class RGBASetting extends Setting implements Listener {
     private final int offsetX = 10; // Offset from the left
     private final int offsetY = 20; // Offset from the top
     private boolean rainbow = false;
-    private float[] brightnessValues;
-    private float[] saturationValues;
+    private final float[] brightnessValues;
+    private final float[] saturationValues;
     float[] hueValues = new float[boxWidth];
 
 
@@ -38,7 +39,8 @@ public class RGBASetting extends Setting implements Listener {
     private int brightnessSaturationBoxX, brightnessSaturationBoxY, brightnessSaturationBoxWidth, brightnessSaturationBoxHeight;
     private fxFontRenderer fxFontRenderer;
 
-    public RGBASetting(String name, String description, Color defaultColor) {
+    public RGBASetting(String name, String description, Color defaultColor, BooleanSupplier shouldRender) {
+        super(shouldRender);
         this.name = name;
         this.description = description;
         this.color = defaultColor;
@@ -293,5 +295,17 @@ public class RGBASetting extends Setting implements Listener {
     @SubscribeEvent
     public void onFontChange(FontChangeEvent event) {
         fxFontRenderer = new fxFontRenderer(event.getFonts(), 5f);
+    }
+
+    public static class Builder extends SettingBuilder<Builder, Color, RGBASetting> {
+        public Builder() {
+            super(new Color(-1));
+        }
+
+        @Override
+        public RGBASetting build() {
+            return new RGBASetting(name, description, value, shouldRender);
+
+        }
     }
 }

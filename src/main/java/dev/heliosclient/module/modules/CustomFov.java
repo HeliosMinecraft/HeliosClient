@@ -5,17 +5,28 @@ import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.DoubleSetting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.util.ISimpleOption;
 
 public class CustomFov extends Module_ {
-    DoubleSetting FOV = new DoubleSetting("FOV", "Desired FOV.", this, 140, 1, 240, 0);
+    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    DoubleSetting FOV = sgGeneral.add(new DoubleSetting.Builder()
+            .name("FOV")
+            .description("Desired FOV")
+            .module(this)
+            .value(140.0)
+            .min(1)
+            .max(240)
+            .roundingPlace(0)
+            .build()
+    );
 
     private int previousFov = 100;
 
     public CustomFov() {
         super("CustomFOV", "Allows you to set custom field of view.", Category.RENDER);
-        settings.add(FOV);
-        quickSettings.add(FOV);
+        settingBuilders.add(sgGeneral);
+        quickSettingsBuilder.add(sgGeneral);
         //quickSettings.add(RainbowPane);
     }
 

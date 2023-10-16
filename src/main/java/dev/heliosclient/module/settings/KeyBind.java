@@ -9,13 +9,16 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.function.BooleanSupplier;
+
 public class KeyBind extends Setting {
 
     public int value;
     public boolean listening = false;
     Module_ module;
 
-    public KeyBind(String name, String description, Module_ module, Integer value) {
+    public KeyBind(String name, String description, Module_ module, Integer value, BooleanSupplier shouldRender) {
+        super(shouldRender);
         this.module = module;
         this.name = name;
         this.description = description;
@@ -71,6 +74,24 @@ public class KeyBind extends Setting {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (hovered((int) mouseX, (int) mouseY) && button == 0) {
             listening = !listening;
+        }
+    }
+
+    public static class Builder extends SettingBuilder<Builder, Integer, KeyBind> {
+        Module_ module;
+
+        public Builder() {
+            super(0);
+        }
+
+        public Builder module(Module_ module) {
+            this.module = module;
+            return this;
+        }
+
+        @Override
+        public KeyBind build() {
+            return new KeyBind(name, description, module, value, shouldRender);
         }
     }
 }

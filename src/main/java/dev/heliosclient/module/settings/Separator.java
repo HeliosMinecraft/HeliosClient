@@ -4,10 +4,13 @@ import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
+import java.util.function.BooleanSupplier;
+
 public class Separator extends Setting {
     public boolean value;
 
-    public Separator(int height) {
+    public Separator(int height, BooleanSupplier shouldRender) {
+        super(shouldRender);
         this.height = height;
     }
 

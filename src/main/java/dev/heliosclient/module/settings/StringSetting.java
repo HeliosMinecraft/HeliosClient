@@ -6,16 +6,19 @@ import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
+import java.util.function.BooleanSupplier;
+
 public class StringSetting extends Setting {
-    private InputBox inputBox;
-    private InputBox inputBoxCompact;
+    private final InputBox inputBox;
+    private final InputBox inputBoxCompact;
 
     private final int characterLimit;
     public String value;
     String description;
-    private InputBox.InputMode inputMode;
+    private final InputBox.InputMode inputMode;
 
-    public StringSetting(String name, String description, String value, int characterLimit, InputBox.InputMode inputMode) {
+    public StringSetting(String name, String description, String value, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender) {
+        super(shouldRender);
         this.name = name;
         this.value = value;
         this.description = description;
@@ -67,6 +70,30 @@ public class StringSetting extends Setting {
 
     public String getDescription() {
         return description;
+    }
+
+    public static class Builder extends SettingBuilder<Builder, String, StringSetting> {
+        int characterLimit;
+        InputBox.InputMode inputMode;
+
+        public Builder() {
+            super("");
+        }
+
+        public Builder characterLimit(int characterLimit) {
+            this.characterLimit = characterLimit;
+            return this;
+        }
+
+        public Builder inputMode(InputBox.InputMode inputMode) {
+            this.inputMode = inputMode;
+            return this;
+        }
+
+        @Override
+        public StringSetting build() {
+            return new StringSetting(name, description, value, characterLimit, inputMode, shouldRender);
+        }
     }
 }
 

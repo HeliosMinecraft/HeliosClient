@@ -10,12 +10,14 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public class ButtonSetting extends Setting {
-    private List<Button> buttons;
-    private String ButtonCategoryText;
+    private final List<Button> buttons;
+    private final String ButtonCategoryText;
 
-    public ButtonSetting(String ButtonCategoryText) {
+    public ButtonSetting(String ButtonCategoryText, BooleanSupplier shouldRender) {
+        super(shouldRender);
         buttons = new ArrayList<>();
         this.ButtonCategoryText = ButtonCategoryText;
     }
@@ -54,8 +56,8 @@ public class ButtonSetting extends Setting {
     }
 
     private class Button {
-        private String text;
-        private Runnable task;
+        private final String text;
+        private final Runnable task;
         private int x, y;
 
         public Button(String text, Runnable task, int x, int y) {
@@ -93,6 +95,17 @@ public class ButtonSetting extends Setting {
                 return true;
             }
             return false;
+        }
+    }
+
+    public static class Builder extends SettingBuilder<Builder, Boolean, ButtonSetting> {
+        public Builder() {
+            super(false);
+        }
+
+        @Override
+        public ButtonSetting build() {
+            return new ButtonSetting(name, shouldRender);
         }
     }
 }

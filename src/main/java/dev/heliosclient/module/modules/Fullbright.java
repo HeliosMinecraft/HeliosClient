@@ -6,6 +6,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.util.ISimpleOption;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -14,22 +15,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Fullbright extends Module_ {
+    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+
     ArrayList<String> modes = new ArrayList<String>(List.of("Gamma", "Night Vision"));
-    CycleSetting mode = new CycleSetting("Mode", "Fullbright mode to apply", this, modes, 0);
-    DoubleSetting gamma = new DoubleSetting("Gamma", "Desired gamma value", this, 15, 0, 15, 0) {
-        @Override
-        public boolean shouldRender() {
-            return mode.value == 0;
-        }
-    };
+    CycleSetting mode = sgGeneral.add(new CycleSetting.Builder()
+            .name("Mode")
+            .description("Fullbright mode to apply")
+            .module(this)
+            .value(modes)
+            .listValue(0)
+            .build()
+    );
+    DoubleSetting gamma = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Gamma")
+            .description("Desired gamma value")
+            .module(this)
+            .value(15.0)
+            .min(0)
+            .max(15)
+            .roundingPlace(0)
+            .build());
+
 
     public Fullbright() {
         super("Fullbright", "Allows you to see in the dark.", Category.RENDER);
         EventManager.register(this);
-        settings.add(mode);
-        settings.add(gamma);
-        quickSettings.add(mode);
-        quickSettings.add(gamma);
+
+        gamma.setVisibilityCondition(() -> mode.value == 0);
+
+        settingBuilders.add(sgGeneral);
+
+        quickSettingsBuilder.add(sgGeneral);
     }
 
     @Override

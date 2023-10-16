@@ -23,60 +23,128 @@ public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
     static ClickGUI INSTANCE = new ClickGUI();
-    public static DoubleSetting ScrollSpeed = new DoubleSetting("Scroll Speed", "Change your scroll speed for the ClickGUI", INSTANCE, 7, 1, 8, 1);
-    BooleanSetting Pause = new BooleanSetting("Pause game", "Pause the game when Click GUI is on.", this, false);
-    BooleanSetting Keybinds = new BooleanSetting("Show Keybinds", "Show keybinds in the Module Button.", this, true);
-    ColorSetting AccentColor = new ColorSetting("Accent color", "Accent color of Click GUI.", this, ColorManager.INSTANCE.clickGuiSecondary);
-    BooleanSetting RainbowAccent = new BooleanSetting("Rainbow", "Rainbow effect for accent color.", this, false);
-    BooleanSetting RainbowPane = new BooleanSetting("Rainbow", "Rainbow effect for category panes.", this, false);
-    ColorSetting PaneTextColor = new ColorSetting("Category pane text color", "Color of pane text.", this, ColorManager.INSTANCE.clickGuiPaneText);
-    ColorSetting TextColor = new ColorSetting("Text color", "Color of text all through out the client.", this, ColorManager.INSTANCE.defaultTextColor);
-    CycleSetting TooltipMode = new CycleSetting("Tooltip mode", "Mode in what tooltips should be shown.", this, new ArrayList<String>(List.of("Normal", "Fixed", "Vanilla")), 0);
-    CycleSetting TooltipPos = new CycleSetting("Tooltip position", "Position of fixed tooltip.", this, new ArrayList<>(List.of("Top-left", "Top-right", "Bottom-left", "Bottom-right", "Center")), 3) {
-        @Override
-        public boolean shouldRender() {
-            return TooltipMode.value == 1;
-        }
-    };
-    public static CycleSetting FontRenderer = new CycleSetting("Font Renderer", "Font Rendering for the client", ClickGUI.INSTANCE, new ArrayList<>(List.of("Custom", "Vanilla")), 0);
-    public static CycleSetting Font = new CycleSetting("Font", "Font for the client", ClickGUI.INSTANCE, FontManager.fontNames, 0) {
-        @Override
-        public boolean shouldRender() {
-            return FontRenderer.value == 0;
-        }
-    };
-    public static DoubleSetting FontSize = new DoubleSetting("Font Size", "Change your FontSize", INSTANCE, 8, 1, 15, 1) {
-        @Override
-        public boolean shouldRender() {
-            return FontRenderer.value == 0;
-        }
-    };
-    ButtonSetting loadFonts = new ButtonSetting("Font");
+    public static SettingBuilder sgGeneralStatic = new SettingBuilder("General Static");
+    public static DoubleSetting ScrollSpeed = sgGeneralStatic.add(new DoubleSetting.Builder()
+            .name("Scroll Speed")
+            .description("Change your scroll speed for the ClickGUI")
+            .module(INSTANCE)
+            .value(7.0)
+            .min(1)
+            .max(8)
+            .roundingPlace(1)
+            .build()
+    );
+    public static CycleSetting FontRenderer = sgGeneralStatic.add(new CycleSetting.Builder()
+            .name("Font Renderer")
+            .description("Font Rendering for the client")
+            .module(INSTANCE)
+            .value(new ArrayList<>(List.of("Custom", "Vanilla")))
+            .listValue(0)
+            .shouldRender(() -> true)
+            .build()
+    );
+    public static CycleSetting Font = sgGeneralStatic.add(new CycleSetting.Builder()
+            .name("Font")
+            .description("Font for the client")
+            .module(INSTANCE)
+            .value(FontManager.fontNames)
+            .listValue(0)
+            .shouldRender(() -> FontRenderer.value == 0)
+            .build()
+    );
+    public static DoubleSetting FontSize = sgGeneralStatic.add(new DoubleSetting.Builder()
+            .name("Font Size")
+            .description("Change your FontSize")
+            .module(INSTANCE)
+            .value(8.0)
+            .min(1)
+            .max(15)
+            .roundingPlace(1)
+            .shouldRender(() -> FontRenderer.value == 0)
+            .build()
+    );
+    public SettingBuilder sgGeneral = new SettingBuilder("General");
+    public CycleSetting TooltipMode = sgGeneral.add(new CycleSetting.Builder()
+            .name("Tooltip mode")
+            .description("Mode in what tooltips should be shown.")
+            .module(INSTANCE)
+            .value(new ArrayList<String>(List.of("Normal", "Fixed", "Vanilla")))
+            .listValue(0)
+            .shouldRender(() -> true)
+            .build()
+    );
+    public CycleSetting TooltipPos = sgGeneral.add(new CycleSetting.Builder()
+            .name("Tooltip position")
+            .description("Position of fixed tooltip.")
+            .module(INSTANCE)
+            .value(new ArrayList<>(List.of("Top-left", "Top-right", "Bottom-left", "Bottom-right", "Center")))
+            .listValue(3)
+            .shouldRender(() -> TooltipMode.value == 1)
+            .build()
+    );
+    BooleanSetting Pause = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Pause game")
+            .description("Pause the game when Click GUI is on.")
+            .module(this)
+            .value(false)
+            .build()
+    );
+    BooleanSetting Keybinds = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Show Keybinds")
+            .description("Show keybinds in the Module Button.")
+            .module(this)
+            .value(true)
+            .build()
+    );
+    ColorSetting AccentColor = sgGeneral.add(new ColorSetting.Builder()
+            .name("Accent color")
+            .description("Accent color of Click GUI.")
+            .module(this)
+            .value(ColorManager.INSTANCE.clickGuiSecondary)
+            .build()
+    );
+    BooleanSetting RainbowAccent = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Rainbow")
+            .description("Rainbow effect for accent color.")
+            .module(this)
+            .value(false)
+            .build()
+    );
+    BooleanSetting RainbowPane = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Rainbow")
+            .description("Rainbow effect for category panes.")
+            .module(this)
+            .value(false)
+            .build()
+    );
+    ColorSetting PaneTextColor = sgGeneral.add(new ColorSetting.Builder()
+            .name("Category pane text color")
+            .description("Color of pane text.")
+            .module(this)
+            .value(ColorManager.INSTANCE.clickGuiPaneText)
+            .build()
+    );
+    ColorSetting TextColor = sgGeneral.add(new ColorSetting.Builder()
+            .name("Text color")
+            .description("Color of text all through out the client.")
+            .module(this)
+            .value(ColorManager.INSTANCE.defaultTextColor)
+            .build()
+    );
+    ButtonSetting loadFonts = sgGeneral.add(new ButtonSetting.Builder()
+            .name("Font")
+            .build()
+    );
 
     public ClickGUI() {
         super("ClickGUI", "ClickGui related stuff.", Category.RENDER);
-        settings.add(Pause);
-        settings.add(Keybinds);
-        settings.add(TooltipMode);
-        settings.add(TooltipPos);
-        settings.add(ScrollSpeed);
-        settings.add(FontRenderer);
-        settings.add(Font);
-        settings.add(FontSize);
-        settings.add(loadFonts);
 
-        settings.add(AccentColor);
-        settings.add(RainbowAccent);
-        settings.add(PaneTextColor);
-        settings.add(RainbowPane);
-        settings.add(TextColor);
+        settingBuilders.add(sgGeneral);
+        settingBuilders.add(sgGeneralStatic);
 
-        quickSettings.add(Pause);
-        quickSettings.add(TooltipMode);
-        quickSettings.add(TooltipPos);
-        quickSettings.add(RainbowPane);
-        quickSettings.add(RainbowAccent);
-        quickSettings.add(TextColor);
+        quickSettingsBuilder.add(sgGeneral);
+        quickSettingsBuilder.add(sgGeneralStatic);
+
         active.value = true;
         loadFonts.addButton("Load Fonts", () -> {
             FontManager.INSTANCE = new FontManager();

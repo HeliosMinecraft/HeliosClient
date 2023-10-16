@@ -8,6 +8,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
+import java.util.function.BooleanSupplier;
 
 public abstract class Setting {
     public String name;
@@ -17,11 +18,17 @@ public abstract class Setting {
     public int heightCompact = 24;
     public int widthCompact = CategoryPane.getWidth();
     public Object value;
+    public Object defaultValue;
     public boolean quickSettings = false;
     protected int moduleWidth = CategoryPane.getWidth();
     int x = 0, y = 0;
     int hovertimer = 0;
     private int hoverAnimationTimer = 0;
+    protected BooleanSupplier shouldRender = () -> true; // Default to true
+
+    public Setting(BooleanSupplier shouldRender) {
+        this.shouldRender = shouldRender;
+    }
 
     /**
      * Renders setting in GUI.
@@ -65,12 +72,16 @@ public abstract class Setting {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, widthCompact, heightCompact, 2, fillColor);
     }
 
+    public void setVisibilityCondition(BooleanSupplier shouldRender) {
+        this.shouldRender = shouldRender;
+    }
+
     /**
      * If setting should render, Meant to be used for overrides for settings that are meant to be shown only if condition is met.
      * @return If should render.
      */
     public boolean shouldRender() {
-        return true;
+        return shouldRender.getAsBoolean();
     }
 
     /**
@@ -141,5 +152,38 @@ public abstract class Setting {
         } else {
             return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height;
         }
+    }
+
+    // Credits: Meteor client
+    public abstract static class SettingBuilder<B, V, S> {
+        protected String name = "undefined", description = "";
+        protected V value;
+        protected BooleanSupplier shouldRender = () -> true; // Default to true
+
+        protected SettingBuilder(V value) {
+            this.value = value;
+        }
+
+        public B name(String name) {
+            this.name = name;
+            return (B) this;
+        }
+
+        public B description(String description) {
+            this.description = description;
+            return (B) this;
+        }
+
+        public B value(V value) {
+            this.value = value;
+            return (B) this;
+        }
+
+        public B shouldRender(BooleanSupplier shouldRender) {
+            this.shouldRender = shouldRender;
+            return (B) this;
+        }
+
+        public abstract S build();
     }
 }

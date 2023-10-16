@@ -7,6 +7,7 @@ import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.ColorSetting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.ui.HUDOverlay;
 import dev.heliosclient.util.ColorUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -14,20 +15,36 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import java.awt.*;
 
 public class HUDModule extends Module_ {
-    public BooleanSetting clientTag = new BooleanSetting("Client Tag", "Visibility of Client Tag.", this, true);
-    public ColorSetting colorSetting = new ColorSetting("Color", "Color of HUD.", this, new Color(241, 83, 92, 255).getRGB());
-    public int hudColor = colorSetting.value;
-    BooleanSetting Rainbow = new BooleanSetting("Rainbow", "Toggles rainbow effect for HUD.", this, false);
+    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    public BooleanSetting clientTag = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Client Tag")
+            .description("Visibility of Client Tag.")
+            .module(this)
+            .value(true)
+            .build()
+    );
+    public ColorSetting colorSetting = sgGeneral.add(new ColorSetting.Builder()
+            .name("Color")
+            .description("Color of HUD.")
+            .module(this)
+            .value(new Color(241, 83, 92, 255).getRGB())
+            .build()
+    );
+    BooleanSetting Rainbow = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Rainbow")
+            .description("Toggles rainbow effect for HUD.")
+            .module(this)
+            .value(false)
+            .build()
+    );
+
 
     public HUDModule() {
         super("HUD", "The HeliosClient HUD. Toggle to update.", Category.RENDER);
         this.active.value = true;
         this.showInModulesList.value = false;
 
-        settings.add(clientTag);
-        settings.add(colorSetting);
-        settings.add(Rainbow);
-        //settings.add(color);
+        settingBuilders.add(sgGeneral);
     }
 
     @Override

@@ -4,6 +4,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.Renderer2D;
@@ -36,12 +37,16 @@ public class ClientSettingsScreen extends Screen {
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext);
-
         windowHeight = 52;
-        for (Setting setting : module.settings) {
-            if (!setting.shouldRender()) continue;
-            setting.quickSettings = false;
-            windowHeight += setting.height + 1;
+        for (SettingBuilder settingBuilder : module.settingBuilders) {
+            windowHeight += Math.round(settingBuilder.getGroupNameHeight() + 3);
+            if (!settingBuilder.shouldRender()) continue;
+            for (Setting setting : settingBuilder.getSettings()) {
+                if (!setting.shouldRender()) continue;
+                setting.quickSettings = false;
+                windowHeight += setting.height + 2;
+            }
+            windowHeight += Math.round(settingBuilder.getGroupNameHeight());
         }
 
         int screenHeight = drawContext.getScaledWindowHeight();
@@ -62,10 +67,16 @@ public class ClientSettingsScreen extends Screen {
         drawContext.drawText(textRenderer, module.name, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + module.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
         int yOffset = y + 44;
-        for (Setting setting : module.settings) {
-            if (!setting.shouldRender()) continue;
-            setting.render(drawContext, x + 16, yOffset, mouseX, mouseY, textRenderer);
-            yOffset += setting.height + 1;
+        for (SettingBuilder settingBuilder : module.settingBuilders) {
+            yOffset += Math.round(settingBuilder.getGroupNameHeight() + 3);
+            settingBuilder.renderBuilder(drawContext, x, yOffset - 3, windowWidth);
+            if (!settingBuilder.shouldRender()) continue;
+            for (Setting setting : settingBuilder.getSettings()) {
+                if (!setting.shouldRender()) continue;
+                setting.render(drawContext, x + 16, yOffset, mouseX, mouseY, textRenderer);
+                yOffset += setting.height + 1;
+            }
+            yOffset += Math.round(settingBuilder.getGroupNameHeight() + 1);
         }
         navBar.render(drawContext, textRenderer, mouseX, mouseY);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
@@ -79,8 +90,10 @@ public class ClientSettingsScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (Setting setting : module.settings) {
-            setting.mouseClicked(mouseX, mouseY, button);
+        for (SettingBuilder settingBuilder : module.settingBuilders) {
+            settingBuilder.mouseClickedBuilder(mouseX, mouseY);
+            if (!settingBuilder.shouldRender()) continue;
+            settingBuilder.mouseClicked(mouseX, mouseY, button);
         }
         navBar.mouseClicked((int) mouseX, (int) mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
@@ -88,24 +101,27 @@ public class ClientSettingsScreen extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        for (Setting setting : module.settings) {
-            setting.mouseReleased(mouseX, mouseY, button);
+        for (SettingBuilder settingBuilder : module.settingBuilders) {
+            if (!settingBuilder.shouldRender()) continue;
+            settingBuilder.mouseReleased(mouseX, mouseY, button);
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (Setting setting : module.settings) {
-            setting.keyPressed(keyCode, scanCode, modifiers);
+        for (SettingBuilder settingBuilder : module.settingBuilders) {
+            if (!settingBuilder.shouldRender()) continue;
+            settingBuilder.keyPressed(keyCode, scanCode, modifiers);
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        for (Setting setting : module.settings) {
-            setting.charTyped(chr, modifiers);
+        for (SettingBuilder settingBuilder : module.settingBuilders) {
+            if (!settingBuilder.shouldRender()) continue;
+            settingBuilder.charTyped(chr, modifiers);
         }
         return super.charTyped(chr, modifiers);
     }

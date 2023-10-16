@@ -3,6 +3,7 @@ package dev.heliosclient;
 import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
@@ -46,9 +47,11 @@ public class HeliosClient implements ModInitializer {
         EventManager.register(KeybindManager.INSTANCE);
 
         for (Module_ m : ModuleManager.INSTANCE.modules) {
-            for (Setting s : m.settings) {
-                s.value = ((Map<String, Object>) ((Map<String, Object>) CONFIG.config.get("modules")).get(m.name))
-                        .get(s.name);
+            for (SettingBuilder settingBuilder : m.settingBuilders) {
+                for (Setting s : settingBuilder.getSettings()) {
+                    s.value = ((Map<String, Object>) ((Map<String, Object>) CONFIG.config.get("modules")).get(m.name))
+                            .get(s.name);
+                }
             }
         }
         CommandManager.prefix = (String) CONFIG.config.get("prefix");
@@ -59,10 +62,12 @@ public class HeliosClient implements ModInitializer {
         Map<String, Object> mi = new HashMap<>();
         for (Module_ m : ModuleManager.INSTANCE.modules) {
             Map<String, Object> mo = new HashMap<>();
-            for (Setting s : m.settings) {
-                mo.put(s.name, s.value);
+            for (SettingBuilder settingBuilder : m.settingBuilders) {
+                for (Setting s : settingBuilder.getSettings()) {
+                    mo.put(s.name, s.value);
+                }
+                mi.put(m.name, mo);
             }
-            mi.put(m.name, mo);
         }
         CONFIG.config.put("modules", mi);
         Map<String, Object> pi = new HashMap<>();

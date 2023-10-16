@@ -9,15 +9,17 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public class StringListSetting extends Setting {
     private final List<InputBox> inputBox = new ArrayList<>();
     private final int characterLimit;
     public String[] values;
     String description;
-    private InputBox.InputMode inputMode;
+    private final InputBox.InputMode inputMode;
 
-    public StringListSetting(String name, String description, String[] values, int defaultBoxes, int characterLimit, InputBox.InputMode inputMode) {
+    public StringListSetting(String name, String description, String[] values, int defaultBoxes, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender) {
+        super(shouldRender);
         this.name = name;
         this.values = values;
         this.description = description;
@@ -76,12 +78,6 @@ public class StringListSetting extends Setting {
         }
     }
 
-    @Override
-    public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        // super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        // this.render(drawContext,x,y,mouseX,mouseY,textRenderer);
-    }
-
 
     public int getCharacterLimit() {
         return characterLimit;
@@ -105,6 +101,35 @@ public class StringListSetting extends Setting {
 
     public String getDescription() {
         return description;
+    }
+
+    public static class Builder extends SettingBuilder<Builder, String[], StringListSetting> {
+        int defaultBoxes, characterLimit;
+        InputBox.InputMode inputMode;
+
+        public Builder() {
+            super(new String[]{});
+        }
+
+        public Builder defaultBoxes(int defaultBoxes) {
+            this.defaultBoxes = defaultBoxes;
+            return this;
+        }
+
+        public Builder characterLimit(int characterLimit) {
+            this.characterLimit = characterLimit;
+            return this;
+        }
+
+        public Builder inputMode(InputBox.InputMode inputMode) {
+            this.inputMode = inputMode;
+            return this;
+        }
+
+        @Override
+        public StringListSetting build() {
+            return new StringListSetting(name, description, value, defaultBoxes, characterLimit, inputMode, shouldRender);
+        }
     }
 }
 

@@ -11,6 +11,7 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
@@ -82,7 +83,7 @@ public class CategoryPane implements Listener {
     }
 
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
-        int categoryNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(category.name);
+        int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
 
         int maxWidth = 0;
         int maxHeight = 4;
@@ -125,14 +126,19 @@ public class CategoryPane implements Listener {
                 buttonYOffset += categoryNameHeight + 10;
                 // Draw the settings for this module if they are open
                 if (m.settingsOpen) {
-                    for (Setting setting : m.module.quickSettings) {
-                        if (!setting.shouldRender()) continue;
-                        //setting.width=96;
-                        setting.quickSettings = m.settingsOpen;
-                        setting.renderCompact(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
-                        buttonYOffset += setting.heightCompact + 1;
+                    for (SettingBuilder settingBuilder : m.module.quickSettingsBuilder) {
+                        settingBuilder.renderBuilder(drawContext, x, buttonYOffset, width);
+                        if (!settingBuilder.shouldRender()) continue;
+                        for (Setting setting : settingBuilder.getSettings()) {
+                            if (!setting.shouldRender()) continue;
+
+                            setting.quickSettings = m.settingsOpen;
+                            setting.renderCompact(drawContext, x + 16, buttonYOffset, mouseX, mouseY, textRenderer);
+                            buttonYOffset += setting.heightCompact + 1;
+                        }
+                        buttonYOffset += Math.round(settingBuilder.getGroupNameHeight() + 1);
                     }
-                    if (!m.module.quickSettings.isEmpty()) {
+                    if (!m.module.quickSettingsBuilder.isEmpty()) {
                         buttonYOffset += 2;
                     }
                 }
@@ -145,7 +151,7 @@ public class CategoryPane implements Listener {
         }
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 255).getRGB());
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, (float) (x + (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2), (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
     }
 
     public boolean hovered(double mouseX, double mouseY) {
@@ -157,8 +163,10 @@ public class CategoryPane implements Listener {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.mouseClicked(mouseX, mouseY, button, collapsed)) return;
             if (moduleButton.settingsOpen) {
-                for (Setting setting : moduleButton.module.settings) {
-                    setting.mouseClicked(mouseX, mouseY, button);
+                for (SettingBuilder settingBuilder : moduleButton.module.settingBuilders) {
+                    settingBuilder.mouseClickedBuilder(mouseX, mouseY);
+                    if (!settingBuilder.shouldRender()) continue;
+                    settingBuilder.mouseClicked(mouseX, mouseY, button);
                 }
             }
         }
@@ -178,8 +186,9 @@ public class CategoryPane implements Listener {
     public void mouseReleased(int mouseX, int mouseY, int button) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.settingsOpen) {
-                for (Setting setting : moduleButton.module.settings) {
-                    setting.mouseReleased(mouseX, mouseY, button);
+                for (SettingBuilder settingBuilder : moduleButton.module.settingBuilders) {
+                    if (!settingBuilder.shouldRender()) continue;
+                    settingBuilder.mouseReleased(mouseX, mouseY, button);
                 }
             }
         }
@@ -189,8 +198,9 @@ public class CategoryPane implements Listener {
     public void charTyped(char chr, int modifiers) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.settingsOpen) {
-                for (Setting setting : moduleButton.module.settings) {
-                    setting.charTyped(chr, modifiers);
+                for (SettingBuilder settingBuilder : moduleButton.module.settingBuilders) {
+                    if (!settingBuilder.shouldRender()) continue;
+                    settingBuilder.charTyped(chr, modifiers);
                 }
             }
         }

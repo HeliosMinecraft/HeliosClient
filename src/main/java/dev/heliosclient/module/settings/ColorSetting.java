@@ -9,6 +9,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
+import java.util.function.BooleanSupplier;
 
 public class ColorSetting extends Setting {
     public int value;
@@ -23,7 +24,8 @@ public class ColorSetting extends Setting {
     Module_ module;
     int boxSize = 20;
 
-    public ColorSetting(String name, String description, Module_ module, int value) {
+    public ColorSetting(String name, String description, Module_ module, int value, BooleanSupplier shouldRender) {
+        super(shouldRender);
         this.name = name;
         this.description = description;
         this.value = value;
@@ -34,7 +36,6 @@ public class ColorSetting extends Setting {
         this.r = (value >> 16) & 0xFF;
         this.g = (value >> 8) & 0xFF;
         this.b = value & 0xFF;
-
     }
 
     @Override
@@ -170,27 +171,6 @@ public class ColorSetting extends Setting {
     public int getR() {
         return r;
     }
-    /* @Override
-    public void mouseClicked(double mouseX, double mouseY, int button)
-    {
-        if (button != 0) {return;}
-        if (hoveredAlpha((int)mouseX, (int)mouseY))
-        {
-            this.slidingAlpha = true;
-        }
-        if (hoveredRed((int)mouseX, (int)mouseY))
-        {
-            this.slidingRed = true;
-        }
-        if (hoveredGreen((int)mouseX, (int)mouseY))
-        {
-            this.slidingGreen = true;
-        }
-        if (hoveredBlue((int)mouseX, (int)mouseY))
-        {
-            this.slidingBlue = true;
-        }
-    }*/
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
@@ -249,5 +229,23 @@ public class ColorSetting extends Setting {
         slidingRed = false;
         slidingGreen = false;
         slidingBlue = false;
+    }
+
+    public static class Builder extends SettingBuilder<Builder, Integer, ColorSetting> {
+        Module_ module;
+
+        public Builder() {
+            super(-1);
+        }
+
+        public Builder module(Module_ module) {
+            this.module = module;
+            return this;
+        }
+
+        @Override
+        public ColorSetting build() {
+            return new ColorSetting(name, description, module, value, shouldRender);
+        }
     }
 }

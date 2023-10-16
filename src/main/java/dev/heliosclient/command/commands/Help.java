@@ -7,6 +7,7 @@ import dev.heliosclient.command.ModuleArgumentType;
 import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -49,8 +50,10 @@ public class Help extends Command {
             ChatUtils.sendMsg(module.description);
             ChatUtils.sendMsg("");
 
-            for (Setting setting : module.settings) {
-                ChatUtils.sendMsg(ColorUtils.aqua + setting.name + ColorUtils.gray + ": " + setting.description);
+            for (SettingBuilder settingBuilder : module.settingBuilders) {
+                for (Setting setting : settingBuilder.getSettings()) {
+                    ChatUtils.sendMsg(ColorUtils.aqua + setting.name + ColorUtils.gray + ": " + setting.description);
+                }
             }
 
             return SINGLE_SUCCESS;

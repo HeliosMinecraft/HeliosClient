@@ -9,6 +9,7 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingBuilder;
 import dev.heliosclient.util.ChatUtils;
 import net.minecraft.client.MinecraftClient;
 
@@ -22,37 +23,58 @@ public abstract class Module_ implements Listener {
     public String name;
     public String description;
     public Category category;
-    public ArrayList<Setting> settings;
-    public ArrayList<Setting> quickSettings;
+    public ArrayList<SettingBuilder> settingBuilders;
+    public ArrayList<SettingBuilder> quickSettingsBuilder;
     public boolean settingsOpen = false;
-
+    public SettingBuilder miscBuilder = new SettingBuilder("Misc");
 
     /**
      * Setting indicating if chat feedback for this module should be shown. Don't remove, that will cause crash.
      */
-    public BooleanSetting chatFeedback = new BooleanSetting("Enable chat feedback", "Toggles feedback in chat.", this, false);
+    public BooleanSetting chatFeedback = miscBuilder.add(new BooleanSetting.Builder()
+            .name("Enable chat feedback")
+            .description("Toggles feedback in chat.")
+            .module(this)
+            .value(false)
+            .build()
+    );
 
     /**
      * Setting that will tell module list if it should be shown. Don't remove, that will cause crash.
      */
-    public BooleanSetting showInModulesList = new BooleanSetting("Show in Modules List", "If this module should show up in Module List.", this, true);
-
+    public BooleanSetting showInModulesList = miscBuilder.add(new BooleanSetting.Builder()
+            .name("Show in Modules List")
+            .description("If this module should show up in Module List.")
+            .module(this)
+            .value(true)
+            .build()
+    );
     /**
      * Key-bind setting. Don't remove, that will cause crash.
      */
-    public KeyBind keyBind = new KeyBind("Keybind", "Key to toggle this module.", this, 0);
-
+    public KeyBind keyBind = miscBuilder.add(new KeyBind.Builder()
+            .name("Keybind")
+            .description("Key to toggle this module.")
+            .module(this)
+            .value(0)
+            .build()
+    );
     /**
      * Value indicating if module is enabled. Don't remove, that will cause crash.
      */
-    public BooleanSetting active = new BooleanSetting("Active", "State of this module.", this, false);
-
+    public BooleanSetting active = miscBuilder.add(new BooleanSetting.Builder()
+            .name("Active")
+            .description("State of this module.")
+            .module(this)
+            .value(false)
+            .build()
+    );
     public Module_(String name, String description, Category category) {
         this.name = name;
         this.description = description;
         this.category = category;
-        settings = new ArrayList<>();
-        quickSettings = new ArrayList<>();
+        settingBuilders = new ArrayList<>();
+        quickSettingsBuilder = new ArrayList<>();
     }
 
     /**
@@ -137,11 +159,7 @@ public abstract class Module_ implements Listener {
      * Called on load. Override to remove default settings.
      */
     public void onLoad() {
-        //Add default settings.
-        settings.add(showInModulesList);
-        settings.add(chatFeedback);
-        settings.add(keyBind);
-        settings.add(active);
+        settingBuilders.add(miscBuilder);
     }
 
     /**
