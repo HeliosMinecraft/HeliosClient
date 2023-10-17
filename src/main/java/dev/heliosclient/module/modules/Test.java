@@ -18,7 +18,7 @@ import java.awt.*;
 
 
 public class Test extends Module_ {
-    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    private final SettingGroup sgGeneral = new SettingGroup("General");
     BooleanSetting rectangle = sgGeneral.add(new BooleanSetting("Rectangle", "", this, false, () -> true));
     BooleanSetting rounded = sgGeneral.add(new BooleanSetting("Rounded", "", this, false, () -> true));
     BooleanSetting Circle = sgGeneral.add(new BooleanSetting("Circle", "", this, false, () -> true));
@@ -40,8 +40,8 @@ public class Test extends Module_ {
     public Test() {
         super("Test", "Render Test", Category.RENDER);
 
-        settingBuilders.add(sgGeneral);
-        quickSettingsBuilder.add(sgGeneral);
+        addSettingGroup(sgGeneral);
+        addQuickSettingGroup(sgGeneral);
 
     }
 

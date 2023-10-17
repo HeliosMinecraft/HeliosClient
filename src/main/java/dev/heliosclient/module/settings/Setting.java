@@ -72,10 +72,6 @@ public abstract class Setting {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, widthCompact, heightCompact, 2, fillColor);
     }
 
-    public void setVisibilityCondition(BooleanSupplier shouldRender) {
-        this.shouldRender = shouldRender;
-    }
-
     /**
      * If setting should render, Meant to be used for overrides for settings that are meant to be shown only if condition is met.
      * @return If should render.

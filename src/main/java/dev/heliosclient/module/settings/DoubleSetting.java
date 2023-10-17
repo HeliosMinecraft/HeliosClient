@@ -52,7 +52,7 @@ public class DoubleSetting extends Setting {
             module.onSettingChange(this);
         }
 
-        float valueWidth = Renderer2D.getFxStringWidth(value + ".00") + 3;
+        float valueWidth = Renderer2D.getFxStringWidth(value + ".00");
 
         inputBox.render(drawContext, (x + 180) - Math.round(valueWidth), y + 2, mouseX, mouseY, textRenderer);
         // Calculate the width of the input box based on the width of the value

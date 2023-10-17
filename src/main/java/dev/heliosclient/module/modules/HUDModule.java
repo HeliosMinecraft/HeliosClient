@@ -7,7 +7,7 @@ import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.ColorSetting;
-import dev.heliosclient.module.settings.SettingBuilder;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.HUDOverlay;
 import dev.heliosclient.util.ColorUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -15,7 +15,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import java.awt.*;
 
 public class HUDModule extends Module_ {
-    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    private final SettingGroup sgGeneral = new SettingGroup("General");
     public BooleanSetting clientTag = sgGeneral.add(new BooleanSetting.Builder()
             .name("Client Tag")
             .description("Visibility of Client Tag.")
@@ -44,7 +44,7 @@ public class HUDModule extends Module_ {
         this.active.value = true;
         this.showInModulesList.value = false;
 
-        settingBuilders.add(sgGeneral);
+        addSettingGroup(sgGeneral);
     }
 
     @Override

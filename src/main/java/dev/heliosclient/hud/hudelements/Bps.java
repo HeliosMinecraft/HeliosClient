@@ -26,7 +26,6 @@ public class Bps extends HudElement {
         String text = "Blocks Per Second: ";
         String value = ColorUtils.gray + MathUtils.round(moveSpeed(), 2);
         this.width = Math.round(Renderer2D.getStringWidth(text + value));
-        this.height = 10;
         Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x - (float) width / 2, this.y - ((float) height / 2), HeliosClient.uiColorA);
 
     }

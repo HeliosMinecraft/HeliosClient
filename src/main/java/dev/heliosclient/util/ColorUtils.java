@@ -1,6 +1,7 @@
 package dev.heliosclient.util;
 
 import java.awt.*;
+import java.util.Random;
 
 /**
  * Utils for working with color and chat formatting.
@@ -137,5 +138,11 @@ public class ColorUtils {
      */
     public static int getBlue(int color) {
         return color & 0xFF;
+    }
+
+    public static Color getRandomColor() {
+        Color[] colors = {Color.MAGENTA, Color.BLUE, Color.CYAN, Color.GREEN, Color.YELLOW, Color.ORANGE, Color.RED};
+        int randomIndex = new Random().nextInt(colors.length);
+        return colors[randomIndex];
     }
 }

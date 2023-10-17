@@ -6,18 +6,19 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.SettingBuilder;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ISimpleOption;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Fullbright extends Module_ {
-    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    private final SettingGroup sgGeneral = new SettingGroup("General");
 
-    ArrayList<String> modes = new ArrayList<String>(List.of("Gamma", "Night Vision"));
+    List<String> modes = new ArrayList<>(List.of("Gamma", "Night Vision"));
     CycleSetting mode = sgGeneral.add(new CycleSetting.Builder()
             .name("Mode")
             .description("Fullbright mode to apply")
@@ -26,6 +27,12 @@ public class Fullbright extends Module_ {
             .listValue(0)
             .build()
     );
+    CycleSetting stringSetting = new CycleSetting.Builder()
+            .module(this)
+            .listValue(0)
+            .value(Arrays.asList("Option 1", "Option 2"))
+            .build();
+
     DoubleSetting gamma = sgGeneral.add(new DoubleSetting.Builder()
             .name("Gamma")
             .description("Desired gamma value")
@@ -33,6 +40,7 @@ public class Fullbright extends Module_ {
             .value(15.0)
             .min(0)
             .max(15)
+            .shouldRender(() -> mode.value == 0)
             .roundingPlace(0)
             .build());
 
@@ -41,11 +49,9 @@ public class Fullbright extends Module_ {
         super("Fullbright", "Allows you to see in the dark.", Category.RENDER);
         EventManager.register(this);
 
-        gamma.setVisibilityCondition(() -> mode.value == 0);
+        addSettingGroup(sgGeneral);
 
-        settingBuilders.add(sgGeneral);
-
-        quickSettingsBuilder.add(sgGeneral);
+        addQuickSettingGroup(sgGeneral);
     }
 
     @Override

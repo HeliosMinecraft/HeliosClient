@@ -6,7 +6,7 @@ import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
-import dev.heliosclient.module.settings.SettingBuilder;
+import dev.heliosclient.module.settings.SettingGroup;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class NoFall extends Module_ {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    private final SettingGroup sgGeneral = new SettingGroup("General");
     DoubleSetting fallHeight = sgGeneral.add(new DoubleSetting.Builder()
             .name("Trigger height")
             .description("Height on which No Fall triggers")
@@ -38,9 +38,9 @@ public class NoFall extends Module_ {
     public NoFall() {
         super("NoFall", "Prevents you from taking fall damage.", Category.PLAYER);
 
-        settingBuilders.add(sgGeneral);
+        addSettingGroup(sgGeneral);
 
-        quickSettingsBuilder.add(sgGeneral);
+        addQuickSettingGroup(sgGeneral);
     }
 
     @SubscribeEvent

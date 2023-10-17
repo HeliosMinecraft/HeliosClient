@@ -5,10 +5,10 @@ import dev.heliosclient.event.events.PlayerMotionEvent;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.DoubleSetting;
-import dev.heliosclient.module.settings.SettingBuilder;
+import dev.heliosclient.module.settings.SettingGroup;
 
 public class Speed extends Module_ {
-    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    private final SettingGroup sgGeneral = new SettingGroup("General");
 
     DoubleSetting speed = sgGeneral.add(new DoubleSetting.Builder()
             .name("Speed")
@@ -24,8 +24,8 @@ public class Speed extends Module_ {
     public Speed() {
         super("Speed", "Allows you to move faster.", Category.MOVEMENT);
 
-        settingBuilders.add(sgGeneral);
-        quickSettingsBuilder.add(sgGeneral);
+        addSettingGroup(sgGeneral);
+        addQuickSettingGroup(sgGeneral);
     }
 
     @SubscribeEvent

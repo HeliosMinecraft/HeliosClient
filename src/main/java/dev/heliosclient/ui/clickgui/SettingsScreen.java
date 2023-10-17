@@ -3,7 +3,7 @@ package dev.heliosclient.ui.clickgui;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.SettingBuilder;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
@@ -42,13 +42,13 @@ public class SettingsScreen extends Screen {
         this.renderBackground(drawContext);
 
         windowHeight = 52;
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             windowHeight += Math.round(settingBuilder.getGroupNameHeight() + 10);
             if (!settingBuilder.shouldRender()) continue;
             for (Setting setting : settingBuilder.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
-                windowHeight += setting.height + 3;
+                windowHeight += setting.height + 1;
             }
             windowHeight += Math.round(settingBuilder.getGroupNameHeight());
         }
@@ -72,17 +72,18 @@ public class SettingsScreen extends Screen {
         drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + module.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
         backButton.render(drawContext, textRenderer, x + 4, y + 4, mouseX, mouseY);
         int yOffset = y + 44;
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             yOffset += Math.round(settingBuilder.getGroupNameHeight() + 10);
-            settingBuilder.renderBuilder(drawContext, x, yOffset - 3, windowWidth);
+            settingBuilder.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
             if (!settingBuilder.shouldRender()) continue;
             for (Setting setting : settingBuilder.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.render(drawContext, x + 16, yOffset + 3, mouseX, mouseY, textRenderer);
-                yOffset += setting.height + 3;
+                yOffset += setting.height + 1;
             }
             yOffset += Math.round(settingBuilder.getGroupNameHeight() + 1);
         }
+
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
     }
 
@@ -98,7 +99,7 @@ public class SettingsScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         backButton.mouseClicked((int) mouseX, (int) mouseY);
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             settingBuilder.mouseClickedBuilder(mouseX, mouseY);
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.mouseClicked(mouseX, mouseY, button);
@@ -108,7 +109,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.mouseReleased(mouseX, mouseY, button);
         }
@@ -117,7 +118,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.keyReleased(keyCode, scanCode, modifiers);
         }
@@ -129,7 +130,7 @@ public class SettingsScreen extends Screen {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             MinecraftClient.getInstance().setScreen(parentScreen);
         }
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.keyPressed(keyCode, scanCode, modifiers);
         }
@@ -138,7 +139,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         }
@@ -147,7 +148,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.charTyped(chr, modifiers);
         }

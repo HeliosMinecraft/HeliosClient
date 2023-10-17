@@ -6,12 +6,12 @@ import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
-import dev.heliosclient.module.settings.SettingBuilder;
+import dev.heliosclient.module.settings.SettingGroup;
 import net.minecraft.client.MinecraftClient;
 
 public class Step extends Module_ {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    private final SettingGroup sgGeneral = new SettingGroup("General");
     DoubleSetting stepHeight = sgGeneral.add(new DoubleSetting.Builder()
             .name("Height")
             .description("Height which step should step up at.")
@@ -33,9 +33,9 @@ public class Step extends Module_ {
     public Step() {
         super("Step", "Allows you to step up full blocks.", Category.MOVEMENT);
 
-        settingBuilders.add(sgGeneral);
+        addSettingGroup(sgGeneral);
 
-        quickSettingsBuilder.add(sgGeneral);
+        addQuickSettingGroup(sgGeneral);
     }
 
     @SubscribeEvent

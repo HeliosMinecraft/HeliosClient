@@ -3,7 +3,7 @@ package dev.heliosclient;
 import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.SettingBuilder;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
@@ -47,7 +47,7 @@ public class HeliosClient implements ModInitializer {
         EventManager.register(KeybindManager.INSTANCE);
 
         for (Module_ m : ModuleManager.INSTANCE.modules) {
-            for (SettingBuilder settingBuilder : m.settingBuilders) {
+            for (SettingGroup settingBuilder : m.settingGroups) {
                 for (Setting s : settingBuilder.getSettings()) {
                     s.value = ((Map<String, Object>) ((Map<String, Object>) CONFIG.config.get("modules")).get(m.name))
                             .get(s.name);
@@ -62,7 +62,7 @@ public class HeliosClient implements ModInitializer {
         Map<String, Object> mi = new HashMap<>();
         for (Module_ m : ModuleManager.INSTANCE.modules) {
             Map<String, Object> mo = new HashMap<>();
-            for (SettingBuilder settingBuilder : m.settingBuilders) {
+            for (SettingGroup settingBuilder : m.settingGroups) {
                 for (Setting s : settingBuilder.getSettings()) {
                     mo.put(s.name, s.value);
                 }

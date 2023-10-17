@@ -8,14 +8,16 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class CycleSetting extends Setting {
     public int value;
-    public ArrayList<String> options;
+    public List options;
     Module_ module;
 
-    public CycleSetting(String name, String description, Module_ module, ArrayList<String> options, int value, BooleanSupplier shouldRender) {
+    public <T> CycleSetting(String name, String description, Module_ module, List<T> options, int value, BooleanSupplier shouldRender) {
         super(shouldRender);
         this.name = name;
         this.description = description;
@@ -25,9 +27,20 @@ public class CycleSetting extends Setting {
         this.value = value;
     }
 
-    public void setOptions(ArrayList<String> options) {
+    public <T> CycleSetting(String name, String description, Module_ module, T[] options, int value, BooleanSupplier shouldRender) {
+        super(shouldRender);
+        this.name = name;
+        this.description = description;
+        this.options = Arrays.asList(options);
+        this.height = 24;
+        this.module = module;
+        this.value = value;
+    }
+
+    public void setOptions(List options) {
         this.options = options;
     }
+
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
@@ -57,7 +70,7 @@ public class CycleSetting extends Setting {
             //  drawContext.drawText(textRenderer, "No option found!", x + 10, y + 28, 0xFFFF0000, false);
             Renderer2D.drawFixedString(drawContext.getMatrices(), "No option found!", x + 10, y + 28, 0xFFFF0000);
         }
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + options.get(value).substring(0, Math.min(12, options.get(value).length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
         //drawContext.drawText(textRenderer, name + ": " + options.get(value).substring(0, Math.min(12, options.get(value).length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor(), false);
 
         if (hovered(mouseX, mouseY)) {
@@ -86,7 +99,7 @@ public class CycleSetting extends Setting {
         }
     }
 
-    public static class Builder extends SettingBuilder<Builder, ArrayList<String>, CycleSetting> {
+    public static class Builder extends SettingBuilder<Builder, List, CycleSetting> {
         Module_ module;
         int listValue;
 

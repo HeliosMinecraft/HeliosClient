@@ -24,6 +24,7 @@ public class StringListSetting extends Setting {
         this.values = values;
         this.description = description;
         this.height = 26 + defaultBoxes * 15;
+        this.heightCompact = 0;
         this.characterLimit = characterLimit;
         this.inputMode = inputMode;
         for (int i = 0; i < defaultBoxes; i++) {

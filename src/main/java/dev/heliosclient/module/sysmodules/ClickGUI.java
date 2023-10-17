@@ -23,8 +23,8 @@ public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
     static ClickGUI INSTANCE = new ClickGUI();
-    public static SettingBuilder sgGeneralStatic = new SettingBuilder("General Static");
-    public static DoubleSetting ScrollSpeed = sgGeneralStatic.add(new DoubleSetting.Builder()
+    public static SettingGroup sgFont = new SettingGroup("Font");
+    public static DoubleSetting ScrollSpeed = sgFont.add(new DoubleSetting.Builder()
             .name("Scroll Speed")
             .description("Change your scroll speed for the ClickGUI")
             .module(INSTANCE)
@@ -34,7 +34,7 @@ public class ClickGUI extends Module_ {
             .roundingPlace(1)
             .build()
     );
-    public static CycleSetting FontRenderer = sgGeneralStatic.add(new CycleSetting.Builder()
+    public static CycleSetting FontRenderer = sgFont.add(new CycleSetting.Builder()
             .name("Font Renderer")
             .description("Font Rendering for the client")
             .module(INSTANCE)
@@ -43,7 +43,7 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> true)
             .build()
     );
-    public static CycleSetting Font = sgGeneralStatic.add(new CycleSetting.Builder()
+    public static CycleSetting Font = sgFont.add(new CycleSetting.Builder()
             .name("Font")
             .description("Font for the client")
             .module(INSTANCE)
@@ -52,7 +52,7 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
-    public static DoubleSetting FontSize = sgGeneralStatic.add(new DoubleSetting.Builder()
+    public static DoubleSetting FontSize = sgFont.add(new DoubleSetting.Builder()
             .name("Font Size")
             .description("Change your FontSize")
             .module(INSTANCE)
@@ -63,7 +63,7 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
-    public SettingBuilder sgGeneral = new SettingBuilder("General");
+    public SettingGroup sgGeneral = new SettingGroup("General");
     public CycleSetting TooltipMode = sgGeneral.add(new CycleSetting.Builder()
             .name("Tooltip mode")
             .description("Mode in what tooltips should be shown.")
@@ -139,11 +139,11 @@ public class ClickGUI extends Module_ {
     public ClickGUI() {
         super("ClickGUI", "ClickGui related stuff.", Category.RENDER);
 
-        settingBuilders.add(sgGeneral);
-        settingBuilders.add(sgGeneralStatic);
+        addSettingGroup(sgFont);
+        addSettingGroup(sgGeneral);
 
-        quickSettingsBuilder.add(sgGeneral);
-        quickSettingsBuilder.add(sgGeneralStatic);
+        addQuickSettingGroup(sgFont);
+        addQuickSettingGroup(sgGeneral);
 
         active.value = true;
         loadFonts.addButton("Load Fonts", () -> {

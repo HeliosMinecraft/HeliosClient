@@ -4,7 +4,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.SettingBuilder;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.Renderer2D;
@@ -38,13 +38,13 @@ public class ClientSettingsScreen extends Screen {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext);
         windowHeight = 52;
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             windowHeight += Math.round(settingBuilder.getGroupNameHeight() + 3);
             if (!settingBuilder.shouldRender()) continue;
             for (Setting setting : settingBuilder.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
-                windowHeight += setting.height + 2;
+                windowHeight += setting.height + 1;
             }
             windowHeight += Math.round(settingBuilder.getGroupNameHeight());
         }
@@ -67,9 +67,9 @@ public class ClientSettingsScreen extends Screen {
         drawContext.drawText(textRenderer, module.name, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
         drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + module.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
         int yOffset = y + 44;
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             yOffset += Math.round(settingBuilder.getGroupNameHeight() + 3);
-            settingBuilder.renderBuilder(drawContext, x, yOffset - 3, windowWidth);
+            settingBuilder.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
             if (!settingBuilder.shouldRender()) continue;
             for (Setting setting : settingBuilder.getSettings()) {
                 if (!setting.shouldRender()) continue;
@@ -90,7 +90,7 @@ public class ClientSettingsScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             settingBuilder.mouseClickedBuilder(mouseX, mouseY);
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.mouseClicked(mouseX, mouseY, button);
@@ -101,7 +101,7 @@ public class ClientSettingsScreen extends Screen {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.mouseReleased(mouseX, mouseY, button);
         }
@@ -110,7 +110,7 @@ public class ClientSettingsScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.keyPressed(keyCode, scanCode, modifiers);
         }
@@ -119,7 +119,7 @@ public class ClientSettingsScreen extends Screen {
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        for (SettingBuilder settingBuilder : module.settingBuilders) {
+        for (SettingGroup settingBuilder : module.settingGroups) {
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.charTyped(chr, modifiers);
         }

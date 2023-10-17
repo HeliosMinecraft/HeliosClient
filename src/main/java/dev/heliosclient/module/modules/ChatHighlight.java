@@ -4,7 +4,7 @@ import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.SettingBuilder;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
@@ -16,7 +16,7 @@ public class ChatHighlight extends Module_ {
 
     protected static MinecraftClient mc = MinecraftClient.getInstance();
     public HashSet<String> highlightList = new HashSet<String>();
-    private final SettingBuilder sgGeneral = new SettingBuilder("General");
+    private final SettingGroup sgGeneral = new SettingGroup("General");
     BooleanSetting highlightUsername = sgGeneral.add(new BooleanSetting.Builder()
             .name("Highlight Username")
             .description("Whether to highlight your username or not.")
@@ -35,9 +35,9 @@ public class ChatHighlight extends Module_ {
     public ChatHighlight() {
         super("Chat Highlighter", "Highlights specified words in chat messages.", Category.CHAT);
 
-        settingBuilders.add(sgGeneral);
+        addSettingGroup(sgGeneral);
 
-        quickSettingsBuilder.add(sgGeneral);
+        addQuickSettingGroup(sgGeneral);
 
         this.highlightList.add("ElBe_Gaming");
         ChatUtils.sendHeliosMsg("" + this.highlightList);
