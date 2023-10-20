@@ -8,6 +8,7 @@ import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.DamageUtils;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class HeliosClient implements ModInitializer {
     public static int uiColorA = 0xFF55FFFF;
     public static int uiColor = 0x55FFFF;
     public static FontManager fontManager = new FontManager();
+    public static NotificationManager notificationManager = new NotificationManager();
 
     @Override
     public void onInitialize() {
@@ -43,8 +45,10 @@ public class HeliosClient implements ModInitializer {
         }
         CONFIG.load();
         EventManager.register(fontManager);
+        EventManager.register(notificationManager);
         EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
         EventManager.register(KeybindManager.INSTANCE);
+        EventManager.register(new DamageUtils());
 
         for (Module_ m : ModuleManager.INSTANCE.modules) {
             for (SettingGroup settingBuilder : m.settingGroups) {

@@ -23,11 +23,11 @@ public class StringSetting extends Setting {
         this.value = value;
         this.description = description;
         this.height = 38;
-        this.heightCompact = 32;
+        this.heightCompact = 25;
         this.characterLimit = characterLimit;
         this.inputMode = inputMode;
         inputBox = new InputBox(180, 13, value, characterLimit, inputMode);
-        inputBoxCompact = new InputBox(widthCompact - 4, 12, value, characterLimit, inputMode);
+        inputBoxCompact = new InputBox(widthCompact - 4, 11, value, characterLimit, inputMode);
     }
 
 
@@ -45,8 +45,8 @@ public class StringSetting extends Setting {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 5, defaultColor);
-        inputBoxCompact.render(drawContext, x, y + 16, mouseX, mouseY, textRenderer);
+        compactFont.drawString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
+        inputBoxCompact.render(drawContext, x, Math.round(y + compactFont.getStringHeight(name) + 3), mouseX, mouseY, textRenderer);
     }
 
     @Override

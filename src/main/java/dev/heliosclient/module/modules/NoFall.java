@@ -63,6 +63,9 @@ public class NoFall extends Module_ {
                 }
                 if (distance <= 2) {
                     assert mc.world != null;
+                    mc.player.networkHandler.sendPacket(
+                            new PlayerMoveC2SPacket.OnGroundOnly(true)
+                    );
                     mc.world.disconnect();
                 }
             }

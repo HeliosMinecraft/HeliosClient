@@ -1,14 +1,14 @@
 package dev.heliosclient.util.animation;
 
-import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.animation.toasts.ErrorToast;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 
-import java.awt.*;
-
-public class AnimationUtils {
+public class AnimationUtils implements Listener {
     public float FADE_SPEED = 0.05f;
     private float alpha = 1.0f;
     private boolean fading = false;
@@ -22,7 +22,11 @@ public class AnimationUtils {
         alpha = fadeIn ? 0.0f : 1.0f;
     }
 
-    public void drawFadingBox(DrawContext context, int x, int y, int width, int height, int color, boolean RoundedBox, int radius) {
+    public static void addErrorToast(String message, boolean hasProgressBar, long endDelay) {
+        HeliosClient.MC.getToastManager().add(new ErrorToast(message, hasProgressBar, endDelay));
+    }
+
+    public void updateAlpha() {
         if (fading) {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
@@ -30,48 +34,36 @@ public class AnimationUtils {
                 alpha = Math.max(0.0f, Math.min(1.0f, alpha));
             }
         }
+    }
+
+    public int getFadingColor(int color) {
+        updateAlpha();
         float t = Easing.ease(easingType, alpha);
         int a = (int) (t * ColorUtils.getAlpha(color));
-        int newColor = ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
+        return ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
+    }
+
+    public void drawFadingBox(DrawContext context, float x, float y, float width, float height, int color, boolean RoundedBox, float radius) {
+        int newColor = getFadingColor(color);
         if (!RoundedBox)
             Renderer2D.drawRectangle(context.getMatrices().peek().getPositionMatrix(), x, y, width, height, newColor);
         else
             Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(), x, y, width, height, radius, newColor);
     }
 
-    public void drawFadingText(MatrixStack matrixStack, String text, int x, int y, int color, boolean fixedSize) {
-        if (fading) {
-            alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
-            if (alpha <= 0.0f || alpha >= 1.0f) {
-                fading = false;
-                alpha = Math.max(0.0f, Math.min(1.0f, alpha));
-            }
-        }
-        float t = Easing.ease(easingType, alpha);
-        int a = (int) (t * 255);
-        if (a >= 255) {
-            a = 254; // 255 makes alpha of text to 0 for some reason
-        }
-        Color nColor = ColorUtils.intToColor(color);
-        Color newColor = ColorUtils.changeAlpha(nColor, a);
+    public void drawFadingText(MatrixStack matrixStack, String text, float x, float y, int color, boolean fixedSize) {
+        int newColor = getFadingColor(color);
+
         if (fixedSize) {
-            Renderer2D.drawFixedString(matrixStack, text, x, y, newColor.getRGB());
+            Renderer2D.drawFixedString(matrixStack, text, x, y, newColor);
         } else {
-            Renderer2D.drawString(matrixStack, text, x, y, newColor.getRGB());
+            Renderer2D.drawString(matrixStack, text, x, y, newColor);
         }
     }
 
-    public void drawFadingAndPoppingBox(DrawContext drawContext, int x, int y, int width, int height, int color, boolean RoundedBox, int radius) {
-        if (fading) {
-            alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
-            if (alpha <= 0.0f || alpha >= 1.0f) {
-                fading = false;
-                alpha = Math.max(0.0f, Math.min(1.0f, alpha));
-            }
-        }
-        float t = Easing.ease(easingType, alpha);
-        int a = (int) (t * 255);
-        int newColor = ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
+    public void drawFadingAndPoppingBox(DrawContext drawContext, float x, float y, float width, float height, int color, boolean RoundedBox, float radius) {
+        int newColor = getFadingColor(color);
+
         float scale = Easing.ease(easingType, alpha);
         drawContext.getMatrices().push();
         drawContext.getMatrices().translate(x + width / 2f, y + height / 2f, 0);
@@ -83,32 +75,22 @@ public class AnimationUtils {
         drawContext.getMatrices().pop();
     }
 
-    public void drawFadingAndPoppingText(DrawContext context, String text, int x, int y, int color, boolean fixedSize) {
-        if (fading) {
-            alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
-            if (alpha <= 0.0f || alpha >= 1.0f) {
-                fading = false;
-                alpha = Math.max(0.0f, Math.min(1.0f, alpha));
-            }
-        }
-        float t = Easing.ease(easingType, alpha);
-        int a = (int) (t * 255);
+    public void drawFadingAndPoppingText(DrawContext context, String text, float x, float y, int color, boolean fixedSize) {
+        int newColor = getFadingColor(color);
 
-        if (a >= 255) {
-            a = 254; // 255 makes alpha of text to 0 for some reason
-        }
-        Color nColor = ColorUtils.intToColor(color);
-        Color newColor = ColorUtils.changeAlpha(nColor, a);
         float scale = Easing.ease(easingType, alpha);
         context.getMatrices().push();
         context.getMatrices().translate(x, y, 0);
         context.getMatrices().scale(scale, scale, 0);
         if (fixedSize) {
-            Renderer2D.drawFixedString(context.getMatrices(), text, -Renderer2D.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, newColor.getRGB());
+            Renderer2D.drawFixedString(context.getMatrices(), text, -Renderer2D.getStringWidth(text) / 2, -Renderer2D.getFxStringHeight(text) / 2, newColor);
         } else {
-            Renderer2D.drawString(context.getMatrices(), text, -Renderer2D.getStringWidth(text) / 2, -FontManager.fontRenderer.getStringHeight(text) / 2, newColor.getRGB());
+            Renderer2D.drawString(context.getMatrices(), text, -Renderer2D.getStringWidth(text) / 2, -Renderer2D.getStringHeight(text) / 2, newColor);
         }
         context.getMatrices().pop();
     }
+
+
+
 }
 

@@ -2,6 +2,7 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.fontutils.FontLoader;
@@ -35,6 +36,7 @@ public class FontManager implements Listener {
         if (HeliosClient.MC.getWindow() != null) {
             fontRenderer = new FontRenderer(fonts, fontSize);
             fxfontRenderer = new fxFontRenderer(fonts, 8f);
+            EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
             EventManager.unregister(this);
         }
     }

@@ -35,6 +35,8 @@ public class StringListSetting extends Setting {
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+        this.x = x;
+        this.y = y;
         this.height = 26 + inputBox.size() * 16;
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
@@ -61,7 +63,7 @@ public class StringListSetting extends Setting {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
 
-        int boxOffset = y;
+        int boxOffset = y + 20;
         // Use a regular for loop with an index variable
         if (hoveredOverAdd(mouseX, mouseY)) {
             inputBox.add(new InputBox(160, 13, "", characterLimit, inputMode)); // Add a new empty box to the list
@@ -75,7 +77,6 @@ public class StringListSetting extends Setting {
                 box.mouseClicked(mouseX, mouseY, button);
             }
             boxOffset += 16;
-
         }
     }
 

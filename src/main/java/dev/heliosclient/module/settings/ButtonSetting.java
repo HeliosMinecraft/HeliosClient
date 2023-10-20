@@ -18,6 +18,7 @@ public class ButtonSetting extends Setting {
 
     public ButtonSetting(String ButtonCategoryText, BooleanSupplier shouldRender) {
         super(shouldRender);
+        this.heightCompact = 0;
         buttons = new ArrayList<>();
         this.ButtonCategoryText = ButtonCategoryText;
     }

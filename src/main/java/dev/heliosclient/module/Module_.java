@@ -1,5 +1,6 @@
 package dev.heliosclient.module;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.PlayerMotionEvent;
 import dev.heliosclient.event.events.RenderEvent;
@@ -11,6 +12,7 @@ import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ChatUtils;
+import dev.heliosclient.util.notification.notifications.InfoNotification;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
@@ -92,6 +94,7 @@ public abstract class Module_ implements Listener {
         if (chatFeedback.value) {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was enabled.");
+            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, " was enabled!", 2000));
         }
         EventManager.register(this);
     }
@@ -110,6 +113,7 @@ public abstract class Module_ implements Listener {
         if (chatFeedback.value) {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
+            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, " was disabled!", 2000));
         }
         EventManager.unregister(this);
     }

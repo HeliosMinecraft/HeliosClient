@@ -17,7 +17,6 @@ public class DoubleSetting extends Setting {
     private final int roundingPlace;
     public double value;
     Module_ module;
-
     boolean sliding = false;
     private final InputBox inputBox;
 
@@ -28,7 +27,7 @@ public class DoubleSetting extends Setting {
         this.value = value;
         this.min = min;
         this.max = max;
-        this.heightCompact = 24;
+        this.heightCompact = 20;
         this.module = module;
         this.roundingPlace = roundingPlace;
         inputBox = new InputBox(String.valueOf(max).length() * 6, 11, String.valueOf(value), 10, InputBox.InputMode.DIGITS);
@@ -40,7 +39,6 @@ public class DoubleSetting extends Setting {
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
-        //   drawContext.drawText(textRenderer, Text.literal(name), x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor(), false);
         double diff = Math.min(100, Math.max(0, (mouseX - x) / 1.9));
 
         if (sliding) {
@@ -52,7 +50,7 @@ public class DoubleSetting extends Setting {
             module.onSettingChange(this);
         }
 
-        float valueWidth = Renderer2D.getFxStringWidth(value + ".00");
+        float valueWidth = Renderer2D.getFxStringWidth(value + ".00") + 3;
 
         inputBox.render(drawContext, (x + 180) - Math.round(valueWidth), y + 2, mouseX, mouseY, textRenderer);
         // Calculate the width of the input box based on the width of the value
@@ -83,7 +81,7 @@ public class DoubleSetting extends Setting {
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         //  inputBox = null;
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
+        compactFont.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
         double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
 
         if (sliding) {
@@ -96,11 +94,13 @@ public class DoubleSetting extends Setting {
         }
 
         String valueString = "" + MathUtils.round(value, roundingPlace);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), valueString, (x + moduleWidth - 10) - Renderer2D.getFxStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, moduleWidth - 8, 2, 1, 0xFFAAAAAA);
+        compactFont.drawString(drawContext.getMatrices(), valueString, (x + moduleWidth - 10) - compactFont.getStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
+
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, moduleWidth - 8, 1, 1, 0xFFAAAAAA);
+
         int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 10)) + 2;
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, scaledValue, 2, 1, 0xFF55FFFF);
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 14, 2, 6, 1, 0xFFFFFFFF);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, scaledValue, 1, 1, 0xFF55FFFF);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue + 2, y + 11, 1, 5, 1, 0xFFFFFFFF);
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {
@@ -132,7 +132,7 @@ public class DoubleSetting extends Setting {
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         super.keyPressed(keyCode, scanCode, modifiers);
         // inputBox.keyPressed(keyCode, scanCode, modifiers);
-        if (keyCode == GLFW.GLFW_KEY_KP_ENTER || keyCode == GLFW.GLFW_KEY_ENTER) {
+        if ((keyCode == GLFW.GLFW_KEY_KP_ENTER || keyCode == GLFW.GLFW_KEY_ENTER) && inputBox.isFocused()) {
             try {
                 double newVal = Double.parseDouble(inputBox.getValue());
                 if (newVal <= min) {
@@ -146,6 +146,7 @@ public class DoubleSetting extends Setting {
             } catch (NumberFormatException e) {
                 value = value;
             }
+            inputBox.setFocused(false);
         }
     }
 

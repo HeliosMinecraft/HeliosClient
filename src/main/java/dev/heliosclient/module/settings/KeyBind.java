@@ -54,7 +54,26 @@ public class KeyBind extends Setting {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        this.render(drawContext, x, y, mouseX, mouseY, textRenderer);
+        int defaultColor = ColorManager.INSTANCE.defaultTextColor();
+
+        if (listening) {
+            compactFont.drawString(drawContext.getMatrices(), name + ": §lLISTENING", x + 2, y + 6, defaultColor);
+        } else if (value == 0) {
+            compactFont.drawString(drawContext.getMatrices(), name + ": None", x + 2, y + 6, defaultColor);
+        } else {
+            String keyName = KeycodeToString.translate(value);
+            compactFont.drawString(drawContext.getMatrices(), name + ": " + keyName, x + 2, y + 6, defaultColor);
+        }
+
+        if (hovered(mouseX, mouseY)) {
+            hovertimer++;
+        } else {
+            hovertimer = 0;
+        }
+
+        if (hovertimer >= 150) {
+            Tooltip.tooltip.changeText(description);
+        }
     }
 
     @Override

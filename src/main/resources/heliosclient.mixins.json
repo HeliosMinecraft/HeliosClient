@@ -4,6 +4,7 @@
   "package": "dev.heliosclient.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ExplosionMixin",
     "MixinMinecraftServer",
     "MixinPlayerEntity",
     "MixinServerPlayerEntity",

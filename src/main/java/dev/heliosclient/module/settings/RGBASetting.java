@@ -45,7 +45,7 @@ public class RGBASetting extends Setting implements Listener {
         this.description = description;
         this.color = defaultColor;
         this.height = 25;
-        this.heightCompact = 20;
+        this.heightCompact = 17;
         float[] hsbvals = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
         this.hue = hsbvals[0];
         this.saturation = hsbvals[1];
@@ -217,8 +217,8 @@ public class RGBASetting extends Setting implements Listener {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 2, -1);
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 71, y + 2, 10, 10, 2, color.getRGB());
+        compactFont.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 1, -1);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 71, y + 1, 10, 10, 2, color.getRGB());
 
         if (rainbow) {
             color = ColorUtils.getRainbowColor();

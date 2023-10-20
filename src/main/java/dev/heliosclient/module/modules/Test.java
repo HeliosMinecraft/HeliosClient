@@ -100,7 +100,7 @@ public class Test extends Module_ {
 
         Vec3d dimenstions = new Vec3d(1, 1, 1);
         Renderer3d.renderOutline(event.getMatrices(), Color.WHITE, start, dimenstions);
-        Renderer3d.renderLine(event.getMatrices(), Color.yellow, start, player.getEyePos());
+        Renderer3d.renderLine(event.getMatrices(), Color.yellow, start, player.getPos());
         Renderer3d.renderFilled(event.getMatrices(), Color.GREEN, start2, dimenstions);
         Renderer3d.renderEdged(event.getMatrices(), Color.CYAN, Color.BLACK, start3, dimenstions);
 

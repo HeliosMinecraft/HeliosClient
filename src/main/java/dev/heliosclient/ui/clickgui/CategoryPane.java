@@ -97,10 +97,10 @@ public class CategoryPane implements Listener {
 
         height = maxHeight;
         if (!collapsed && height >= 10) {
-            if (category != Category.SEARCH) {
-                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
-            } else {
+            if (category == Category.SEARCH) {
                 Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+            } else {
+                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
             }
         }
 
@@ -111,7 +111,7 @@ public class CategoryPane implements Listener {
         if (!collapsed) {
             int buttonYOffset = y + 10 + categoryNameHeight;
             if (category == Category.SEARCH) {
-                buttonYOffset = y + 25 + categoryNameHeight;
+                buttonYOffset = y + 27 + categoryNameHeight;
 
             }
 
@@ -135,7 +135,7 @@ public class CategoryPane implements Listener {
 
                             setting.quickSettings = m.settingsOpen;
                             setting.renderCompact(drawContext, x, buttonYOffset + 3, mouseX, mouseY, textRenderer);
-                            buttonYOffset += setting.heightCompact + 1;
+                            buttonYOffset += setting.heightCompact;
                         }
                         buttonYOffset += Math.round(settingBuilder.getGroupNameHeight());
                     }

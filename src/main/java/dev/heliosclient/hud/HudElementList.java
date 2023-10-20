@@ -16,6 +16,8 @@ public class HudElementList {
         registerElement(new Bps());
         registerElement(new Ping());
         registerElement(new ModuleList());
+        registerElement(new TestHud());
+
     }
 
     public void registerElement(HudElement module) {

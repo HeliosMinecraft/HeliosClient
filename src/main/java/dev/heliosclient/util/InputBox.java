@@ -5,6 +5,7 @@ import dev.heliosclient.event.events.CharTypedEvent;
 import dev.heliosclient.event.events.KeyPressedEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.util.animation.AnimationUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -70,9 +71,6 @@ public class InputBox implements Listener {
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 1.2f, y - 0.5f, width + 1.5f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y, width, height, 2, Color.BLACK.getRGB());
         float textHeight = Renderer2D.getFxStringHeight();
-        if (Renderer2D.isVanillaRenderer()) {
-            textHeight -= 3;
-        }
         float textY = y + (height - textHeight) / 2; // Center the text vertically
 
         if (focused) {
@@ -93,22 +91,21 @@ public class InputBox implements Listener {
 
                 // Display the segment that contains the cursor
                 String displayValue = textSegments.get(segmentIndex);
-                // drawContext.drawText(textRenderer,Text.literal(displayValue),x + 5,y + height / 3 + 10 + textRenderer.fontHeight,0xFFFFFFFF,false);
-                Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, textY, 0xFFFFFFFF);
+                Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, Renderer2D.isVanillaRenderer() ? textY + 1 : textY, 0xFFFFFFFF);
 
                 // Draw the cursor
                 int cursorX = (int) (x + 5 + Renderer2D.getFxStringWidth(displayValue.substring(0, cursorPosition - segmentStartIndex)));
                 Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
                         cursorX - 0.4f,
-                        textY,
+                        textY + 0.5f,
                         0.6f,
-                        textHeight,
+                        textHeight - 0.5f,
                         ColorUtils.rgbaToInt(150, 150, 150, 255));
             }
         } else {
             // Display the first segment of the text
             String displayValue = !textSegments.isEmpty() ? textSegments.get(0) : "";
-            Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, textY, 0xFFAAAAAA);            //drawContext.drawText(textRenderer, Text.literal(displayValue), x + 5, y + height / 3 + 10 + textRenderer.fontHeight, 0xFFAAAAAA, false);
+            Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, Renderer2D.isVanillaRenderer() ? textY + 1 : textY, 0xFFAAAAAA);
         }
 
         // Draw selection box
@@ -118,7 +115,7 @@ public class InputBox implements Listener {
             if (endX > x + width) {
                 endX = x + width;
             }
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, textY, endX - startX + 1, textHeight, new Color(0, 166, 255, 64).getRGB());
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, Renderer2D.isVanillaRenderer() ? textY + 1 : textY, endX - startX + 1, textHeight, new Color(0, 166, 255, 64).getRGB());
         }
     }
 
@@ -216,13 +213,6 @@ public class InputBox implements Listener {
         }
     }
 
-    public void keyReleased(int keyCode, int scanCode, int modifiers) {
-     /*   if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT || keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT) {
-            selecting = false;
-        }
-
-      */
-    }
 
     private void insertCharacter(char chr) {
         if (value.length() <= characterLimit) {
@@ -244,26 +234,36 @@ public class InputBox implements Listener {
                 case DIGITS -> {
                     if (Character.isDigit(chr) || Character.toString(chr).equals(".")) {
                         insertCharacter(chr);
+                    } else {
+                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only digits " + ColorUtils.green + "0-9 ", true, 1000);
                     }
                 }
                 case CHARACTERS -> {
                     if (Character.isLetter(chr)) {
                         insertCharacter(chr);
+                    } else {
+                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only letters a-z // A-Z", true, 1000);
                     }
                 }
                 case CHARACTERS_AND_WHITESPACE -> {
                     if (Character.isLetter(chr) || Character.isWhitespace(chr)) {
                         insertCharacter(chr);
+                    } else {
+                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only letters or blank " + ColorUtils.green + " a-z // A-Z //  ", true, 1000);
                     }
                 }
                 case DIGITS_AND_CHARACTERS_AND_WHITESPACE -> {
                     if (Character.isLetterOrDigit(chr) || Character.isWhitespace(chr)) {
                         insertCharacter(chr);
+                    } else {
+                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only digits or letters or blank " + ColorUtils.green + " a-z // A-Z //   // 0-9", true, 1000);
                     }
                 }
                 case DIGITS_AND_CHARACTERS -> {
                     if (Character.isLetterOrDigit(chr)) {
                         insertCharacter(chr);
+                    } else {
+                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only digits or letters" + ColorUtils.green + " a-z // A-Z // 0-9", true, 1000);
                     }
                 }
                 case ALL -> insertCharacter(chr);

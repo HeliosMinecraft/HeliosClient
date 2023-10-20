@@ -1,21 +1,28 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.FontChangeEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.function.BooleanSupplier;
 
-public abstract class Setting {
+public abstract class Setting implements Listener {
     public String name;
     public String description;
     public int height = 24;
     public int width = 192;
-    public int heightCompact = 24;
+    protected static fxFontRenderer compactFont;
     public int widthCompact = CategoryPane.getWidth();
     public Object value;
     public Object defaultValue;
@@ -25,9 +32,20 @@ public abstract class Setting {
     int hovertimer = 0;
     private int hoverAnimationTimer = 0;
     protected BooleanSupplier shouldRender = () -> true; // Default to true
+    public int heightCompact = 18;
 
     public Setting(BooleanSupplier shouldRender) {
         this.shouldRender = shouldRender;
+        EventManager.register(this);
+        if (HeliosClient.MC.getWindow() != null) {
+            compactFont = new fxFontRenderer(FontManager.fonts, 6);
+        }
+    }
+
+    @SubscribeEvent
+    private void onFontChange(FontChangeEvent event) {
+        System.out.println("FONT CHANGE");
+        compactFont = new fxFontRenderer(FontManager.fonts, 6);
     }
 
     /**
