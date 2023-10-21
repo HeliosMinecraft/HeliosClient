@@ -16,7 +16,6 @@ import java.util.Iterator;
 public class NotificationManager implements Listener {
     private static final int HEIGHT = 25;
     private final Deque<Notification> notifications = new ArrayDeque<>();
-    private long lastUpdateTime;
     private fxFontRenderer fontRenderer;
 
     public NotificationManager() {
@@ -27,9 +26,6 @@ public class NotificationManager implements Listener {
 
     public void addNotification(Notification notification) {
         notifications.addFirst(notification);
-        if (notifications.size() > 1) {
-            lastUpdateTime = System.currentTimeMillis();
-        }
         updatePositions();
     }
 
@@ -54,6 +50,7 @@ public class NotificationManager implements Listener {
 
     @SubscribeEvent
     public void render(RenderEvent event) {
+
         Iterator<Notification> iterator = notifications.descendingIterator();
         while (iterator.hasNext()) {
             Notification notification = iterator.next();
@@ -64,6 +61,5 @@ public class NotificationManager implements Listener {
     @SubscribeEvent
     public void onFontChange(FontChangeEvent event) {
         fontRenderer = new fxFontRenderer(event.getFonts(), 6);
-        System.out.println("FONT CHANGED");
     }
 }

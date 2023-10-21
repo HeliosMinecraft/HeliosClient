@@ -27,11 +27,10 @@ public class CustomFov extends Module_ {
         super("CustomFOV", "Allows you to set custom field of view.", Category.RENDER);
         addSettingGroup(sgGeneral);
         addQuickSettingGroup(sgGeneral);
-        //quickSettings.add(RainbowPane);
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
         ((ISimpleOption<Integer>) (Object) mc.options.getFov()).setValueUnrestricted((int) (FOV.value));
     }
 
@@ -44,6 +43,6 @@ public class CustomFov extends Module_ {
     @Override
     public void onDisable() {
         super.onDisable();
-        mc.options.getFov().setValue(previousFov);
+        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).setValueUnrestricted(previousFov);
     }
 }

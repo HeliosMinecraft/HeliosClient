@@ -9,6 +9,7 @@ import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.DamageUtils;
+import dev.heliosclient.util.SoundUtils;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import org.slf4j.Logger;
@@ -35,6 +36,14 @@ public class HeliosClient implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("Helios Client loading...");
         loadConfig();
+
+        EventManager.register(fontManager);
+        EventManager.register(notificationManager);
+        EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
+        EventManager.register(KeybindManager.INSTANCE);
+        EventManager.register(new DamageUtils());
+
+        SoundUtils.registerSounds();
     }
 
     public void loadConfig() {
@@ -44,11 +53,6 @@ public class HeliosClient implements ModInitializer {
             CONFIG.save();
         }
         CONFIG.load();
-        EventManager.register(fontManager);
-        EventManager.register(notificationManager);
-        EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
-        EventManager.register(KeybindManager.INSTANCE);
-        EventManager.register(new DamageUtils());
 
         for (Module_ m : ModuleManager.INSTANCE.modules) {
             for (SettingGroup settingBuilder : m.settingGroups) {

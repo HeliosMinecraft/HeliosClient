@@ -21,7 +21,8 @@ public class ModuleManager {
                 new ModulesList(),
                 new CustomFov(),
                 new Test(),
-                new ChatHighlight()
+                new ChatHighlight(),
+                new NotificationModule()
         );
     }
 
