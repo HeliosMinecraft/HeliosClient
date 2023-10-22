@@ -1,20 +1,15 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.FontChangeEvent;
-import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -23,7 +18,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryPane implements Listener {
+public class CategoryPane {
     public Category category;
     public int x;
     public int y;
@@ -34,7 +29,8 @@ public class CategoryPane implements Listener {
     boolean dragging = false;
     ArrayList<ModuleButton> moduleButtons;
     private final Screen parentScreen;
-    private fxFontRenderer fxFontRenderer;
+    public static int MAX_HEIGHT = 150;
+    private int scrollOffset = 0;
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
         this.category = category;
@@ -47,10 +43,6 @@ public class CategoryPane implements Listener {
             moduleButtons.add(new ModuleButton(m, parentScreen));
         }
         if (moduleButtons.size() == 0) collapsed = true;
-        EventManager.register(this);
-        if (HeliosClient.MC.getWindow() != null) {
-            fxFontRenderer = new fxFontRenderer(FontManager.fonts, 8f);
-        }
         height = Math.round((moduleButtons.size() * (5 + Renderer2D.getStringHeight())));
     }
 
@@ -96,11 +88,21 @@ public class CategoryPane implements Listener {
         }
 
         height = maxHeight;
+
+        if (ClickGUI.ScrollTypes.values()[ClickGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
+            MAX_HEIGHT = height;
+        } else {
+            MAX_HEIGHT = (int) Math.round(ClickGUI.CategoryHeight.value);
+            if (MAX_HEIGHT > height) {
+                MAX_HEIGHT = height;
+            }
+        }
+
         if (!collapsed && height >= 10) {
-            if (category == Category.SEARCH) {
-                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+            if (category == Categories.SEARCH) {
+                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, MAX_HEIGHT, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
             } else {
-                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, height, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, MAX_HEIGHT, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
             }
         }
 
@@ -109,10 +111,9 @@ public class CategoryPane implements Listener {
             y = mouseY - startY;
         }
         if (!collapsed) {
-            int buttonYOffset = y + 10 + categoryNameHeight;
-            if (category == Category.SEARCH) {
-                buttonYOffset = y + 27 + categoryNameHeight;
-
+            int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
+            if (category == Categories.SEARCH) {
+                buttonYOffset = y + 27 + categoryNameHeight - scrollOffset + 17;
             }
 
 
@@ -122,14 +123,20 @@ public class CategoryPane implements Listener {
                 }
 
                 m.setFaded(false);
-                m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth);
+                if (buttonYOffset >= y && buttonYOffset < y + MAX_HEIGHT) {
+                    m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth);
+                }
+
                 buttonYOffset += categoryNameHeight + 10;
                 // Draw the settings for this module if they are open
                 if (m.settingsOpen) {
                     for (SettingGroup settingBuilder : m.module.quickSettingGroups) {
                         buttonYOffset += Math.round(settingBuilder.getGroupNameHeight() + 3);
+
                         settingBuilder.renderBuilder(drawContext, x - 1, buttonYOffset, width);
+
                         if (!settingBuilder.shouldRender()) continue;
+
                         for (Setting setting : settingBuilder.getSettings()) {
                             if (!setting.shouldRender()) continue;
 
@@ -156,18 +163,24 @@ public class CategoryPane implements Listener {
     }
 
     public boolean hovered(double mouseX, double mouseY) {
-        int categoryNameHeight = (int) FontManager.fxfontRenderer.getStringHeight(category.name);
+        int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
         return mouseX > x + 2 && mouseX < x + (width - 2) && mouseY > y + 2 && mouseY < y + categoryNameHeight + 14;
     }
+
+    public boolean hoveredOverModules(double mouseX, double mouseY) {
+        int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
+        return mouseX > x + 2 && mouseX < x + (width - 2) && mouseY > y + categoryNameHeight + 14 && mouseY < y + height;
+    }
+
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.mouseClicked(mouseX, mouseY, button, collapsed)) return;
             if (moduleButton.settingsOpen) {
-                for (SettingGroup settingBuilder : moduleButton.module.quickSettingGroups) {
-                    settingBuilder.mouseClickedBuilder(mouseX, mouseY);
-                    if (!settingBuilder.shouldRender()) continue;
-                    settingBuilder.mouseClicked(mouseX, mouseY, button);
+                for (SettingGroup settingGroup : moduleButton.module.quickSettingGroups) {
+                    settingGroup.mouseClickedBuilder(mouseX, mouseY);
+                    if (!settingGroup.shouldRender()) continue;
+                    settingGroup.mouseClicked(mouseX, mouseY, button);
                 }
             }
         }
@@ -184,12 +197,24 @@ public class CategoryPane implements Listener {
         }
     }
 
+    public void mouseScrolled(int mouseX, int mouseY, double amount) {
+        if (hoveredOverModules(mouseX, mouseY) && ClickGUI.ScrollTypes.values()[ClickGUI.ScrollType.value] == ClickGUI.ScrollTypes.NEW) {
+            int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
+            // Scroll this pane by changing the scroll offset
+            scrollOffset += (int) (amount * ClickGUI.ScrollSpeed.value);
+
+            // Clamp the scroll offset to prevent scrolling past the start or end of the modules
+            int maxScroll = Math.max(0, moduleButtons.size() * (categoryNameHeight + 10));
+            scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
+        }
+    }
+
     public void mouseReleased(int mouseX, int mouseY, int button) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.settingsOpen) {
-                for (SettingGroup settingBuilder : moduleButton.module.quickSettingGroups) {
-                    if (!settingBuilder.shouldRender()) continue;
-                    settingBuilder.mouseReleased(mouseX, mouseY, button);
+                for (SettingGroup settingGroup : moduleButton.module.quickSettingGroups) {
+                    if (!settingGroup.shouldRender()) continue;
+                    settingGroup.mouseReleased(mouseX, mouseY, button);
                 }
             }
         }
@@ -199,9 +224,9 @@ public class CategoryPane implements Listener {
     public void charTyped(char chr, int modifiers) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.settingsOpen) {
-                for (SettingGroup settingBuilder : moduleButton.module.quickSettingGroups) {
-                    if (!settingBuilder.shouldRender()) continue;
-                    settingBuilder.charTyped(chr, modifiers);
+                for (SettingGroup settingGroup : moduleButton.module.quickSettingGroups) {
+                    if (!settingGroup.shouldRender()) continue;
+                    settingGroup.charTyped(chr, modifiers);
                 }
             }
         }
@@ -209,10 +234,5 @@ public class CategoryPane implements Listener {
 
     public static int getWidth() {
         return width;
-    }
-
-    @SubscribeEvent
-    public void onFontChange(FontChangeEvent fontChangeEvent) {
-        fxFontRenderer = new fxFontRenderer(fontChangeEvent.getFonts(), 8f);
     }
 }

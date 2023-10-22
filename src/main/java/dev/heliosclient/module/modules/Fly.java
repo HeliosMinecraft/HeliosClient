@@ -2,12 +2,12 @@ package dev.heliosclient.module.modules;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 
 public class Fly extends Module_ {
     public Fly() {
-        super("Fly", "Allows you to fly in survival mode.", Category.MOVEMENT);
+        super("Fly", "Allows you to fly in survival mode.", Categories.MOVEMENT);
     }
 
     @SubscribeEvent

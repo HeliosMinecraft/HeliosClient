@@ -2,7 +2,7 @@ package dev.heliosclient.module.modules;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
@@ -36,7 +36,7 @@ public class NoFall extends Module_ {
     );
 
     public NoFall() {
-        super("NoFall", "Prevents you from taking fall damage.", Category.PLAYER);
+        super("NoFall", "Prevents you from taking fall damage.", Categories.PLAYER);
 
         addSettingGroup(sgGeneral);
 

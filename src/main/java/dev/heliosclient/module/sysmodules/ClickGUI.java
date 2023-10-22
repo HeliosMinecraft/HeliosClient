@@ -4,7 +4,7 @@ import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.ui.clickgui.Tooltip;
@@ -24,6 +24,26 @@ public class ClickGUI extends Module_ {
     public static boolean keybinds = false;
     static ClickGUI INSTANCE = new ClickGUI();
     public static SettingGroup sgFont = new SettingGroup("Font");
+    public static CycleSetting ScrollType = sgFont.add(new CycleSetting.Builder()
+            .name("Scrolling System")
+            .description("Scrolling for the ClickGui")
+            .module(INSTANCE)
+            .value(new ArrayList<>(List.of(ScrollTypes.values())))
+            .listValue(0)
+            .shouldRender(() -> true)
+            .build()
+    );
+    public static DoubleSetting CategoryHeight = sgFont.add(new DoubleSetting.Builder()
+            .name("CategoryPane Height")
+            .description("CategoryPane Height for the ClickGUI")
+            .module(INSTANCE)
+            .value(150.0)
+            .max(1000)
+            .min(25)
+            .roundingPlace(0)
+            .shouldRender(() -> ScrollType.value == 1)
+            .build()
+    );
     public static DoubleSetting ScrollSpeed = sgFont.add(new DoubleSetting.Builder()
             .name("Scroll Speed")
             .description("Change your scroll speed for the ClickGUI")
@@ -137,7 +157,7 @@ public class ClickGUI extends Module_ {
     );
 
     public ClickGUI() {
-        super("ClickGUI", "ClickGui related stuff.", Category.RENDER);
+        super("ClickGUI", "ClickGui related stuff.", Categories.RENDER);
 
         addSettingGroup(sgFont);
         addSettingGroup(sgGeneral);
@@ -206,5 +226,10 @@ public class ClickGUI extends Module_ {
 
     @Override
     public void toggle() {
+    }
+
+    public enum ScrollTypes {
+        OLD,
+        NEW
     }
 }

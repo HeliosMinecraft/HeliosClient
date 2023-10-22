@@ -1,6 +1,6 @@
 package dev.heliosclient.module.modules;
 
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -17,7 +17,7 @@ public class NotificationModule extends Module_ {
     );
 
     public NotificationModule() {
-        super("Notifications", "Change notifications for certain events", Category.MISC);
+        super("Notifications", "Change notifications for certain events", Categories.MISC);
         addSettingGroup(sgNotifications);
         addQuickSettingGroup(sgNotifications);
     }

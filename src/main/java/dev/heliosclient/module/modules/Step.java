@@ -2,7 +2,7 @@ package dev.heliosclient.module.modules;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
@@ -31,7 +31,7 @@ public class Step extends Module_ {
     );
 
     public Step() {
-        super("Step", "Allows you to step up full blocks.", Category.MOVEMENT);
+        super("Step", "Allows you to step up full blocks.", Categories.MOVEMENT);
 
         addSettingGroup(sgGeneral);
 

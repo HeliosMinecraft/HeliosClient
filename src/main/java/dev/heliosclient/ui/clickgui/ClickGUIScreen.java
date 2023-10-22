@@ -1,8 +1,9 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.CategoryManager;
 import dev.heliosclient.managers.ModuleManager;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.InputBox;
@@ -28,18 +29,24 @@ public class ClickGUIScreen extends Screen {
         scrollY = 0;
         categoryPanes = new ArrayList<CategoryPane>();
         Map<String, Object> panePos = ((Map<String, Object>) HeliosClient.CONFIG.config.get("panes"));
-        for (Category category : Category.values()) {
-            int xOffset = MathUtils.d2iSafe(((Map<String, Object>) panePos.get(category.name)).get("x"));
-            int yOffset = MathUtils.d2iSafe(((Map<String, Object>) panePos.get(category.name)).get("y"));
-            boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
-            categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
-        }
+
+        CategoryManager.getCategories().forEach((s, category) -> {
+                    int xOffset = MathUtils.d2iSafe((((Map<String, Object>) panePos.get(category.name)).get("x")));
+                    int yOffset = MathUtils.d2iSafe(((Map<String, Object>) panePos.get(category.name)).get("y"));
+                    boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
+                    categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
+                }
+        );
+
         searchBox = new InputBox(CategoryPane.getWidth() - 4, 12, "", 20, InputBox.InputMode.DIGITS_AND_CHARACTERS_AND_WHITESPACE);
     }
 
     public static void onScroll(double horizontal, double vertical) {
+        if (ClickGUI.ScrollTypes.values()[ClickGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
+            // Old mode: scroll the whole screen
+            scrollY += vertical;
+        }
         scrollX += horizontal;
-        scrollY += vertical;
     }
 
     @Override
@@ -49,11 +56,11 @@ public class ClickGUIScreen extends Screen {
             category.y += scrollY * 10;
             category.x += scrollX * 10;
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
-            if (category.category == Category.SEARCH && !category.collapsed) {
+            if (category.category == Categories.SEARCH && !category.collapsed) {
 
                 Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), category.x, category.y + 17, CategoryPane.getWidth(), 18, 0xFF1B1B1B);
 
-                searchBox.render(drawContext, category.x, (int) (category.y + 19), mouseX, mouseY, textRenderer);
+                searchBox.render(drawContext, category.x, category.y + 19, mouseX, mouseY, textRenderer);
 
                 category.addModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()));
 
@@ -74,11 +81,18 @@ public class ClickGUIScreen extends Screen {
         //HeliosClient.fontRenderer.drawString(drawContext.getMatrices(),"This is testing font", (float) client.getWindow().getScaledWidth() /2,client.getWindow().getScaledWidth()-10, 255,255 , 255, 255);
     }
 
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        for (CategoryPane category : categoryPanes) {
+            category.mouseScrolled((int) mouseX, (int) mouseY, amount);
+        }
+        return super.mouseScrolled(mouseX, mouseY, amount);
+    }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (CategoryPane category : categoryPanes) {
-            if (category.category == Category.SEARCH && !category.collapsed) {
+            if (category.category == Categories.SEARCH && !category.collapsed) {
                 searchBox.mouseClicked(mouseX, mouseY, button);
             }
             category.mouseClicked((int) mouseX, (int) mouseY, button);

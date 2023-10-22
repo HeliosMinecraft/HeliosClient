@@ -1,7 +1,7 @@
 package dev.heliosclient.module.modules;
 
 import dev.heliosclient.managers.FriendManager;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -33,7 +33,7 @@ public class ChatHighlight extends Module_ {
     );
 
     public ChatHighlight() {
-        super("Chat Highlighter", "Highlights specified words in chat messages.", Category.CHAT);
+        super("Chat Highlighter", "Highlights specified words in chat messages.", Categories.CHAT);
 
         addSettingGroup(sgGeneral);
 

@@ -3,7 +3,7 @@ package dev.heliosclient.module.modules;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.ColorSetting;
@@ -40,7 +40,7 @@ public class HUDModule extends Module_ {
 
 
     public HUDModule() {
-        super("HUD", "The HeliosClient HUD. Toggle to update.", Category.RENDER);
+        super("HUD", "The HeliosClient HUD. Toggle to update.", Categories.RENDER);
         this.active.value = true;
         this.showInModulesList.value = false;
 

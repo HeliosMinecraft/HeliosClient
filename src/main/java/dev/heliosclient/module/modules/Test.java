@@ -3,7 +3,7 @@ package dev.heliosclient.module.modules;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.*;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
@@ -38,7 +38,7 @@ public class Test extends Module_ {
 
 
     public Test() {
-        super("Test", "Render Test", Category.RENDER);
+        super("Test", "Render Test", Categories.RENDER);
 
         addSettingGroup(sgGeneral);
         addQuickSettingGroup(sgGeneral);
@@ -103,7 +103,6 @@ public class Test extends Module_ {
         Renderer3d.renderLine(event.getMatrices(), Color.yellow, start, player.getPos());
         Renderer3d.renderFilled(event.getMatrices(), Color.GREEN, start2, dimenstions);
         Renderer3d.renderEdged(event.getMatrices(), Color.CYAN, Color.BLACK, start3, dimenstions);
-
     }
 
 

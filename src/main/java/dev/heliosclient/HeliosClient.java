@@ -1,6 +1,8 @@
 package dev.heliosclient;
 
+import dev.heliosclient.addon.AddonManager;
 import dev.heliosclient.managers.*;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -31,10 +33,15 @@ public class HeliosClient implements ModInitializer {
     public static int uiColor = 0x55FFFF;
     public static FontManager fontManager = new FontManager();
     public static NotificationManager notificationManager = new NotificationManager();
+    public static AddonManager addonManager = new AddonManager();
 
     @Override
     public void onInitialize() {
         LOGGER.info("Helios Client loading...");
+        addonManager.loadAddons();
+        AddonManager.initializeAddons();
+
+        Categories.registerCategories();
         loadConfig();
 
         EventManager.register(fontManager);

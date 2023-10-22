@@ -1,7 +1,7 @@
 package dev.heliosclient.module.modules;
 
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
@@ -46,7 +46,7 @@ public class Fullbright extends Module_ {
 
 
     public Fullbright() {
-        super("Fullbright", "Allows you to see in the dark.", Category.RENDER);
+        super("Fullbright", "Allows you to see in the dark.", Categories.RENDER);
         EventManager.register(this);
 
         addSettingGroup(sgGeneral);
