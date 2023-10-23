@@ -1,8 +1,6 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
-import dev.heliosclient.ui.clickgui.ClientSettingsScreen;
-import dev.heliosclient.ui.clickgui.SettingsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import org.spongepowered.asm.mixin.Final;
@@ -18,13 +16,10 @@ public abstract class MouseMixin {
     @Final
     private MinecraftClient client;
 
-    @Inject(method = "onMouseScroll", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onMouseScroll", at = @At("HEAD"))
     public void onMouseScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
-        if (client.currentScreen instanceof SettingsScreen)
-            SettingsScreen.onScroll(horizontal, vertical);
-        else if (client.currentScreen instanceof ClickGUIScreen)
+        if (client.currentScreen instanceof ClickGUIScreen)
             ClickGUIScreen.onScroll(horizontal, vertical);
-        else if (client.currentScreen instanceof ClientSettingsScreen)
-            ClientSettingsScreen.onScroll(horizontal, vertical);
+
     }
 }

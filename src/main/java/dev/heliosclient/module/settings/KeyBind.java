@@ -15,6 +15,8 @@ public class KeyBind extends Setting {
 
     public int value;
     public boolean listening = false;
+    public static boolean listeningKey = false;
+
     Module_ module;
 
     public KeyBind(String name, String description, Module_ module, Integer value, BooleanSupplier shouldRender) {
@@ -85,6 +87,7 @@ public class KeyBind extends Setting {
                 this.value = keyCode;
             }
             listening = false;
+            listeningKey = false;
             module.onSettingChange(this);
         }
     }
@@ -93,6 +96,7 @@ public class KeyBind extends Setting {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (hovered((int) mouseX, (int) mouseY) && button == 0) {
             listening = !listening;
+            listeningKey = !listeningKey;
         }
     }
 

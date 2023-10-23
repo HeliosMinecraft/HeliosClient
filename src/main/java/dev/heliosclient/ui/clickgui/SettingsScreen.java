@@ -2,6 +2,7 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
@@ -33,13 +34,18 @@ public class SettingsScreen extends Screen {
         this.parentScreen = parentScreen;
     }
 
-    public static void onScroll(double horizontal, double vertical) {
-        offsetY += vertical * (Easing.ease(EasingType.QUADRATIC_IN, (float) ClickGUI.ScrollSpeed.value));
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        offsetY += (int) (amount * (Easing.ease(EasingType.QUADRATIC_IN, (float) ClickGUI.ScrollSpeed.value)));
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext);
+
+        int halfWindowWidth = drawContext.getScaledWindowWidth() / 2;
+
 
         windowHeight = 52;
         for (SettingGroup settingBuilder : module.settingGroups) {
@@ -65,12 +71,21 @@ public class SettingsScreen extends Screen {
 
         x = Math.max(drawContext.getScaledWindowWidth() / 2 - windowWidth / 2, 0);
 
+        // Draw the screen
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, windowWidth, windowHeight, 5, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 180).getRGB());
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, true, true, false, false, windowWidth, 18, 5, ColorManager.INSTANCE.clickGuiPrimary);
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
-        drawContext.drawText(textRenderer, module.name, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
-        drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + module.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
+
+        //Render module name and description
+        String warpedText = Renderer2D.wrapText("§o" + module.description, windowWidth, textRenderer);
+        int warpedTextWidth = textRenderer.getWidth(warpedText);
+
+        drawContext.drawText(textRenderer, module.name, halfWindowWidth - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
+        drawContext.drawText(textRenderer, warpedText, halfWindowWidth - warpedTextWidth / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
+
+        // Render the back button
         backButton.render(drawContext, textRenderer, x + 4, y + 4, mouseX, mouseY);
+
         int yOffset = y + 44;
         for (SettingGroup settingBuilder : module.settingGroups) {
             yOffset += Math.round(settingBuilder.getGroupNameHeight() + 10);
@@ -127,7 +142,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE && !KeyBind.listeningKey) {
             MinecraftClient.getInstance().setScreen(parentScreen);
         }
         for (SettingGroup settingBuilder : module.settingGroups) {

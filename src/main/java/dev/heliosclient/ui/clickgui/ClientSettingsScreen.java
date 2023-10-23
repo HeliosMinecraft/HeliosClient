@@ -30,13 +30,18 @@ public class ClientSettingsScreen extends Screen {
         offsetY = 0;
     }
 
-    public static void onScroll(double horizontal, double vertical) {
-        offsetY += vertical * (Easing.ease(EasingType.QUADRATIC_IN, (float) ClickGUI.ScrollSpeed.value));
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        offsetY += (int) (amount * (Easing.ease(EasingType.QUADRATIC_IN_OUT, (float) ClickGUI.ScrollSpeed.value)));
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext);
+
+        int halfWindowWidth = drawContext.getScaledWindowWidth() / 2;
+
         windowHeight = 52;
         for (SettingGroup settingBuilder : module.settingGroups) {
             windowHeight += Math.round(settingBuilder.getGroupNameHeight() + 3);
@@ -64,8 +69,14 @@ public class ClientSettingsScreen extends Screen {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, windowWidth, windowHeight, 5, 0xFF222222);
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, windowWidth, 18, 5, 0xFF1B1B1B);
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
-        drawContext.drawText(textRenderer, module.name, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
-        drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + module.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
+
+
+        String warpedText = Renderer2D.wrapText("§o" + module.description, windowWidth, textRenderer);
+        int warpedTextWidth = textRenderer.getWidth(warpedText);
+
+        drawContext.drawText(textRenderer, module.name, halfWindowWidth - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
+        drawContext.drawText(textRenderer, warpedText, halfWindowWidth - warpedTextWidth / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
+
         int yOffset = y + 44;
         for (SettingGroup settingBuilder : module.settingGroups) {
             yOffset += Math.round(settingBuilder.getGroupNameHeight() + 3);
