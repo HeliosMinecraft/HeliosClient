@@ -1,5 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
@@ -9,7 +10,9 @@ import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.Renderer2D;
+import me.x150.renderer.render.SVGFile;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -31,6 +34,9 @@ public class CategoryPane {
     private final Screen parentScreen;
     public static int MAX_HEIGHT = 150;
     private int scrollOffset = 0;
+    public int iconWidth = 10;
+    public int iconHeight = 10;
+    private SVGFile svgFile;
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
         this.category = category;
@@ -44,6 +50,12 @@ public class CategoryPane {
         }
         if (moduleButtons.size() == 0) collapsed = true;
         height = Math.round((moduleButtons.size() * (5 + Renderer2D.getStringHeight())));
+
+        if (FileUtils.doesFileInPathExist(category.iconSrc)) {
+            svgFile = new SVGFile(category.iconSrc, iconWidth, iconHeight);
+        } else {
+            HeliosClient.LOGGER.info("SVG File for " + category.name + "does not exist");
+        }
     }
 
     public void addModule(List<Module_> moduleS) {
@@ -123,7 +135,7 @@ public class CategoryPane {
                 }
 
                 m.setFaded(false);
-                if (buttonYOffset >= y && buttonYOffset < y + MAX_HEIGHT) {
+                if (buttonYOffset >= y + categoryNameHeight && buttonYOffset < y + MAX_HEIGHT) {
                     m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth);
                 }
 
@@ -159,7 +171,11 @@ public class CategoryPane {
         }
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 255).getRGB());
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
+        if (svgFile != null) {
+            // Gives a very shitty error idk why. Not fixable
+            //svgFile.render(drawContext.getMatrices(), x, y,iconWidth,iconHeight);
+        }
     }
 
     public boolean hovered(double mouseX, double mouseY) {

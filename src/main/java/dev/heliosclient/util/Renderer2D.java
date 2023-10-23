@@ -17,6 +17,8 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Renderer2D implements Listener {
 
@@ -533,4 +535,26 @@ public class Renderer2D implements Listener {
     public static void setDrawContext(DrawContext drawContext) {
         Renderer2D.drawContext = drawContext;
     }
+
+    public static List<String> wrapText(String text, int maxWidth) {
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder();
+
+        for (String word : words) {
+            if (Renderer2D.getStringWidth(line + word) > maxWidth) {
+                lines.add(line.toString());
+                line.setLength(0);
+            }
+            line.append(word).append(" ");
+        }
+
+        if (line.length() > 0) {
+            lines.add(line.toString());
+        }
+
+        return lines;
+    }
+
+
 }

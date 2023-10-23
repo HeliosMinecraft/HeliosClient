@@ -47,7 +47,7 @@ public class SettingsScreen extends Screen {
         int halfWindowWidth = drawContext.getScaledWindowWidth() / 2;
 
 
-        windowHeight = 52;
+        windowHeight = 45;
         for (SettingGroup settingBuilder : module.settingGroups) {
             windowHeight += Math.round(settingBuilder.getGroupNameHeight() + 10);
             if (!settingBuilder.shouldRender()) continue;
@@ -76,12 +76,14 @@ public class SettingsScreen extends Screen {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, true, true, false, false, windowWidth, 18, 5, ColorManager.INSTANCE.clickGuiPrimary);
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
 
-        //Render module name and description
-        String warpedText = Renderer2D.wrapText("§o" + module.description, windowWidth, textRenderer);
-        int warpedTextWidth = textRenderer.getWidth(warpedText);
-
         drawContext.drawText(textRenderer, module.name, halfWindowWidth - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
-        drawContext.drawText(textRenderer, warpedText, halfWindowWidth - warpedTextWidth / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
+
+        //Render module description wrapped to lines, so it doesn't appear out of the window
+        Renderer2D.wrapText("§o" + module.description, windowWidth).forEach(text -> {
+            int warpedTextWidth = textRenderer.getWidth(text);
+            drawContext.drawText(textRenderer, text, halfWindowWidth - warpedTextWidth / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
+            windowHeight += warpedTextWidth + 2;
+        });
 
         // Render the back button
         backButton.render(drawContext, textRenderer, x + 4, y + 4, mouseX, mouseY);

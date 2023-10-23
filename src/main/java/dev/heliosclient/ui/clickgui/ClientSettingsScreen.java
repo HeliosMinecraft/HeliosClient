@@ -42,7 +42,7 @@ public class ClientSettingsScreen extends Screen {
 
         int halfWindowWidth = drawContext.getScaledWindowWidth() / 2;
 
-        windowHeight = 52;
+        windowHeight = 45;
         for (SettingGroup settingBuilder : module.settingGroups) {
             windowHeight += Math.round(settingBuilder.getGroupNameHeight() + 3);
             if (!settingBuilder.shouldRender()) continue;
@@ -71,11 +71,14 @@ public class ClientSettingsScreen extends Screen {
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
 
 
-        String warpedText = Renderer2D.wrapText("§o" + module.description, windowWidth, textRenderer);
-        int warpedTextWidth = textRenderer.getWidth(warpedText);
-
         drawContext.drawText(textRenderer, module.name, halfWindowWidth - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
-        drawContext.drawText(textRenderer, warpedText, halfWindowWidth - warpedTextWidth / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
+
+        //Render module description wrapped to lines, so it doesn't appear out of the window
+        Renderer2D.wrapText("§o" + module.description, windowWidth).forEach(text -> {
+            int warpedTextWidth = textRenderer.getWidth(text);
+            drawContext.drawText(textRenderer, text, halfWindowWidth - warpedTextWidth / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
+            windowHeight += warpedTextWidth + 2;
+        });
 
         int yOffset = y + 44;
         for (SettingGroup settingBuilder : module.settingGroups) {
