@@ -50,6 +50,7 @@ public abstract class Module_ implements Listener {
             .description("If this module should show up in Module List.")
             .module(this)
             .value(true)
+            .defaultValue(true)
             .build()
     );
     /**
@@ -60,6 +61,7 @@ public abstract class Module_ implements Listener {
             .description("Key to toggle this module.")
             .module(this)
             .value(0)
+            .defaultValue(0)
             .build()
     );
     /**
@@ -106,18 +108,18 @@ public abstract class Module_ implements Listener {
      * @return Active status.
      */
     public boolean isActive() {
-        return active.value;
+        return active.value.booleanValue();
     }
 
     /**
      * Called on disable. Probably shouldn't disable original functionality since it will remove chat feedback.
      */
     public void onDisable() {
-        if (chatFeedback.value) {
+        if (chatFeedback.value.booleanValue()) {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
         }
-        if (NotificationModule.moduleNotification.value) {
+        if (NotificationModule.moduleNotification.value.booleanValue()) {
             HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, " was disabled!", 2000));
         }
         EventManager.unregister(this);
@@ -149,7 +151,7 @@ public abstract class Module_ implements Listener {
      */
     public void toggle() {
         active.value = !active.value;
-        if (active.value) {
+        if (active.value.booleanValue()) {
             onEnable();
         } else {
             onDisable();
@@ -186,7 +188,7 @@ public abstract class Module_ implements Listener {
      */
     public void onSettingChange(Setting setting) {
         if (setting == active) {
-            if (active.value) {
+            if (active.value.booleanValue()) {
                 onEnable();
             } else {
                 onDisable();

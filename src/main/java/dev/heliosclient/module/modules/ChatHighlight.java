@@ -22,6 +22,7 @@ public class ChatHighlight extends Module_ {
             .description("Whether to highlight your username or not.")
             .module(this)
             .value(true)
+            .defaultValue(true)
             .build()
     );
     BooleanSetting highlightFriends = sgGeneral.add(new BooleanSetting.Builder()
@@ -29,6 +30,7 @@ public class ChatHighlight extends Module_ {
             .description("Whether to highlight friend's username or not.")
             .module(this)
             .value(false)
+            .defaultValue(true)
             .build()
     );
 

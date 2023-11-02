@@ -11,16 +11,14 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.function.BooleanSupplier;
 
-public class KeyBind extends Setting {
-
+public class KeyBind extends Setting<Integer> {
     public int value;
     public boolean listening = false;
     public static boolean listeningKey = false;
-
     Module_ module;
 
-    public KeyBind(String name, String description, Module_ module, Integer value, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public KeyBind(String name, String description, Module_ module, Integer value, BooleanSupplier shouldRender, int defaultValue) {
+        super(shouldRender, defaultValue);
         this.module = module;
         this.name = name;
         this.description = description;
@@ -94,6 +92,7 @@ public class KeyBind extends Setting {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         if (hovered((int) mouseX, (int) mouseY) && button == 0) {
             listening = !listening;
             listeningKey = !listeningKey;
@@ -114,7 +113,7 @@ public class KeyBind extends Setting {
 
         @Override
         public KeyBind build() {
-            return new KeyBind(name, description, module, value, shouldRender);
+            return new KeyBind(name, description, module, value, shouldRender, defaultValue);
         }
     }
 }

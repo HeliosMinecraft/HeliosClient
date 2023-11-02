@@ -21,6 +21,7 @@ public class HUDModule extends Module_ {
             .description("Visibility of Client Tag.")
             .module(this)
             .value(true)
+            .defaultValue(true)
             .build()
     );
     public ColorSetting colorSetting = sgGeneral.add(new ColorSetting.Builder()
@@ -28,6 +29,7 @@ public class HUDModule extends Module_ {
             .description("Color of HUD.")
             .module(this)
             .value(new Color(241, 83, 92, 255).getRGB())
+            .defaultValue(new Color(241, 83, 92, 255).getRGB())
             .build()
     );
     BooleanSetting Rainbow = sgGeneral.add(new BooleanSetting.Builder()
@@ -35,6 +37,7 @@ public class HUDModule extends Module_ {
             .description("Toggles rainbow effect for HUD.")
             .module(this)
             .value(false)
+            .defaultValue(false)
             .build()
     );
 

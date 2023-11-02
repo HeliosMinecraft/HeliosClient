@@ -15,6 +15,7 @@ public class Speed extends Module_ {
             .description("Multiplier of speed.")
             .module(this)
             .value(2.0)
+            .defaultValue(2.0)
             .min(0.1)
             .max(10)
             .roundingPlace(1)

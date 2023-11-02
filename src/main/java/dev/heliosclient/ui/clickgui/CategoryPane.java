@@ -127,6 +127,7 @@ public class CategoryPane {
             if (category == Categories.SEARCH) {
                 buttonYOffset = y + 27 + categoryNameHeight - scrollOffset + 17;
             }
+            int boxHeight = 0;
 
 
             for (ModuleButton m : moduleButtons) {
@@ -144,7 +145,7 @@ public class CategoryPane {
                 if (m.settingsOpen) {
                     for (SettingGroup settingBuilder : m.module.quickSettingGroups) {
                         buttonYOffset += Math.round(settingBuilder.getGroupNameHeight() + 3);
-
+                        boxHeight += Math.round(settingBuilder.getGroupNameHeight() + 3);
                         settingBuilder.renderBuilder(drawContext, x - 1, buttonYOffset, width);
 
                         if (!settingBuilder.shouldRender()) continue;
@@ -155,12 +156,17 @@ public class CategoryPane {
                             setting.quickSettings = m.settingsOpen;
                             setting.renderCompact(drawContext, x, buttonYOffset + 3, mouseX, mouseY, textRenderer);
                             buttonYOffset += setting.heightCompact;
+                            boxHeight += setting.heightCompact;
                         }
                         buttonYOffset += Math.round(settingBuilder.getGroupNameHeight());
+                        boxHeight += Math.round(settingBuilder.getGroupNameHeight());
+
                     }
                     if (!m.module.quickSettingGroups.isEmpty()) {
                         buttonYOffset += 2;
+                        boxHeight = 0;
                     }
+                    m.setBoxHeight(boxHeight);
                 }
             }
         }

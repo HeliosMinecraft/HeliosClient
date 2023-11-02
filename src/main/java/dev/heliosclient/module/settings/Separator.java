@@ -6,11 +6,10 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.util.function.BooleanSupplier;
 
-public class Separator extends Setting {
-    public boolean value;
+public class Separator extends Setting<Boolean> {
 
-    public Separator(int height, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public Separator(int height, BooleanSupplier shouldRender, boolean defaultValue) {
+        super(shouldRender, defaultValue);
         this.height = height;
     }
 

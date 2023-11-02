@@ -11,13 +11,12 @@ import net.minecraft.client.gui.screen.Screen;
 import java.util.ArrayList;
 import java.util.function.BooleanSupplier;
 
-public class ListSetting extends Setting {
-    public ArrayList<String> value;
+public class ListSetting extends Setting<ArrayList<String>> {
     public ArrayList<String> options;
     Screen parentScreen;
 
-    public ListSetting(String name, String description, Screen parentScreen, ArrayList<String> options, ArrayList<String> value, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public ListSetting(String name, String description, Screen parentScreen, ArrayList<String> options, ArrayList<String> value, BooleanSupplier shouldRender, ArrayList<String> defaultValue) {
+        super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
         this.options = options;
@@ -35,6 +34,7 @@ public class ListSetting extends Setting {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         if (hovered((int) mouseX, (int) mouseY) && button == 0) {
             MinecraftClient.getInstance().setScreen(new ListSettingScreen(this, parentScreen));
         }
@@ -64,7 +64,7 @@ public class ListSetting extends Setting {
 
         @Override
         public ListSetting build() {
-            return new ListSetting(name, description, parentScreen, options, value, shouldRender);
+            return new ListSetting(name, description, parentScreen, options, value, shouldRender, defaultValue);
         }
     }
 }

@@ -5,11 +5,10 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.util.function.BooleanSupplier;
 
-public class Space extends Setting {
-    public boolean value;
+public class Space extends Setting<Boolean> {
 
-    public Space(int height, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public Space(int height, BooleanSupplier shouldRender, boolean defaultValue) {
+        super(shouldRender, defaultValue);
         this.height = height;
         this.heightCompact = height;
     }

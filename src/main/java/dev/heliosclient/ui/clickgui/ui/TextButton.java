@@ -1,6 +1,7 @@
-package dev.heliosclient.ui.clickgui;
+package dev.heliosclient.ui.clickgui.ui;
 
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -39,6 +40,12 @@ public class TextButton {
         if (hovered(mouseX, mouseY)) {
             ClickGUIScreen.INSTANCE.onLoad();
             MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
+        }
+    }
+
+    public void mouseClicked(int mouseX, int mouseY, Runnable task) {
+        if (hovered(mouseX, mouseY)) {
+            task.run();
         }
     }
 }

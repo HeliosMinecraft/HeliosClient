@@ -11,25 +11,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class StringListSetting extends Setting {
-    private final List<InputBox> inputBox = new ArrayList<>();
+public class StringListSetting extends Setting<String[]> {
+    private final List<InputBox> defaultInputBoxes = new ArrayList<>();
+    private final List<InputBox> inputBoxes = new ArrayList<>();
+
     private final int characterLimit;
-    public String[] values;
     String description;
     private final InputBox.InputMode inputMode;
 
-    public StringListSetting(String name, String description, String[] values, int defaultBoxes, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public StringListSetting(String name, String description, String[] defaultValues, int defaultBoxes, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender) {
+        super(shouldRender, defaultValues);
         this.name = name;
-        this.values = values;
+        this.value = defaultValues;
         this.description = description;
         this.height = 26 + defaultBoxes * 15;
         this.heightCompact = 0;
         this.characterLimit = characterLimit;
         this.inputMode = inputMode;
         for (int i = 0; i < defaultBoxes; i++) {
-            inputBox.add(new InputBox(160, 12, values[i], characterLimit, inputMode));
+            inputBoxes.add(new InputBox(160, 12, defaultValues[i], characterLimit, inputMode));
         }
+        defaultInputBoxes.addAll(inputBoxes);
     }
 
 
@@ -37,7 +39,7 @@ public class StringListSetting extends Setting {
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         this.x = x;
         this.y = y;
-        this.height = 26 + inputBox.size() * 16;
+        this.height = 26 + inputBoxes.size() * 16;
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 5, defaultColor);
@@ -48,7 +50,7 @@ public class StringListSetting extends Setting {
         drawContext.drawHorizontalLine(x + 167, x + 173, y + 10, Color.GREEN.getRGB());
         drawContext.drawVerticalLine(x + 170, y + 6, y + 14, Color.GREEN.getRGB());
         int boxOffset = y + 20;
-        for (InputBox box : inputBox) {
+        for (InputBox box : inputBoxes) {
             box.render(drawContext, x, boxOffset, mouseX, mouseY, textRenderer);
 
             // Draw a '-' button next to the text
@@ -61,17 +63,20 @@ public class StringListSetting extends Setting {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
+        if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
+            inputBoxes.clear();
+            inputBoxes.addAll(defaultInputBoxes);
+        }
 
         int boxOffset = y + 20;
         // Use a regular for loop with an index variable
         if (hoveredOverAdd(mouseX, mouseY)) {
-            inputBox.add(new InputBox(160, 13, "", characterLimit, inputMode)); // Add a new empty box to the list
+            inputBoxes.add(new InputBox(160, 13, "", characterLimit, inputMode)); // Add a new empty box to the list
         }
-        for (int i = 0; i < inputBox.size(); i++) {
-            InputBox box = inputBox.get(i); // Get the box at the current index
+        for (int i = 0; i < inputBoxes.size(); i++) {
+            InputBox box = inputBoxes.get(i); // Get the box at the current index
             if (hoveredOverRemove(mouseX, mouseY, boxOffset)) {
-                inputBox.remove(i); // Remove the box at the current index
+                inputBoxes.remove(i); // Remove the box at the current index
                 i--; // Decrement the index to account for the removal
             } else {
                 box.mouseClicked(mouseX, mouseY, button);
@@ -86,11 +91,11 @@ public class StringListSetting extends Setting {
     }
 
     public String[] getValue() {
-        return values;
+        return value;
     }
 
-    public List<InputBox> getInputBox() {
-        return inputBox;
+    public List<InputBox> getInputBoxes() {
+        return inputBoxes;
     }
 
     public boolean hoveredOverRemove(double mouseX, double mouseY, int boxOffset) {

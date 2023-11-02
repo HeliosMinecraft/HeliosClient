@@ -24,6 +24,7 @@ public class Fullbright extends Module_ {
             .description("Fullbright mode to apply")
             .module(this)
             .value(modes)
+            .defaultValue(modes)
             .listValue(0)
             .build()
     );
@@ -31,6 +32,7 @@ public class Fullbright extends Module_ {
             .module(this)
             .listValue(0)
             .value(Arrays.asList("Option 1", "Option 2"))
+            .defaultValue(Arrays.asList("Option 1", "Option 2"))
             .build();
 
     DoubleSetting gamma = sgGeneral.add(new DoubleSetting.Builder()
@@ -38,6 +40,7 @@ public class Fullbright extends Module_ {
             .description("Desired gamma value")
             .module(this)
             .value(15.0)
+            .defaultValue(15.0)
             .min(0)
             .max(15)
             .shouldRender(() -> mode.value == 0)

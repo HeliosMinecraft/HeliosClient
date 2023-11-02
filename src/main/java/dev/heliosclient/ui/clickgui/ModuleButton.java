@@ -22,10 +22,10 @@ public class ModuleButton {
     public boolean settingsOpen = false;
     AnimationUtils TextAnimation = new AnimationUtils();
     AnimationUtils BackgroundAnimation = new AnimationUtils();
-    private final int alpha = 255;
-    private final int hovertimer = 0;
     private boolean faded = true;
     public final Screen parentScreen;
+    public int boxHeight = 0;
+
 
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
@@ -63,18 +63,23 @@ public class ModuleButton {
         int moduleNameHeight = (int) Renderer2D.getFxStringHeight(module.name) - 1;
 
         // Adjust the button size based on the text dimensions
-        //this.height = moduleNameHeight + 6;
         this.width = maxWidth;
 
-        int fillColor = module.isActive() ? new Color(ColorManager.INSTANCE.clickGuiSecondary()).getRGB() : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB();
+        Color fillColor = module.isActive() ? new Color(ColorManager.INSTANCE.clickGuiSecondary()) : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
 
-        BackgroundAnimation.drawFadingBox(drawContext, x + 1, y, maxWidth, height, fillColor, true, 2);
+        BackgroundAnimation.drawFadingBox(drawContext, x + 1, y, maxWidth, height, fillColor.getRGB(), true, 2);
+        if (settingsOpen) {
+            BackgroundAnimation.drawFadingBox(drawContext, x + 1, y + height, maxWidth, boxHeight, ColorUtils.changeAlpha(fillColor, 100).getRGB(), true, 2);
+        }
+
         int textY = y + (height - moduleNameHeight) / 2;
 
         TextAnimation.drawFadingText(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor(), true);
         if (hovered(mouseX, mouseY)) {
             Tooltip.tooltip.changeText(module.description);
         }
+
+
         if (module.keyBind.value != 0 && ClickGUI.keybinds) {
             String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
             TextAnimation.drawFadingText(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor, true);
@@ -104,4 +109,11 @@ public class ModuleButton {
         return false;
     }
 
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setBoxHeight(int boxHeight) {
+        this.boxHeight = boxHeight;
+    }
 }

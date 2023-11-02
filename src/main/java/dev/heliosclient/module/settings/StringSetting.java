@@ -8,17 +8,16 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.util.function.BooleanSupplier;
 
-public class StringSetting extends Setting {
+public class StringSetting extends Setting<String> {
     private final InputBox inputBox;
     private final InputBox inputBoxCompact;
-
     private final int characterLimit;
-    public String value;
     String description;
+    public String value;
     private final InputBox.InputMode inputMode;
 
-    public StringSetting(String name, String description, String value, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public StringSetting(String name, String description, String value, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender, String defaultValue) {
+        super(shouldRender, defaultValue);
         this.name = name;
         this.value = value;
         this.description = description;
@@ -51,6 +50,7 @@ public class StringSetting extends Setting {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        inputBox.setText(value);
         super.mouseClicked(mouseX, mouseY, button);
         inputBox.setFocused(hovered((int) mouseX, (int) mouseY));
         inputBoxCompact.setFocused(hovered((int) mouseX, (int) mouseY));
@@ -92,7 +92,7 @@ public class StringSetting extends Setting {
 
         @Override
         public StringSetting build() {
-            return new StringSetting(name, description, value, characterLimit, inputMode, shouldRender);
+            return new StringSetting(name, description, value, characterLimit, inputMode, shouldRender, defaultValue);
         }
     }
 }

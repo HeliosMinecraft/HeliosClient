@@ -21,6 +21,7 @@ public class NoFall extends Module_ {
             .description("Height on which No Fall triggers")
             .module(this)
             .value(2.5)
+            .defaultValue(2.5)
             .min(2)
             .max(22)
             .roundingPlace(1)
@@ -31,6 +32,7 @@ public class NoFall extends Module_ {
             .description("Mode which should save player from fall height ")
             .module(this)
             .value(new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")))
+            .defaultValue(new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")))
             .listValue(0)
             .build()
     );

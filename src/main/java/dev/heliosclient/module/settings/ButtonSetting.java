@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class ButtonSetting extends Setting {
+public class ButtonSetting extends Setting<Boolean> {
     private final List<Button> buttons;
     private final String ButtonCategoryText;
 
-    public ButtonSetting(String ButtonCategoryText, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public ButtonSetting(String ButtonCategoryText, BooleanSupplier shouldRender, boolean defaultValue) {
+        super(shouldRender, defaultValue);
         this.heightCompact = 0;
         buttons = new ArrayList<>();
         this.ButtonCategoryText = ButtonCategoryText;
@@ -35,9 +35,7 @@ public class ButtonSetting extends Setting {
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        //  super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         Renderer2D.drawFixedString(drawContext.getMatrices(), ButtonCategoryText, (float) HeliosClient.MC.getWindow().getScaledWidth() / 2 - (float) textRenderer.getWidth(ButtonCategoryText) / 2 + 1, y + 2, ColorManager.INSTANCE.defaultTextColor());
-        //drawContext.drawText(textRenderer,ButtonCategoryText, HeliosClient.MC.getWindow().getScaledWidth()/2 - textRenderer.getWidth(ButtonCategoryText)/2 + 1, y + 2,Color.WHITE.getRGB(),true);
 
         int buttonX = x + 2;
         int buttonY = (int) (y + FontManager.fxfontRenderer.getStringHeight(ButtonCategoryText) + 10);
@@ -106,7 +104,7 @@ public class ButtonSetting extends Setting {
 
         @Override
         public ButtonSetting build() {
-            return new ButtonSetting(name, shouldRender);
+            return new ButtonSetting(name, shouldRender, defaultValue);
         }
     }
 }

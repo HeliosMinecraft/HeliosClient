@@ -19,22 +19,22 @@ import java.awt.*;
 
 public class Test extends Module_ {
     private final SettingGroup sgGeneral = new SettingGroup("General");
-    BooleanSetting rectangle = sgGeneral.add(new BooleanSetting("Rectangle", "", this, false, () -> true));
-    BooleanSetting rounded = sgGeneral.add(new BooleanSetting("Rounded", "", this, false, () -> true));
-    BooleanSetting Circle = sgGeneral.add(new BooleanSetting("Circle", "", this, false, () -> true));
-    BooleanSetting Triangle = sgGeneral.add(new BooleanSetting("Triangle", "", this, false, () -> true));
-    StringSetting num = sgGeneral.add(new StringSetting("Enter a number", "DESCRIPTION", "E", 100, InputBox.InputMode.ALL, () -> true));
+    BooleanSetting rectangle = sgGeneral.add(new BooleanSetting("Rectangle", "", this, false, () -> true, false));
+    BooleanSetting rounded = sgGeneral.add(new BooleanSetting("Rounded", "", this, false, () -> true, false));
+    BooleanSetting Circle = sgGeneral.add(new BooleanSetting("Circle", "", this, false, () -> true, false));
+    BooleanSetting Triangle = sgGeneral.add(new BooleanSetting("Triangle", "", this, false, () -> true, false));
+    StringSetting num = sgGeneral.add(new StringSetting("Enter a number", "DESCRIPTION", "E", 100, InputBox.InputMode.ALL, () -> true, "E"));
     String[] list = new String[]{"1ST", "2ND", "3RD", "LMAO"};
     StringListSetting stringListSetting = sgGeneral.add(new StringListSetting("Enter a number", "DESCRIPTION", list, 4, 100, InputBox.InputMode.DIGITS_AND_CHARACTERS, () -> true));
 
-    BooleanSetting PartiallyRounded = sgGeneral.add(new BooleanSetting("NotRounded", "", this, false, () -> true));
-    BooleanSetting GradientRounded = sgGeneral.add(new BooleanSetting("gradientrounded", "", this, false, () -> true));
-    BooleanSetting Gradient = sgGeneral.add(new BooleanSetting("Gradient", "", this, false, () -> true));
+    BooleanSetting PartiallyRounded = sgGeneral.add(new BooleanSetting("NotRounded", "", this, false, () -> true, false));
+    BooleanSetting GradientRounded = sgGeneral.add(new BooleanSetting("gradientrounded", "", this, false, () -> true, false));
+    BooleanSetting Gradient = sgGeneral.add(new BooleanSetting("Gradient", "", this, false, () -> true, false));
 
-    BooleanSetting Arc = sgGeneral.add(new BooleanSetting("Arc", "", this, false, () -> true));
-    BooleanSetting TracerLine = sgGeneral.add(new BooleanSetting("TracerLine", "", this, false, () -> true));
-    BooleanSetting blockOutlineAndFIll = sgGeneral.add(new BooleanSetting("blockOutlineAndFIll", "", this, false, () -> true));
-    RGBASetting color = sgGeneral.add(new RGBASetting("Color", "color", Color.WHITE, () -> true));
+    BooleanSetting Arc = sgGeneral.add(new BooleanSetting("Arc", "", this, false, () -> true, false));
+    BooleanSetting TracerLine = sgGeneral.add(new BooleanSetting("TracerLine", "", this, false, () -> true, false));
+    BooleanSetting blockOutlineAndFIll = sgGeneral.add(new BooleanSetting("blockOutlineAndFIll", "", this, false, () -> true, false));
+    RGBASetting color = sgGeneral.add(new RGBASetting("Color", "color", Color.WHITE, false, () -> true));
 
 
     public Test() {
@@ -98,11 +98,11 @@ public class Test extends Module_ {
         Vec3d start3 = new Vec3d(player.getX() - 5, player.getY() + 2, player.getZ() + 6);
 
 
-        Vec3d dimenstions = new Vec3d(1, 1, 1);
-        Renderer3d.renderOutline(event.getMatrices(), Color.WHITE, start, dimenstions);
+        Vec3d dimensions = new Vec3d(1, 1, 1);
+        Renderer3d.renderOutline(event.getMatrices(), Color.WHITE, start, dimensions);
         Renderer3d.renderLine(event.getMatrices(), Color.yellow, start, player.getPos());
-        Renderer3d.renderFilled(event.getMatrices(), Color.GREEN, start2, dimenstions);
-        Renderer3d.renderEdged(event.getMatrices(), Color.CYAN, Color.BLACK, start3, dimenstions);
+        Renderer3d.renderFilled(event.getMatrices(), Color.GREEN, start2, dimensions);
+        Renderer3d.renderEdged(event.getMatrices(), Color.CYAN, Color.BLACK, start3, dimensions);
     }
 
 

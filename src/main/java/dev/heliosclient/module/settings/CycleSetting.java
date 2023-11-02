@@ -12,13 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class CycleSetting extends Setting {
-    public int value;
+public class CycleSetting extends Setting<Integer> {
     public List options;
     Module_ module;
 
-    public <T> CycleSetting(String name, String description, Module_ module, List<T> options, int value, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public <T> CycleSetting(String name, String description, Module_ module, List<T> options, int value, BooleanSupplier shouldRender, int defaultValue) {
+        super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
         this.options = options;
@@ -27,8 +26,8 @@ public class CycleSetting extends Setting {
         this.value = value;
     }
 
-    public <T> CycleSetting(String name, String description, Module_ module, T[] options, int value, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public <T> CycleSetting(String name, String description, Module_ module, T[] options, int value, BooleanSupplier shouldRender, int defaultValue) {
+        super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
         this.options = Arrays.asList(options);
@@ -84,6 +83,7 @@ public class CycleSetting extends Setting {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         if (options.isEmpty() || options.size() - 1 < value) {
             return;
         }
@@ -117,7 +117,7 @@ public class CycleSetting extends Setting {
 
         @Override
         public CycleSetting build() {
-            return new CycleSetting(name, description, module, value, listValue, shouldRender);
+            return new CycleSetting(name, description, module, value, listValue, shouldRender, listValue);
         }
     }
 }

@@ -15,6 +15,7 @@ public class CustomFov extends Module_ {
             .description("Desired FOV")
             .module(this)
             .value(140.0)
+            .defaultValue(140.0)
             .min(1)
             .max(240)
             .roundingPlace(0)
@@ -31,7 +32,7 @@ public class CustomFov extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
-        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).setValueUnrestricted((int) (FOV.value));
+        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).setValueUnrestricted((int) (FOV.value.floatValue()));
     }
 
     @Override

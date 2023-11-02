@@ -13,6 +13,7 @@ public class NotificationModule extends Module_ {
             .description("Whether to show module state.")
             .module(INSTANCE)
             .value(true)
+            .defaultValue(true)
             .build()
     );
 

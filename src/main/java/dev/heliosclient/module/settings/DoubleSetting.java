@@ -12,16 +12,15 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.function.BooleanSupplier;
 
-public class DoubleSetting extends Setting {
+public class DoubleSetting extends Setting<Double> {
     private final double min, max;
     private final int roundingPlace;
-    public double value;
     Module_ module;
     boolean sliding = false;
     private final InputBox inputBox;
 
-    public DoubleSetting(String name, String description, Module_ module, double value, double min, double max, int roundingPlace, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public DoubleSetting(String name, String description, Module_ module, double value, double min, double max, int roundingPlace, BooleanSupplier shouldRender, double defaultValue) {
+        super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
         this.value = value;
@@ -115,6 +114,7 @@ public class DoubleSetting extends Setting {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.mouseClicked(mouseX, mouseY, button)) {
             this.sliding = true;
         }
@@ -203,7 +203,7 @@ public class DoubleSetting extends Setting {
 
         @Override
         public DoubleSetting build() {
-            return new DoubleSetting(name, description, module, value, min, max, roundingPlace, shouldRender);
+            return new DoubleSetting(name, description, module, value, min, max, roundingPlace, shouldRender, defaultValue);
         }
     }
 }

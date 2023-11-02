@@ -1,51 +1,36 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.KeyBind;
+import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.animation.Easing;
-import dev.heliosclient.util.animation.EasingType;
+import dev.heliosclient.ui.clickgui.ui.Window;
+import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
-
-public class SettingsScreen extends Screen {
+public class SettingsScreen extends Screen implements IWindowContentRenderer {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    static int offsetY = 0;
-    public TextButton backButton = new TextButton("< Back");
-
     int x, y, windowWidth = 224, windowHeight;
     private final Module_ module;
     private final Screen parentScreen;
+    private final Window window;
 
     public SettingsScreen(Module_ module, Screen parentScreen) {
         super(Text.literal("Settings"));
         this.module = module;
-        offsetY = 0;
         this.parentScreen = parentScreen;
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        offsetY += (int) (amount * (Easing.ease(EasingType.QUADRATIC_IN, (float) ClickGUI.ScrollSpeed.value)));
-        return super.mouseScrolled(mouseX, mouseY, amount);
+        window = new Window(100, windowWidth, true, this);
     }
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext);
-
-        int halfWindowWidth = drawContext.getScaledWindowWidth() / 2;
-
 
         windowHeight = 45;
         for (SettingGroup settingBuilder : module.settingGroups) {
@@ -59,47 +44,12 @@ public class SettingsScreen extends Screen {
             windowHeight += Math.round(settingBuilder.getGroupNameHeight());
         }
 
-        int screenHeight = drawContext.getScaledWindowHeight();
+        window.setWindowHeight(windowHeight);
+        window.render(drawContext, mouseX, mouseY, module.name, module.description, textRenderer);
 
-        if (drawContext.getScaledWindowHeight() > windowHeight) {
-            offsetY = 0;
-            y = drawContext.getScaledWindowHeight() / 2 - (windowHeight) / 2;
-        } else {
-            offsetY = Math.max(Math.min(offsetY, 0), screenHeight - windowHeight);
-            y = offsetY;
-        }
 
-        x = Math.max(drawContext.getScaledWindowWidth() / 2 - windowWidth / 2, 0);
-
-        // Draw the screen
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, windowWidth, windowHeight, 5, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 180).getRGB());
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, true, true, false, false, windowWidth, 18, 5, ColorManager.INSTANCE.clickGuiPrimary);
-        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
-
-        drawContext.drawText(textRenderer, module.name, halfWindowWidth - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
-
-        //Render module description wrapped to lines, so it doesn't appear out of the window
-        Renderer2D.wrapText("§o" + module.description, windowWidth).forEach(text -> {
-            int warpedTextWidth = textRenderer.getWidth(text);
-            drawContext.drawText(textRenderer, text, halfWindowWidth - warpedTextWidth / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
-            windowHeight += warpedTextWidth + 2;
-        });
-
-        // Render the back button
-        backButton.render(drawContext, textRenderer, x + 4, y + 4, mouseX, mouseY);
-
-        int yOffset = y + 44;
-        for (SettingGroup settingBuilder : module.settingGroups) {
-            yOffset += Math.round(settingBuilder.getGroupNameHeight() + 10);
-            settingBuilder.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
-            if (!settingBuilder.shouldRender()) continue;
-            for (Setting setting : settingBuilder.getSettings()) {
-                if (!setting.shouldRender()) continue;
-                setting.render(drawContext, x + 16, yOffset + 3, mouseX, mouseY, textRenderer);
-                yOffset += setting.height + 1;
-            }
-            yOffset += Math.round(settingBuilder.getGroupNameHeight() + 1);
-        }
+        x = window.getX();
+        y = window.getY();
 
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
     }
@@ -115,13 +65,19 @@ public class SettingsScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        backButton.mouseClicked((int) mouseX, (int) mouseY);
+        window.mouseClicked(mouseX, mouseY);
         for (SettingGroup settingBuilder : module.settingGroups) {
             settingBuilder.mouseClickedBuilder(mouseX, mouseY);
             if (!settingBuilder.shouldRender()) continue;
             settingBuilder.mouseClicked(mouseX, mouseY, button);
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        window.init();
     }
 
     @Override
@@ -155,6 +111,12 @@ public class SettingsScreen extends Screen {
     }
 
     @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        window.mouseScrolled(mouseX, mouseY, amount);
+        return super.mouseScrolled(mouseX, mouseY, amount);
+    }
+
+    @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         for (SettingGroup settingBuilder : module.settingGroups) {
             if (!settingBuilder.shouldRender()) continue;
@@ -175,5 +137,24 @@ public class SettingsScreen extends Screen {
     @Override
     public boolean shouldCloseOnEsc() {
         return false;
+    }
+
+    @Override
+    public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+        int yOffset = y;
+        for (SettingGroup settingBuilder : module.settingGroups) {
+            yOffset += Math.round(settingBuilder.getGroupNameHeight() + 10);
+            settingBuilder.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
+            if (!settingBuilder.shouldRender()) continue;
+            for (Setting setting : settingBuilder.getSettings()) {
+                if (!setting.shouldRender()) continue;
+                if (setting instanceof RGBASetting rgbaSetting) {
+                    rgbaSetting.setParentScreen(this);
+                }
+                setting.render(drawContext, x + 16, yOffset + 3, mouseX, mouseY, textRenderer);
+                yOffset += setting.height + 1;
+            }
+            yOffset += Math.round(settingBuilder.getGroupNameHeight() + 1);
+        }
     }
 }

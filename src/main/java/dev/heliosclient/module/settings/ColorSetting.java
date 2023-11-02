@@ -11,8 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.function.BooleanSupplier;
 
-public class ColorSetting extends Setting {
-    public int value;
+public class ColorSetting extends Setting<Integer> {
     public int r;
     public int g;
     public int b;
@@ -24,8 +23,8 @@ public class ColorSetting extends Setting {
     Module_ module;
     int boxSize = 20;
 
-    public ColorSetting(String name, String description, Module_ module, int value, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public ColorSetting(String name, String description, Module_ module, int value, BooleanSupplier shouldRender, int defaultValue) {
+        super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
         this.value = value;
@@ -174,6 +173,7 @@ public class ColorSetting extends Setting {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         if (button != 0) {
             return;
         }
@@ -245,7 +245,7 @@ public class ColorSetting extends Setting {
 
         @Override
         public ColorSetting build() {
-            return new ColorSetting(name, description, module, value, shouldRender);
+            return new ColorSetting(name, description, module, value, shouldRender, defaultValue);
         }
     }
 }

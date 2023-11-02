@@ -12,14 +12,14 @@ import dev.heliosclient.util.fontutils.fxFontRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.awt.*;
 import java.util.function.BooleanSupplier;
 
-public class RGBASetting extends Setting implements Listener {
+public class RGBASetting extends Setting<Color> implements Listener {
 
     private final RGBASettingScreen screen = new RGBASettingScreen(this);
-    private Color color;
     private float hue, saturation, brightness, alpha;
     private int handleX, handleY, alphaHandleY, shadeHandleX, shadeHandleY;
     private final int boxHeight = 70;
@@ -28,29 +28,33 @@ public class RGBASetting extends Setting implements Listener {
     private final int offsetX = 10; // Offset from the left
     private final int offsetY = 20; // Offset from the top
     private boolean rainbow = false;
+    private final boolean defaultRainbow;
     private final float[] brightnessValues;
     private final float[] saturationValues;
     float[] hueValues = new float[boxWidth];
-
+    public Color value;
 
     // Add new fields to store calculated values
     private int gradientBoxX, gradientBoxY, gradientBoxWidth, gradientBoxHeight;
     private int alphaSliderX, alphaSliderY, alphaSliderWidth, alphaSliderHeight;
     private int brightnessSaturationBoxX, brightnessSaturationBoxY, brightnessSaturationBoxWidth, brightnessSaturationBoxHeight;
     private fxFontRenderer fxFontRenderer;
+    private Screen parentScreen = null;
 
-    public RGBASetting(String name, String description, Color defaultColor, BooleanSupplier shouldRender) {
-        super(shouldRender);
+    public RGBASetting(String name, String description, Color defaultColor, boolean rainbow, BooleanSupplier shouldRender) {
+        super(shouldRender, defaultColor);
         this.name = name;
         this.description = description;
-        this.color = defaultColor;
+        this.value = defaultColor;
+        this.rainbow = rainbow;
+        this.defaultRainbow = rainbow;
         this.height = 25;
         this.heightCompact = 17;
-        float[] hsbvals = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+        float[] hsbvals = Color.RGBtoHSB(value.getRed(), value.getGreen(), value.getBlue(), null);
         this.hue = hsbvals[0];
         this.saturation = hsbvals[1];
         this.brightness = hsbvals[2];
-        this.alpha = color.getAlpha() / 255f;
+        this.alpha = value.getAlpha() / 255f;
         this.handleX = (int) (hue * width);
         this.handleY = (int) ((1 - saturation) * (boxHeight - 50));
         this.alphaHandleY = (int) ((1 - alpha) * boxHeight);
@@ -60,7 +64,6 @@ public class RGBASetting extends Setting implements Listener {
             fxFontRenderer = new fxFontRenderer(FontManager.fonts, 5f);
         }
         EventManager.register(this);
-        value = defaultColor.getRGB();
         // Calculate values once and store them
         this.gradientBoxX = x + offsetX;
         this.gradientBoxY = y + offsetY;
@@ -94,25 +97,30 @@ public class RGBASetting extends Setting implements Listener {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
+        this.x = x;
+        this.y = y;
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 3, y + 2, -1);
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, color.getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, value.getRGB());
 
         if (rainbow) {
-            color = ColorUtils.getRainbowColor();
+            value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), value.getAlpha());
         }
     }
 
     public void renderSetting(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 3, y + 2, -1);
+        this.x = x;
+        this.y = y;
 
-        int color1 = hoveredOverGradientBox(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
-        int color2 = hoveredOverAlphaSlider(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
-        int color3 = hoveredOverBrightnessSaturationBox(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 3, y + 2, -1);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, value.getRGB());
+
+        int value1 = hoveredOverGradientBox(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
+        int value2 = hoveredOverAlphaSlider(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
+        int value3 = hoveredOverBrightnessSaturationBox(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
 
         if (rainbow) {
-            color = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), color.getAlpha());
-            float[] hsbvals = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+            value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), value.getAlpha());
+            float[] hsbvals = Color.RGBtoHSB(value.getRed(), value.getGreen(), value.getBlue(), null);
             hue = hsbvals[0];
             saturation = hsbvals[1];
             brightness = hsbvals[2];
@@ -136,9 +144,9 @@ public class RGBASetting extends Setting implements Listener {
         this.brightnessSaturationBoxWidth = boxWidth;
         this.brightnessSaturationBoxHeight = boxHeight;
 
-        drawGradientBox(drawContext, gradientBoxX, gradientBoxY, brightness, color1);
-        drawAlphaSlider(drawContext, alphaSliderX, alphaSliderY, color2);
-        drawBrightnessSaturationBox(drawContext, brightnessSaturationBoxX, brightnessSaturationBoxY, hue, color3);
+        drawGradientBox(drawContext, gradientBoxX, gradientBoxY, brightness, value1);
+        drawAlphaSlider(drawContext, alphaSliderX, alphaSliderY, value2);
+        drawBrightnessSaturationBox(drawContext, brightnessSaturationBoxX, brightnessSaturationBoxY, hue, value3);
 
         //Draw Rainbow button bg
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + offsetX - 1, y + boxHeight - 26, Renderer2D.getFxStringWidth("Rainbow ") + 1, Renderer2D.getFxStringHeight("Rainbow ") + 1, 2, Color.DARK_GRAY.getRGB());
@@ -146,55 +154,51 @@ public class RGBASetting extends Setting implements Listener {
         //Render the texts
         fxFontRenderer.drawString(drawContext.getMatrices(), "Alpha", x + offsetX + boxWidth + sliderWidth - 2, y + 94, -1);
         Renderer2D.drawFixedString(drawContext.getMatrices(), "Rainbow ", x + offsetX + 1, y + boxHeight - 25, rainbow ? Color.GREEN.getRGB() : Color.RED.getRGB());
-        Renderer2D.drawFixedString(drawContext.getMatrices(), "Alpha: " + color.getAlpha(), gradientBoxX, y + boxHeight + Renderer2D.getFxStringHeight() - 23, -1);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), "Red: " + color.getRed(), gradientBoxX, y + boxHeight + Renderer2D.getFxStringHeight() - 13, -1);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), "Green: " + color.getGreen(), gradientBoxX, y + boxHeight + Renderer2D.getFxStringHeight() - 4, -1);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), "Blue: " + color.getBlue(), gradientBoxX, y + boxHeight + Renderer2D.getFxStringHeight() + 5, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Alpha: " + value.getAlpha(), gradientBoxX, y + boxHeight + Renderer2D.getFxStringHeight() - 23, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Red: " + value.getRed(), gradientBoxX, y + boxHeight + Renderer2D.getFxStringHeight() - 13, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Green: " + value.getGreen(), gradientBoxX, y + boxHeight + Renderer2D.getFxStringHeight() - 4, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Blue: " + value.getBlue(), gradientBoxX, y + boxHeight + Renderer2D.getFxStringHeight() + 5, -1);
 
         // Draw the handles
         Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), gradientBoxX + handleX, gradientBoxY + handleY, 1, -1);
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), alphaSliderX - 2, alphaSliderY + alphaHandleY, sliderWidth + 4, 3, -1);
         Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), brightnessSaturationBoxX + shadeHandleX, brightnessSaturationBoxY + shadeHandleY, 1, -1);
-
-        // Draw the preview box
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 20, 10, 2, color.getRGB());
-        value = color.getRGB();
     }
 
-    public void drawGradientBox(DrawContext drawContext, int x, int y, float brightness, int color) {
-        Color color1;
+    public void drawGradientBox(DrawContext drawContext, int x, int y, float brightness, int value) {
+        Color value1;
 
-        // Draw the color gradient box
+        // Draw the value gradient box
         for (int i = 0; i < boxWidth; i++) {
-            color1 = Color.getHSBColor(hueValues[i], 1.0f, 1.0f);
-            Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), x + i, y, 1, boxHeight - 50, color1.getRGB(), color1.getRGB());
+            value1 = Color.getHSBColor(hueValues[i], 1.0f, 1.0f);
+            Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), x + i, y, 1, boxHeight - 50, value1.getRGB(), value1.getRGB());
         }
 
-        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, boxWidth + 2, boxHeight - 50 + 2, 1, 1, color);
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, boxWidth + 2, boxHeight - 50 + 2, 1, 1, value);
     }
 
 
-    public void drawAlphaSlider(DrawContext drawContext, int x, int y, int color3) {
+    public void drawAlphaSlider(DrawContext drawContext, int x, int y, int value3) {
         // Draw the alpha slider
-        Color color1 = new Color(color.getRed(), color.getGreen(), color.getBlue(), 0);
-        Color color2 = new Color(color.getRed(), color.getGreen(), color.getBlue(), 255);
-        Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), x, y, sliderWidth, boxHeight, color1.getRGB(), color2.getRGB());
+        Color value1 = new Color(value.getRed(), value.getGreen(), value.getBlue(), 0);
+        Color value2 = new Color(value.getRed(), value.getGreen(), value.getBlue(), 255);
+        Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), x, y, sliderWidth, boxHeight, value1.getRGB(), value2.getRGB());
 
-        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, sliderWidth + 2, boxHeight + 2, 1, 1, color3);
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, sliderWidth + 2, boxHeight + 2, 1, 1, value3);
     }
 
-    public void drawBrightnessSaturationBox(DrawContext drawContext, int x, int y, float hue, int color3) {
-        Color color;
+    public void drawBrightnessSaturationBox(DrawContext drawContext, int x, int y, float hue, int value3) {
+        Color value;
 
         // Draw the brightness-saturation gradient box
         for (int i = 0; i < boxWidth; i++) {
             for (int j = 0; j < boxHeight; j++) {
-                color = Color.getHSBColor(hue, saturationValues[j], brightnessValues[i]);
-                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + i, y + j, 1, 1, color.getRGB());
+                value = Color.getHSBColor(hue, saturationValues[j], brightnessValues[i]);
+                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + i, y + j, 1, 1, value.getRGB());
             }
         }
 
-        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, boxWidth + 2, boxHeight + 2, 1, 1, color3);
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, boxWidth + 2, boxHeight + 2, 1, 1, value3);
     }
 
 
@@ -218,15 +222,18 @@ public class RGBASetting extends Setting implements Listener {
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         compactFont.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 1, -1);
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 71, y + 1, 10, 10, 2, color.getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 71, y + 1, 10, 10, 2, value.getRGB());
 
         if (rainbow) {
-            color = ColorUtils.getRainbowColor();
+            value = ColorUtils.getRainbowColor();
         }
     }
 
     public void mouse(double mouseX, double mouseY) {
-
+        if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
+            value = defaultValue;
+            rainbow = defaultRainbow;
+        }
         if (hoveredOverGradientBox(mouseX, mouseY)) {
             handleX = (int) (mouseX - x - offsetX);
             handleY = (int) (mouseY - y - offsetY);
@@ -245,7 +252,7 @@ public class RGBASetting extends Setting implements Listener {
         }
 
         if (rainbow) {
-            float[] hsbvals = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+            float[] hsbvals = Color.RGBtoHSB(value.getRed(), value.getGreen(), value.getBlue(), null);
             hue = hsbvals[0];
             saturation = hsbvals[1];
             brightness = hsbvals[2];
@@ -254,14 +261,19 @@ public class RGBASetting extends Setting implements Listener {
             shadeHandleX = Math.min((int) (brightness * boxWidth), boxWidth);
             shadeHandleY = Math.min((int) ((1 - saturation) * boxHeight), boxHeight);
         } else {
-            color = Color.getHSBColor(hue, saturation, brightness);
+            value = Color.getHSBColor(hue, saturation, brightness);
         }
-        color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (alpha * 255));
+        value = new Color(value.getRed(), value.getGreen(), value.getBlue(), (int) (alpha * 255));
 
     }
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
+            value = defaultValue;
+            rainbow = defaultRainbow;
+        }
+
         super.mouseClicked(mouseX, mouseY, button);
         if (hovered((int) mouseX, (int) mouseY)) {
             MinecraftClient.getInstance().setScreen(screen);
@@ -269,11 +281,11 @@ public class RGBASetting extends Setting implements Listener {
     }
 
     public Color getColor() {
-        return color;
+        return value;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void setColor(Color value) {
+        this.value = value;
     }
 
     public float getAlpha() {
@@ -297,15 +309,27 @@ public class RGBASetting extends Setting implements Listener {
         fxFontRenderer = new fxFontRenderer(event.getFonts(), 5f);
     }
 
+    public Screen getParentScreen() {
+        return parentScreen;
+    }
+
+    public void setParentScreen(Screen parentScreen) {
+        this.parentScreen = parentScreen;
+    }
+
     public static class Builder extends SettingBuilder<Builder, Color, RGBASetting> {
+        boolean rainbow = false;
         public Builder() {
             super(new Color(-1));
         }
 
+        public Builder rainbow(boolean rainbow) {
+            this.rainbow = rainbow;
+            return this;
+        }
         @Override
         public RGBASetting build() {
-            return new RGBASetting(name, description, value, shouldRender);
-
+            return new RGBASetting(name, description, value, rainbow, shouldRender);
         }
     }
 }

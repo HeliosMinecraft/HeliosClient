@@ -17,6 +17,7 @@ public class Step extends Module_ {
             .description("Height which step should step up at.")
             .module(this)
             .value(1.0)
+            .defaultValue(1.0)
             .min(1.0)
             .max(10)
             .roundingPlace(1)
@@ -27,6 +28,7 @@ public class Step extends Module_ {
             .description("Disables step when crouch key is pressed.")
             .module(this)
             .value(true)
+            .defaultValue(true)
             .build()
     );
 
@@ -45,10 +47,10 @@ public class Step extends Module_ {
             if (mc.options.sneakKey.isPressed()) {
                 mc.player.setStepHeight(0.5f);
             } else {
-                mc.player.setStepHeight((float) stepHeight.value);
+                mc.player.setStepHeight(stepHeight.value.floatValue());
             }
         } else {
-            mc.player.setStepHeight((float) stepHeight.value);
+            mc.player.setStepHeight(stepHeight.value.floatValue());
         }
     }
 
