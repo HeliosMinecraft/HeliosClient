@@ -43,6 +43,10 @@ public class AnimationUtils implements Listener {
         return ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
     }
 
+    public static float lerp(float point1, float point2, float alpha) {
+        return point1 + alpha * (point2 - point1);
+    }
+
     public void drawFadingBox(DrawContext context, float x, float y, float width, float height, int color, boolean RoundedBox, float radius) {
         int newColor = getFadingColor(color);
         if (!RoundedBox)

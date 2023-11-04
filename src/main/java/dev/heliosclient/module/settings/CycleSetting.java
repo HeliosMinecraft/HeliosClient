@@ -15,6 +15,7 @@ import java.util.function.BooleanSupplier;
 public class CycleSetting extends Setting<Integer> {
     public List options;
     Module_ module;
+    public int value;
 
     public <T> CycleSetting(String name, String description, Module_ module, List<T> options, int value, BooleanSupplier shouldRender, int defaultValue) {
         super(shouldRender, defaultValue);
@@ -84,6 +85,9 @@ public class CycleSetting extends Setting<Integer> {
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
+        if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
+            value = defaultValue;
+        }
         if (options.isEmpty() || options.size() - 1 < value) {
             return;
         }

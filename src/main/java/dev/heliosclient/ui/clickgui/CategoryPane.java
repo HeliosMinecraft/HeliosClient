@@ -37,6 +37,10 @@ public class CategoryPane {
     public int iconWidth = 10;
     public int iconHeight = 10;
     private SVGFile svgFile;
+    float delay = 0, delay2 = 0;
+    private final float delayBetweenButtons = 0.2f;
+    private final float delayBetweenSettings = 0.2f;
+
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
         this.category = category;
@@ -86,6 +90,38 @@ public class CategoryPane {
         moduleButtons.clear();
     }
 
+    public void update() {
+        float prevbuttonY = y;
+        for (ModuleButton button : moduleButtons) {
+            button.update(prevbuttonY);
+            if (!button.isAnimationDone()) {
+                if (delay <= 0) {
+                    delay = delayBetweenButtons;
+                }
+                delay -= button.animationSpeed;
+            }
+            prevbuttonY = button.y;
+        }
+    }
+
+    public void updateSetting() {
+        for (ModuleButton button : moduleButtons) {
+            for (SettingGroup settingBuilder : button.module.quickSettingGroups) {
+                if (!settingBuilder.shouldRender()) continue;
+                for (Setting setting : settingBuilder.getSettings()) {
+                    if (!setting.shouldRender()) continue;
+                    setting.update(button.getY());
+                    if (!setting.isAnimationDone()) {
+                        if (delay2 <= 0) {
+                            delay2 = delayBetweenSettings;
+                        }
+                        delay2 -= setting.animationSpeed;
+                    }
+                }
+            }
+        }
+    }
+
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
         int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
 
@@ -109,7 +145,6 @@ public class CategoryPane {
                 MAX_HEIGHT = height;
             }
         }
-
         if (!collapsed && height >= 10) {
             if (category == Categories.SEARCH) {
                 Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, MAX_HEIGHT, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
@@ -123,9 +158,11 @@ public class CategoryPane {
             y = mouseY - startY;
         }
         if (!collapsed) {
+            update();
+
             int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
             if (category == Categories.SEARCH) {
-                buttonYOffset = y + 27 + categoryNameHeight - scrollOffset + 17;
+                buttonYOffset = y + 27 + categoryNameHeight - scrollOffset;
             }
             int boxHeight = 0;
 
@@ -137,12 +174,15 @@ public class CategoryPane {
 
                 m.setFaded(false);
                 if (buttonYOffset >= y + categoryNameHeight && buttonYOffset < y + MAX_HEIGHT) {
-                    m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth);
+                    // Update the y position of the button based on its animation progress
+                    int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
+                    m.render(drawContext, mouseX, mouseY, x, animatedY, maxWidth);
                 }
 
                 buttonYOffset += categoryNameHeight + 10;
                 // Draw the settings for this module if they are open
                 if (m.settingsOpen) {
+                    updateSetting();
                     for (SettingGroup settingBuilder : m.module.quickSettingGroups) {
                         buttonYOffset += Math.round(settingBuilder.getGroupNameHeight() + 3);
                         boxHeight += Math.round(settingBuilder.getGroupNameHeight() + 3);
@@ -154,7 +194,10 @@ public class CategoryPane {
                             if (!setting.shouldRender()) continue;
 
                             setting.quickSettings = m.settingsOpen;
-                            setting.renderCompact(drawContext, x, buttonYOffset + 3, mouseX, mouseY, textRenderer);
+                            // Update the y position of the setting based on its animation progress
+                            int animatedY = Math.round(setting.getY() + (buttonYOffset - setting.getY()) * setting.getAnimationProgress());
+                            setting.renderCompact(drawContext, x, animatedY + 3, mouseX, mouseY, textRenderer);
+
                             buttonYOffset += setting.heightCompact;
                             boxHeight += setting.heightCompact;
                         }
@@ -164,15 +207,25 @@ public class CategoryPane {
                     }
                     if (!m.module.quickSettingGroups.isEmpty()) {
                         buttonYOffset += 2;
-                        boxHeight = 0;
                     }
                     m.setBoxHeight(boxHeight);
+                } else {
+                    for (SettingGroup settingBuilder : m.module.quickSettingGroups) {
+                        for (Setting setting : settingBuilder.getSettings()) {
+                            setting.animationDone = false;
+                            delay2 = 0;
+                            setting.setAnimationProgress(0.0f);
+                        }
+                    }
                 }
             }
         }
         if (collapsed) {
             for (ModuleButton m : moduleButtons) {
                 m.setFaded(true);
+                m.animationDone = false;
+                delay = 0;
+                m.setAnimationProgress(0.0f);
             }
         }
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 255).getRGB());

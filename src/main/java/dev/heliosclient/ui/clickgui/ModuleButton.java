@@ -7,6 +7,7 @@ import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -18,14 +19,18 @@ import java.awt.*;
 public class ModuleButton {
     public int hoverAnimationTimer;
     public Module_ module;
-    public int x, y, width, height = 0;
+    public float x, y;
+    public int width, height = 0;
     public boolean settingsOpen = false;
     AnimationUtils TextAnimation = new AnimationUtils();
     AnimationUtils BackgroundAnimation = new AnimationUtils();
     private boolean faded = true;
     public final Screen parentScreen;
     public int boxHeight = 0;
-
+    public boolean animationDone = false;
+    float animationSpeed = 0.06f;
+    private float targetY;
+    private float animationProgress = 0;
 
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
@@ -40,6 +45,25 @@ public class ModuleButton {
     public void startFading() {
         BackgroundAnimation.startFading(faded, EasingType.LINEAR_IN);
         TextAnimation.startFading(faded, EasingType.LINEAR_IN);
+    }
+
+    public void update(float targetY) {
+        if (!animationDone) {
+            //the first update, set the initial position above the target
+            if (animationProgress == 0) {
+                y = (int) (targetY);
+            }
+
+            this.targetY = targetY;
+            animationProgress += animationSpeed;
+            animationProgress = Math.min(animationProgress, 1);
+
+            float easedProgress = Easing.ease(EasingType.LINEAR_OUT, animationProgress);
+            y = Math.round(AnimationUtils.lerp(y, this.targetY, easedProgress));
+            if (animationProgress >= 1) {
+                animationDone = true;
+            }
+        }
     }
 
     public void setFaded(boolean faded) {
@@ -68,8 +92,8 @@ public class ModuleButton {
         Color fillColor = module.isActive() ? new Color(ColorManager.INSTANCE.clickGuiSecondary()) : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
 
         BackgroundAnimation.drawFadingBox(drawContext, x + 1, y, maxWidth, height, fillColor.getRGB(), true, 2);
-        if (settingsOpen) {
-            BackgroundAnimation.drawFadingBox(drawContext, x + 1, y + height, maxWidth, boxHeight, ColorUtils.changeAlpha(fillColor, 100).getRGB(), true, 2);
+        if (settingsOpen && boxHeight >= 4) {
+            BackgroundAnimation.drawFadingBox(drawContext, x + 1, y + height, maxWidth, boxHeight + 2, ColorUtils.changeAlpha(fillColor, 100).getRGB(), true, 2);
         }
 
         int textY = y + (height - moduleNameHeight) / 2;
@@ -115,5 +139,25 @@ public class ModuleButton {
 
     public void setBoxHeight(int boxHeight) {
         this.boxHeight = boxHeight;
+    }
+
+    public float getAnimationProgress() {
+        return animationProgress;
+    }
+
+    public void setAnimationProgress(float animationProgress) {
+        this.animationProgress = animationProgress;
+    }
+
+    public float getTargetY() {
+        return targetY;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public boolean isAnimationDone() {
+        return animationDone;
     }
 }

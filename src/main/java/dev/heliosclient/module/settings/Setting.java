@@ -8,6 +8,9 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.animation.Easing;
+import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -31,6 +34,10 @@ public abstract class Setting<T> implements Listener {
     private int hoverAnimationTimer = 0;
     protected BooleanSupplier shouldRender = () -> true; // Default to true
     public int heightCompact = 18;
+    public float animationProgress = 0;
+    public float animationSpeed = 0.06f;
+    public boolean animationDone = false;
+    private float targetY;
 
     public Setting(BooleanSupplier shouldRender, T defaultValue) {
         this.shouldRender = shouldRender;
@@ -38,6 +45,25 @@ public abstract class Setting<T> implements Listener {
         EventManager.register(this);
         if (HeliosClient.MC.getWindow() != null) {
             compactFont = new fxFontRenderer(FontManager.fonts, 6);
+        }
+    }
+
+    public void update(float targetY) {
+        if (!animationDone) {
+            //the first update, set the initial position above the target
+            if (animationProgress == 0) {
+                y = (int) (targetY - 20);
+            }
+
+            this.targetY = targetY;
+            animationProgress += animationSpeed;
+            animationProgress = Math.min(animationProgress, 1);
+
+            float easedProgress = Easing.ease(EasingType.LINEAR_OUT, animationProgress);
+            y = Math.round(AnimationUtils.lerp(y, this.targetY, easedProgress));
+            if (animationProgress >= 1) {
+                animationDone = true;
+            }
         }
     }
 
@@ -170,6 +196,34 @@ public abstract class Setting<T> implements Listener {
 
     protected boolean hoveredSetting(int mouseX, int mouseY) {
         return mouseX > x && mouseX < x + width + 40 && mouseY > y && mouseY < y + height;
+    }
+
+    public boolean isAnimationDone() {
+        return animationDone;
+    }
+
+    public void setAnimationDone(boolean animationDone) {
+        this.animationDone = animationDone;
+    }
+
+    public float getTargetY() {
+        return targetY;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getAnimationProgress() {
+        return animationProgress;
+    }
+
+    public void setAnimationProgress(float animationProgress) {
+        this.animationProgress = animationProgress;
+    }
+
+    public void setAnimationSpeed(float animationSpeed) {
+        this.animationSpeed = animationSpeed;
     }
 
     // Credits: Meteor client
