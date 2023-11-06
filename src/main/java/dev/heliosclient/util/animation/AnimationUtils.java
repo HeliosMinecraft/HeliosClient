@@ -44,7 +44,7 @@ public class AnimationUtils implements Listener {
     }
 
     public static float lerp(float point1, float point2, float alpha) {
-        return point1 + alpha * (point2 - point1);
+        return (1 - alpha) * point1 + alpha * point2;
     }
 
     public void drawFadingBox(DrawContext context, float x, float y, float width, float height, int color, boolean RoundedBox, float radius) {

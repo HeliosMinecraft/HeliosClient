@@ -28,7 +28,7 @@ public class ModuleButton {
     public final Screen parentScreen;
     public int boxHeight = 0;
     public boolean animationDone = false;
-    float animationSpeed = 0.06f;
+    float animationSpeed = 0.13f;
     private float targetY;
     private float animationProgress = 0;
 
@@ -58,7 +58,7 @@ public class ModuleButton {
             animationProgress += animationSpeed;
             animationProgress = Math.min(animationProgress, 1);
 
-            float easedProgress = Easing.ease(EasingType.LINEAR_OUT, animationProgress);
+            float easedProgress = Easing.ease(EasingType.LINEAR_IN_OUT, animationProgress);
             y = Math.round(AnimationUtils.lerp(y, this.targetY, easedProgress));
             if (animationProgress >= 1) {
                 animationDone = true;

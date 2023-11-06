@@ -35,7 +35,7 @@ public abstract class Setting<T> implements Listener {
     protected BooleanSupplier shouldRender = () -> true; // Default to true
     public int heightCompact = 18;
     public float animationProgress = 0;
-    public float animationSpeed = 0.06f;
+    public float animationSpeed = 0.13f;
     public boolean animationDone = false;
     private float targetY;
 
@@ -52,20 +52,21 @@ public abstract class Setting<T> implements Listener {
         if (!animationDone) {
             //the first update, set the initial position above the target
             if (animationProgress == 0) {
-                y = (int) (targetY - 20);
+                y = (int) (targetY);
             }
 
             this.targetY = targetY;
             animationProgress += animationSpeed;
             animationProgress = Math.min(animationProgress, 1);
 
-            float easedProgress = Easing.ease(EasingType.LINEAR_OUT, animationProgress);
+            float easedProgress = Easing.ease(EasingType.LINEAR_IN_OUT, animationProgress);
             y = Math.round(AnimationUtils.lerp(y, this.targetY, easedProgress));
             if (animationProgress >= 1) {
                 animationDone = true;
             }
         }
     }
+
 
     @SubscribeEvent
     private void onFontChange(FontChangeEvent event) {

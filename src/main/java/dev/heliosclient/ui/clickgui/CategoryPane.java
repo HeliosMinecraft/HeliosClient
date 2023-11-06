@@ -38,8 +38,8 @@ public class CategoryPane {
     public int iconHeight = 10;
     private SVGFile svgFile;
     float delay = 0, delay2 = 0;
-    private final float delayBetweenButtons = 0.2f;
-    private final float delayBetweenSettings = 0.2f;
+    private final float delayBetweenButtons = 0.0f;
+    private final float delayBetweenSettings = 0.1f;
 
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
@@ -106,9 +106,9 @@ public class CategoryPane {
 
     public void updateSetting() {
         for (ModuleButton button : moduleButtons) {
-            for (SettingGroup settingBuilder : button.module.quickSettingGroups) {
-                if (!settingBuilder.shouldRender()) continue;
-                for (Setting setting : settingBuilder.getSettings()) {
+            for (SettingGroup settingGroup : button.module.quickSettingGroups) {
+                if (!settingGroup.shouldRender()) continue;
+                for (Setting setting : settingGroup.getSettings()) {
                     if (!setting.shouldRender()) continue;
                     setting.update(button.getY());
                     if (!setting.isAnimationDone()) {
@@ -162,7 +162,7 @@ public class CategoryPane {
 
             int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
             if (category == Categories.SEARCH) {
-                buttonYOffset = y + 27 + categoryNameHeight - scrollOffset;
+                buttonYOffset = y + 27 + categoryNameHeight - scrollOffset + 17;
             }
             int boxHeight = 0;
 
@@ -177,21 +177,34 @@ public class CategoryPane {
                     // Update the y position of the button based on its animation progress
                     int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
                     m.render(drawContext, mouseX, mouseY, x, animatedY, maxWidth);
+                } else {
+                    m.settingsOpen = false;
                 }
 
                 buttonYOffset += categoryNameHeight + 10;
                 // Draw the settings for this module if they are open
                 if (m.settingsOpen) {
                     updateSetting();
-                    for (SettingGroup settingBuilder : m.module.quickSettingGroups) {
-                        buttonYOffset += Math.round(settingBuilder.getGroupNameHeight() + 3);
-                        boxHeight += Math.round(settingBuilder.getGroupNameHeight() + 3);
-                        settingBuilder.renderBuilder(drawContext, x - 1, buttonYOffset, width);
+                    for (SettingGroup settingGroup : m.module.quickSettingGroups) {
+                        buttonYOffset += Math.round(settingGroup.getGroupNameHeight() + 3);
+                        boxHeight += Math.round(settingGroup.getGroupNameHeight() + 3);
+                        settingGroup.renderBuilder(drawContext, x - 1, buttonYOffset, width);
 
-                        if (!settingBuilder.shouldRender()) continue;
-
-                        for (Setting setting : settingBuilder.getSettings()) {
-                            if (!setting.shouldRender()) continue;
+                        if (!settingGroup.shouldRender()) {
+                            for (Setting setting : settingGroup.getSettings()) {
+                                setting.animationDone = false;
+                                delay2 = 0;
+                                setting.setAnimationProgress(0.5f);
+                            }
+                            continue;
+                        }
+                        for (Setting setting : settingGroup.getSettings()) {
+                            if (!setting.shouldRender()) {
+                                setting.animationDone = false;
+                                delay2 = 0;
+                                setting.setAnimationProgress(0.5f);
+                                continue;
+                            }
 
                             setting.quickSettings = m.settingsOpen;
                             // Update the y position of the setting based on its animation progress
@@ -201,8 +214,8 @@ public class CategoryPane {
                             buttonYOffset += setting.heightCompact;
                             boxHeight += setting.heightCompact;
                         }
-                        buttonYOffset += Math.round(settingBuilder.getGroupNameHeight());
-                        boxHeight += Math.round(settingBuilder.getGroupNameHeight());
+                        buttonYOffset += Math.round(settingGroup.getGroupNameHeight());
+                        boxHeight += Math.round(settingGroup.getGroupNameHeight());
 
                     }
                     if (!m.module.quickSettingGroups.isEmpty()) {
@@ -210,13 +223,13 @@ public class CategoryPane {
                     }
                     m.setBoxHeight(boxHeight);
                 } else {
-                    for (SettingGroup settingBuilder : m.module.quickSettingGroups) {
-                        for (Setting setting : settingBuilder.getSettings()) {
+                    for (SettingGroup settingGroup : m.module.quickSettingGroups) {
+                        for (Setting setting : settingGroup.getSettings()) {
                             setting.animationDone = false;
-                            delay2 = 0;
                             setting.setAnimationProgress(0.0f);
                         }
                     }
+                    delay2 = 0;
                 }
             }
         }
@@ -231,6 +244,7 @@ public class CategoryPane {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 255).getRGB());
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
+
         if (svgFile != null) {
             // Gives a very shitty error idk why. Not fixable
             //svgFile.render(drawContext.getMatrices(), x, y,iconWidth,iconHeight);

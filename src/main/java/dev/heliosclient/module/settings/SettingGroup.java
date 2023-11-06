@@ -98,6 +98,18 @@ public class SettingGroup {
         return mouseX > x && mouseX < x + windowWidth && mouseY > y - 4 && mouseY < y + 4;
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWindowWidth() {
+        return windowWidth;
+    }
+
     public List<Setting> getSettings() {
         return settings;
     }

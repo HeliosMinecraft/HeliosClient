@@ -49,11 +49,12 @@ public class BooleanSetting extends Setting<Boolean> {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
+
         compactFont.drawString(drawContext.getMatrices(), name, x + 3, y + 4, ColorManager.INSTANCE.defaultTextColor());
 
-        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + moduleWidth - 12, y + 4, 7, 7, 2, 0.6f, 0xFFFFFFFF);
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + widthCompact - 12, y + 4, 7, 7, 2, 0.6f, 0xFFFFFFFF);
 
-        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + moduleWidth - 11.6f, y + 4.4f, 5f, 5f, value ? 0xAA55FFFF : 0xFF222222, true, 1);
+        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + widthCompact - 11.6f, y + 4.4f, 5f, 5f, value ? 0xAA55FFFF : 0xFF222222, true, 1);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -68,7 +69,11 @@ public class BooleanSetting extends Setting<Boolean> {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
+        if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
+            value = defaultValue;
+            module.onSettingChange(this);
+            CheckBoxAnimation.startFading(value, EasingType.QUADRATIC_OUT);
+        }
         if (hovered((int) mouseX, (int) mouseY) && button == 0) {
             this.value = !value;
             module.onSettingChange(this);

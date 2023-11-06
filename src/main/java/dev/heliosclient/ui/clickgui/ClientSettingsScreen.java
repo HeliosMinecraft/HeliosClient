@@ -48,15 +48,15 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
         this.renderBackground(drawContext);
 
         windowHeight = 45;
-        for (SettingGroup settingBuilder : module.settingGroups) {
-            windowHeight += Math.round(settingBuilder.getGroupNameHeight() + 3);
-            if (!settingBuilder.shouldRender()) continue;
-            for (Setting setting : settingBuilder.getSettings()) {
+        for (SettingGroup settingGroup : module.settingGroups) {
+            windowHeight += Math.round(settingGroup.getGroupNameHeight() + 3);
+            if (!settingGroup.shouldRender()) continue;
+            for (Setting setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
                 windowHeight += setting.height + 1;
             }
-            windowHeight += Math.round(settingBuilder.getGroupNameHeight());
+            windowHeight += Math.round(settingGroup.getGroupNameHeight());
         }
 
         window.setWindowHeight(windowHeight);
@@ -76,10 +76,10 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         window.mouseClicked(mouseX, mouseY);
-        for (SettingGroup settingBuilder : module.settingGroups) {
-            settingBuilder.mouseClickedBuilder(mouseX, mouseY);
-            if (!settingBuilder.shouldRender()) continue;
-            settingBuilder.mouseClicked(mouseX, mouseY, button);
+        for (SettingGroup settingGroup : module.settingGroups) {
+            settingGroup.mouseClickedBuilder(mouseX, mouseY);
+            if (!settingGroup.shouldRender()) continue;
+            settingGroup.mouseClicked(mouseX, mouseY, button);
         }
         navBar.mouseClicked((int) mouseX, (int) mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
@@ -87,27 +87,27 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        for (SettingGroup settingBuilder : module.settingGroups) {
-            if (!settingBuilder.shouldRender()) continue;
-            settingBuilder.mouseReleased(mouseX, mouseY, button);
+        for (SettingGroup settingGroup : module.settingGroups) {
+            if (!settingGroup.shouldRender()) continue;
+            settingGroup.mouseReleased(mouseX, mouseY, button);
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (SettingGroup settingBuilder : module.settingGroups) {
-            if (!settingBuilder.shouldRender()) continue;
-            settingBuilder.keyPressed(keyCode, scanCode, modifiers);
+        for (SettingGroup settingGroup : module.settingGroups) {
+            if (!settingGroup.shouldRender()) continue;
+            settingGroup.keyPressed(keyCode, scanCode, modifiers);
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean charTyped(char chr, int modifiers) {
-        for (SettingGroup settingBuilder : module.settingGroups) {
-            if (!settingBuilder.shouldRender()) continue;
-            settingBuilder.charTyped(chr, modifiers);
+        for (SettingGroup settingGroup : module.settingGroups) {
+            if (!settingGroup.shouldRender()) continue;
+            settingGroup.charTyped(chr, modifiers);
         }
         return super.charTyped(chr, modifiers);
     }
@@ -115,11 +115,11 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
     @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         int yOffset = y;
-        for (SettingGroup settingBuilder : module.settingGroups) {
-            yOffset += Math.round(settingBuilder.getGroupNameHeight() + 3);
-            settingBuilder.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
-            if (!settingBuilder.shouldRender()) continue;
-            for (Setting setting : settingBuilder.getSettings()) {
+        for (SettingGroup settingGroup : module.settingGroups) {
+            yOffset += Math.round(settingGroup.getGroupNameHeight() + 3);
+            settingGroup.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
+            if (!settingGroup.shouldRender()) continue;
+            for (Setting setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 if (setting instanceof RGBASetting rgbaSetting) {
                     rgbaSetting.setParentScreen(this);
@@ -127,7 +127,7 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
                 setting.render(drawContext, x + 16, yOffset + 3, mouseX, mouseY, textRenderer);
                 yOffset += setting.height + 1;
             }
-            yOffset += Math.round(settingBuilder.getGroupNameHeight() + 1);
+            yOffset += Math.round(settingGroup.getGroupNameHeight() + 1);
         }
     }
 }
