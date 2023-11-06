@@ -1,5 +1,7 @@
 package dev.heliosclient.util;
 
+import dev.heliosclient.module.sysmodules.ClickGUI;
+
 import java.awt.*;
 import java.util.Random;
 
@@ -90,7 +92,7 @@ public class ColorUtils {
      * @return Current rainbow color.
      */
     public static Color getRainbowColor() {
-        float hue = (System.currentTimeMillis() % 10000) / 10000.0f;
+        float hue = (System.currentTimeMillis() % (ClickGUI.RainbowSpeed.value.intValue() * 10000)) / 10000.0f;
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
 

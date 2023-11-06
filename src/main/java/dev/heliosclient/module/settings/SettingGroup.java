@@ -83,7 +83,7 @@ public class SettingGroup {
 
         // Draw the horizontal line and the name of the setting builder
         drawContext.drawHorizontalLine(x, (int) (x + windowWidth / 2 - Renderer2D.getFxStringWidth(this.getName()) / 2) - 1, yOffset, ColorManager.INSTANCE.clickGuiSecondary());
-        Renderer2D.drawFixedString(drawContext.getMatrices(), this.getName(), (int) (x + windowWidth / 2 - Renderer2D.getFxStringWidth(this.getName()) / 2) + 1, (int) (yOffset - Renderer2D.getFxStringHeight() / 2), ColorManager.INSTANCE.clickGuiPaneText());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), this.getName(), (int) (x + windowWidth / 2 - Renderer2D.getFxStringWidth(this.getName()) / 2) + 1, (int) (yOffset - Renderer2D.getFxStringHeight() / 2), -1);
         drawContext.drawHorizontalLine((int) ((x + windowWidth / 2 - Renderer2D.getFxStringWidth(this.getName()) / 2) + Renderer2D.getFxStringWidth(this.getName())) + 2, x + windowWidth, yOffset, ColorManager.INSTANCE.clickGuiSecondary());
         Renderer2D.drawFixedString(drawContext.getMatrices(), shouldRender ? "▾" : "▴", x + windowWidth + 1, (int) (yOffset - Renderer2D.getFxStringHeight() / 2), ColorManager.INSTANCE.clickGuiPaneText());
     }

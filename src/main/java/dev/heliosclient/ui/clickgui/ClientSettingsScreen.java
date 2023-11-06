@@ -17,17 +17,16 @@ import net.minecraft.text.Text;
 
 public class ClientSettingsScreen extends Screen implements IWindowContentRenderer {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    static int offsetY = 0;
     public NavBar navBar = new NavBar();
-
     int x, y, windowWidth = 224, windowHeight;
     private final Module_ module;
     private final Window window;
+    private final float delayBetweenSettings = 0.2f;
+    float delay = 0;
 
     public ClientSettingsScreen(Module_ module) {
         super(Text.literal("Client Settings"));
         this.module = module;
-        offsetY = 0;
         window = new Window(windowHeight, windowWidth, true, this);
     }
 
@@ -41,6 +40,22 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
     protected void init() {
         super.init();
         window.init();
+    }
+
+    public void updateSetting() {
+        for (SettingGroup settingGroup : module.settingGroups) {
+            if (!settingGroup.shouldRender()) continue;
+            for (Setting setting : settingGroup.getSettings()) {
+                if (!setting.shouldRender()) continue;
+                setting.update(settingGroup.getY());
+                if (!setting.isAnimationDone()) {
+                    if (delay <= 0) {
+                        delay = delayBetweenSettings;
+                    }
+                    delay -= setting.animationSpeed;
+                }
+            }
+        }
     }
 
     @Override
@@ -62,6 +77,8 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
         window.setWindowHeight(windowHeight);
         window.render(drawContext, mouseX, mouseY, module.name, module.description, textRenderer);
 
+        x = window.getX();
+        y = window.getY();
 
         navBar.render(drawContext, textRenderer, mouseX, mouseY);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
@@ -114,19 +131,38 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
 
     @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+        updateSetting();
+
         int yOffset = y;
         for (SettingGroup settingGroup : module.settingGroups) {
             yOffset += Math.round(settingGroup.getGroupNameHeight() + 3);
             settingGroup.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
-            if (!settingGroup.shouldRender()) continue;
+            if (!settingGroup.shouldRender()) {
+                for (Setting setting : settingGroup.getSettings()) {
+                    setting.animationDone = false;
+                    delay = 0;
+                    setting.setAnimationProgress(0.5f);
+                }
+                continue;
+            }
+
             for (Setting setting : settingGroup.getSettings()) {
-                if (!setting.shouldRender()) continue;
+                if (!setting.shouldRender()) {
+                    setting.animationDone = false;
+                    delay = 0;
+                    setting.setAnimationProgress(0.5f);
+                    continue;
+                }
                 if (setting instanceof RGBASetting rgbaSetting) {
                     rgbaSetting.setParentScreen(this);
                 }
-                setting.render(drawContext, x + 16, yOffset + 3, mouseX, mouseY, textRenderer);
+
+                // Update the y position of the setting based on its animation progress
+                int animatedY = Math.round(setting.getY() + (yOffset - setting.getY()) * setting.getAnimationProgress());
+                setting.render(drawContext, x + 16, animatedY + 3, mouseX, mouseY, textRenderer);
                 yOffset += setting.height + 1;
             }
+
             yOffset += Math.round(settingGroup.getGroupNameHeight() + 1);
         }
     }

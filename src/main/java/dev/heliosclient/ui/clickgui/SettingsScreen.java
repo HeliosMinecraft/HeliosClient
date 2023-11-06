@@ -1,7 +1,7 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -12,24 +12,34 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import org.lwjgl.glfw.GLFW;
 
 public class SettingsScreen extends Screen implements IWindowContentRenderer {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
     int x, y, windowWidth = 224, windowHeight;
     private final Module_ module;
-    private final Screen parentScreen;
     private final Window window;
-    private final float delayBetweenSettings = 0.1f;
+    private final Screen parentScreen;
+    private final float delayBetweenSettings = 0.2f;
     float delay = 0;
 
     public SettingsScreen(Module_ module, Screen parentScreen) {
         super(Text.literal("Settings"));
         this.module = module;
+        window = new Window(windowHeight, windowWidth, true, this);
         this.parentScreen = parentScreen;
-        window = new Window(100, windowWidth, true, this);
     }
 
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        window.mouseScrolled(mouseX, mouseY, amount);
+        return super.mouseScrolled(mouseX, mouseY, amount);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        window.init();
+    }
     public void updateSetting() {
         for (SettingGroup settingGroup : module.settingGroups) {
             if (!settingGroup.shouldRender()) continue;
@@ -52,7 +62,7 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
 
         windowHeight = 45;
         for (SettingGroup settingGroup : module.settingGroups) {
-            windowHeight += Math.round(settingGroup.getGroupNameHeight() + 10);
+            windowHeight += Math.round(settingGroup.getGroupNameHeight() + 3);
             if (!settingGroup.shouldRender()) continue;
             for (Setting setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
@@ -65,15 +75,11 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
         window.setWindowHeight(windowHeight);
         window.render(drawContext, mouseX, mouseY, module.name, module.description, textRenderer);
 
-
         x = window.getX();
         y = window.getY();
 
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-    }
-
-    public boolean barHovered(double mouseX, double mouseY) {
-        return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + 16;
+        FontManager.fontSize = ClickGUI.FontSize.value.intValue();
     }
 
     @Override
@@ -93,12 +99,6 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
     }
 
     @Override
-    protected void init() {
-        super.init();
-        window.init();
-    }
-
-    @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         for (SettingGroup settingGroup : module.settingGroups) {
             if (!settingGroup.shouldRender()) continue;
@@ -108,39 +108,12 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
     }
 
     @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        for (SettingGroup settingGroup : module.settingGroups) {
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.keyReleased(keyCode, scanCode, modifiers);
-        }
-        return super.keyReleased(keyCode, scanCode, modifiers);
-    }
-
-    @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE && !KeyBind.listeningKey) {
-            MinecraftClient.getInstance().setScreen(parentScreen);
-        }
         for (SettingGroup settingGroup : module.settingGroups) {
             if (!settingGroup.shouldRender()) continue;
             settingGroup.keyPressed(keyCode, scanCode, modifiers);
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        window.mouseScrolled(mouseX, mouseY, amount);
-        return super.mouseScrolled(mouseX, mouseY, amount);
-    }
-
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        for (SettingGroup settingGroup : module.settingGroups) {
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-        }
-        return false;
     }
 
     @Override
@@ -153,17 +126,12 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
     }
 
     @Override
-    public boolean shouldCloseOnEsc() {
-        return false;
-    }
-
-    @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         updateSetting();
 
         int yOffset = y;
         for (SettingGroup settingGroup : module.settingGroups) {
-            yOffset += Math.round(settingGroup.getGroupNameHeight() + 10);
+            yOffset += Math.round(settingGroup.getGroupNameHeight() + 12);
             settingGroup.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
             if (!settingGroup.shouldRender()) {
                 for (Setting setting : settingGroup.getSettings()) {
@@ -187,7 +155,7 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
 
                 // Update the y position of the setting based on its animation progress
                 int animatedY = Math.round(setting.getY() + (yOffset - setting.getY()) * setting.getAnimationProgress());
-                setting.render(drawContext, x + 16, animatedY + 3, mouseX, mouseY, textRenderer);
+                setting.render(drawContext, x + 16, animatedY + 6, mouseX, mouseY, textRenderer);
                 yOffset += setting.height + 1;
             }
 
@@ -195,3 +163,4 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
         }
     }
 }
+
