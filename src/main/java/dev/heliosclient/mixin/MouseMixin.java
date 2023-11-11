@@ -16,10 +16,17 @@ public abstract class MouseMixin {
     @Final
     private MinecraftClient client;
 
+
+    @Shadow
+    public abstract double getX();
+
+    @Shadow
+    public abstract double getY();
+
     @Inject(method = "onMouseScroll", at = @At("HEAD"))
     public void onMouseScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
         if (client.currentScreen instanceof ClickGUIScreen)
             ClickGUIScreen.onScroll(horizontal, vertical);
-
     }
+
 }

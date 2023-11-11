@@ -14,7 +14,6 @@ public class Friend extends Command {
         super("friend", "Adds or removes friend", "f");
     }
 
-    // Override the build method
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         // Define the subcommands for adding and removing friends
@@ -63,11 +62,11 @@ public class Friend extends Command {
                 .then(literal("list")
                         .executes(context -> {
                             FriendManager friendManager = new FriendManager();
-                            if (friendManager.getFriendsName().size() > 0) {
+                            if (!friendManager.getFriendsName().isEmpty()) {
                                 ChatUtils.sendHeliosMsg("You are friends with " + ColorUtils.green
                                         + String.join(", ", friendManager.getFriendsName()));
                             } else {
-                                ChatUtils.sendHeliosMsg("You don't have any friends.");
+                                ChatUtils.sendHeliosMsg("You don't have any friends. :(");
                             }
 
                             return SINGLE_SUCCESS;

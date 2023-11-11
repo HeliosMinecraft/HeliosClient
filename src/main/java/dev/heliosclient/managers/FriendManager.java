@@ -16,7 +16,7 @@ public class FriendManager {
 
     public FriendManager() {
         for (Friend friend : friends) {
-            friendsName.add(friend.getPlayerName());
+            friendsName.add(friend.playerName());
         }
     }
 
@@ -25,15 +25,17 @@ public class FriendManager {
     }
 
     public static void addFriend(Friend friend) {
-        if (Objects.equals(friend.getPlayerName(), mc.getSession().getUsername())) {
+        if (Objects.equals(friend.playerName(), mc.getSession().getUsername())) {
             ChatUtils.sendHeliosMsg("You can't befriend yourself.");
         } else {
             friends.add(friend);
+            friendsName.add(friend.playerName());
         }
     }
 
     public static void removeFriend(Friend friend) {
         friends.remove(friend);
+        friendsName.remove(friend.playerName());
     }
 
     public static HashSet<Friend> getFriends() {

@@ -6,9 +6,11 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.Renderer2D;
@@ -18,6 +20,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.awt.*;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +43,9 @@ public class CategoryPane {
     float delay = 0, delay2 = 0;
     private final float delayBetweenButtons = 0.0f;
     private final float delayBetweenSettings = 0.1f;
+    public static List<Hitbox> hitboxes = new ArrayList<>();
+    private final Hitbox hitBox;
+
 
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
@@ -60,6 +66,8 @@ public class CategoryPane {
         } else {
             HeliosClient.LOGGER.info("SVG File for " + category.name + "does not exist");
         }
+        hitBox = new Hitbox(x, y, width, height);
+        hitboxes.add(hitBox);
     }
 
     public void addModule(List<Module_> moduleS) {
@@ -106,19 +114,19 @@ public class CategoryPane {
 
     public void updateSetting() {
         for (ModuleButton button : moduleButtons) {
-            for (SettingGroup settingGroup : button.module.quickSettingGroups) {
-                if (!settingGroup.shouldRender()) continue;
-                for (Setting setting : settingGroup.getSettings()) {
-                    if (!setting.shouldRender()) continue;
-                    setting.update(button.getY());
-                    if (!setting.isAnimationDone()) {
-                        if (delay2 <= 0) {
+            button.module.settingGroups.stream()
+                    .filter(SettingGroup::shouldRender)
+                    .flatMap(settingGroup -> settingGroup.getSettings().stream().map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
+                    .filter(entry -> entry.getValue().shouldRender())
+                    .forEach(entry -> {
+                        SettingGroup settingGroup = entry.getKey();
+                        Setting setting = entry.getValue();
+                        setting.update(settingGroup.getY());
+                        if (!setting.isAnimationDone() && delay2 <= 0) {
                             delay2 = delayBetweenSettings;
+                            delay2 -= setting.animationSpeed;
                         }
-                        delay2 -= setting.animationSpeed;
-                    }
-                }
-            }
+                    });
         }
     }
 
@@ -145,7 +153,20 @@ public class CategoryPane {
                 MAX_HEIGHT = height;
             }
         }
+        hitBox.set(x, y, width, height);
+
         if (!collapsed && height >= 10) {
+            int settingHeight = 2;
+            for (ModuleButton m : moduleButtons) {
+                if (m.settingsOpen && !m.module.quickSettingGroups.isEmpty()) {
+                    for (SettingGroup settingGroup : m.module.quickSettingGroups) {
+                        for (Setting setting : settingGroup.getSettings()) {
+                            settingHeight += setting.heightCompact;
+                        }
+                    }
+                }
+            }
+            MAX_HEIGHT = settingHeight + MAX_HEIGHT;
             if (category == Categories.SEARCH) {
                 Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, MAX_HEIGHT, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
             } else {
@@ -186,8 +207,8 @@ public class CategoryPane {
                 if (m.settingsOpen) {
                     updateSetting();
                     for (SettingGroup settingGroup : m.module.quickSettingGroups) {
-                        buttonYOffset += Math.round(settingGroup.getGroupNameHeight() + 3);
-                        boxHeight += Math.round(settingGroup.getGroupNameHeight() + 3);
+                        buttonYOffset += Math.round(settingGroup.getGroupNameHeight() + 2);
+                        boxHeight += Math.round(settingGroup.getGroupNameHeight() + 2);
                         settingGroup.renderBuilder(drawContext, x - 1, buttonYOffset, width);
 
                         if (!settingGroup.shouldRender()) {
@@ -205,17 +226,20 @@ public class CategoryPane {
                                 setting.setAnimationProgress(0.5f);
                                 continue;
                             }
+                            if (setting instanceof RGBASetting) {
+                                ((RGBASetting) setting).setParentScreen(ClickGUIScreen.INSTANCE);
+                            }
 
                             setting.quickSettings = m.settingsOpen;
                             // Update the y position of the setting based on its animation progress
                             int animatedY = Math.round(setting.getY() + (buttonYOffset - setting.getY()) * setting.getAnimationProgress());
-                            setting.renderCompact(drawContext, x, animatedY + 3, mouseX, mouseY, textRenderer);
+                            setting.renderCompact(drawContext, x, animatedY + 6, mouseX, mouseY, textRenderer);
 
                             buttonYOffset += setting.heightCompact;
                             boxHeight += setting.heightCompact;
                         }
-                        buttonYOffset += Math.round(settingGroup.getGroupNameHeight());
-                        boxHeight += Math.round(settingGroup.getGroupNameHeight());
+                        buttonYOffset += Math.round(settingGroup.getGroupNameHeight() + 2);
+                        boxHeight += Math.round(settingGroup.getGroupNameHeight() + 2);
 
                     }
                     if (!m.module.quickSettingGroups.isEmpty()) {
@@ -244,6 +268,7 @@ public class CategoryPane {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 255).getRGB());
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
+        hitBox.set(x + 2, y + 2, width - 2, categoryNameHeight + 14);
 
         if (svgFile != null) {
             // Gives a very shitty error idk why. Not fixable
@@ -252,8 +277,7 @@ public class CategoryPane {
     }
 
     public boolean hovered(double mouseX, double mouseY) {
-        int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
-        return mouseX > x + 2 && mouseX < x + (width - 2) && mouseY > y + 2 && mouseY < y + categoryNameHeight + 14;
+        return hitBox.contains(mouseX, mouseY);
     }
 
     public boolean hoveredOverModules(double mouseX, double mouseY) {

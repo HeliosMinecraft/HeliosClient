@@ -29,7 +29,7 @@ public class AddonManager {
 
         File addonsDir = new File(currentWorkingDir);
         if (!addonsDir.exists()) {
-            HeliosClient.LOGGER.info("Mods folder directory missing for some reason");
+            HeliosClient.LOGGER.info("Current folder directory missing for some reason");
             return;
         }
 
@@ -61,6 +61,7 @@ public class AddonManager {
                     addons.add(addon);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
         }

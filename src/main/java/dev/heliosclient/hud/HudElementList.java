@@ -7,8 +7,8 @@ import java.util.ArrayList;
 public class HudElementList {
     public static HudElementList INSTANCE = new HudElementList();
     public ArrayList<HudElement> hudElements = new ArrayList<>();
-
     public HudElementList() {
+
         registerElements(new Coords());
         registerElement(new Fps());
         registerElement(new PlayerModel());

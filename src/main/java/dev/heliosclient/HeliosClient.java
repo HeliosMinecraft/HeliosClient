@@ -9,6 +9,7 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
+import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.DamageUtils;
 import dev.heliosclient.util.SoundUtils;
@@ -27,7 +28,7 @@ public class HeliosClient implements ModInitializer {
     public static final String clientTag = ColorUtils.red + "Helios Client";
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
-
+    public static Quadtree quadTree;
     public static Config CONFIG = new Config();
     public static int uiColorA = 0xFF55FFFF;
     public static int uiColor = 0x55FFFF;
@@ -49,6 +50,10 @@ public class HeliosClient implements ModInitializer {
         EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
         EventManager.register(KeybindManager.INSTANCE);
         EventManager.register(new DamageUtils());
+
+        if (MC.getWindow() != null) {
+            quadTree = new Quadtree(0);
+        }
 
         SoundUtils.registerSounds();
     }

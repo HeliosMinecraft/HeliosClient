@@ -5,6 +5,7 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.util.fontutils.FontLoader;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
@@ -37,6 +38,7 @@ public class FontManager implements Listener {
             fontRenderer = new FontRenderer(fonts, fontSize);
             fxfontRenderer = new fxFontRenderer(fonts, 8f);
             EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
+            HeliosClient.quadTree = new Quadtree(0);
             EventManager.unregister(this);
         }
     }

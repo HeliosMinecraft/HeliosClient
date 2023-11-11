@@ -41,7 +41,7 @@ public class HudElementButton {
     public <T extends HudElement> void addInstanceToList(Class<? extends T> clazz) {
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
-            HudManager.INSTANCE.hudElements.add(instance);
+            HudManager.INSTANCE.addHudElement(instance);
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).posX = 1;
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).posY = 1;
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).distanceX = 0;

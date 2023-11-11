@@ -22,7 +22,7 @@ public class Fps extends HudElement {
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         String text = "FPS: " + ColorUtils.gray + mc.getCurrentFps();
         this.width = Math.round(Renderer2D.getStringWidth(text));
-        Renderer2D.drawString(drawContext.getMatrices(), text, this.x - (float) width / 2, this.y - ((float) height / 2), HeliosClient.uiColorA);
+        Renderer2D.drawString(drawContext.getMatrices(), text, this.x - (float) width / 2, this.y - ((float) height / 2), HeliosClient.uiColor);
     }
 
 }

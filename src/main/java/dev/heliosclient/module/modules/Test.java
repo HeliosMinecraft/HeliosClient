@@ -1,6 +1,5 @@
 package dev.heliosclient.module.modules;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.*;
 import dev.heliosclient.module.Categories;
@@ -9,10 +8,7 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
-import me.x150.renderer.render.Renderer3d;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 
@@ -34,7 +30,7 @@ public class Test extends Module_ {
     BooleanSetting Arc = sgGeneral.add(new BooleanSetting("Arc", "", this, false, () -> true, false));
     BooleanSetting TracerLine = sgGeneral.add(new BooleanSetting("TracerLine", "", this, false, () -> true, false));
     BooleanSetting blockOutlineAndFIll = sgGeneral.add(new BooleanSetting("blockOutlineAndFIll", "", this, false, () -> true, false));
-    RGBASetting color = sgGeneral.add(new RGBASetting("Color", "color", Color.WHITE, false, () -> true));
+    RGBASetting color = sgGeneral.add(new RGBASetting("Color", "color", Color.WHITE, false, this, () -> true));
 
 
     public Test() {
@@ -60,15 +56,15 @@ public class Test extends Module_ {
         // Draw a 2D rectangle using the CustomRenderer class
         DrawContext drawContext = event.getDrawContext();
         if (rectangle.value)
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 10, 10, 100, 50, 0xFFFF0000);
+            Renderer2D.drawRectangleWithShadow(drawContext.getMatrices(), 10, 10, 100, 50, 0xFFFF0000, 10);
 
         // Draw a 2D rounded rectangle using the CustomRenderer class
         if (rounded.value)
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 120, 10, 10, 5, 1, Color.DARK_GRAY.getRGB());
+            Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), 120, 10, 25, 15, 3, 20, Color.YELLOW.getRGB());
 
         // Draw a 2D circle using the CustomRenderer class
         if (Circle.value)
-            Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), 165, 35, 20, 0xFF0000FF);
+            Renderer2D.drawCircleWithShadow(drawContext.getMatrices(), 165, 35, 20, 10, 0x0AEE27);
 
         // Draw a 2D triangle using the CustomRenderer class
         if (Triangle.value)
@@ -83,15 +79,15 @@ public class Test extends Module_ {
             Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 20, 20, false, true, true, false, 120, 120, 10, 0xFF00FF00);
 
         if (GradientRounded.value)
-            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 22, 20, 40, 40, 2);
+            Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), 22, 20, 40, 40, Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 2, 20);
 
         if (Gradient.value)
-            Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), 20, 20, 40, 40, ColorUtils.getRainbowColor().getRGB(), Color.WHITE.getRGB());
+            Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), 20, 20, 40, 40, 10, ColorUtils.getRainbowColor().getRGB(), Color.WHITE.getRGB());
     }
 
     @SubscribeEvent
     public void renderer3d(Render3DEvent event) {
-        Renderer3d.renderThroughWalls();
+     /*   Renderer3d.renderThroughWalls();
         PlayerEntity player = HeliosClient.MC.player;
         Vec3d start = new Vec3d(player.getX() + 2, player.getY() + 1, player.getZ() - 3);
         Vec3d start2 = new Vec3d(50, player.getY() - 1, player.getZ() + 2);
@@ -103,6 +99,8 @@ public class Test extends Module_ {
         Renderer3d.renderLine(event.getMatrices(), Color.yellow, start, player.getPos());
         Renderer3d.renderFilled(event.getMatrices(), Color.GREEN, start2, dimensions);
         Renderer3d.renderEdged(event.getMatrices(), Color.CYAN, Color.BLACK, start3, dimensions);
+
+      */
     }
 
 

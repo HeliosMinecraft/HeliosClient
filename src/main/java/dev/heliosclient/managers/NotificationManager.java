@@ -6,8 +6,8 @@ import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.event.events.RenderEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.ui.notification.Notification;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
-import dev.heliosclient.util.notification.Notification;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -54,7 +54,7 @@ public class NotificationManager implements Listener {
         Iterator<Notification> iterator = notifications.descendingIterator();
         while (iterator.hasNext()) {
             Notification notification = iterator.next();
-            notification.render(event.getDrawContext().getMatrices(), notification.currentY, fontRenderer);
+            notification.render(event.getDrawContext().getMatrices(), notification.y, fontRenderer);
         }
     }
 

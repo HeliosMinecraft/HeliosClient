@@ -1,6 +1,8 @@
 package dev.heliosclient.module.sysmodules;
 
+import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.FontChangeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
@@ -13,6 +15,7 @@ import dev.heliosclient.util.fontutils.FontUtils;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,10 +90,10 @@ public class ClickGUI extends Module_ {
             .name("Rainbow speed")
             .description("Speed of the rainbow throughout the client")
             .module(ClickGUI.INSTANCE)
-            .value(1.0)
-            .max(15)
+            .value(7.0)
+            .max(20)
             .min(1)
-            .defaultValue(1.0)
+            .defaultValue(8.0)
             .roundingPlace(0)
             .build()
     );
@@ -132,39 +135,28 @@ public class ClickGUI extends Module_ {
             .value(true)
             .build()
     );
-    ColorSetting AccentColor = sgGeneral.add(new ColorSetting.Builder()
+    RGBASetting AccentColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Accent color")
             .description("Accent color of Click GUI.")
             .module(this)
-            .value(ColorManager.INSTANCE.clickGuiSecondary)
+            .value(new Color(ColorManager.INSTANCE.clickGuiSecondary))
+            .defaultValue(new Color(ColorManager.INSTANCE.clickGuiSecondary))
             .build()
     );
-    BooleanSetting RainbowAccent = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Rainbow")
-            .description("Rainbow effect for accent color.")
-            .module(this)
-            .value(false)
-            .build()
-    );
-    BooleanSetting RainbowPane = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Rainbow")
-            .description("Rainbow effect for category panes.")
-            .module(this)
-            .value(false)
-            .build()
-    );
-    ColorSetting PaneTextColor = sgGeneral.add(new ColorSetting.Builder()
+    RGBASetting PaneTextColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Category pane text color")
             .description("Color of pane text.")
             .module(this)
-            .value(ColorManager.INSTANCE.clickGuiPaneText)
+            .value(new Color(ColorManager.INSTANCE.clickGuiPaneText))
+            .defaultValue(new Color(ColorManager.INSTANCE.clickGuiPaneText))
             .build()
     );
-    ColorSetting TextColor = sgGeneral.add(new ColorSetting.Builder()
+    RGBASetting TextColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Text color")
             .description("Color of text all through out the client.")
             .module(this)
-            .value(ColorManager.INSTANCE.defaultTextColor)
+            .value(new Color(ColorManager.INSTANCE.defaultTextColor))
+            .defaultValue(new Color(ColorManager.INSTANCE.defaultTextColor))
             .build()
     );
 
@@ -180,6 +172,8 @@ public class ClickGUI extends Module_ {
             FontManager.INSTANCE = new FontManager();
             Font.setOptions(FontManager.fontNames);
         });
+
+        EventManager.register(this);
     }
 
     @Override
@@ -189,17 +183,6 @@ public class ClickGUI extends Module_ {
         Tooltip.tooltip.fixedPos = TooltipPos.value;
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
 
-        if (!(setting instanceof CycleSetting) && !(setting instanceof DoubleSetting)) {
-            ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getA();
-            ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
-            ColorManager.INSTANCE.clickGuiSecondaryRainbow = RainbowAccent.value;
-
-            ColorManager.INSTANCE.defaultTextColor = TextColor.value;
-
-            ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getA();
-            ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
-            ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
-        }
         pause = Pause.value;
         keybinds = Keybinds.value;
 
@@ -209,6 +192,21 @@ public class ClickGUI extends Module_ {
         EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
     }
 
+    @SubscribeEvent
+    @Override
+    public void onTick(TickEvent event) {
+        super.onTick(event);
+        ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getColor().getAlpha();
+        ColorManager.INSTANCE.clickGuiSecondary = AccentColor.getColor().getRGB();
+        ColorManager.INSTANCE.clickGuiSecondaryRainbow = AccentColor.isRainbow();
+
+        ColorManager.INSTANCE.defaultTextColor = TextColor.getColor().getRGB();
+
+        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getColor().getAlpha();
+        ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.getColor().getRGB();
+        ColorManager.INSTANCE.clickGuiPaneTextRainbow = PaneTextColor.isRainbow();
+    }
+
     @Override
     public void onLoad() {
         super.onLoad();
@@ -216,15 +214,16 @@ public class ClickGUI extends Module_ {
         Tooltip.tooltip.fixedPos = TooltipPos.value;
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
 
-        ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getA();
-        ColorManager.INSTANCE.clickGuiSecondary = AccentColor.value;
-        ColorManager.INSTANCE.clickGuiSecondaryRainbow = RainbowAccent.value;
+        ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getColor().getAlpha();
+        ColorManager.INSTANCE.clickGuiSecondary = AccentColor.getColor().getRGB();
+        ColorManager.INSTANCE.clickGuiSecondaryRainbow = AccentColor.isRainbow();
 
-        ColorManager.INSTANCE.defaultTextColor = TextColor.value;
+        ColorManager.INSTANCE.defaultTextColor = TextColor.getColor().getRGB();
 
-        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getA();
-        ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
-        ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
+        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getColor().getAlpha();
+        ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.getColor().getRGB();
+        ColorManager.INSTANCE.clickGuiPaneTextRainbow = PaneTextColor.isRainbow();
+
         pause = Pause.value;
         keybinds = Keybinds.value;
 

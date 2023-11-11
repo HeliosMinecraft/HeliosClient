@@ -32,7 +32,6 @@ public class Speed extends Module_ {
     @SubscribeEvent
     public void onMotion(PlayerMotionEvent event) {
         assert mc.player != null;
-        mc.player.addVelocity(event.getMovement());
     }
 
 }

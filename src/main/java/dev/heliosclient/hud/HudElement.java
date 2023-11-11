@@ -2,6 +2,7 @@ package dev.heliosclient.hud;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -31,11 +32,15 @@ public class HudElement {
     public boolean selected = false;
     public boolean draggable = true;
     public boolean renderOutLineBox = true;
-    int startX, startY;
+    public Hitbox hitbox;
+    public boolean shiftDown = false;
+    int startX, startY, snapSize = 100;
+
 
     public HudElement(String name, String description) {
         this.name = name;
         this.description = description;
+        hitbox = new Hitbox(x, y, width, height);
     }
 
     /**
@@ -48,8 +53,25 @@ public class HudElement {
      */
     public void renderEditor(DrawContext drawContext, TextRenderer textRenderer, int mouseX, int mouseY) {
         if (dragging) {
-            x = mouseX - startX;
-            y = mouseY - startY;
+            int newX = mouseX - startX;
+            int newY = mouseY - startY;
+
+            if (this.shiftDown) {
+                // Calculate the size of each snap box
+                int snapBoxWidth = drawContext.getScaledWindowWidth() / this.snapSize;
+                int snapBoxHeight = drawContext.getScaledWindowHeight() / this.snapSize;
+
+                // Calculate the index of the snap box that the new position would be in
+                int snapBoxX = newX / snapBoxWidth;
+                int snapBoxY = newY / snapBoxHeight;
+
+                // Snap the new position to the top-left corner of the snap box
+                newX = snapBoxX * snapBoxWidth;
+                newY = snapBoxY * snapBoxHeight;
+            }
+
+            x = newX;
+            y = newY;
 
             //Get right line to align to
             if (drawContext.getScaledWindowHeight() / 3 > y) {
@@ -116,13 +138,14 @@ public class HudElement {
             }
 
             Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1 - (float) width / 2, y - 1 - (float) height / 2, width + 2, height + 2, 0.4f, 0xFFFFFFFF);
-
         }
         //Set default height value
         this.height = Math.round(Renderer2D.getStringHeight());
 
         //Renders element
         renderElement(drawContext, textRenderer);
+
+        hitbox.set(x - 1 - (float) this.width / 2, y - 1 - (float) this.height / 2, width + 2, height + 2);
     }
 
     /**
@@ -154,6 +177,7 @@ public class HudElement {
 
         //Render element
         renderElement(drawContext, textRenderer);
+        hitbox.set(x - 1 - (float) this.width / 2, y - 1 - (float) this.height / 2, width + 2, height + 2);
     }
 
     /**
@@ -191,6 +215,19 @@ public class HudElement {
             startY = (int) (mouseY - y);
             dragging = true;
         }
+        if (this.shiftDown) {
+            // Calculate the size of each snap box
+            int snapBoxWidth = this.width / this.snapSize;
+            int snapBoxHeight = this.height / this.snapSize;
+
+            // Calculate the index of the snap box that the mouse is currently in
+            int snapBoxX = (int) (mouseX / snapBoxWidth);
+            int snapBoxY = (int) (mouseY / snapBoxHeight);
+
+            // Snap the element to the top-left corner of the snap box
+            this.x = snapBoxX * snapBoxWidth;
+            this.y = snapBoxY * snapBoxHeight;
+        }
     }
 
     /**
@@ -199,7 +236,7 @@ public class HudElement {
      * @return if mouse is hovered over this element
      */
     public boolean hovered(double mouseX, double mouseY) {
-        return mouseX > x - (double) width / 2 && mouseX < x + (double) width / 2 && mouseY > y - (double) height / 2 && mouseY < y + (double) height / 2;
+        return hitbox.contains(mouseX, mouseY);
     }
 
     /**
@@ -212,5 +249,21 @@ public class HudElement {
     public void mouseReleased(double mouseX, double mouseY, int button) {
         //Stop dragging
         dragging = false;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 }

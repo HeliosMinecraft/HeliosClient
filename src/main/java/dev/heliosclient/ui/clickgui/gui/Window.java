@@ -1,4 +1,4 @@
-package dev.heliosclient.ui.clickgui.ui;
+package dev.heliosclient.ui.clickgui.gui;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
@@ -84,10 +84,12 @@ public class Window {
 
             Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 20, windowWidth, windowHeight, 5, color);
 
+            int textOffsetY = 0;
             for (String text : wrappedText) {
                 int warpedTextWidth = textRenderer.getWidth(text);
-                drawContext.drawText(textRenderer, text, x + windowWidth / 2 - warpedTextWidth / 2 + 1, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
+                drawContext.drawText(textRenderer, text, x + windowWidth / 2 - warpedTextWidth / 2 + 1, y + 26 + textOffsetY, ColorManager.INSTANCE.defaultTextColor(), false);
                 windowHeight += textRenderer.fontHeight + 2;
+                textOffsetY += textRenderer.fontHeight + 2;
             }
 
             contentRenderer.renderContent(this, drawContext, x, y + 30 + (wrappedText.size() * textRenderer.fontHeight), mouseX, mouseY);

@@ -3,6 +3,7 @@ package dev.heliosclient.ui.clickgui;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.Renderer2D;
@@ -31,6 +32,7 @@ public class ModuleButton {
     float animationSpeed = 0.13f;
     private float targetY;
     private float animationProgress = 0;
+    private final Hitbox hitBox;
 
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
@@ -39,6 +41,7 @@ public class ModuleButton {
         this.parentScreen = parentScreen;
         BackgroundAnimation.FADE_SPEED = 0.2f;
         TextAnimation.FADE_SPEED = 0.2f;
+        hitBox = new Hitbox(x, y, width, height);
     }
 
 
@@ -48,6 +51,7 @@ public class ModuleButton {
     }
 
     public void update(float targetY) {
+
         if (!animationDone) {
             //the first update, set the initial position above the target
             if (animationProgress == 0) {
@@ -78,7 +82,7 @@ public class ModuleButton {
         this.x = x;
         this.y = y;
 
-        if (hovered(mouseX, mouseY)) {
+        if (hitBox.contains(mouseX, mouseY)) {
             hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 20);
         } else {
             hoverAnimationTimer = Math.max(hoverAnimationTimer - 1, 0);
@@ -86,8 +90,10 @@ public class ModuleButton {
         // Get the width and height of the module name
         int moduleNameHeight = (int) Renderer2D.getFxStringHeight(module.name) - 1;
 
-        // Adjust the button size based on the text dimensions
         this.width = maxWidth;
+
+        hitBox.set(x, y, width, height);
+
 
         Color fillColor = module.isActive() ? new Color(ColorManager.INSTANCE.clickGuiSecondary()) : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
 
@@ -99,7 +105,7 @@ public class ModuleButton {
         int textY = y + (height - moduleNameHeight) / 2;
 
         TextAnimation.drawFadingText(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor(), true);
-        if (hovered(mouseX, mouseY)) {
+        if (hitBox.contains(mouseX, mouseY)) {
             Tooltip.tooltip.changeText(module.description);
         }
 
@@ -108,15 +114,12 @@ public class ModuleButton {
             String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
             TextAnimation.drawFadingText(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor, true);
         }
-    }
 
-    public boolean hovered(double mouseX, double mouseY) {
-        return mouseX > x && mouseX < x + width - 3 && mouseY > y && mouseY < y + height;
     }
 
     public boolean mouseClicked(int mouseX, int mouseY, int button, boolean collapsed) {
         if (!collapsed) {
-            if (hovered(mouseX, mouseY)) {
+            if (hitBox.contains(mouseX, mouseY)) {
                 if (button == 0) {
                     module.toggle();
                     return true;

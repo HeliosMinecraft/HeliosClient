@@ -8,23 +8,33 @@ import dev.heliosclient.event.events.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
+import dev.heliosclient.util.render.GaussianBlur;
+import dev.heliosclient.util.render.Texture;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL40C;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import static me.x150.renderer.render.Renderer2d.renderTexture;
+import static me.x150.renderer.util.RendererUtils.registerBufferedImageTexture;
 
 public class Renderer2D implements Listener {
 
     public static Renderer2D INSTANCE = new Renderer2D();
     public static DrawContext drawContext;
     public static Renderers renderer = Renderers.CUSTOM;
+    public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
+
 
     @SubscribeEvent
     public void renderEvent(RenderEvent renderEvent) {
@@ -57,6 +67,124 @@ public class Renderer2D implements Listener {
         RenderSystem.disableBlend();
     }
 
+    public static void drawRectangleWithShadowBadWay(Matrix4f matrix4f, float x, float y, float width, float height, int color, int shadowOpacity, float shadowOffsetX, float shadowOffsetY) {
+        // First, render the shadow
+        drawRectangle(matrix4f, x + shadowOffsetX, y + shadowOffsetY, width, height, ColorUtils.rgbaToInt(0, 0, 0, shadowOpacity));
+
+        // Then, render the rectangle
+        drawRectangle(matrix4f, x, y, width, height, color);
+    }
+
+    public static void drawRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, int color, int blurRadius) {
+        //Shadow
+        drawBlurredShadow(matrices, x, y, width, height, blurRadius, new Color(color));
+
+        //Rectangle
+        drawRectangle(matrices.peek().getPositionMatrix(), x, y, width, height, color);
+    }
+
+
+    // https://github.com/Pan4ur/ThunderHack-Recode/blob/main/src/main/java/thunder/hack/utility/render/Render2DEngine.java#L187
+    public static void drawBlurredShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, Color color) {
+        width = width + blurRadius * 2;
+        height = height + blurRadius * 2;
+        x = x - blurRadius;
+        y = y - blurRadius;
+
+        int identifier = (int) (width * height + width * blurRadius);
+        if (shadowCache.containsKey(identifier)) {
+            shadowCache.get(identifier).bind();
+            RenderSystem.defaultBlendFunc();
+        } else {
+            BufferedImage original = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB);
+            Graphics g = original.getGraphics();
+            g.setColor(new Color(-1));
+            g.fillRect(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2));
+            g.dispose();
+            GaussianBlur op = new GaussianBlur(blurRadius);
+            BufferedImage blurred = op.applyFilter(original, null);
+            shadowCache.put(identifier, new BlurredShadow(blurred));
+            return;
+        }
+
+        RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        RenderSystem.enableBlend();
+        renderTexture(matrices, x, y, width, height, 0, 0, width, height, width, height);
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+    }
+
+
+    public static void drawCircleWithShadowBadWay(Matrix4f matrix4f, float xCenter, float yCenter, float radius, int color, int shadowOpacity, float shadowOffsetX, float shadowOffsetY) {
+        // First, render the shadow
+        drawFilledCircle(matrix4f, xCenter + shadowOffsetX, yCenter + shadowOffsetY, radius, ColorUtils.rgbaToInt(0, 0, 0, shadowOpacity));
+
+        // Then, render the circle
+        drawFilledCircle(matrix4f, xCenter, yCenter, radius, color);
+    }
+
+    public static void drawCircleWithShadow(MatrixStack matrices, float xCenter, float yCenter, float radius, int blurRadius, int color) {
+        // First, render the shadow
+        drawCircleBlurredShadow(matrices, xCenter, yCenter, radius, new Color(color), blurRadius);
+
+        // Then, render the circle
+        drawFilledCircle(matrices.peek().getPositionMatrix(), xCenter, yCenter, radius, color);
+    }
+
+    public static void drawCircleBlurredShadow(MatrixStack matrices, float xCenter, float yCenter, float radius, Color color, int blurRadius) {
+        // Calculate the size of the shadow image
+        int diameter = (int) (radius * 2);
+        int shadowWidth = diameter + blurRadius * 2;
+        int shadowHeight = diameter + blurRadius * 2;
+
+        int identifier = shadowWidth * shadowHeight + shadowWidth * blurRadius;
+        if (shadowCache.containsKey(identifier)) {
+            shadowCache.get(identifier).bind();
+            RenderSystem.defaultBlendFunc();
+        } else {
+            BufferedImage original = new BufferedImage(shadowWidth, shadowHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = original.createGraphics();
+            g.setColor(new Color(-1));
+            g.fillOval(blurRadius, blurRadius, diameter, diameter); // Draw a circle instead of a rectangle
+            g.dispose();
+            GaussianBlur op = new GaussianBlur(blurRadius);
+            BufferedImage blurred = op.applyFilter(original, null);
+            shadowCache.put(identifier, new BlurredShadow(blurred));
+            return;
+        }
+
+        RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        RenderSystem.enableBlend();
+        renderTexture(matrices, xCenter - radius, yCenter - radius, shadowWidth, shadowHeight, 0, 0, shadowWidth, shadowHeight, shadowWidth, shadowHeight);
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+    }
+
+
+    public static void drawRoundedRectangleWithShadowBadWay(Matrix4f matrix4f, float x, float y, float width, float height, float radius, int color, int shadowOpacity, float shadowOffsetX, float shadowOffsetY) {
+        // First, render the shadow
+        drawRoundedRectangle(matrix4f, x + shadowOffsetX, y + shadowOffsetY, width, height, radius, ColorUtils.rgbaToInt(0, 0, 0, shadowOpacity));
+
+        // Then, render the rounded rectangle
+        drawRoundedRectangle(matrix4f, x, y, width, height, radius, color);
+    }
+
+    public static void drawRoundedRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, float radius, int blurRadius, int color) {
+        // First, render the shadow
+        drawBlurredShadow(matrices, x, y, width, height, blurRadius, new Color(color));
+
+        // Then, render the rounded rectangle
+        drawRoundedRectangle(matrices.peek().getPositionMatrix(), x, y, width, height, radius, color);
+    }
+
+
+    public static void drawVerticalLine(Matrix4f matrix4f, float x, float y1, float height, float thickness, int color) {
+        drawRectangle(matrix4f, x, y1, thickness, height, color);
+    }
+
+    public static void drawHorizontalLine(Matrix4f matrix4f, float x1, float width, float y, float thickness, int color) {
+        drawRectangle(matrix4f, x1, y, width, thickness, color);
+    }
 
     public static void drawRoundedRectangle(Matrix4f matrix4f, float x, float y, float width, float height, float radius, int color) {
         // Draw the main rectangle
@@ -108,7 +236,7 @@ public class Renderer2D implements Listener {
     }
 
 
-    public static void drawCircle(Matrix4f matrix4f, int xCenter, int yCenter, int radius, int color) {
+    public static void drawCircle(Matrix4f matrix4f, float xCenter, float yCenter, float radius, int color) {
         float red = (float) (color >> 16 & 255) / 255.0F;
         float green = (float) (color >> 8 & 255) / 255.0F;
         float blue = (float) (color & 255) / 255.0F;
@@ -128,6 +256,7 @@ public class Renderer2D implements Listener {
         tessellator.draw();
     }
 
+    @Deprecated
     public static void drawFilledArc(Matrix4f matrix4f, float x, float y, float radius, float startAngle, float endAngle, int color) {
         float red = (float) (color >> 16 & 255) / 255.0F;
         float green = (float) (color >> 8 & 255) / 255.0F;
@@ -293,27 +422,6 @@ public class Renderer2D implements Listener {
         drawArc(matrix4f, xCenter, yCenter, radius, 1f, color, startAngle, endAngle);
     }
 
-    public static void drawLine(Matrix4f matrix4f, int x1, int y1, int x2, int y2, int color) {
-        float red = (float) (color >> 16 & 255) / 255.0F;
-        float green = (float) (color >> 8 & 255) / 255.0F;
-        float blue = (float) (color & 255) / 255.0F;
-        float alpha = (float) (color >> 24 & 255) / 255.0F;
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-
-        RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.defaultBlendFunc();
-
-        bufferBuilder.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
-        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha).next();
-
-        tessellator.draw();
-        RenderSystem.disableBlend();
-    }
-
     public static void drawFilledTriangle(Matrix4f matrix4f, int x1, int y1, int x2, int y2, int x3, int y3, int color) {
         float red = (float) (color >> 16 & 255) / 255.0F;
         float green = (float) (color >> 8 & 255) / 255.0F;
@@ -370,6 +478,13 @@ public class Renderer2D implements Listener {
         RenderSystem.disableBlend();
     }
 
+    public static void drawGradientWithShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, int startColor, int endColor) {
+        drawBlurredShadow(matrices, x, y, width, height, blurRadius, new Color(startColor));
+
+        drawGradient(matrices.peek().getPositionMatrix(), x, y, width, height, startColor, endColor);
+    }
+
+
     public static void drawFilledGradientQuadrant(Matrix4f matrix4f, float xCenter, float yCenter, float radius, int startColor, int endColor, int quadrant) {
         float startRed = (float) (startColor >> 16 & 255) / 255.0F;
         float startGreen = (float) (startColor >> 8 & 255) / 255.0F;
@@ -411,27 +526,35 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.colorMask(false, false, false, true);
         RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        RenderSystem.clear(GL11.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
         RenderSystem.colorMask(true, true, true, true);
 
         drawRoundedRectangle(matrix, x, y, width, height, (int) radius, color1.getRGB());
+
+        RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
+
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.blendFunc(GL11.GL_DST_ALPHA, GL11.GL_ONE_MINUS_DST_ALPHA);
 
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRed(), color2.getGreen(), color2.getBlue(), color2.getAlpha()).next();
-        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRed(), color1.getGreen(), color1.getBlue(), color1.getAlpha()).next();
-        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRed(), color4.getGreen(), color4.getBlue(), color4.getAlpha()).next();
-        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRed(), color3.getGreen(), color3.getBlue(), color3.getAlpha()).next();
-
-        Tessellator.getInstance().draw();
+        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB()).next();
+        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB()).next();
+        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB()).next();
+        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB()).next();
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         RenderSystem.disableBlend();
 
         RenderSystem.defaultBlendFunc();
     }
+
+    public static void drawRoundedGradientRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, Color color1, Color color2, Color color3, Color color4, float radius, int blurRadius) {
+        drawBlurredShadow(matrices, x, y, width, height, blurRadius, color1);
+
+        drawRoundedGradientRectangle(matrices.peek().getPositionMatrix(), color1, color2, color3, color4, x, y, width, height, radius);
+    }
+
 
     private static final String TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-=_+|{};<>?~`,./;'[] ";
 
@@ -556,5 +679,18 @@ public class Renderer2D implements Listener {
         return lines;
     }
 
+    // https://github.com/Pan4ur/ThunderHack-Recode/blob/main/src/main/java/thunder/hack/utility/render/Render2DEngine.java
+    public static class BlurredShadow {
+        Texture id;
+
+        public BlurredShadow(BufferedImage bufferedImage) {
+            this.id = new Texture("identifier/blur/" + RandomStringUtils.randomAlphanumeric(16));
+            registerBufferedImageTexture(id, bufferedImage);
+        }
+
+        public void bind() {
+            RenderSystem.setShaderTexture(0, id);
+        }
+    }
 
 }

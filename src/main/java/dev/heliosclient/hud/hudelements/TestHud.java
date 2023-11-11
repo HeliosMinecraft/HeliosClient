@@ -31,7 +31,7 @@ public class TestHud extends HudElement {
         }
         this.width = Math.round(Renderer2D.getStringWidth(text + value));
 
-        Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x - (float) width / 2, this.y - ((float) height / 2), HeliosClient.uiColorA);
+        Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x - (float) width / 2, this.y - ((float) height / 2), HeliosClient.uiColor);
     }
 
 }

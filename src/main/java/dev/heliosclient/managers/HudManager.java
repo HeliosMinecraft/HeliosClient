@@ -5,6 +5,7 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -19,10 +20,13 @@ public class HudManager implements Listener {
 
     protected MinecraftClient mc = MinecraftClient.getInstance();
 
+    public static Quadtree quadtree;
+
     public HudManager() {
+        quadtree = new Quadtree(0);
+        quadtree.clear();
         EventManager.register(this);
     }
-
     @SubscribeEvent
     public void render(RenderEvent event) {
         if (ModuleManager.INSTANCE.getModuleByName("HUD").active.value && !(mc.currentScreen instanceof HudEditorScreen)) {
@@ -36,5 +40,15 @@ public class HudManager implements Listener {
         for (HudElement element : hudElements) {
             element.renderEditor(drawContext, textRenderer, mouseX, mouseY);
         }
+    }
+
+    public void addHudElement(HudElement element) {
+        this.hudElements.add(element);
+        quadtree.insert(element.hitbox);
+    }
+
+    public void removeHudElement(HudElement element) {
+        this.hudElements.remove(element);
+        quadtree.remove(element.hitbox);
     }
 }

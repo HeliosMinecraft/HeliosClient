@@ -81,8 +81,8 @@ public class ColorUtils {
      * @param speed
      * @return Current rainbow color.
      */
-    public static Color getRainbowColor(float speed) {
-        float hue = (System.currentTimeMillis() % speed * 100) / speed * 100.0f;
+    public static Color getRainbowColor(int speed) {
+        float hue = (System.currentTimeMillis() % (speed * 100)) / (speed * 100.0f);
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
 
@@ -92,7 +92,7 @@ public class ColorUtils {
      * @return Current rainbow color.
      */
     public static Color getRainbowColor() {
-        float hue = (System.currentTimeMillis() % (ClickGUI.RainbowSpeed.value.intValue() * 10000)) / 10000.0f;
+        float hue = (System.currentTimeMillis() % (ClickGUI.RainbowSpeed.value.intValue() * 1000)) / (ClickGUI.RainbowSpeed.value.intValue() * 1000.0f);
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
 

@@ -1,4 +1,4 @@
-package dev.heliosclient.util.notification;
+package dev.heliosclient.ui.notification;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.animation.Easing;
@@ -11,36 +11,37 @@ public abstract class Notification {
     protected final long creationTime;
     public int WIDTH = 60;
     public int targetY;
-    public int currentY;
-    protected int currentX;
+    public int y;
+    public long timeElapsed;
     protected boolean expired;
     protected long endDelay = 5000;
+    protected int x;
 
     public Notification() {
         int screenWidth = HeliosClient.MC.getWindow().getScaledWidth();
-        this.currentY = targetY + HEIGHT;
-        this.currentX = screenWidth - WIDTH - 5;
+        this.y = targetY + HEIGHT;
+        this.x = screenWidth - WIDTH - 5;
         this.creationTime = System.currentTimeMillis();
     }
 
     public void update() {
-        long timeElapsed = System.currentTimeMillis() - creationTime;
+        timeElapsed = System.currentTimeMillis() - creationTime;
 
         if (timeElapsed > endDelay) {
             float t = (timeElapsed - endDelay) / 1000.0f; // convert to seconds
             int deltaX = (int) (WIDTH * Easing.ease(EasingType.CUBIC_IN, t));
-            currentX += deltaX;
-            if (currentX > HeliosClient.MC.getWindow().getScaledWidth()) {
+            x += deltaX;
+            if (x > HeliosClient.MC.getWindow().getScaledWidth()) {
                 expired = true;
             }
-        } else if (currentY > targetY) {
-            currentY--;
+        } else if (y > targetY) {
+            y--;
         }
     }
 
     public void moveY(int deltaY) {
         targetY += deltaY;
-        currentY += deltaY;
+        y += deltaY;
     }
 
     public boolean isExpired() {

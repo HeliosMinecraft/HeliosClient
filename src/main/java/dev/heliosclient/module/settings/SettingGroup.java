@@ -30,7 +30,7 @@ public class SettingGroup {
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
         for (Setting setting : settings) {
-            if (setting.shouldRender()) {
+            if (setting.shouldRender() && setting.getAnimationProgress() > 0.9f) {
                 setting.mouseClicked(mouseX, mouseY, button);
             }
         }

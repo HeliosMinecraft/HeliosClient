@@ -12,8 +12,8 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.notification.notifications.InfoNotification;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;

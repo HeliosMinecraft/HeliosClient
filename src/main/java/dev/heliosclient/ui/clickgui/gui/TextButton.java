@@ -1,4 +1,4 @@
-package dev.heliosclient.ui.clickgui.ui;
+package dev.heliosclient.ui.clickgui.gui;
 
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;

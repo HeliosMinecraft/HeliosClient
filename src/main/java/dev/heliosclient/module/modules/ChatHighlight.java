@@ -52,7 +52,7 @@ public class ChatHighlight extends Module_ {
 
         if (highlightFriends.value) {
             for (Friend friend : FriendManager.getFriends()) {
-                this.highlightList.add(friend.getPlayerName());
+                this.highlightList.add(friend.playerName());
             }
         }
 

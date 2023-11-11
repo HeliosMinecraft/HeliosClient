@@ -23,7 +23,7 @@ public class ClientTag extends HudElement {
         this.width = (int) (Renderer2D.getStringWidth(text) + 1);
         this.x = MinecraftClient.getInstance().getWindow().getScaledWidth() - this.width / 2 - 3;
         this.y = MinecraftClient.getInstance().getWindow().getScaledHeight() - this.height / 2;
-        Renderer2D.drawString(drawContext.getMatrices(), text, this.x - width / 2 + 1, this.y + height / 2f - Renderer2D.getStringHeight(text), HeliosClient.uiColorA);
+        Renderer2D.drawString(drawContext.getMatrices(), text, this.x - width / 2 + 1, this.y + height / 2f - Renderer2D.getStringHeight(text), HeliosClient.uiColor);
 
     }
 

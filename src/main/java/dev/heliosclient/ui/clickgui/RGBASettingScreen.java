@@ -2,7 +2,7 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.settings.RGBASetting;
-import dev.heliosclient.ui.clickgui.ui.Window;
+import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -25,7 +25,15 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext);
 
+        if (textRenderer.getWidth(setting.description) > windowWidth) {
+            windowWidth = textRenderer.getWidth(setting.description) + 5;
+        } else if (textRenderer.getWidth(setting.name) > windowWidth) {
+            windowWidth = textRenderer.getWidth(setting.name) + 20;
+        }
+
         window.setWindowHeight(windowHeight);
+        window.setWindowWidth(windowWidth);
+
         window.render(drawContext, mouseX, mouseY, setting.name, setting.description, textRenderer);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
     }

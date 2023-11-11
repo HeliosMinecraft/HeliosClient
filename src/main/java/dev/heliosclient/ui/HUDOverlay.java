@@ -1,8 +1,6 @@
 package dev.heliosclient.ui;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.ModuleManager;
-import dev.heliosclient.module.modules.HUDModule;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import net.minecraft.client.MinecraftClient;
@@ -11,7 +9,6 @@ import net.minecraft.util.math.Vec3d;
 
 public class HUDOverlay {
     public static HUDOverlay INSTANCE = new HUDOverlay();
-    public boolean showClientTag = ((HUDModule) ModuleManager.INSTANCE.getModuleByName("HUD")).clientTag.value;
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public void render(DrawContext drawContext, int scaledWidth, int scaledHeight) {
@@ -32,10 +29,6 @@ public class HUDOverlay {
         );
 
         // draw client tag (if enabled)
-        if (showClientTag) {
-            drawContext.drawTextWithShadow(mc.textRenderer, HeliosClient.clientTag + " " + HeliosClient.versionTag,
-                    scaledWidth - mc.textRenderer.getWidth(HeliosClient.clientTag + " " + HeliosClient.versionTag) - 2, scaledHeight - 10, 16777215);
-        }
     }
 
     private double moveSpeed() {

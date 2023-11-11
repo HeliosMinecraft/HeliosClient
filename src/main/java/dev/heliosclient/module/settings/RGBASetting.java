@@ -5,6 +5,7 @@ import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
@@ -40,8 +41,9 @@ public class RGBASetting extends Setting<Color> implements Listener {
     private int brightnessSaturationBoxX, brightnessSaturationBoxY, brightnessSaturationBoxWidth, brightnessSaturationBoxHeight;
     private fxFontRenderer fxFontRenderer;
     private Screen parentScreen = null;
+    private final Module_ module;
 
-    public RGBASetting(String name, String description, Color defaultColor, boolean rainbow, BooleanSupplier shouldRender) {
+    public RGBASetting(String name, String description, Color defaultColor, boolean rainbow, Module_ module, BooleanSupplier shouldRender) {
         super(shouldRender, defaultColor);
         this.name = name;
         this.description = description;
@@ -60,6 +62,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.alphaHandleY = (int) ((1 - alpha) * boxHeight);
         this.shadeHandleX = (int) (brightness * boxWidth);
         this.shadeHandleY = (int) ((1 - saturation) * boxHeight);
+        this.module = module;
         if (MinecraftClient.getInstance().getWindow() != null) {
             fxFontRenderer = new fxFontRenderer(FontManager.fonts, 5f);
         }
@@ -230,10 +233,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
     }
 
     public void mouse(double mouseX, double mouseY) {
-        if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
-            value = defaultValue;
-            rainbow = defaultRainbow;
-        }
         if (hoveredOverGradientBox(mouseX, mouseY)) {
             handleX = (int) (mouseX - x - offsetX);
             handleY = (int) (mouseY - y - offsetY);
@@ -264,7 +263,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
             value = Color.getHSBColor(hue, saturation, brightness);
         }
         value = new Color(value.getRed(), value.getGreen(), value.getBlue(), (int) (alpha * 255));
-
     }
 
     @Override
@@ -288,10 +286,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.value = value;
     }
 
-    public float getAlpha() {
-        return alpha;
-    }
-
     public float getBrightness() {
         return brightness;
     }
@@ -302,6 +296,14 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
     public float getSaturation() {
         return saturation;
+    }
+
+    public boolean isRainbow() {
+        return rainbow;
+    }
+
+    public boolean isDefaultRainbow() {
+        return defaultRainbow;
     }
 
     @SubscribeEvent
@@ -319,6 +321,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
     public static class Builder extends SettingBuilder<Builder, Color, RGBASetting> {
         boolean rainbow = false;
+        Module_ module;
         public Builder() {
             super(new Color(-1));
         }
@@ -327,9 +330,14 @@ public class RGBASetting extends Setting<Color> implements Listener {
             this.rainbow = rainbow;
             return this;
         }
+
+        public Builder module(Module_ module) {
+            this.module = module;
+            return this;
+        }
         @Override
         public RGBASetting build() {
-            return new RGBASetting(name, description, value, rainbow, shouldRender);
+            return new RGBASetting(name, description, value, rainbow, module, shouldRender);
         }
     }
 }

@@ -1,18 +1,6 @@
 package dev.heliosclient.system;
 
-public class Friend {
-    private final String playerName;
-
-    // Create a constructor that takes a player name as an argument
-    public Friend(String playerName) {
-        this.playerName = playerName;
-    }
-
-    // Create a getter method for the player name
-    public String getPlayerName() {
-        return this.playerName;
-    }
-
+public record Friend(String playerName) {
     // Override the equals method to compare friends by their player names
     @Override
     public boolean equals(Object obj) {
@@ -22,7 +10,11 @@ public class Friend {
         return false;
     }
 
-    // Override the hashCode method to use the player name as the hash code
+    @Override
+    public String playerName() {
+        return playerName;
+    }
+
     @Override
     public int hashCode() {
         return this.playerName.hashCode();
