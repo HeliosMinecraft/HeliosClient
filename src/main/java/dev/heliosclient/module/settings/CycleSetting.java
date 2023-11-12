@@ -67,9 +67,9 @@ public class CycleSetting extends Setting<Integer> {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         if (options.isEmpty() || options.size() - 1 < value) {
-            compactFont.drawString(drawContext.getMatrices(), "No option found!", x + 10, y + 28, 0xFFFF0000);
+            compactFont.drawString(drawContext.getMatrices(), "No option found!", x + 10, y + 24, 0xFFFF0000);
         }
-        compactFont.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
+        compactFont.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;

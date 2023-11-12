@@ -48,11 +48,11 @@ public class ModuleList extends HudElement implements Listener {
         for (Module_ m : enabledModules) {
             if (!m.showInModulesList.value) continue;
             float nameWidth = Renderer2D.getStringWidth(m.name);
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 6 - (float) width / 2 + width - nameWidth, this.y - (float) height / 2 + yOffset, nameWidth + 3, Math.round(Renderer2D.getStringHeight()) + 2, 0x66222222);
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 7 + width - nameWidth, this.y + yOffset - 1, nameWidth + 3, Math.round(Renderer2D.getStringHeight()) + 2, 0x66222222);
 
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2 - (float) width / 2 + width, this.y - (float) height / 2, 2, yOffset + Math.round(Renderer2D.getStringHeight()) + 3, HeliosClient.uiColor);
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 3 + width, this.y, 2, yOffset + Math.round(Renderer2D.getStringHeight()) + 3, HeliosClient.uiColor);
 
-            Renderer2D.drawString(drawContext.getMatrices(), m.name, x - 4 + width / 2 - nameWidth, this.y + 1 - (float) height / 2 + yOffset, ColorUtils.rgbaToInt(255, 255, 255, 255));
+            Renderer2D.drawString(drawContext.getMatrices(), m.name, x - 5 + width - nameWidth, this.y + 1 + yOffset, ColorUtils.rgbaToInt(255, 255, 255, 255));
             yOffset += Math.round(Renderer2D.getStringHeight()) + 2;
         }
     }

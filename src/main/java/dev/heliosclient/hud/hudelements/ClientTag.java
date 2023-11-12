@@ -21,9 +21,9 @@ public class ClientTag extends HudElement {
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         String text = HeliosClient.clientTag + " " + HeliosClient.versionTag;
         this.width = (int) (Renderer2D.getStringWidth(text) + 1);
-        this.x = MinecraftClient.getInstance().getWindow().getScaledWidth() - this.width / 2 - 3;
-        this.y = MinecraftClient.getInstance().getWindow().getScaledHeight() - this.height / 2;
-        Renderer2D.drawString(drawContext.getMatrices(), text, this.x - width / 2 + 1, this.y + height / 2f - Renderer2D.getStringHeight(text), HeliosClient.uiColor);
+        this.x = MinecraftClient.getInstance().getWindow().getScaledWidth() - this.width - 3;
+        this.y = MinecraftClient.getInstance().getWindow().getScaledHeight() - this.height;
+        Renderer2D.drawString(drawContext.getMatrices(), text, this.x + 1, this.y - Renderer2D.getStringHeight(text), HeliosClient.uiColor);
 
     }
 

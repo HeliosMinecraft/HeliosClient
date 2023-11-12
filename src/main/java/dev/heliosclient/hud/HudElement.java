@@ -96,7 +96,7 @@ public class HudElement {
             } else if (posX == 1) {
                 distanceX = drawContext.getScaledWindowWidth() / 2 - x;
             } else {
-                distanceX = Math.max(drawContext.getScaledWindowWidth() - x, this.width / 2);
+                distanceX = Math.max(drawContext.getScaledWindowWidth() - x, this.width);
             }
 
             if (posY == 0) {
@@ -104,25 +104,25 @@ public class HudElement {
             } else if (posY == 1) {
                 distanceY = drawContext.getScaledWindowHeight() / 2 - y;
             } else {
-                distanceY = Math.max(drawContext.getScaledWindowHeight() - y, this.height / 2);
+                distanceY = Math.max(drawContext.getScaledWindowHeight() - y, this.height);
             }
         }
 
         //Move to right position according to pos and distance variables
         if (posX == 0) {
-            x = Math.max(Math.min(distanceX, drawContext.getScaledWindowWidth() - width / 2), width / 2);
+            x = Math.max(Math.min(distanceX, drawContext.getScaledWindowWidth() - width), 0);
         } else if (posX == 1) {
-            x = Math.max(Math.min(drawContext.getScaledWindowWidth() / 2 - distanceX, drawContext.getScaledWindowWidth() - width / 2), width / 2);
+            x = Math.max(Math.min(drawContext.getScaledWindowWidth() / 2 - distanceX, drawContext.getScaledWindowWidth() - width), 0);
         } else {
-            x = Math.max(Math.min(drawContext.getScaledWindowWidth() - distanceX, drawContext.getScaledWindowWidth() - width / 2), width / 2);
+            x = Math.max(Math.min(drawContext.getScaledWindowWidth() - distanceX, drawContext.getScaledWindowWidth() - width), 0);
         }
 
         if (posY == 0) {
-            y = Math.max(Math.min(distanceY, drawContext.getScaledWindowHeight() - height / 2), height / 2);
+            y = Math.max(Math.min(distanceY, drawContext.getScaledWindowHeight() - height), 0);
         } else if (posY == 1) {
-            y = Math.max(Math.min(drawContext.getScaledWindowHeight() / 2 - distanceY, drawContext.getScaledWindowHeight() - height / 2), height / 2);
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight() / 2 - distanceY, drawContext.getScaledWindowHeight() - height), 0);
         } else {
-            y = Math.max(Math.min(drawContext.getScaledWindowHeight() - distanceY, drawContext.getScaledWindowHeight() - height / 2), height / 2);
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight() - distanceY, drawContext.getScaledWindowHeight() - height), 0);
         }
 
         //Draw outline when selected
@@ -137,7 +137,7 @@ public class HudElement {
                 }
             }
 
-            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1 - (float) width / 2, y - 1 - (float) height / 2, width + 2, height + 2, 0.4f, 0xFFFFFFFF);
+            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, width + 1, height + 1, 0.4f, 0xFFFFFFFF);
         }
         //Set default height value
         this.height = Math.round(Renderer2D.getStringHeight());
@@ -145,7 +145,8 @@ public class HudElement {
         //Renders element
         renderElement(drawContext, textRenderer);
 
-        hitbox.set(x - 1 - (float) this.width / 2, y - 1 - (float) this.height / 2, width + 2, height + 2);
+        // Set the hitbox values after the render element incase any change of width/height occurs
+        hitbox.set(x - 1, y - 1, width + 1, height + 1);
     }
 
     /**
@@ -160,24 +161,26 @@ public class HudElement {
 
         //Move to proper position
         if (posY == 0) {
-            y = Math.max(Math.min(distanceY, drawContext.getScaledWindowHeight() - height / 2), height / 2);
+            y = Math.max(Math.min(distanceY, drawContext.getScaledWindowHeight() - height), 0);
         } else if (posY == 1) {
-            y = Math.max(Math.min(drawContext.getScaledWindowHeight() / 2 - distanceY, drawContext.getScaledWindowHeight() - height / 2), height / 2);
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight() / 2 - distanceY, drawContext.getScaledWindowHeight() - height), 0);
         } else {
-            y = Math.max(Math.min(drawContext.getScaledWindowHeight() - distanceY, drawContext.getScaledWindowHeight() - height / 2), height / 2);
+            y = Math.max(Math.min(drawContext.getScaledWindowHeight() - distanceY, drawContext.getScaledWindowHeight() - height), 0);
         }
 
         if (posX == 0) {
-            x = Math.max(Math.min(distanceX, drawContext.getScaledWindowWidth() - width / 2), width / 2);
+            x = Math.max(Math.min(distanceX, drawContext.getScaledWindowWidth() - width), 0);
         } else if (posX == 1) {
-            x = Math.max(Math.min(drawContext.getScaledWindowWidth() / 2 - distanceX, drawContext.getScaledWindowWidth() - width / 2), width / 2);
+            x = Math.max(Math.min(drawContext.getScaledWindowWidth() / 2 - distanceX, drawContext.getScaledWindowWidth() - width), 0);
         } else {
-            x = Math.max(Math.min(drawContext.getScaledWindowWidth() - distanceX, drawContext.getScaledWindowWidth() - width / 2), width / 2);
+            x = Math.max(Math.min(drawContext.getScaledWindowWidth() - distanceX, drawContext.getScaledWindowWidth() - width), 0);
         }
 
         //Render element
         renderElement(drawContext, textRenderer);
-        hitbox.set(x - 1 - (float) this.width / 2, y - 1 - (float) this.height / 2, width + 2, height + 2);
+
+        // Set the hitbox values after the render element incase any change of width/height occurs
+        hitbox.set(x - 1, y - 1, width + 1, height + 1);
     }
 
     /**
@@ -215,6 +218,7 @@ public class HudElement {
             startY = (int) (mouseY - y);
             dragging = true;
         }
+        // Divides the screen into several "grid boxes" which the elements snap to. Higher the snapSize, more the grid boxes
         if (this.shiftDown) {
             // Calculate the size of each snap box
             int snapBoxWidth = this.width / this.snapSize;
@@ -249,8 +253,13 @@ public class HudElement {
     public void mouseReleased(double mouseX, double mouseY, int button) {
         //Stop dragging
         dragging = false;
+        if (button == 0) {
+            this.x = (int) mouseX;
+            this.y = (int) mouseY;
+        }
     }
 
+    /* Getter and setters */
     public void setX(int x) {
         this.x = x;
     }

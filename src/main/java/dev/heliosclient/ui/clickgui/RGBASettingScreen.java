@@ -28,7 +28,7 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
         if (textRenderer.getWidth(setting.description) > windowWidth) {
             windowWidth = textRenderer.getWidth(setting.description) + 5;
         } else if (textRenderer.getWidth(setting.name) > windowWidth) {
-            windowWidth = textRenderer.getWidth(setting.name) + 20;
+            windowWidth = textRenderer.getWidth(setting.name) + 30;
         }
 
         window.setWindowHeight(windowHeight);

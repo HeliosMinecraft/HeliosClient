@@ -27,13 +27,11 @@ public class PlayerModel extends HudElement {
         this.height = 55;
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) {
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x - (float) width / 2, this.y - height / 2, width, height - 1, Color.BLACK.getRGB());
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, this.y, width - 1, height - 1, Color.BLACK.getRGB());
         } else {
             float yaw = MathHelper.wrapDegrees(player.prevYaw + (player.getYaw() - player.prevYaw) * mc.getTickDelta());
             float pitch = player.getPitch();
-            int x = this.x;
-            int y = this.y;
-            InventoryScreen.drawEntity(drawContext, x, y + height / 2 - 3, 25, -yaw, -pitch, player);
+            InventoryScreen.drawEntity(drawContext, x + width / 2, y + height - 3, 25, -yaw, -pitch, player);
         }
     }
 

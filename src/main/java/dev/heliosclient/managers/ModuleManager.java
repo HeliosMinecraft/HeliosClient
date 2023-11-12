@@ -18,7 +18,6 @@ public class ModuleManager {
                 new Step(),
                 new Fullbright(),
                 new Speed(),
-                new ModulesList(),
                 new CustomFov(),
                 new Test(),
                 new ChatHighlight(),

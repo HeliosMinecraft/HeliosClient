@@ -23,10 +23,10 @@ public class Bps extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
-        String text = "Blocks Per Second: ";
+        String text = "Speed: ";
         String value = ColorUtils.gray + MathUtils.round(moveSpeed(), 2);
         this.width = Math.round(Renderer2D.getStringWidth(text + value));
-        Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x - (float) width / 2, this.y - ((float) height / 2), HeliosClient.uiColor);
+        Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x, this.y, HeliosClient.uiColor);
 
     }
 

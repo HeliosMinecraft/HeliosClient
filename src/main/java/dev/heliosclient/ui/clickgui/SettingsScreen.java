@@ -64,16 +64,16 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext);
 
-        windowHeight = 55;
+        windowHeight = 45;
         for (SettingGroup settingGroup : module.settingGroups) {
-            windowHeight += Math.round(settingGroup.getGroupNameHeight() + 3);
+            windowHeight += Math.round(settingGroup.getGroupNameHeight() + 12);
             if (!settingGroup.shouldRender()) continue;
             for (Setting setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
                 windowHeight += setting.height + 1;
             }
-            windowHeight += Math.round(settingGroup.getGroupNameHeight());
+            windowHeight += Math.round(settingGroup.getGroupNameHeight()) + 1;
         }
 
         window.setWindowHeight(windowHeight);

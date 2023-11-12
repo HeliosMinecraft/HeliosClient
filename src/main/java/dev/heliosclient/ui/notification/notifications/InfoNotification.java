@@ -27,7 +27,8 @@ public class InfoNotification extends Notification {
 
         Renderer2D.drawRoundedRectangle(matrices.peek().getPositionMatrix(), x, y, true, true, false, false, WIDTH, HEIGHT, 3, ColorManager.INSTANCE.clickGuiPrimary);
 
-        fontRenderer.drawString(matrices, title, x + ((WIDTH / 2) - (fontRenderer.getStringWidth(description) / 2)) + 2, y + 1 + fontRenderer.getStringHeight(title) / 2, -1);
+        int titleHeight = Math.round(Math.max((fontRenderer.getStringWidth(title) / 2), (fontRenderer.getStringWidth(description) / 2)));
+        fontRenderer.drawString(matrices, title, x + ((WIDTH / 2) - titleHeight) + 2, y + 1 + fontRenderer.getStringHeight(title) / 2, -1);
         fontRenderer.drawString(matrices, description, x + ((WIDTH / 2) - (fontRenderer.getStringWidth(description) / 2)) - 1, y + 9 + fontRenderer.getStringHeight(description) / 2, -1);
         if (this.WIDTH <= fontRenderer.getStringWidth(description)) {
             this.WIDTH = Math.round(fontRenderer.getStringWidth(description) + 3);

@@ -54,6 +54,7 @@ public class HeliosClient implements ModInitializer {
         if (MC.getWindow() != null) {
             quadTree = new Quadtree(0);
         }
+        ClickGUIScreen.INSTANCE.onLoad();
 
         SoundUtils.registerSounds();
     }

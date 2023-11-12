@@ -78,7 +78,6 @@ public class ClickGUIScreen extends Screen {
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
         scrollY = 0;
         scrollX = 0;
-        //HeliosClient.fontRenderer.drawString(drawContext.getMatrices(),"This is testing font", (float) client.getWindow().getScaledWidth() /2,client.getWindow().getScaledWidth()-10, 255,255 , 255, 255);
     }
 
     @Override
