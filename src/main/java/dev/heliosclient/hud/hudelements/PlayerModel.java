@@ -5,9 +5,7 @@ import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
 
@@ -29,9 +27,7 @@ public class PlayerModel extends HudElement {
         if (player == null) {
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, this.y, width - 1, height - 1, Color.BLACK.getRGB());
         } else {
-            float yaw = MathHelper.wrapDegrees(player.prevYaw + (player.getYaw() - player.prevYaw) * mc.getTickDelta());
-            float pitch = player.getPitch();
-            InventoryScreen.drawEntity(drawContext, x + width / 2, y + height - 3, 25, -yaw, -pitch, player);
+            Renderer2D.drawEntity(drawContext, x + width / 2, y + height - 3, 25, player);
         }
     }
 

@@ -13,10 +13,14 @@ import dev.heliosclient.util.render.Texture;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.lwjgl.opengl.GL40C;
 
 import java.awt.*;
@@ -175,7 +179,7 @@ public class Renderer2D implements Listener {
     }
 
     /**
-     * Draws a singular gradient rectangle with a shaodw  on screen with the given parameters
+     * Draws a singular gradient rectangle with a shadow on screen with the given parameters
      *
      * @param matrices   MatrixStack object to draw the gradient
      * @param x          X position of the gradient
@@ -190,6 +194,24 @@ public class Renderer2D implements Listener {
         drawBlurredShadow(matrices, x, y, width, height, blurRadius, new Color(startColor));
 
         drawGradient(matrices.peek().getPositionMatrix(), x, y, width, height, startColor, endColor);
+    }
+
+    public static void drawRainbowGradient(Matrix4f matrix4f, float x, float y, float width, float height) {
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        for (int i = 0; i < width; i++) {
+            float hue = (i / width); // Multiply by 1 to go through the whole color spectrum once (red to red)
+            Color color = Color.getHSBColor(hue, 1.0f, 1.0f); // Full saturation and brightness
+
+            bufferBuilder.vertex(matrix4f, x + i, y, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+            bufferBuilder.vertex(matrix4f, x + i + 1, y, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+            bufferBuilder.vertex(matrix4f, x + i + 1, y + height, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+            bufferBuilder.vertex(matrix4f, x + i, y + height, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+        }
+
+        Tessellator.getInstance().draw();
+
     }
 
     /* ==== Drawing Blurred Shadow ==== */
@@ -825,8 +847,8 @@ public class Renderer2D implements Listener {
      * @param color4 4th color of the gradient
      * @param blurRadius blur radius of the shadow
      */
-    public static void drawRoundedGradientRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, Color color1, Color color2, Color color3, Color color4, float radius, int blurRadius) {
-        drawBlurredShadow(matrices, x, y, width, height, blurRadius, color1);
+    public static void drawRoundedGradientRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, Color color1, Color color2, Color color3, Color color4, float radius, int blurRadius, Color blurColor) {
+        drawBlurredShadow(matrices, x, y, width, height, blurRadius, blurColor);
 
         drawRoundedGradientRectangle(matrices.peek().getPositionMatrix(), color1, color2, color3, color4, x, y, width, height, radius);
     }
@@ -838,6 +860,92 @@ public class Renderer2D implements Listener {
 
     public static void drawHorizontalLine(Matrix4f matrix4f, float x1, float width, float y, float thickness, int color) {
         drawRectangle(matrix4f, x1, y, width, thickness, color);
+    }
+
+    /* ==== Drawing Custom Stuff ==== */
+
+    // Minecraft InventoryScreen source code but 360 degree support
+    public static void drawEntity(DrawContext context, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
+        float f = (float) Math.atan(mouseX / 40.0F);
+        float g = (float) Math.atan(mouseY / 40.0F);
+        Quaternionf quaternionf = (new Quaternionf()).rotateZ(3.1415927F);
+        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(g * 20.0F * 0.017453292F);
+        quaternionf.mul(quaternionf2);
+        float h = entity.bodyYaw;
+        float i = entity.getYaw();
+        float j = entity.getPitch();
+        float k = entity.prevHeadYaw;
+        float l = entity.headYaw;
+        entity.bodyYaw = 360.0F + f * 20.0F;
+        entity.setYaw(360.0F + f * 40.0F);
+        entity.headYaw = entity.getYaw();
+        entity.prevHeadYaw = entity.getYaw();
+        context.getMatrices().push();
+        context.getMatrices().translate(x, y, 50.0);
+        context.getMatrices().multiplyPositionMatrix((new Matrix4f()).scaling((float) size, (float) size, (float) (-size)));
+        context.getMatrices().multiply(quaternionf);
+        DiffuseLighting.method_34742();
+        EntityRenderDispatcher entityRenderDispatcher = HeliosClient.MC.getEntityRenderDispatcher();
+        if (quaternionf2 != null) {
+            quaternionf2.conjugate();
+            entityRenderDispatcher.setRotation(quaternionf2);
+        }
+
+        entityRenderDispatcher.setRenderShadows(false);
+        RenderSystem.runAsFancy(() -> {
+            entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, 1.0F, context.getMatrices(), context.getVertexConsumers(), 15728880);
+        });
+        context.draw();
+        entityRenderDispatcher.setRenderShadows(true);
+        context.getMatrices().pop();
+        DiffuseLighting.enableGuiDepthLighting();
+        entity.bodyYaw = h;
+        entity.setYaw(i);
+        entity.setPitch(j);
+        entity.prevHeadYaw = k;
+        entity.headYaw = l;
+    }
+
+
+    public static void drawEntity(DrawContext context, int x, int y, int size, Entity entity) {
+        float yaw = MathHelper.wrapDegrees(entity.prevYaw + (entity.getYaw() - entity.prevYaw) * HeliosClient.MC.getTickDelta());
+        float pitch = entity.getPitch();
+
+        Quaternionf quaternionf = (new Quaternionf()).rotateZ(3.1415927F);
+        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(-pitch * 0.017453292F); // Invert the pitch rotation
+        quaternionf.mul(quaternionf2);
+        float h = entity.getBodyYaw();
+        float i = entity.getYaw();
+        float j = entity.getPitch();
+        float k = entity.prevYaw;
+        float l = entity.getHeadYaw();
+        entity.setBodyYaw(yaw);
+        entity.setPitch(pitch);
+        entity.setHeadYaw(entity.getYaw());
+        entity.prevYaw = entity.getYaw();
+
+        context.getMatrices().push();
+        context.getMatrices().translate(x, y, 50.0);
+        context.getMatrices().multiplyPositionMatrix((new Matrix4f()).scaling((float) size, (float) size, (float) (-size)));
+        context.getMatrices().multiply(quaternionf);
+        DiffuseLighting.method_34742();
+        EntityRenderDispatcher entityRenderDispatcher = HeliosClient.MC.getEntityRenderDispatcher();
+        if (quaternionf2 != null) {
+            quaternionf2.conjugate();
+            entityRenderDispatcher.setRotation(quaternionf2);
+        }
+
+        entityRenderDispatcher.setRenderShadows(false);
+        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, 1.0F, context.getMatrices(), context.getVertexConsumers(), 15728880));
+        context.draw();
+        entityRenderDispatcher.setRenderShadows(true);
+        context.getMatrices().pop();
+        DiffuseLighting.enableGuiDepthLighting();
+        entity.setBodyYaw(h);
+        entity.setYaw(i);
+        entity.setPitch(j);
+        entity.prevYaw = k;
+        entity.setHeadYaw(l);
     }
 
 

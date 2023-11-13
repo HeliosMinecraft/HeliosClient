@@ -79,7 +79,7 @@ public class Test extends Module_ {
             Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 20, 20, false, true, true, false, 120, 120, 10, 0xFF00FF00);
 
         if (GradientRounded.value)
-            Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), 22, 20, 40, 40, Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 2, 20);
+            Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), 22, 20, 40, 40, Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 2, 20, Color.WHITE);
 
         if (Gradient.value)
             Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), 20, 20, 40, 40, 10, ColorUtils.getRainbowColor().getRGB(), Color.WHITE.getRGB());

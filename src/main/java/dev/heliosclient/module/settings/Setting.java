@@ -29,7 +29,8 @@ public abstract class Setting<T> implements Listener {
     public T value;
     public boolean quickSettings = false;
     protected int moduleWidth = CategoryPane.getWidth();
-    int x = 0, y = 0;
+    protected int x = 0;
+    protected int y = 0;
     int hovertimer = 0;
     private int hoverAnimationTimer = 0;
     protected BooleanSupplier shouldRender = () -> true; // Default to true

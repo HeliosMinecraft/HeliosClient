@@ -9,6 +9,7 @@ import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
+import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontUtils;
@@ -168,7 +169,7 @@ public class ClickGUI extends Module_ {
         addSettingGroup(sgTooltip);
 
         active.value = true;
-        loadFonts.addButton("Load Fonts", () -> {
+        loadFonts.addButton("Load Fonts", 0, 0, () -> {
             FontManager.INSTANCE = new FontManager();
             Font.setOptions(FontManager.fontNames);
         });

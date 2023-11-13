@@ -41,19 +41,18 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         window.setBackButtonTask(() -> {
-
             if (setting.getParentScreen() != null) {
                 HeliosClient.MC.setScreen(setting.getParentScreen());
             }
         });
         window.mouseClicked(mouseX, mouseY);
-        setting.mouse(mouseX, mouseY);
+        setting.mouse(mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        setting.mouse(mouseX, mouseY);
+        setting.mouse(mouseX, mouseY, button);
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
@@ -65,14 +64,16 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        setting.keyPress(keyCode);
         if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             setting.height = 25;
-            if (setting.getParentScreen() != null) {
+            if (setting.getParentScreen() != null && !setting.hexInput.isFocused()) {
                 HeliosClient.MC.setScreen(setting.getParentScreen());
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
+
 
     @Override
     protected void init() {

@@ -1,9 +1,13 @@
 package dev.heliosclient.util;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import net.minecraft.client.gl.Framebuffer;
+import net.minecraft.client.util.GlAllocationUtils;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.util.Random;
+import java.nio.ByteBuffer;
 
 /**
  * Utils for working with color and chat formatting.
@@ -142,9 +146,60 @@ public class ColorUtils {
         return color & 0xFF;
     }
 
-    public static Color getRandomColor() {
-        Color[] colors = {Color.MAGENTA, Color.BLUE, Color.CYAN, Color.GREEN, Color.YELLOW, Color.ORANGE, Color.RED};
-        int randomIndex = new Random().nextInt(colors.length);
-        return colors[randomIndex];
+    /**
+     * @param value Target value in hex.
+     * @return Boolean value if the string is color encoded or not
+     */
+    public static boolean isHexColor(String value) {
+        if (value.startsWith("#")) {
+            value = value.substring(1);
+        }
+        if (value.length() != 6) {
+            return false;
+        }
+        try {
+            Color.decode("#" + value);
+            return true;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Color getColorAtPixel(double mouseX, double mouseY) {
+        Framebuffer framebuffer = HeliosClient.MC.getFramebuffer();
+        int x = (int) (mouseX * framebuffer.textureWidth / HeliosClient.MC.getWindow().getScaledWidth());
+        int y = (int) ((HeliosClient.MC.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / HeliosClient.MC.getWindow().getScaledHeight());
+
+        ByteBuffer buffer = GlAllocationUtils.allocateByteBuffer(4);
+        GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        int red = buffer.get(0) & 0xFF;
+        int green = buffer.get(1) & 0xFF;
+        int blue = buffer.get(2) & 0xFF;
+        int alpha = buffer.get(3) & 0xFF;
+
+        return new Color(red, green, blue, alpha);
+    }
+
+    public static float getSaturation(Color color) {
+        float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+        return hsb[1];
+    }
+
+    public static float getBrightness(Color color) {
+        float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+        return hsb[2];
+    }
+
+    public static String colorToHex(Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
+    public static Color hexToColor(String hex) {
+        return new Color(
+                Integer.valueOf(hex.substring(1, 3), 16),
+                Integer.valueOf(hex.substring(3, 5), 16),
+                Integer.valueOf(hex.substring(5, 7), 16)
+        );
     }
 }
