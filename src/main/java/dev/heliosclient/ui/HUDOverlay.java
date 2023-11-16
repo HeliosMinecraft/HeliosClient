@@ -13,7 +13,7 @@ public class HUDOverlay {
 
     public void render(DrawContext drawContext, int scaledWidth, int scaledHeight) {
         // do not draw if F3 enabled
-        if (mc.options.debugEnabled) return;
+      //  if (mc.options.debugEnabled) return;
 
         // draw stats
         drawContext.drawTextWithShadow(mc.textRenderer, "FPS: " + ColorUtils.gray + mc.getCurrentFps(), 2, 2, HeliosClient.uiColorA);

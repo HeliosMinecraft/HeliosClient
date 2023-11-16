@@ -31,12 +31,12 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
         window = new Window(windowHeight, windowWidth, true, this);
         this.parentScreen = parentScreen;
     }
-
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        window.mouseScrolled(mouseX, mouseY, amount);
-        return super.mouseScrolled(mouseX, mouseY, amount);
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        window.mouseScrolled(mouseX, mouseY, verticalAmount);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
+
 
     @Override
     protected void init() {
@@ -62,7 +62,7 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
 
         windowHeight = 45;
         for (SettingGroup settingGroup : module.settingGroups) {

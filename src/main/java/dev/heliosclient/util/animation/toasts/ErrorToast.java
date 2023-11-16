@@ -2,8 +2,10 @@ package dev.heliosclient.util.animation.toasts;
 
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.toast.AdvancementToast;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
@@ -16,6 +18,8 @@ public class ErrorToast implements net.minecraft.client.toast.Toast {
     private final long endDelay;
     private float lastProgress;
     private float progress;
+    private static final Identifier TEXTURE = new Identifier("toast/system");
+
 
     public ErrorToast(String message, boolean hasProgressBar, long endDelay) {
         this.message = message;

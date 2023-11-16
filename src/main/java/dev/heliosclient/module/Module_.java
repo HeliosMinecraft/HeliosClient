@@ -99,7 +99,7 @@ public abstract class Module_ implements Listener {
             ChatUtils.sendHeliosMsg(this.name + " was enabled.");
         }
         if (NotificationModule.moduleNotification.value) {
-            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, " was enabled!", 2000));
+            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000));
         }
         EventManager.register(this);
     }
@@ -120,7 +120,7 @@ public abstract class Module_ implements Listener {
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
         }
         if (NotificationModule.moduleNotification.value.booleanValue()) {
-            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, " was disabled!", 2000));
+            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000));
         }
         EventManager.unregister(this);
     }

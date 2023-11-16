@@ -14,11 +14,12 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class FontManager implements Listener {
-    public static Font[] fonts;
+    public static Font[] fonts, iconFonts;
     public static Font[] Originalfonts;
     public static int fontSize = 8;
     public static ArrayList<String> fontNames = new ArrayList<>();
     public static FontRenderer fontRenderer;
+    public static fxFontRenderer iconRenderer;
     public static fxFontRenderer fxfontRenderer;
 
     public static FontManager INSTANCE = new FontManager();
@@ -26,10 +27,12 @@ public class FontManager implements Listener {
     public FontManager() {
         fontNames.clear();
         fonts = FontLoader.loadFonts();
+        iconFonts = FontLoader.loadIconFonts();
         Originalfonts = fonts;
         for (Font font : fonts) {
             fontNames.add(font.getName());
         }
+        EventManager.register(this);
     }
 
     @SubscribeEvent
@@ -37,6 +40,7 @@ public class FontManager implements Listener {
         if (HeliosClient.MC.getWindow() != null) {
             fontRenderer = new FontRenderer(fonts, fontSize);
             fxfontRenderer = new fxFontRenderer(fonts, 8f);
+            iconRenderer = new fxFontRenderer(iconFonts,10f);
             EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
             HeliosClient.quadTree = new Quadtree(0);
             EventManager.unregister(this);

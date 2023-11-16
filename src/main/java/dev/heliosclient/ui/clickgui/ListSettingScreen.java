@@ -29,13 +29,14 @@ public class ListSettingScreen extends Screen {
         hoverAnimationTimers = new int[listSetting.options.size()];
     }
 
-    public static void onScroll(double horizontal, double vertical) {
-        offsetY += vertical * 7;
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        offsetY += (int) (verticalAmount * 7);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
-
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
 
         windowHeight = 52;
         for (String s : listSetting.options) {

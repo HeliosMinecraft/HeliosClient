@@ -23,7 +23,7 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
 
         if (textRenderer.getWidth(setting.description) > windowWidth) {
             windowWidth = textRenderer.getWidth(setting.description) + 5;
@@ -57,9 +57,9 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        window.mouseScrolled(mouseX, mouseY, amount);
-        return super.mouseScrolled(mouseX, mouseY, amount);
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        window.mouseScrolled(mouseX, mouseY, verticalAmount);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override

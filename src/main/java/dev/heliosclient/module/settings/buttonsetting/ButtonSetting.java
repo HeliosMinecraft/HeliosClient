@@ -25,14 +25,14 @@ public class ButtonSetting extends Setting<Boolean> {
     public void addButton(String buttonText, int rowIndex, int columnIndex, Runnable task) {
         Button button = new Button(buttonText, task, this.x, this.y, this.width, this.height);
         table.addButton(rowIndex, columnIndex, button);
-        this.height = table.adjustButtonLayout(this.x, this.y, this.width, false);
+        this.height = table.adjustButtonLayout(this.x, this.y, this.width, false) + 5;
     }
 
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         Renderer2D.drawFixedString(drawContext.getMatrices(), ButtonCategoryText, (float) HeliosClient.MC.getWindow().getScaledWidth() / 2 - (float) textRenderer.getWidth(ButtonCategoryText) / 2 + 1, y + 2, ColorManager.INSTANCE.defaultTextColor());
-        this.height = table.adjustButtonLayout(x, Math.round(y + 4 + Renderer2D.getFxStringHeight(ButtonCategoryText)), this.width, false);
+        this.height = table.adjustButtonLayout(x, Math.round(y + 4 + Renderer2D.getFxStringHeight(ButtonCategoryText)), this.width, false) + 5;
 
 
         for (List<Button> row : table.table) {

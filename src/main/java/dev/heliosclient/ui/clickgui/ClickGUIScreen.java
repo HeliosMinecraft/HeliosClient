@@ -41,17 +41,22 @@ public class ClickGUIScreen extends Screen {
         searchBox = new InputBox(CategoryPane.getWidth() - 4, 12, "", 20, InputBox.InputMode.DIGITS_AND_CHARACTERS_AND_WHITESPACE);
     }
 
-    public static void onScroll(double horizontal, double vertical) {
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        for (CategoryPane category : categoryPanes) {
+            category.mouseScrolled((int) mouseX, (int) mouseY, verticalAmount);
+        }
         if (ClickGUI.ScrollTypes.values()[ClickGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
             // Old mode: scroll the whole screen
-            scrollY += vertical;
+            scrollY += (int) verticalAmount;
         }
-        scrollX += horizontal;
+        scrollX += (int) horizontalAmount;
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX,mouseY,delta);
         for (CategoryPane category : categoryPanes) {
             category.y += scrollY * 10;
             category.x += scrollX * 10;
@@ -78,14 +83,6 @@ public class ClickGUIScreen extends Screen {
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
         scrollY = 0;
         scrollX = 0;
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        for (CategoryPane category : categoryPanes) {
-            category.mouseScrolled((int) mouseX, (int) mouseY, amount);
-        }
-        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override

@@ -27,7 +27,7 @@ public class HudEditorScreen extends Screen implements Listener {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
 
         float thickness = 0.5f;
         Matrix4f positionMatrix = drawContext.getMatrices().peek().getPositionMatrix();

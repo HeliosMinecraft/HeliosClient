@@ -32,11 +32,10 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
         this.module = module;
         window = new Window(windowHeight, windowWidth, true, this);
     }
-
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        window.mouseScrolled(mouseX, mouseY, amount);
-        return super.mouseScrolled(mouseX, mouseY, amount);
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        window.mouseScrolled(mouseX, mouseY, verticalAmount);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
 
         windowHeight = 50;
         for (SettingGroup settingGroup : module.settingGroups) {
@@ -80,6 +79,7 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
         }
 
         window.setWindowHeight(windowHeight);
+        window.setWindowWidth(windowWidth);
         window.render(drawContext, mouseX, mouseY, module.name, module.description, textRenderer);
 
         x = window.getX();

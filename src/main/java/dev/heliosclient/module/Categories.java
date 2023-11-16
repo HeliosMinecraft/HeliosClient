@@ -3,15 +3,17 @@ package dev.heliosclient.module;
 import dev.heliosclient.addon.AddonManager;
 import dev.heliosclient.addon.HeliosAddon;
 import dev.heliosclient.managers.CategoryManager;
+import dev.heliosclient.util.render.Texture;
+import net.minecraft.util.Identifier;
 
 public class Categories {
-    public static final Category MISC = new Category("Misc", "assets/heliosclient/svgIcons/misc.svg");
-    public static final Category CHAT = new Category("Chat", "assets/heliosclient/svgIcons/chat.svg");
-    public static final Category COMBAT = new Category("Combat", "assets/heliosclient/svgIcons/combat.svg");
-    public static final Category MOVEMENT = new Category("Movement", "assets/heliosclient/svgIcons/movement.svg");
-    public static final Category PLAYER = new Category("Player", "assets/heliosclient/svgIcons/player.svg");
-    public static final Category SEARCH = new Category("Search", "assets/heliosclient/svgIcons/search.svg");
-    public static final Category RENDER = new Category("Render", "assets/heliosclient/svgIcons/render.svg");
+    public static final Category MISC = new Category("Misc", '\uF156');
+    public static final Category CHAT = new Category("Chat",'\uF172');
+    public static final Category COMBAT = new Category("Combat", '\uEAC4');
+    public static final Category MOVEMENT = new Category("Movement", '\uF16A');
+    public static final Category PLAYER = new Category("Player", '\uEA08');
+    public static final Category SEARCH = new Category("Search", '\uEA17');
+    public static final Category RENDER = new Category("Render", '\uF164');
 
     public static void registerCategories() {
         CategoryManager.register(MISC);

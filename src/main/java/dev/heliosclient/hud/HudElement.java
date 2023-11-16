@@ -157,7 +157,7 @@ public class HudElement {
      */
     public void render(DrawContext drawContext, TextRenderer textRenderer) {
         //Skip if in F3 menu
-        if (HeliosClient.MC.options.debugEnabled) return;
+        if (HeliosClient.MC.options.hudHidden || HeliosClient.MC.getDebugHud().shouldShowDebugHud()) return;
 
         //Move to proper position
         if (posY == 0) {

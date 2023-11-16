@@ -39,6 +39,7 @@ public abstract class Setting<T> implements Listener {
     public float animationSpeed = 0.13f;
     public boolean animationDone = false;
     private float targetY;
+    public fxFontRenderer iconRenderer;
 
     public Setting(BooleanSupplier shouldRender, T defaultValue) {
         this.shouldRender = shouldRender;
@@ -46,6 +47,7 @@ public abstract class Setting<T> implements Listener {
         EventManager.register(this);
         if (HeliosClient.MC.getWindow() != null) {
             compactFont = new fxFontRenderer(FontManager.fonts, 6);
+            iconRenderer = new fxFontRenderer(FontManager.iconFonts,8f);
         }
     }
 
@@ -72,6 +74,7 @@ public abstract class Setting<T> implements Listener {
     @SubscribeEvent
     private void onFontChange(FontChangeEvent event) {
         compactFont = new fxFontRenderer(FontManager.fonts, 6);
+        iconRenderer = new fxFontRenderer(FontManager.iconFonts,7f);
     }
 
     /**
@@ -95,7 +98,11 @@ public abstract class Setting<T> implements Listener {
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 195, y + (float) this.height / 2 - 5.5f, 11, 11, Color.black.getRGB());
             Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 195, y + (float) this.height / 2 - 5.5f, 11, 11, 0.4f, (hoveredOverReset(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
 
-            drawContext.drawText(textRenderer, "↻", (int) (x + 199.5f), (int) (y + height / 2 - 5f), -1, true);
+            if(iconRenderer!=null) {
+                iconRenderer.drawString(drawContext.getMatrices(), "\uEA1D", (x + 203.9f - iconRenderer.getStringWidth("\uEA1D")), (y + height / 2 - 3.8f), -1);
+            }else{
+                iconRenderer = new fxFontRenderer(FontManager.iconFonts,7f);
+            }
         }
     }
 

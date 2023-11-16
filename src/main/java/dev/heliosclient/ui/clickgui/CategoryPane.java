@@ -6,6 +6,7 @@ import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Category;
@@ -16,12 +17,19 @@ import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontLoader;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.render.SVGFile;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -39,15 +47,13 @@ public class CategoryPane implements Listener {
     private final Screen parentScreen;
     public static int MAX_HEIGHT = 150;
     private int scrollOffset = 0;
-    public int iconWidth = 10;
-    public int iconHeight = 10;
-    private SVGFile svgFile;
     public static List<Hitbox> hitboxes = new CopyOnWriteArrayList<>();
     private final float delayBetweenButtons = 0.0f;
     float delay = 0;
     private final Hitbox hitBox;
+    public final char icon;
     int categoryNameHeight = 2;
-
+    private fxFontRenderer iconRenderer;
     public void addModule(List<Module_> moduleS) {
         for (Module_ module : moduleS) {
             boolean exists = false;
@@ -103,18 +109,17 @@ public class CategoryPane implements Listener {
         if (moduleButtons.size() == 0) collapsed = true;
         height = Math.round((moduleButtons.size() * (5 + Renderer2D.getStringHeight())));
 
-        if (FileUtils.doesFileInPathExist(category.iconSrc)) {
-            svgFile = new SVGFile(category.iconSrc, iconWidth, iconHeight);
-        } else {
-            HeliosClient.LOGGER.info("SVG File for " + category.name + "does not exist");
-        }
+        icon = category.icon;
+
         hitBox = new Hitbox(x, y, width, height);
         hitboxes.add(hitBox);
+
         EventManager.register(this);
     }
 
     @SubscribeEvent
     public void onFontChange(FontChangeEvent event) {
+        iconRenderer = new fxFontRenderer(FontManager.iconFonts,11f);
         categoryNameHeight = Math.round(Renderer2D.getFxStringHeight(category.name));
     }
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
@@ -176,10 +181,8 @@ public class CategoryPane implements Listener {
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
         hitBox.set(x, y, width, MAX_HEIGHT);
 
-        if (svgFile != null) {
-            // Gives a very shitty error idk why. Not fixable
-            //svgFile.render(drawContext.getMatrices(), x, y,iconWidth,iconHeight);
-        }
+        iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), -1);
+
     }
 
     public boolean hovered(double mouseX, double mouseY) {
