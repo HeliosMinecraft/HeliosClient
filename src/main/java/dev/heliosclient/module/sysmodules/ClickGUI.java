@@ -197,6 +197,8 @@ public class ClickGUI extends Module_ {
     @Override
     public void onTick(TickEvent event) {
         super.onTick(event);
+        Tooltip.tooltip.mode = TooltipMode.value;
+        Tooltip.tooltip.fixedPos = TooltipPos.value;
         ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getColor().getAlpha();
         ColorManager.INSTANCE.clickGuiSecondary = AccentColor.getColor().getRGB();
         ColorManager.INSTANCE.clickGuiSecondaryRainbow = AccentColor.isRainbow();
