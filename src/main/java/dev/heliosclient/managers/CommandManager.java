@@ -12,8 +12,8 @@ import net.minecraft.command.CommandSource;
 import java.util.*;
 
 public class CommandManager {
-    public static String prefix = ".";
     private static final MinecraftClient mc = MinecraftClient.getInstance();
+    public static String prefix = ".";
     private final CommandDispatcher<CommandSource> DISPATCHER = new CommandDispatcher<>();
     private final CommandSource COMMAND_SOURCE = new ChatCommandSource(mc);
     private final List<Command> commands = new ArrayList<>();

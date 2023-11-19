@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.*;
 import dev.heliosclient.module.Categories;
@@ -8,7 +9,10 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
+import me.x150.renderer.render.Renderer3d;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 
@@ -83,24 +87,35 @@ public class Test extends Module_ {
 
         if (Gradient.value)
             Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), 20, 20, 40, 40, 10, ColorUtils.getRainbowColor().getRGB(), Color.WHITE.getRGB());
+        PlayerEntity player = HeliosClient.MC.player;
+
+        if (player != null && player.getWorld() != null) {
+            Renderer3d.renderThroughWalls();
+            float pitch = player.getPitch();
+            float yaw = player.getYaw();
+            Vec3d direction = new Vec3d(0, 0, -1).rotateY(yaw).rotateX(pitch);
+            Vec3d end = player.getEyePos().add(direction.multiply(20));
+
+
+            Vec3d start = new Vec3d(player.getX() + 2, player.getY() + 1, player.getZ() - 3);
+            Vec3d start2 = new Vec3d(50, player.getY() - 1, player.getZ() + 2);
+            Vec3d start3 = new Vec3d(player.getX() - 5, player.getY() + 2, player.getZ() + 6);
+
+
+            Vec3d dimensions = new Vec3d(1, 1, 1);
+
+            Renderer3d.renderOutline(drawContext.getMatrices(), Color.WHITE, start, dimensions);
+            Renderer3d.renderLine(drawContext.getMatrices(), Color.yellow, player.getEyePos(), end);
+            Renderer3d.renderFilled(drawContext.getMatrices(), Color.GREEN, start2, dimensions);
+            Renderer3d.renderEdged(drawContext.getMatrices(), Color.CYAN, Color.BLACK, start3, dimensions);
+        }
+
     }
 
     @SubscribeEvent
     public void renderer3d(Render3DEvent event) {
-     /*   Renderer3d.renderThroughWalls();
-        PlayerEntity player = HeliosClient.MC.player;
-        Vec3d start = new Vec3d(player.getX() + 2, player.getY() + 1, player.getZ() - 3);
-        Vec3d start2 = new Vec3d(50, player.getY() - 1, player.getZ() + 2);
-        Vec3d start3 = new Vec3d(player.getX() - 5, player.getY() + 2, player.getZ() + 6);
 
 
-        Vec3d dimensions = new Vec3d(1, 1, 1);
-        Renderer3d.renderOutline(event.getMatrices(), Color.WHITE, start, dimensions);
-        Renderer3d.renderLine(event.getMatrices(), Color.yellow, start, player.getPos());
-        Renderer3d.renderFilled(event.getMatrices(), Color.GREEN, start2, dimensions);
-        Renderer3d.renderEdged(event.getMatrices(), Color.CYAN, Color.BLACK, start3, dimensions);
-
-      */
     }
 
 

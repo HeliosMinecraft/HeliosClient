@@ -3,12 +3,10 @@ package dev.heliosclient.module;
 import dev.heliosclient.addon.AddonManager;
 import dev.heliosclient.addon.HeliosAddon;
 import dev.heliosclient.managers.CategoryManager;
-import dev.heliosclient.util.render.Texture;
-import net.minecraft.util.Identifier;
 
 public class Categories {
     public static final Category MISC = new Category("Misc", '\uF156');
-    public static final Category CHAT = new Category("Chat",'\uF172');
+    public static final Category CHAT = new Category("Chat", '\uF172');
     public static final Category COMBAT = new Category("Combat", '\uEAC4');
     public static final Category MOVEMENT = new Category("Movement", '\uF16A');
     public static final Category PLAYER = new Category("Player", '\uEA08');

@@ -33,8 +33,9 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
 
         window.setWindowHeight(windowHeight);
         window.setWindowWidth(windowWidth);
-
         window.render(drawContext, mouseX, mouseY, setting.name, setting.description, textRenderer);
+
+
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
     }
 

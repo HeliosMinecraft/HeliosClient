@@ -30,7 +30,9 @@ public class Teleport extends Command {
 
                                             if (player.hasVehicle()) {
                                                 Entity vehicle = player.getVehicle();
-                                                vehicle.setPosition(x, y, z);
+                                                if (vehicle != null) {
+                                                    vehicle.setPosition(x, y, z);
+                                                }
                                             }
                                             player.setPosition(x, y, z);
 

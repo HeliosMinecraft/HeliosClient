@@ -3,6 +3,7 @@ package dev.heliosclient.module.settings;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -12,9 +13,9 @@ public class StringSetting extends Setting<String> {
     private final InputBox inputBox;
     private final InputBox inputBoxCompact;
     private final int characterLimit;
-    String description;
-    public String value;
     private final InputBox.InputMode inputMode;
+    public String value;
+    String description;
 
     public StringSetting(String name, String description, String value, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender, String defaultValue) {
         super(shouldRender, defaultValue);
@@ -44,8 +45,8 @@ public class StringSetting extends Setting<String> {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        compactFont.drawString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
-        inputBoxCompact.render(drawContext, x, Math.round(y + compactFont.getStringHeight(name) + 3), mouseX, mouseY, textRenderer);
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
+        inputBoxCompact.render(drawContext, x, Math.round(y + FontRenderers.Small_fxfontRenderer.getStringHeight(name) + 3), mouseX, mouseY, textRenderer);
     }
 
     @Override

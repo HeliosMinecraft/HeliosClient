@@ -47,10 +47,10 @@ public class Step extends Module_ {
             if (mc.options.sneakKey.isPressed()) {
                 mc.player.setStepHeight(0.5f);
             } else {
-                mc.player.setStepHeight(stepHeight.value.floatValue());
+                mc.player.setStepHeight((float) stepHeight.value);
             }
         } else {
-            mc.player.setStepHeight(stepHeight.value.floatValue());
+            mc.player.setStepHeight((float) stepHeight.value);
         }
     }
 

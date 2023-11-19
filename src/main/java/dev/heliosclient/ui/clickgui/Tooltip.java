@@ -58,7 +58,6 @@ public class Tooltip {
         Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 13, (textWidth + 5), 14, 1, Color.GRAY.getRGB());
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), text, x + 2, textY, ColorManager.INSTANCE.defaultTextColor());
-        //drawContext.drawText(textRenderer, text, x + 2, y - 10, ColorManager.INSTANCE.defaultTextColor(), true);
     }
 
     public void changeText(String str) {

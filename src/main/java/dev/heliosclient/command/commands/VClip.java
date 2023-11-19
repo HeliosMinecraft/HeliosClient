@@ -23,7 +23,9 @@ public class VClip extends Command {
             double blocks = context.getArgument("blocks", Double.class);
             if (player.hasVehicle()) {
                 Entity vehicle = player.getVehicle();
-                vehicle.setPosition(vehicle.getX(), vehicle.getY() + blocks, vehicle.getZ());
+                if (vehicle != null) {
+                    vehicle.setPosition(vehicle.getX(), vehicle.getY() + blocks, vehicle.getZ());
+                }
             }
             player.setPosition(player.getX(), player.getY() + blocks, player.getZ());
 

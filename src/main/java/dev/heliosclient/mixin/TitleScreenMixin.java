@@ -53,7 +53,9 @@ public abstract class TitleScreenMixin extends Screen {
         //drawContext.drawTextWithShadow(this.textRenderer, HeliosClient.clientTag + " " + HeliosClient.versionTag, 2, 2, 16777215 | l);
 
         this.addDrawableChild(new PressableTextWidget(2, 2, 150, 10, Text.literal(HeliosClient.clientTag + " " + HeliosClient.versionTag), (button) -> {
-            this.client.setScreen(HeliosClientInfoScreen.INSTANCE);
+            if (this.client != null) {
+                this.client.setScreen(HeliosClientInfoScreen.INSTANCE);
+            }
         }, this.textRenderer));
     }
 

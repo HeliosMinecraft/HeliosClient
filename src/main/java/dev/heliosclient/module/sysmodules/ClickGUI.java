@@ -12,6 +12,7 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
@@ -20,14 +21,16 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.heliosclient.managers.FontManager.*;
+
 /**
  * Setting for ClickGUI.
  */
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
-    static ClickGUI INSTANCE = new ClickGUI();
     public static SettingGroup sgUI = new SettingGroup("UI");
+    static ClickGUI INSTANCE = new ClickGUI();
     public static CycleSetting ScrollType = sgUI.add(new CycleSetting.Builder()
             .name("Scrolling System")
             .description("Scrolling for the ClickGui")
@@ -160,37 +163,48 @@ public class ClickGUI extends Module_ {
             .defaultValue(new Color(ColorManager.INSTANCE.defaultTextColor))
             .build()
     );
-
-    public ClickGUI() {
+   public ClickGUI() {
         super("ClickGUI", "ClickGui related stuff.", Categories.RENDER);
 
         addSettingGroup(sgUI);
         addSettingGroup(sgGeneral);
         addSettingGroup(sgTooltip);
 
-        active.value = true;
+       active.value = true;
         loadFonts.addButton("Load Fonts", 0, 0, () -> {
             FontManager.INSTANCE = new FontManager();
             Font.setOptions(FontManager.fontNames);
         });
 
         EventManager.register(this);
-    }
+   }
+   @Override
+   public void onSettingChange(Setting setting) {
+       super.onSettingChange(setting);
+       Tooltip.tooltip.mode = TooltipMode.value;
+       Tooltip.tooltip.fixedPos = TooltipPos.value;
 
-    @Override
-    public void onSettingChange(Setting setting) {
-        super.onSettingChange(setting);
-        Tooltip.tooltip.mode = TooltipMode.value;
-        Tooltip.tooltip.fixedPos = TooltipPos.value;
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
-
-        pause = Pause.value;
+       pause = Pause.value;
         keybinds = Keybinds.value;
 
-        FontManager.fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
-        FontManager.fontRenderer = new FontRenderer(FontManager.fonts, FontManager.fontSize);
-        FontManager.fxfontRenderer = new fxFontRenderer(FontManager.fonts, 8f);
-        EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
+        fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
+
+        FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
+        FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
+        FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 11f);
+
+        FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
+        FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
+
+        FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
+        FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
+
+        FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
+        FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
+
+
+        EventManager.postEvent(new FontChangeEvent(fonts));
     }
 
     @SubscribeEvent
@@ -199,6 +213,7 @@ public class ClickGUI extends Module_ {
         super.onTick(event);
         Tooltip.tooltip.mode = TooltipMode.value;
         Tooltip.tooltip.fixedPos = TooltipPos.value;
+
         ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getColor().getAlpha();
         ColorManager.INSTANCE.clickGuiSecondary = AccentColor.getColor().getRGB();
         ColorManager.INSTANCE.clickGuiSecondaryRainbow = AccentColor.isRainbow();
@@ -230,10 +245,22 @@ public class ClickGUI extends Module_ {
         pause = Pause.value;
         keybinds = Keybinds.value;
 
-        FontManager.fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
-        FontManager.fontRenderer = new FontRenderer(FontManager.fonts, FontManager.fontSize);
-        FontManager.fxfontRenderer = new fxFontRenderer(FontManager.fonts, 8f);
-        EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
+        fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
+
+        FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
+        FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
+        FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 11f);
+
+        FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
+        FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
+
+        FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
+        FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
+
+        FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
+        FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
+
+        EventManager.postEvent(new FontChangeEvent(fonts));
     }
 
     @Override

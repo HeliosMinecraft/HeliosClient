@@ -21,7 +21,7 @@ public class ClickGUIScreen extends Screen {
     static int scrollX = 0;
     static int scrollY = 0;
     public ArrayList<CategoryPane> categoryPanes;
-    public InputBox searchBox;
+    public SearchBar searchBar;
 
     public ClickGUIScreen() {
         super(Text.literal("ClickGUI"));
@@ -38,7 +38,7 @@ public class ClickGUIScreen extends Screen {
                 }
         );
 
-        searchBox = new InputBox(CategoryPane.getWidth() - 4, 12, "", 20, InputBox.InputMode.DIGITS_AND_CHARACTERS_AND_WHITESPACE);
+        searchBar = new SearchBar();
     }
 
     @Override
@@ -56,29 +56,24 @@ public class ClickGUIScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext, mouseX,mouseY,delta);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
         for (CategoryPane category : categoryPanes) {
             category.y += scrollY * 10;
             category.x += scrollX * 10;
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
             if (category.category == Categories.SEARCH && !category.collapsed) {
+                category.addModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()));
 
-                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), category.x, category.y + 17, CategoryPane.getWidth(), 18, 0xFF1B1B1B);
-
-                searchBox.render(drawContext, category.x, category.y + 19, mouseX, mouseY, textRenderer);
-
-                category.addModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()));
-
-                if (ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()).size() == 1) {
-                    category.keepOnlyModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()).get(0));
+                if (ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()).size() == 1) {
+                    category.keepOnlyModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()).get(0));
                 }
 
-                if (searchBox.getValue().isEmpty()) {
+                if (searchBar.getValue().isEmpty()) {
                     category.removeModules();
                 }
-
             }
         }
+        searchBar.render(drawContext, drawContext.getScaledWindowWidth() / 2 - searchBar.width / 2 + 5, drawContext.getScaledWindowHeight() - searchBar.height - 10, mouseX, mouseY, textRenderer);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
         scrollY = 0;
@@ -88,11 +83,9 @@ public class ClickGUIScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (CategoryPane category : categoryPanes) {
-            if (category.category == Categories.SEARCH && !category.collapsed) {
-                searchBox.mouseClicked(mouseX, mouseY, button);
-            }
             category.mouseClicked((int) mouseX, (int) mouseY, button);
         }
+        searchBar.mouseClicked(mouseX, mouseY, button);
         NavBar.navBar.mouseClicked((int) mouseX, (int) mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }

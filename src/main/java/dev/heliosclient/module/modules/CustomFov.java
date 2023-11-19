@@ -32,7 +32,7 @@ public class CustomFov extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
-        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).setValueUnrestricted((int) (FOV.value.floatValue()));
+        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).setValueUnrestricted((int) (FOV.value));
     }
 
     @Override

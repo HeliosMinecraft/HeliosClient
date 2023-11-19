@@ -1,24 +1,26 @@
 package dev.heliosclient.util.animation.toasts;
 
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.toast.AdvancementToast;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
+import java.util.List;
 
 public class ErrorToast implements net.minecraft.client.toast.Toast {
 
+    private static final Identifier TEXTURE = new Identifier("toast/advancement");
     private final String message;
     private final boolean hasProgressBar;
-    private long lastTime;
     private final long endDelay;
+    private long lastTime;
     private float lastProgress;
     private float progress;
-    private static final Identifier TEXTURE = new Identifier("toast/system");
 
 
     public ErrorToast(String message, boolean hasProgressBar, long endDelay) {
@@ -29,7 +31,13 @@ public class ErrorToast implements net.minecraft.client.toast.Toast {
 
     public Toast.Visibility draw(DrawContext context, ToastManager manager, long startTime) {
         context.drawTexture(TEXTURE, 0, 0, 0, 96, this.getWidth(), this.getHeight());
-        context.drawText(manager.getClient().textRenderer, this.message, 30, 12, -11534256, false);
+        List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth() - 30);
+
+        int yOffset = 2;
+        for (String s : messageWarp) {
+            context.drawText(manager.getClient().textRenderer, s, this.getWidth() - HeliosClient.MC.textRenderer.getWidth(s), yOffset, -11534256, false);
+            yOffset += HeliosClient.MC.textRenderer.fontHeight + 4;
+        }
 
         if (this.hasProgressBar) {
             context.fill(3, 28, 157, 29, -1);

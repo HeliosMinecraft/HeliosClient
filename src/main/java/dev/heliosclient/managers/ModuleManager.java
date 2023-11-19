@@ -21,7 +21,7 @@ public class ModuleManager {
                 new CustomFov(),
                 new Test(),
                 new ChatHighlight(),
-                new NotificationModule()
+                NotificationModule.INSTANCE
         );
     }
 
@@ -52,29 +52,32 @@ public class ModuleManager {
                 moduleS.add(module);
                 return moduleS;
             }
-            if (!moduleName.isEmpty() && module.name.trim().toLowerCase().startsWith(moduleName.trim().toLowerCase())) {
+            if (!moduleName.isEmpty() && (module.name.trim().toLowerCase().startsWith(moduleName.trim().toLowerCase()) || module.description.trim().toLowerCase().contains(moduleName.trim().toLowerCase()))) {
                 moduleS.add(module);
             }
         }
         moduleS.sort((m1, m2) -> {
             int m1Score = getRelevanceScore(m1.name, moduleName);
             int m2Score = getRelevanceScore(m2.name, moduleName);
-            return Integer.compare(m1Score, m2Score);
+            return Integer.compare(m2Score, m1Score);
         });
         return moduleS;
     }
 
     private int getRelevanceScore(String name, String query) {
-        if (name.equalsIgnoreCase(query)) {
+        String lowerCaseName = name.toLowerCase();
+        String lowerCaseQuery = query.toLowerCase();
+        if (lowerCaseName.equals(lowerCaseQuery)) {
             return 3;
-        } else if (name.toLowerCase().startsWith(query.toLowerCase())) {
+        } else if (lowerCaseName.startsWith(lowerCaseQuery)) {
             return 2;
-        } else if (name.toLowerCase().contains(query.toLowerCase())) {
+        } else if (lowerCaseName.contains(lowerCaseQuery)) {
             return 1;
         } else {
             return 0;
         }
     }
+
 
 
     public ArrayList<Module_> getModulesByCategory(Category category) {

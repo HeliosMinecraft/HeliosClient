@@ -18,11 +18,11 @@ import java.util.List;
 
 public class SettingsScreen extends Screen implements IWindowContentRenderer {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    int x, y, windowWidth = 224, windowHeight;
     private final Module_ module;
     private final Window window;
     private final Screen parentScreen;
     private final float delayBetweenSettings = 0.2f;
+    int x, y, windowWidth = 224, windowHeight;
     float delay = 0;
 
     public SettingsScreen(Module_ module, Screen parentScreen) {
@@ -31,6 +31,7 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
         window = new Window(windowHeight, windowWidth, true, this);
         this.parentScreen = parentScreen;
     }
+
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         window.mouseScrolled(mouseX, mouseY, verticalAmount);
@@ -43,6 +44,7 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
         super.init();
         window.init();
     }
+
     public void updateSetting() {
         module.settingGroups.stream()
                 .filter(SettingGroup::shouldRender)
@@ -83,7 +85,7 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
         y = window.getY();
 
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-        FontManager.fontSize = ClickGUI.FontSize.value.intValue();
+        FontManager.fontSize = (int) ClickGUI.FontSize.value;
     }
 
     @Override

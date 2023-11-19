@@ -28,13 +28,6 @@ public class Fullbright extends Module_ {
             .listValue(0)
             .build()
     );
-    CycleSetting stringSetting = new CycleSetting.Builder()
-            .module(this)
-            .listValue(0)
-            .value(Arrays.asList("Option 1", "Option 2"))
-            .defaultValue(Arrays.asList("Option 1", "Option 2"))
-            .build();
-
     DoubleSetting gamma = sgGeneral.add(new DoubleSetting.Builder()
             .name("Gamma")
             .description("Desired gamma value")
@@ -46,6 +39,12 @@ public class Fullbright extends Module_ {
             .shouldRender(() -> mode.value == 0)
             .roundingPlace(0)
             .build());
+    CycleSetting stringSetting = new CycleSetting.Builder()
+            .module(this)
+            .listValue(0)
+            .value(Arrays.asList("Option 1", "Option 2"))
+            .defaultValue(Arrays.asList("Option 1", "Option 2"))
+            .build();
 
 
     public Fullbright() {

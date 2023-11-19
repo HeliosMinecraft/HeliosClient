@@ -18,18 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InputBox implements Listener {
+    protected final InputMode inputMode;
     public int x, y, width, height;
-    private String value;
-    private List<String> textSegments;
-    private boolean focused = false;
-    private int cursorPosition = 0;
-    private int selectionStart = 0;
-    private int selectionEnd = 0;
-    private int scrollOffset = 0;
-    private int characterLimit = 0;
-    private boolean selecting = false;
-    private boolean selectedAll = false;
-    private final InputMode inputMode;
+    protected String value;
+    protected List<String> textSegments;
+    protected boolean focused = false;
+    protected int cursorPosition = 0;
+    protected int selectionStart = 0;
+    protected int selectionEnd = 0;
+    protected int scrollOffset = 0;
+    protected int characterLimit;
+    protected boolean selecting = false;
+    protected boolean selectedAll = false;
 
     public InputBox(int width, int height, String value, int characterLimit, InputMode inputMode) {
         this.width = width;
@@ -63,55 +63,64 @@ public class InputBox implements Listener {
         return focused;
     }
 
-    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+    public void update(int x, int y) {
         setText(value);
 
         this.x = x;
         this.y = y;
-        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 1.2f, y - 0.5f, width + 1.5f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y, width, height, 2, Color.BLACK.getRGB());
-        float textHeight = Renderer2D.getFxStringHeight();
-        float textY = y + (height - textHeight) / 2; // Center the text vertically
+    }
 
-        if (focused) {
-            scrollOffset = Math.max(0, Math.min(scrollOffset, value.length()));
-            cursorPosition = Math.max(0, Math.min(cursorPosition, value.length()));
-
-            // Find the segment that contains the cursor
-            int segmentIndex = 0;
-            int segmentStartIndex = 0;
-            if (!textSegments.isEmpty()) {
-                for (int i = 0; i < textSegments.size(); i++) {
-                    if (cursorPosition >= segmentStartIndex && cursorPosition <= segmentStartIndex + textSegments.get(i).length()) {
-                        segmentIndex = i;
-                        break;
-                    }
-                    segmentStartIndex += textSegments.get(i).length();
+    public String displaySegment(DrawContext drawContext, float textY, float textHeight) {
+        // Find the segment that contains the cursor
+        int segmentIndex = 0;
+        int segmentStartIndex = 0;
+        if (!textSegments.isEmpty()) {
+            for (int i = 0; i < textSegments.size(); i++) {
+                if (cursorPosition >= segmentStartIndex && cursorPosition <= segmentStartIndex + textSegments.get(i).length()) {
+                    segmentIndex = i;
+                    break;
                 }
-
-                // Display the segment that contains the cursor
-                String displayValue = textSegments.get(segmentIndex);
-                Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, Renderer2D.isVanillaRenderer() ? textY + 1 : textY, 0xFFFFFFFF);
-
-                // Draw the cursor
-                int cursorX = (int) (x + 5 + Renderer2D.getFxStringWidth(displayValue.substring(0, cursorPosition - segmentStartIndex)));
-                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
-                        cursorX - 0.4f,
-                        textY + 0.5f,
-                        0.6f,
-                        textHeight - 0.5f,
-                        ColorUtils.rgbaToInt(150, 150, 150, 255));
+                segmentStartIndex += textSegments.get(i).length();
             }
-        } else {
-            // Display the first segment of the text
-            String displayValue = !textSegments.isEmpty() ? textSegments.get(0) : "";
-            Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, Renderer2D.isVanillaRenderer() ? textY + 1 : textY, 0xFFAAAAAA);
-        }
 
+            // Display the segment that contains the cursor
+            String displayValue = textSegments.get(segmentIndex);
+            Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, Renderer2D.isVanillaRenderer() ? textY + 1 : textY, 0xFFFFFFFF);
+            displayCursor(drawContext, displayValue, textY, textHeight, segmentStartIndex, 0.5f);
+            return displayValue;
+        }
+        return "";
+    }
+
+    public void displayCursor(DrawContext drawContext, String displayValue, float textY, float textHeight, int segmentStartIndex, float cursorWidth) {
+        // Draw the cursor
+        if (!textSegments.isEmpty()) {
+            String strBeforeCursor = displayValue.substring(0, cursorPosition - segmentStartIndex);
+            float cursorX = (x + 5.5f + Renderer2D.getFxStringWidth(strBeforeCursor));
+
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
+                    cursorX - 0.3f,
+                    textY + 0.5f,
+                    cursorWidth,
+                    textHeight - 0.5f,
+                    ColorUtils.rgbaToInt(150, 150, 150, 255));
+        }
+    }
+
+
+    public void displayFirstSegment(DrawContext drawContext, float textY) {
+        // Display the first segment of the text
+        String displayValue = !textSegments.isEmpty() ? textSegments.get(0) : "";
+        Renderer2D.drawFixedString(drawContext.getMatrices(), (displayValue), x + 5, Renderer2D.isVanillaRenderer() ? textY + 1 : textY, 0xFFAAAAAA);
+    }
+
+    public void drawSelectionBox(DrawContext drawContext, float textY, float textHeight) {
         // Draw selection box
         if (focused && selecting && selectionStart != selectionEnd) {
-            int startX = (int) (x + 4 + Renderer2D.getFxStringWidth(value.substring(0, Math.min(selectionStart, value.length()))));
-            int endX = (int) (x + 4 + Renderer2D.getFxStringWidth(value.substring(0, Math.min(selectionEnd, value.length()))));
+            String strBeforeStart = value.substring(0, Math.min(selectionStart, value.length()));
+            String strBeforeEnd = value.substring(0, Math.min(selectionEnd, value.length()));
+            int startX = (int) (x + 5.5f + Renderer2D.getFxStringWidth(strBeforeStart));
+            int endX = (int) (x + 5.5f + Renderer2D.getFxStringWidth(strBeforeEnd));
             if (endX > x + width) {
                 endX = x + width;
             }
@@ -119,6 +128,32 @@ public class InputBox implements Listener {
         }
     }
 
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+        update(x, y);
+
+        renderBackground(drawContext);
+
+        float textHeight = Renderer2D.getFxStringHeight();
+        float textY = y + (height - textHeight) / 2; // Center the text vertically
+
+        if (focused) {
+            scrollOffset = Math.max(0, Math.min(scrollOffset, value.length()));
+            cursorPosition = Math.max(0, Math.min(cursorPosition, value.length()));
+            displaySegment(drawContext, textY, textHeight);
+
+        } else {
+            displayFirstSegment(drawContext, textY);
+        }
+
+
+        drawSelectionBox(drawContext, textY, textHeight);
+
+    }
+
+    public void renderBackground(DrawContext drawContext) {
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 1.2f, y - 0.5f, width + 1.5f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : Color.DARK_GRAY.getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y, width, height, 2, Color.BLACK.getRGB());
+    }
 
     @SubscribeEvent
     public void keyPressed(KeyPressedEvent event) {
@@ -176,7 +211,7 @@ public class InputBox implements Listener {
                         selecting = false;
                         selectionStart = 0;
                         selectionEnd = 0;
-                    } else {
+                    } else if (cursorPosition != value.length()) {
                         value = value.substring(0, cursorPosition) + value.substring(cursorPosition + 1);
                     }
                 }
@@ -216,11 +251,27 @@ public class InputBox implements Listener {
 
     private void insertCharacter(char chr) {
         if (value.length() <= characterLimit) {
-            value = value.substring(0, cursorPosition) + chr + value.substring(cursorPosition);
-            setText(value);
-            cursorPosition++;
+            // Check if text is selected
+            if (selecting) {
+                // Replace the selected text with the new character
+                int start = Math.min(selectionStart, selectionEnd);
+                int end = Math.max(selectionStart, selectionEnd);
+                StringBuilder builder = new StringBuilder(value);
+                builder.replace(start, end, String.valueOf(chr));
+                value = builder.toString();
+                cursorPosition = start + 1;
+
+                // Clear the selection
+                selecting = false;
+                selectionStart = selectionEnd = cursorPosition;
+            } else {
+                // Insert the new character at the cursor position
+                value = value.substring(0, cursorPosition) + chr + value.substring(cursorPosition);
+                cursorPosition++;
+            }
         }
     }
+
 
     public void moveCursor(int offset) {
         this.setCursorPos(this.cursorPosition + offset);
@@ -288,16 +339,15 @@ public class InputBox implements Listener {
         // Otherwise, insert the clipboard text at the cursor position
         int start = Math.min(selectionStart, selectionEnd);
         int end = Math.max(selectionStart, selectionEnd);
-        if (start != end) {
-            StringBuilder builder = new StringBuilder(value);
-            builder.replace(start, end, clipboardText);
-            value = builder.toString();
-            cursorPosition = start + clipboardText.length();
-        } else {
-            StringBuilder builder = new StringBuilder(value);
+        StringBuilder builder = new StringBuilder(value);
+        if (start == end) {
             builder.insert(cursorPosition, clipboardText);
             value = builder.toString();
             cursorPosition += clipboardText.length();
+        } else {
+            builder.replace(start, end, clipboardText);
+            value = builder.toString();
+            cursorPosition = start + clipboardText.length();
         }
 
         // Clear the selection

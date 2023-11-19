@@ -7,17 +7,20 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.Objects;
+
 public class HUDOverlay {
     public static HUDOverlay INSTANCE = new HUDOverlay();
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public void render(DrawContext drawContext, int scaledWidth, int scaledHeight) {
         // do not draw if F3 enabled
-      //  if (mc.options.debugEnabled) return;
+        //  if (mc.options.debugEnabled) return;
 
         // draw stats
         drawContext.drawTextWithShadow(mc.textRenderer, "FPS: " + ColorUtils.gray + mc.getCurrentFps(), 2, 2, HeliosClient.uiColorA);
-        drawContext.drawTextWithShadow(mc.textRenderer, "Ping: " + ColorUtils.gray + (mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid()) == null ? 0 : mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid()).getLatency()), 2, 12, HeliosClient.uiColorA);
+        assert mc.player != null;
+        drawContext.drawTextWithShadow(mc.textRenderer, "Ping: " + ColorUtils.gray + (Objects.requireNonNull(mc.getNetworkHandler()).getPlayerListEntry(mc.player.getUuid()) == null ? 0 : mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid()).getLatency()), 2, 12, HeliosClient.uiColorA);
         drawContext.drawTextWithShadow(mc.textRenderer, "Meters/s: " + ColorUtils.gray + MathUtils.round(moveSpeed(), 2), 2, scaledHeight - 20, HeliosClient.uiColorA);
         drawContext.drawTextWithShadow(mc.textRenderer, "TPS: " + ColorUtils.gray + ((HeliosClient.MC.getServer() != null) ? HeliosClient.MC.getServer().getTicks() : 0), 2, scaledHeight - 28, HeliosClient.uiColorA);
 

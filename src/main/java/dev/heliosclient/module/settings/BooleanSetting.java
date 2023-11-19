@@ -6,12 +6,14 @@ import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.function.BooleanSupplier;
 
 public class BooleanSetting extends Setting<Boolean> {
+    public boolean value;
     Module_ module;
     String description;
     AnimationUtils CheckBoxAnimation = new AnimationUtils();
@@ -50,7 +52,7 @@ public class BooleanSetting extends Setting<Boolean> {
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
 
-        compactFont.drawString(drawContext.getMatrices(), name, x + 3, y + 4, ColorManager.INSTANCE.defaultTextColor());
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name, x + 3, y + 4, ColorManager.INSTANCE.defaultTextColor());
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + widthCompact - 12, y + 4, 7, 7, 2, 0.6f, 0xFFFFFFFF);
 

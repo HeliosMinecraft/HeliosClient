@@ -39,9 +39,8 @@ public class DamageUtils implements Listener {
         float protectionReduction = getProtectionReduction(player);
 
         // Calculate final damage
-        float finalDamage = rawDamage * (1.0F - armorReduction) * (1.0F - blastProtectionReduction) * (1.0F - protectionReduction);
 
-        return finalDamage;
+        return rawDamage * (1.0F - armorReduction) * (1.0F - blastProtectionReduction) * (1.0F - protectionReduction);
     }
 
     public static double calculateBedBlastDamage(LivingEntity target, Vec3d bedLocation) {
@@ -62,7 +61,7 @@ public class DamageUtils implements Listener {
         rawDamage = getResistanceReduction(target, rawDamage);
 
         // Reduce damage based on armor
-        rawDamage = DamageUtil.getDamageLeft((float) rawDamage, (float) target.getArmor(), (float) target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
+        rawDamage = DamageUtil.getDamageLeft((float) rawDamage, (float) target.getArmor(), (float) Objects.requireNonNull(target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS)).getValue());
 
         // Reduce damage based on blast protection enchantment
         ((IExplosion) explosion).set(bedLocation, 5, true);
@@ -73,7 +72,7 @@ public class DamageUtils implements Listener {
     }
 
     public static float calculateCrystalDamage(World world, Vec3d source, PlayerEntity player) {
-        if (player == null) return 0;
+        if (player == null || player.isCreative()) return 0;
         explosion = new Explosion(HeliosClient.MC.world, null, 0, 0, 0, 6, false, Explosion.DestructionType.DESTROY);
 
         double distance = source.distanceTo(player.getPos());

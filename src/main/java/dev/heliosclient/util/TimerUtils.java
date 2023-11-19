@@ -5,8 +5,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class TimerUtils {
-    private long startTime;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private long startTime;
 
     // Starts the timer
     public void startTimer() {
@@ -38,8 +38,8 @@ public class TimerUtils {
 
     // Checks if ms milliseconds have passed since the last reset
     public boolean every(long ms) {
-        if(getElapsedTime() >= ms / 1000.0)
+        if (getElapsedTime() >= ms / 1000.0)
             resetTimer();
-        return getElapsedTime() >= ms/1000.0;
+        return getElapsedTime() >= ms / 1000.0;
     }
 }

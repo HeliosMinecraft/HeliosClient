@@ -1,8 +1,6 @@
 package dev.heliosclient.module;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.render.Texture;
-import net.minecraft.util.Identifier;
 
 public class Category {
     public String name;
@@ -19,10 +17,12 @@ public class Category {
         this.svgiconSrc = new Texture(svgIconSrc);
 
     }
+
     public Category(String name, Texture iconSrc) {
         this.name = name;
         this.svgiconSrc = iconSrc;
     }
+
     public Category(String name, char icon) {
         this.name = name;
         this.icon = icon;

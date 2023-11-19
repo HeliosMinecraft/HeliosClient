@@ -12,6 +12,7 @@ public class Fly extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
+        assert mc.player != null;
         mc.player.getAbilities().flying = true;
     }
 

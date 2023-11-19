@@ -21,9 +21,9 @@ public class Window {
     private final IWindowContentRenderer contentRenderer;
     public TextButton backButton = new TextButton("< Back");
     public TextButton collapseButton = new TextButton("+/-");
-    int offsetY = 0;
+    int offsetY;
     private int x, y, windowHeight, windowWidth;
-    private boolean isCollapsible = false;
+    private boolean isCollapsible;
     private boolean isCollapsed = false;
     private Runnable backButtonTask;
 
@@ -88,8 +88,8 @@ public class Window {
             for (String text : wrappedText) {
                 int warpedTextWidth = textRenderer.getWidth(text);
                 drawContext.drawText(textRenderer, text, x + windowWidth / 2 - warpedTextWidth / 2 + 1, y + 26 + textOffsetY, ColorManager.INSTANCE.defaultTextColor(), false);
-                windowHeight += textRenderer.fontHeight + 2;
-                textOffsetY += textRenderer.fontHeight + 2;
+                windowHeight += textRenderer.fontHeight + 4;
+                textOffsetY += textRenderer.fontHeight + 3;
             }
 
             contentRenderer.renderContent(this, drawContext, x, y + 30 + (wrappedText.size() * textRenderer.fontHeight), mouseX, mouseY);
@@ -118,7 +118,7 @@ public class Window {
     }
 
     public void mouseScrolled(double mouseX, double mouseY, double amount) {
-        offsetY += (int) (amount * (Easing.ease(EasingType.QUADRATIC_IN, ClickGUI.ScrollSpeed.value.floatValue())));
+        offsetY += (int) (amount * (Easing.ease(EasingType.QUADRATIC_IN, (float) ClickGUI.ScrollSpeed.value)));
     }
 
     private boolean hoveredOver(double mouseX, double mouseY) {

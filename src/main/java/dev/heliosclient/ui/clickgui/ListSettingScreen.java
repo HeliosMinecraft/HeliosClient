@@ -15,11 +15,11 @@ import java.awt.*;
 
 public class ListSettingScreen extends Screen {
     static int offsetY = 0;
-    public TextButton backButton = new TextButton("< Back");
-    int x, x2, y, windowWidth = 180, windowHeight;
     private final ListSetting listSetting;
     private final Screen parentScreen;
     private final int[] hoverAnimationTimers;
+    public TextButton backButton = new TextButton("< Back");
+    int x, x2, y, windowWidth = 180, windowHeight;
 
     public ListSettingScreen(ListSetting listSetting, Screen parentScreen) {
         super(Text.literal(listSetting.name));
@@ -34,6 +34,7 @@ public class ListSettingScreen extends Screen {
         offsetY += (int) (verticalAmount * 7);
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
+
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
