@@ -20,11 +20,11 @@ import java.util.List;
 
 public class ClientSettingsScreen extends Screen implements IWindowContentRenderer {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    public NavBar navBar = new NavBar();
-    int x, y, windowWidth = 224, windowHeight;
     private final Module_ module;
     private final Window window;
     private final float delayBetweenSettings = 0.2f;
+    public NavBar navBar = new NavBar();
+    int x, y, windowWidth = 224, windowHeight;
     float delay = 0;
 
     public ClientSettingsScreen(Module_ module) {
@@ -32,6 +32,7 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
         this.module = module;
         window = new Window(windowHeight, windowWidth, true, this);
     }
+
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         window.mouseScrolled(mouseX, mouseY, verticalAmount);
@@ -87,7 +88,7 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
 
         navBar.render(drawContext, textRenderer, mouseX, mouseY);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-        FontManager.fontSize = ClickGUI.FontSize.value.intValue();
+        FontManager.fontSize = (int) ClickGUI.FontSize.value;
     }
 
     @Override

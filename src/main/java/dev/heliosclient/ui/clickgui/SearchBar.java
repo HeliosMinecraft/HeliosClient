@@ -1,0 +1,59 @@
+package dev.heliosclient.ui.clickgui;
+
+import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+
+import java.awt.*;
+
+public class SearchBar extends InputBox {
+    public SearchBar() {
+        super(150, 18, "", 25, InputMode.DIGITS_AND_CHARACTERS_AND_WHITESPACE);
+    }
+
+    @Override
+    public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+        update(x, y);
+
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 15 + 1.5f, y - 0.5f, width + 1f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 255).getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 15 + 2, y, width, height, 2, ColorManager.INSTANCE.clickGuiPrimary);
+        FontRenderers.Large_iconRenderer.drawString(drawContext.getMatrices(), "\uEA17", x - 15 + 4, y + 2, -1);
+
+        float textHeight = Renderer2D.getFxStringHeight();
+        float textY = y + (height - textHeight) / 2; // Center the text vertically
+
+        if (focused) {
+            scrollOffset = Math.max(0, Math.min(scrollOffset, value.length()));
+            cursorPosition = Math.max(0, Math.min(cursorPosition, value.length()));
+            displaySegment(drawContext, textY, textHeight);
+        }
+        if(!focused) {
+            if(value.trim().isEmpty() || value.trim().equals(" ")) {
+                if (Renderer2D.isVanillaRenderer()) {
+                    drawContext.drawText(textRenderer, "Search...", x + 5, (int) (textY + 1), 0xFFAAAAAA, false);
+                } else {
+                    FontRenderers.Mid_fxfontRenderer.drawString(drawContext.getMatrices(), "Search...", x + 5, Renderer2D.isVanillaRenderer() ? textY + 1 : textY, 0xFFAAAAAA);
+                }
+            }else{
+                displaySegment(drawContext,textY,textHeight);
+            }
+        }
+
+        drawSelectionBox(drawContext, textY, textHeight);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+       /* if(!super.mouseClicked(mouseX, mouseY, button)){
+            setText("");
+            return false;
+        }
+        return true;
+        */
+        return  super.mouseClicked(mouseX, mouseY, button);
+    }
+}

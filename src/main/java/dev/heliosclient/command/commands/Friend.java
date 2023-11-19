@@ -62,11 +62,11 @@ public class Friend extends Command {
                 .then(literal("list")
                         .executes(context -> {
                             FriendManager friendManager = new FriendManager();
-                            if (!friendManager.getFriendsName().isEmpty()) {
+                            if (friendManager.getFriendsName().isEmpty()) {
+                                ChatUtils.sendHeliosMsg("You don't have any friends. :(");
+                            } else {
                                 ChatUtils.sendHeliosMsg("You are friends with " + ColorUtils.green
                                         + String.join(", ", friendManager.getFriendsName()));
-                            } else {
-                                ChatUtils.sendHeliosMsg("You don't have any friends. :(");
                             }
 
                             return SINGLE_SUCCESS;

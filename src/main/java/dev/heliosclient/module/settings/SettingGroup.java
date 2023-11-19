@@ -11,8 +11,8 @@ import java.util.List;
 public class SettingGroup {
     private final String name;
     private List<Setting> settings = new ArrayList<>();
-    private float height = 0;
-    private float groupNameHeight = 0;
+    private float height;
+    private final float groupNameHeight;
     private boolean shouldRender = true;
     private int x, y, windowWidth;
 

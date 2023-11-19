@@ -15,18 +15,16 @@ import java.util.ArrayList;
 
 public class HudManager implements Listener {
     public static HudManager INSTANCE = new HudManager();
-
-    public ArrayList<HudElement> hudElements = new ArrayList<>();
-
-    protected MinecraftClient mc = MinecraftClient.getInstance();
-
     public static Quadtree quadtree;
+    public ArrayList<HudElement> hudElements = new ArrayList<>();
+    protected MinecraftClient mc = MinecraftClient.getInstance();
 
     public HudManager() {
         quadtree = new Quadtree(0);
         quadtree.clear();
         EventManager.register(this);
     }
+
     @SubscribeEvent
     public void render(RenderEvent event) {
         if (ModuleManager.INSTANCE.getModuleByName("HUD").active.value && !(mc.currentScreen instanceof HudEditorScreen)) {

@@ -15,15 +15,19 @@ public class AnimationUtils implements Listener {
     private boolean fadeIn = false;
     private EasingType easingType = EasingType.LINEAR_IN;
 
+    public static void addErrorToast(String message, boolean hasProgressBar, long endDelay) {
+        HeliosClient.MC.getToastManager().add(new ErrorToast(message, hasProgressBar, endDelay));
+    }
+
+    public static float lerp(float point1, float point2, float alpha) {
+        return (1 - alpha) * point1 + alpha * point2;
+    }
+
     public void startFading(boolean fadeIn, EasingType easingType) {
         fading = true;
         this.fadeIn = fadeIn;
         this.easingType = easingType;
         alpha = fadeIn ? 0.0f : 1.0f;
-    }
-
-    public static void addErrorToast(String message, boolean hasProgressBar, long endDelay) {
-        HeliosClient.MC.getToastManager().add(new ErrorToast(message, hasProgressBar, endDelay));
     }
 
     public void updateAlpha() {
@@ -41,10 +45,6 @@ public class AnimationUtils implements Listener {
         float t = Easing.ease(easingType, alpha);
         int a = (int) (t * ColorUtils.getAlpha(color));
         return ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
-    }
-
-    public static float lerp(float point1, float point2, float alpha) {
-        return (1 - alpha) * point1 + alpha * point2;
     }
 
     public void drawFadingBox(DrawContext context, float x, float y, float width, float height, int color, boolean RoundedBox, float radius) {
@@ -93,7 +93,6 @@ public class AnimationUtils implements Listener {
         }
         context.getMatrices().pop();
     }
-
 
 
 }

@@ -1,12 +1,10 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Category;
@@ -15,45 +13,61 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.fontutils.FontLoader;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
-import me.x150.renderer.render.SVGFile;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CategoryPane implements Listener {
+    public static int width = 83;
+    public static int MAX_HEIGHT = 150;
+    public static List<Hitbox> hitboxes = new CopyOnWriteArrayList<>();
+    public final char icon;
+    private final Screen parentScreen;
+    private final float delayBetweenButtons = 0.0f;
+    private final Hitbox hitBox;
     public Category category;
     public int x;
     public int y;
     public int height;
-    public static int width = 83;
-    public boolean collapsed = false;
+    public boolean collapsed;
     int startX, startY;
     boolean dragging = false;
     ArrayList<ModuleButton> moduleButtons;
-    private final Screen parentScreen;
-    public static int MAX_HEIGHT = 150;
-    private int scrollOffset = 0;
-    public static List<Hitbox> hitboxes = new CopyOnWriteArrayList<>();
-    private final float delayBetweenButtons = 0.0f;
     float delay = 0;
-    private final Hitbox hitBox;
-    public final char icon;
     int categoryNameHeight = 2;
-    private fxFontRenderer iconRenderer;
+    private int scrollOffset = 0;
+
+    public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
+        this.category = category;
+        this.x = initialX;
+        this.y = initialY;
+        this.collapsed = collapsed;
+        this.parentScreen = parentScreen;
+        moduleButtons = new ArrayList<ModuleButton>();
+        for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
+            moduleButtons.add(new ModuleButton(m, parentScreen));
+        }
+        height = Math.round((moduleButtons.size() * (5 + Renderer2D.getStringHeight())));
+
+        icon = category.icon;
+
+        hitBox = new Hitbox(x, y, width, height);
+        hitboxes.add(hitBox);
+
+        EventManager.register(this);
+    }
+
+    public static int getWidth() {
+        return width;
+    }
+
     public void addModule(List<Module_> moduleS) {
         for (Module_ module : moduleS) {
             boolean exists = false;
@@ -96,32 +110,11 @@ public class CategoryPane implements Listener {
         }
     }
 
-    public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
-        this.category = category;
-        this.x = initialX;
-        this.y = initialY;
-        this.collapsed = collapsed;
-        this.parentScreen = parentScreen;
-        moduleButtons = new ArrayList<ModuleButton>();
-        for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
-            moduleButtons.add(new ModuleButton(m, parentScreen));
-        }
-        if (moduleButtons.size() == 0) collapsed = true;
-        height = Math.round((moduleButtons.size() * (5 + Renderer2D.getStringHeight())));
-
-        icon = category.icon;
-
-        hitBox = new Hitbox(x, y, width, height);
-        hitboxes.add(hitBox);
-
-        EventManager.register(this);
-    }
-
     @SubscribeEvent
     public void onFontChange(FontChangeEvent event) {
-        iconRenderer = new fxFontRenderer(FontManager.iconFonts,11f);
         categoryNameHeight = Math.round(Renderer2D.getFxStringHeight(category.name));
     }
+
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
         int maxWidth = 0;
         height = 4;
@@ -141,33 +134,27 @@ public class CategoryPane implements Listener {
                 MAX_HEIGHT = height;
             }
         }
-        if (!collapsed && height >= 10) {
-            if (category == Categories.SEARCH) {
-                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 25, false, false, true, true, width + 4.5f, hitBox.getHeight(), 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
-            } else {
-                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, hitBox.getHeight(), 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
-            }
-        }
-
-
         if (dragging) {
             x = mouseX - startX;
             y = mouseY - startY;
         }
+        if (!collapsed && height >= 10) {
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, hitBox.getHeight(), 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+        }
+
         if (collapsed) {
             delay = 0;
         } else {
             update();
             int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
-            if (category == Categories.SEARCH) {
-                buttonYOffset += 17;
-            }
 
             for (ModuleButton m : moduleButtons) {
-                if (buttonYOffset >= y + categoryNameHeight && buttonYOffset < y + MAX_HEIGHT) {
+
+                if (visible(buttonYOffset)) {
                     int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
                     m.render(drawContext, mouseX, mouseY, x, animatedY, maxWidth);
                 }
+
                 int settingsHeight = m.renderSettings(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                 buttonYOffset += settingsHeight;
                 MAX_HEIGHT = settingsHeight + MAX_HEIGHT;
@@ -181,8 +168,12 @@ public class CategoryPane implements Listener {
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
         hitBox.set(x, y, width, MAX_HEIGHT);
 
-        iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), -1);
+        FontRenderers.iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), -1);
 
+    }
+
+    public boolean visible(int buttonYOffset) {
+        return buttonYOffset >= y + categoryNameHeight && buttonYOffset < y + MAX_HEIGHT;
     }
 
     public boolean hovered(double mouseX, double mouseY) {
@@ -193,7 +184,6 @@ public class CategoryPane implements Listener {
         int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
         return mouseX > x + 2 && mouseX < x + (width - 2) && mouseY > y + categoryNameHeight + 14 && mouseY < y + height;
     }
-
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
         for (ModuleButton moduleButton : moduleButtons) {
@@ -245,9 +235,5 @@ public class CategoryPane implements Listener {
                 }
             }
         }
-    }
-
-    public static int getWidth() {
-        return width;
     }
 }

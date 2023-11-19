@@ -4,6 +4,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -14,8 +15,8 @@ import java.util.function.BooleanSupplier;
 
 public class CycleSetting extends Setting<Integer> {
     public List options;
-    Module_ module;
     public int value;
+    Module_ module;
 
     public <T> CycleSetting(String name, String description, Module_ module, List<T> options, int value, BooleanSupplier shouldRender, int defaultValue) {
         super(shouldRender, defaultValue);
@@ -67,9 +68,9 @@ public class CycleSetting extends Setting<Integer> {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         if (options.isEmpty() || options.size() - 1 < value) {
-            compactFont.drawString(drawContext.getMatrices(), "No option found!", x + 10, y + 24, 0xFFFF0000);
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "No option found!", x + 10, y + 24, 0xFFFF0000);
         }
-        compactFont.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -96,6 +97,13 @@ public class CycleSetting extends Setting<Integer> {
                 value = 0;
             } else {
                 value++;
+            }
+            module.onSettingChange(this);
+        } else if (hovered((int) mouseX, (int) mouseY) && button == 1) {
+            if (value == options.size() - 1) {
+                value = 0;
+            } else {
+                value--;
             }
             module.onSettingChange(this);
         }

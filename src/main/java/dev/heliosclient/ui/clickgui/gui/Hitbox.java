@@ -62,8 +62,8 @@ public class Hitbox implements Listener {
     }
 
     public void set(float x, float y, float width, float height) {
-        setPosition(x,y);
-        setDimensions(width,height);
+        setPosition(x, y);
+        setDimensions(width, height);
     }
 
     public float getY() {

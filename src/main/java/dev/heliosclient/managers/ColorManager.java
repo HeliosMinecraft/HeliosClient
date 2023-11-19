@@ -7,11 +7,10 @@ import java.awt.*;
 public class ColorManager {
 
     public static final ColorManager INSTANCE = new ColorManager();
-
-    //Global
-    public int defaultTextColor = 0xFFFFFFFF;
     //ClickGui
     public final int clickGuiPrimary = new Color(17, 18, 19, 255).getRGB();
+    //Global
+    public int defaultTextColor = 0xFFFFFFFF;
     public int clickGuiPrimaryAlpha = 255;
 
     public boolean clickGuiSecondaryRainbow = false;

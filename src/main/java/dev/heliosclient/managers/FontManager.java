@@ -7,6 +7,7 @@ import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.util.fontutils.FontLoader;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
 
@@ -18,9 +19,6 @@ public class FontManager implements Listener {
     public static Font[] Originalfonts;
     public static int fontSize = 8;
     public static ArrayList<String> fontNames = new ArrayList<>();
-    public static FontRenderer fontRenderer;
-    public static fxFontRenderer iconRenderer;
-    public static fxFontRenderer fxfontRenderer;
 
     public static FontManager INSTANCE = new FontManager();
 
@@ -38,9 +36,19 @@ public class FontManager implements Listener {
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
         if (HeliosClient.MC.getWindow() != null) {
-            fontRenderer = new FontRenderer(fonts, fontSize);
-            fxfontRenderer = new fxFontRenderer(fonts, 8f);
-            iconRenderer = new fxFontRenderer(iconFonts,10f);
+            FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
+            FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
+            FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 10f);
+
+            FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
+            FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
+
+            FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
+            FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
+
+            FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 11f);
+            FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 11f);
+
             EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
             HeliosClient.quadTree = new Quadtree(0);
             EventManager.unregister(this);

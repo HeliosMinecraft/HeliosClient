@@ -5,6 +5,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
@@ -12,9 +13,9 @@ import org.lwjgl.glfw.GLFW;
 import java.util.function.BooleanSupplier;
 
 public class KeyBind extends Setting<Integer> {
+    public static boolean listeningKey = false;
     public int value;
     public boolean listening = false;
-    public static boolean listeningKey = false;
     Module_ module;
 
     public KeyBind(String name, String description, Module_ module, Integer value, BooleanSupplier shouldRender, int defaultValue) {
@@ -57,12 +58,12 @@ public class KeyBind extends Setting<Integer> {
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         if (listening) {
-            compactFont.drawString(drawContext.getMatrices(), name + ": §lLISTENING", x + 2, y + 6, defaultColor);
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": §lLISTENING", x + 2, y + 6, defaultColor);
         } else if (value == 0) {
-            compactFont.drawString(drawContext.getMatrices(), name + ": None", x + 2, y + 6, defaultColor);
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": None", x + 2, y + 6, defaultColor);
         } else {
             String keyName = KeycodeToString.translate(value);
-            compactFont.drawString(drawContext.getMatrices(), name + ": " + keyName, x + 2, y + 6, defaultColor);
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + keyName, x + 2, y + 6, defaultColor);
         }
 
         if (hovered(mouseX, mouseY)) {

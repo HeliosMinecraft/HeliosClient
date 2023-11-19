@@ -9,7 +9,7 @@ import java.math.RoundingMode;
 public class MathUtils {
 
     /**
-     * Rounding to given number of palces.
+     * Rounding to given number of places.
      *
      * @param value  Target double.
      * @param places Number of rounding places.
@@ -24,7 +24,7 @@ public class MathUtils {
     }
 
     public static int d2iSafe(Object value) {
-        int out = 0;
+        int out;
         try {
             out = (int) Math.floor((double) value);
         } catch (Exception e) {

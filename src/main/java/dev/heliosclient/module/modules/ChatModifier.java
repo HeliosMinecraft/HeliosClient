@@ -24,6 +24,7 @@ public class ChatModifier {
     public static void onReceiveChatMessage(Text message, @Nullable SignedMessage signedMessage, @Nullable GameProfile sender, Parameters params, Instant timestamp) {
         ChatHighlight chatHighlighter = new ChatHighlight();
         DateTimeFormatter timestampFormatter = DateTimeFormatter.ofPattern("H:m:s").withZone(ZoneId.systemDefault());
+        assert sender != null;
         Object[] messageArguments = {chatHighlighter.onMessage(message.toString()).replace("<" + sender.getName() + ">", "").strip(), sender.getName(), timestampFormatter.format(timestamp)};
 
         ChatUtils.sendMsg(new MessageFormat(formatString).format(messageArguments));

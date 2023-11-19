@@ -6,7 +6,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.GaussianBlur;
 import dev.heliosclient.util.render.Texture;
@@ -196,8 +196,14 @@ public class Renderer2D implements Listener {
         drawGradient(matrices.peek().getPositionMatrix(), x, y, width, height, startColor, endColor);
     }
 
-    public static void drawRainbowGradient(Matrix4f matrix4f, float x, float y, float width, float height) {
+    public static void drawRainbowGradientRectangle(Matrix4f matrix4f, float x, float y, float width, float height) {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         for (int i = 0; i < width; i++) {
@@ -212,6 +218,40 @@ public class Renderer2D implements Listener {
 
         Tessellator.getInstance().draw();
 
+        RenderSystem.disableBlend();
+    }
+
+    public static void drawRainbowGradient(Matrix4f matrix, float x, float y, float width, float height) {
+        RenderSystem.enableBlend();
+        RenderSystem.colorMask(false, false, false, true);
+        RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.colorMask(true, true, true, true);
+
+        drawRectangle(matrix, x, y, width, height, Color.BLACK.getRGB());
+
+        RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
+
+        RenderSystem.enableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        for (float i = 0; i < width; i += 1.0f) {
+            float hue = (i / width); // Multiply by 1 to go through the whole color spectrum once (red to red)
+            Color color = Color.getHSBColor(hue, 1.0f, 1.0f); // Full saturation and brightness
+
+            bufferBuilder.vertex(matrix, x + i, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+            bufferBuilder.vertex(matrix, x + i + 1.0f, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+            bufferBuilder.vertex(matrix, x + i + 1.0f, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+            bufferBuilder.vertex(matrix, x + i, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+        }
+
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        RenderSystem.disableBlend();
+
+        RenderSystem.defaultBlendFunc();
     }
 
     /* ==== Drawing Blurred Shadow ==== */
@@ -621,7 +661,6 @@ public class Renderer2D implements Listener {
             startAngle = 90;
             endAngle = 180;
         } else if (quadrant == 4) {
-            startAngle = 0;
             endAngle = 90;
         }
 
@@ -841,10 +880,10 @@ public class Renderer2D implements Listener {
      * @param width      Width of rounded gradient rectangle
      * @param height     Height of rounded gradient rectangle
      * @param radius     Radius of the quadrants / the rounded gradient rectangle
-     * @param color1 Main color of the gradient
-     * @param color2 Primary color of the gradient
-     * @param color3 Secondary color of the gradient
-     * @param color4 4th color of the gradient
+     * @param color1     Main color of the gradient
+     * @param color2     Primary color of the gradient
+     * @param color3     Secondary color of the gradient
+     * @param color4     4th color of the gradient
      * @param blurRadius blur radius of the shadow
      */
     public static void drawRoundedGradientRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, Color color1, Color color2, Color color3, Color color4, float radius, int blurRadius, Color blurColor) {
@@ -957,9 +996,18 @@ public class Renderer2D implements Listener {
         }
         return getFontRenderer() != null ? getFontRenderer().getStringWidth(text) : 0;
     }
+    public static float getCustomStringWidth(String text, FontRenderer fontRenderer) {
+        if (isVanillaRenderer()) {
+            return HeliosClient.MC.textRenderer.getWidth(text);
+        }
+        return fontRenderer.getStringWidth(text);
+    }
 
     public static float getStringWidth() {
         return getStringWidth(TEXT);
+    }
+    public static float getCustomStringWidth(FontRenderer fontRenderer) {
+        return fontRenderer.getStringWidth(TEXT);
     }
 
     public static float getFxStringWidth(String text) {
@@ -979,9 +1027,19 @@ public class Renderer2D implements Listener {
         }
         return getFontRenderer() != null ? getFontRenderer().getStringHeight(text) : 0;
     }
+    public static float getCustomStringHeight(String text, FontRenderer fontRenderer) {
+        if (isVanillaRenderer()) {
+            return HeliosClient.MC.textRenderer.fontHeight;
+        }
+        return fontRenderer.getStringHeight(text);
+    }
+
 
     public static float getStringHeight() {
         return getStringHeight(TEXT);
+    }
+    public static float getCustomStringHeight(FontRenderer fontRenderer) {
+        return fontRenderer.getStringHeight(TEXT);
     }
 
     public static float getFxStringHeight(String text) {
@@ -1000,11 +1058,11 @@ public class Renderer2D implements Listener {
     }
 
     public static fxFontRenderer getFxFontRenderer() {
-        return FontManager.fxfontRenderer;
+        return FontRenderers.fxfontRenderer;
     }
 
     public static FontRenderer getFontRenderer() {
-        return FontManager.fontRenderer;
+        return FontRenderers.fontRenderer;
     }
 
     public static void drawString(MatrixStack matrixStack, String text, float x, float y, int color) {
@@ -1038,6 +1096,21 @@ public class Renderer2D implements Listener {
             getFxFontRenderer().drawCenteredString(matrixStack, text, x, y, color);
         }
     }
+    public static void drawCustomString(fxFontRenderer fontRenderer, MatrixStack matrixStack, String text, float x, float y, int color) {
+        if (isVanillaRenderer()) {
+            drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
+        } else if (fontRenderer!= null) {
+            fontRenderer.drawString(matrixStack, text, x, y, color);
+        }
+    }
+
+    public static void drawCustomCenteredString(fxFontRenderer fontRenderer,MatrixStack matrixStack, String text, float x, float y, int color) {
+        if (isVanillaRenderer()) {
+            drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
+        } else if (fontRenderer != null) {
+            fontRenderer.drawCenteredString(matrixStack, text, x, y, color);
+        }
+    }
 
     public static void setRenderer(Renderers renderer) {
         Renderer2D.renderer = renderer;
@@ -1060,7 +1133,7 @@ public class Renderer2D implements Listener {
             line.append(word).append(" ");
         }
 
-        if (line.length() > 0) {
+        if (!line.isEmpty()) {
             lines.add(line.toString());
         }
 

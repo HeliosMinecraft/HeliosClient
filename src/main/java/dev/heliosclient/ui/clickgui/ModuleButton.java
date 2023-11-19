@@ -23,24 +23,24 @@ import java.awt.*;
 import java.util.AbstractMap;
 
 public class ModuleButton {
+    public final Screen parentScreen;
+    private final Hitbox hitBox;
+    private final float delayBetweenSettings = 0.1f;
     public int hoverAnimationTimer;
     public Module_ module;
     public float x, y;
-    public int width, height = 0;
+    public int width, height;
     public boolean settingsOpen = false;
-    AnimationUtils TextAnimation = new AnimationUtils();
-    AnimationUtils BackgroundAnimation = new AnimationUtils();
-    private boolean faded = true;
-    public final Screen parentScreen;
     public int boxHeight = 0;
     public boolean animationDone = false;
+    AnimationUtils TextAnimation = new AnimationUtils();
+    AnimationUtils BackgroundAnimation = new AnimationUtils();
     float animationSpeed = 0.13f;
-    private float targetY;
-    private float animationProgress = 0;
-    private final Hitbox hitBox;
-    private final float delayBetweenSettings = 0.1f;
     float delay = 0;
     int settingHeight = 0;
+    private boolean faded = true;
+    private float targetY;
+    private float animationProgress = 0;
 
 
     public ModuleButton(Module_ module, Screen parentScreen) {
@@ -181,6 +181,7 @@ public class ModuleButton {
         delay = 0;
         setting.setAnimationProgress(0.5f);
     }
+
     public boolean mouseClicked(int mouseX, int mouseY, int button, boolean collapsed) {
         if (!collapsed) {
             setFaded(false);

@@ -11,6 +11,7 @@ import dev.heliosclient.ui.clickgui.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -28,27 +29,26 @@ import java.util.function.BooleanSupplier;
 public class RGBASetting extends Setting<Color> implements Listener {
 
     private final RGBASettingScreen screen = new RGBASettingScreen(this);
-    private float hue, saturation, brightness, alpha;
-    private int handleX, handleY, alphaHandleY, shadeHandleX, shadeHandleY;
     private final int boxHeight = 70;
     private final int boxWidth = 70;
     private final int sliderWidth = 10;
     private final int offsetX = 10; // Offset from the left
     private final int offsetY = 20; // Offset from the top
-    private boolean rainbow = false;
     private final boolean defaultRainbow;
+    private final Module_ module;
     public Color value;
-
+    public fxFontRenderer iconRenderer;
+    public InputBox hexInput;
+    public boolean isPicking = false;
+    private float hue, saturation, brightness, alpha;
+    private int handleX, handleY, alphaHandleY, shadeHandleX, shadeHandleY;
+    private boolean rainbow;
     // Add new fields to store calculated values
     private int gradientBoxX, gradientBoxY, gradientBoxWidth, gradientBoxHeight;
     private int alphaSliderX, alphaSliderY, alphaSliderWidth, alphaSliderHeight;
     private int brightnessSaturationBoxX, brightnessSaturationBoxY, brightnessSaturationBoxWidth, brightnessSaturationBoxHeight;
     private fxFontRenderer fxFontRenderer;
-    public fxFontRenderer iconRenderer;
     private Screen parentScreen = null;
-    private final Module_ module;
-    public InputBox hexInput;
-    public boolean isPicking = false;
 
     public RGBASetting(String name, String description, Color defaultColor, boolean rainbow, Module_ module, BooleanSupplier shouldRender) {
         super(shouldRender, defaultColor);
@@ -83,6 +83,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.brightnessSaturationBoxHeight = boxHeight;
 
         updateHandles();
+
         hexInput = new InputBox(50, 11, ColorUtils.colorToHex(value), 7, InputBox.InputMode.ALL);
     }
 
@@ -114,7 +115,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
             value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), value.getAlpha());
             updateHandles();
         }
-
         this.gradientBoxX = x + offsetX;
         this.gradientBoxY = y + offsetY;
         this.gradientBoxWidth = boxWidth;
@@ -140,7 +140,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
         //Draw picker button
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 5, y + offsetY + gradientBoxHeight + 6, iconRenderer.getStringWidth("\uF17C ") + 3, iconRenderer.getStringHeight("\uF17C ") + 1, 2, Color.LIGHT_GRAY.getRGB());
-        iconRenderer.drawString(drawContext.getMatrices(), "\uF14B", x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 7, y  + offsetY + gradientBoxHeight + 6.5f, isPicking ? Color.GREEN.getRGB() : Color.RED.getRGB());
+        iconRenderer.drawString(drawContext.getMatrices(), "\uF14B", x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 6.5f, y + offsetY + gradientBoxHeight + 6.5f, isPicking ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
         //Render the texts
         Renderer2D.drawFixedString(drawContext.getMatrices(), "Alpha: " + value.getAlpha(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 9, -1);
@@ -157,16 +157,16 @@ public class RGBASetting extends Setting<Color> implements Listener {
         if (!hexInput.isFocused()) {
             hexInput.setText(ColorUtils.colorToHex(value));
         }
-        if(isPicking && !hoveredOverPickBool(mouseX,mouseY)){
+        if (isPicking && !hoveredOverPickBool(mouseX, mouseY)) {
             drawContext.getMatrices().push();
-            drawContext.getMatrices().translate(0,0,1000);
+            drawContext.getMatrices().translate(0, 0, 1000);
             // Draw the cursor
             double mouseXPick = HeliosClient.MC.mouse.getX() * HeliosClient.MC.getWindow().getScaledWidth() / (double) HeliosClient.MC.getWindow().getWidth();
             double mouseYPick = HeliosClient.MC.mouse.getY() * HeliosClient.MC.getWindow().getScaledHeight() / (double) HeliosClient.MC.getWindow().getHeight();
 
-            Framebuffer framebuffer =  HeliosClient.MC.getFramebuffer();
-            int pickX = (int) (mouseX * framebuffer.textureWidth /  HeliosClient.MC.getWindow().getScaledWidth());
-            int pickY = (int) (( HeliosClient.MC.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / HeliosClient.MC.getWindow().getScaledHeight());
+            Framebuffer framebuffer = HeliosClient.MC.getFramebuffer();
+            int pickX = (int) (mouseXPick * framebuffer.textureWidth / HeliosClient.MC.getWindow().getScaledWidth());
+            int pickY = (int) ((HeliosClient.MC.getWindow().getScaledHeight() - mouseYPick) * framebuffer.textureHeight / HeliosClient.MC.getWindow().getScaledHeight());
 
             ByteBuffer buffer = GlAllocationUtils.allocateByteBuffer(4);
             GL11.glReadPixels(pickX, pickY, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
@@ -174,15 +174,15 @@ public class RGBASetting extends Setting<Color> implements Listener {
             int green = buffer.get(1) & 0xFF;
             int blue = buffer.get(2) & 0xFF;
 
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) (mouseXPick + 10), (float) mouseYPick,  14, 14, -1);
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) ( mouseXPick + 11), (float) (mouseYPick + 1), 12,  12,new Color(red,green,blue, value.getAlpha()).getRGB());
+
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) (mouseXPick + 10), (float) mouseYPick, 14, 14, -1);
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) (mouseXPick + 11), (float) (mouseYPick + 1), 12, 12, new Color(red, green, blue, (int) (alpha * 255)).getRGB());
 
             drawContext.getMatrices().push();
         }
     }
 
     public void drawGradientBox(DrawContext drawContext, int x, int y, int value) {
-
         // Draw the value gradient box
         Renderer2D.drawRainbowGradient(drawContext.getMatrices().peek().getPositionMatrix(), x, y, boxWidth, gradientBoxHeight);
 
@@ -212,6 +212,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         hue = hsbvals[0];
         saturation = hsbvals[1];
         brightness = hsbvals[2];
+        alpha = value.getAlpha() / 255f;
         handleX = Math.min((int) (hue * boxWidth), boxWidth);
         handleY = Math.min((int) ((1 - saturation) * gradientBoxHeight), gradientBoxHeight);
         shadeHandleX = Math.min((int) (brightness * boxWidth), boxWidth);
@@ -222,6 +223,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
     public boolean hoveredOverPickBool(double mouseX, double mouseY) {
         return mouseX > gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 && mouseX < gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 + iconRenderer.getStringWidth("\uF17C ") + 3 && mouseY > y + offsetY + gradientBoxHeight + 5 && mouseY < y + offsetY + gradientBoxHeight + 6 + Renderer2D.getFxStringHeight("\uF17C ") + 2;
     }
+
     public boolean hoveredOverRainbowBool(double mouseX, double mouseY) {
         return mouseX > gradientBoxX - 1 && mouseX < gradientBoxX - 1 + Renderer2D.getFxStringWidth("Rainbow ") + 3 && mouseY > y + offsetY + gradientBoxHeight + 5 && mouseY < y + offsetY + gradientBoxHeight + 6 + Renderer2D.getFxStringHeight("Rainbow ") + 2;
     }
@@ -241,7 +243,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        compactFont.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 1, -1);
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 1, -1);
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 71, y + 1, 10, 10, 2, value.getRGB());
 
         if (rainbow) {
@@ -250,13 +252,13 @@ public class RGBASetting extends Setting<Color> implements Listener {
     }
 
     public void mouse(double mouseX, double mouseY, int button) {
-        if(isPicking && !hoveredOverPickBool(mouseX,mouseY)){
+        if (isPicking && !hoveredOverPickBool(mouseX, mouseY)) {
             double mouseXPick = HeliosClient.MC.mouse.getX() * HeliosClient.MC.getWindow().getScaledWidth() / (double) HeliosClient.MC.getWindow().getWidth();
             double mouseYPick = HeliosClient.MC.mouse.getY() * HeliosClient.MC.getWindow().getScaledHeight() / (double) HeliosClient.MC.getWindow().getHeight();
 
-            Framebuffer framebuffer =  HeliosClient.MC.getFramebuffer();
-            int pickX = (int) (mouseXPick * framebuffer.textureWidth /  HeliosClient.MC.getWindow().getScaledWidth());
-            int pickY = (int) (( HeliosClient.MC.getWindow().getScaledHeight() - mouseYPick) * framebuffer.textureHeight / HeliosClient.MC.getWindow().getScaledHeight());
+            Framebuffer framebuffer = HeliosClient.MC.getFramebuffer();
+            int pickX = (int) (mouseXPick * framebuffer.textureWidth / HeliosClient.MC.getWindow().getScaledWidth());
+            int pickY = (int) ((HeliosClient.MC.getWindow().getScaledHeight() - mouseYPick) * framebuffer.textureHeight / HeliosClient.MC.getWindow().getScaledHeight());
 
             ByteBuffer buffer = GlAllocationUtils.allocateByteBuffer(4);
             GL11.glReadPixels(pickX, pickY, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
@@ -264,9 +266,9 @@ public class RGBASetting extends Setting<Color> implements Listener {
             int green = buffer.get(1) & 0xFF;
             int blue = buffer.get(2) & 0xFF;
 
-           value = new Color(red,green,blue, value.getAlpha());
-           isPicking = !isPicking;
-           updateHandles();
+            value = new Color(red, green, blue, (int) (alpha * 255));
+            isPicking = !isPicking;
+            updateHandles();
         }
 
         hexInput.mouseClicked(mouseX, mouseY, button);
@@ -285,8 +287,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
             saturation = 1.0f - shadeHandleY / (float) boxHeight;
         } else if (hoveredOverRainbowBool(mouseX, mouseY)) {
             rainbow = !rainbow;
-        }
-        else if(hoveredOverPickBool(mouseX,mouseY)){
+        } else if (hoveredOverPickBool(mouseX, mouseY)) {
             isPicking = !isPicking;
         }
         if (rainbow) {
@@ -355,7 +356,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
     @SubscribeEvent
     public void onFontChange(FontChangeEvent event) {
         fxFontRenderer = new fxFontRenderer(event.getFonts(), 5f);
-        iconRenderer = new fxFontRenderer(FontManager.iconFonts,9f);
+        iconRenderer = new fxFontRenderer(FontManager.iconFonts, 9f);
 
     }
 
@@ -370,6 +371,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
     public static class Builder extends SettingBuilder<Builder, Color, RGBASetting> {
         boolean rainbow = false;
         Module_ module;
+
         public Builder() {
             super(new Color(-1));
         }
@@ -383,6 +385,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
             this.module = module;
             return this;
         }
+
         @Override
         public RGBASetting build() {
             return new RGBASetting(name, description, value, rainbow, module, shouldRender);

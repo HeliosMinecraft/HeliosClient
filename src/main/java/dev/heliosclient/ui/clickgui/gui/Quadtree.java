@@ -98,10 +98,10 @@ public class Quadtree {
             int i = 0;
             while (i < objects.size()) {
                 int index = getIndex(objects.get(i));
-                if (index != -1) {
-                    nodes[index].insert(objects.remove(i));
-                } else {
+                if (index == -1) {
                     i++;
+                } else {
+                    nodes[index].insert(objects.remove(i));
                 }
             }
         }

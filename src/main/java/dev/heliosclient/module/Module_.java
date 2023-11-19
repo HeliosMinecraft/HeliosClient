@@ -14,6 +14,7 @@ import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.ChatUtils;
+import dev.heliosclient.util.SoundUtils;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
@@ -74,6 +75,7 @@ public abstract class Module_ implements Listener {
             .value(false)
             .build()
     );
+
     public Module_(String name, String description, Category category) {
         this.name = name;
         this.description = description;
@@ -98,8 +100,8 @@ public abstract class Module_ implements Listener {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was enabled.");
         }
-        if (NotificationModule.moduleNotification.value) {
-            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000));
+        if (NotificationModule.INSTANCE.moduleNotification.value) {
+            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
         }
         EventManager.register(this);
     }
@@ -108,19 +110,19 @@ public abstract class Module_ implements Listener {
      * @return Active status.
      */
     public boolean isActive() {
-        return active.value.booleanValue();
+        return active.value;
     }
 
     /**
      * Called on disable. Probably shouldn't disable original functionality since it will remove chat feedback.
      */
     public void onDisable() {
-        if (chatFeedback.value.booleanValue()) {
+        if (chatFeedback.value) {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
         }
-        if (NotificationModule.moduleNotification.value.booleanValue()) {
-            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000));
+        if (NotificationModule.INSTANCE.moduleNotification.value) {
+            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
         }
         EventManager.unregister(this);
     }
@@ -151,7 +153,7 @@ public abstract class Module_ implements Listener {
      */
     public void toggle() {
         active.value = !active.value;
-        if (active.value.booleanValue()) {
+        if (active.value) {
             onEnable();
         } else {
             onDisable();
@@ -188,7 +190,7 @@ public abstract class Module_ implements Listener {
      */
     public void onSettingChange(Setting setting) {
         if (setting == active) {
-            if (active.value.booleanValue()) {
+            if (active.value) {
                 onEnable();
             } else {
                 onDisable();

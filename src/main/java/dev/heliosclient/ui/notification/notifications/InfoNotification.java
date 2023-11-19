@@ -2,23 +2,26 @@ package dev.heliosclient.ui.notification.notifications;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.module.modules.NotificationModule;
 import dev.heliosclient.ui.notification.Notification;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 
 public class InfoNotification extends Notification {
     private final String title;
     private final String description;
 
-    public InfoNotification(String title, String description, long endDelay) {
+    public InfoNotification(String title, String description, long endDelay, SoundEvent soundEvent, float pitch) {
         this.title = title;
         this.description = description;
         this.endDelay = endDelay;
         this.WIDTH = 50;
-        SoundUtils.playSound(SoundUtils.TING_SOUNDEVENT, HeliosClient.MC.options.getSoundVolume(SoundCategory.MASTER), 100f);
+        if (NotificationModule.INSTANCE.playSound.value && NotificationModule.INSTANCE.isActive()) {
+            SoundUtils.playSound(soundEvent, (float) (NotificationModule.INSTANCE.volume.value / 100f), pitch);
+        }
     }
 
     @Override
@@ -34,8 +37,8 @@ public class InfoNotification extends Notification {
             this.WIDTH = Math.round(fontRenderer.getStringWidth(title) + 3);
         }
 
-        fontRenderer.drawString(matrices, title, x + ((WIDTH / 2) - titleHeight) + 2, y + 1 + fontRenderer.getStringHeight(title) / 2, -1);
-        fontRenderer.drawString(matrices, description, x + ((WIDTH / 2) - (fontRenderer.getStringWidth(description) / 2)), y + 9 + fontRenderer.getStringHeight(description) / 2, -1);
+        fontRenderer.drawString(matrices, title, x + (((float) WIDTH / 2) - titleHeight) + 2, y + 1 + fontRenderer.getStringHeight(title) / 2, -1);
+        fontRenderer.drawString(matrices, description, x + (((float) WIDTH / 2) - (fontRenderer.getStringWidth(description) / 2)), y + 9 + fontRenderer.getStringHeight(description) / 2, -1);
 
         // Draw progress bar
         float progress = Math.min(timeElapsed / (float) endDelay, 1);

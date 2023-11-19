@@ -28,10 +28,6 @@ public class Config {
         configDir.mkdirs();
     }
 
-    public boolean doesConfigExist() {
-        return Files.exists(configFile.toPath());
-    }
-
     @NotNull
     private static Map<String, Object> getPi() {
         final AtomicInteger[] xOffset = {new AtomicInteger(4)};
@@ -50,6 +46,10 @@ public class Config {
             xOffset[0].addAndGet(100);
         });
         return pi;
+    }
+
+    public boolean doesConfigExist() {
+        return Files.exists(configFile.toPath());
     }
 
     public void loadDefaultConfig() {

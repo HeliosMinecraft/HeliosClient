@@ -6,7 +6,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -53,6 +52,7 @@ public class FontLoader {
 
         return fonts.toArray(new Font[0]);
     }
+
     public static Font[] loadIconFonts() {
         File gameDir = MinecraftClient.getInstance().runDirectory;
 

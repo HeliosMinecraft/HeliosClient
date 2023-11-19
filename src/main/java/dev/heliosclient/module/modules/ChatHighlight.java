@@ -15,8 +15,8 @@ import java.util.HashSet;
 public class ChatHighlight extends Module_ {
 
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    public HashSet<String> highlightList = new HashSet<String>();
     private final SettingGroup sgGeneral = new SettingGroup("General");
+    public HashSet<String> highlightList = new HashSet<String>();
     BooleanSetting highlightUsername = sgGeneral.add(new BooleanSetting.Builder()
             .name("Highlight Username")
             .description("Whether to highlight your username or not.")

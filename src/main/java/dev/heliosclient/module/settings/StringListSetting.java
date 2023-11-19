@@ -16,8 +16,8 @@ public class StringListSetting extends Setting<String[]> {
     private final List<InputBox> inputBoxes = new ArrayList<>();
 
     private final int characterLimit;
-    String description;
     private final InputBox.InputMode inputMode;
+    String description;
 
     public StringListSetting(String name, String description, String[] defaultValues, int defaultBoxes, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender) {
         super(shouldRender, defaultValues);

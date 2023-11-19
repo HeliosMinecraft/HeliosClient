@@ -5,9 +5,11 @@ import net.minecraft.client.util.math.MatrixStack;
 
 public class Render3DEvent extends Event {
 
-    private MatrixStack matrices;
-    private float tickDelta;
-    private double offsetX, offsetY, offsetZ;
+    private final MatrixStack matrices;
+    private final float tickDelta;
+    private final double offsetX;
+    private final double offsetY;
+    private final double offsetZ;
 
     public Render3DEvent(MatrixStack matrices, float tickDelta, double offsetX, double offsetY, double offsetZ) {
         this.matrices = matrices;

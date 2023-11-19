@@ -1,17 +1,13 @@
 package dev.heliosclient.module.settings;
 
-import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -19,36 +15,30 @@ import java.awt.*;
 import java.util.function.BooleanSupplier;
 
 public abstract class Setting<T> implements Listener {
+    public final T defaultValue;
     public String name;
     public String description;
     public int height = 24;
     public int width = 192;
-    protected static fxFontRenderer compactFont;
     public int widthCompact = CategoryPane.getWidth();
-    public final T defaultValue;
     public T value;
     public boolean quickSettings = false;
-    protected int moduleWidth = CategoryPane.getWidth();
-    protected int x = 0;
-    protected int y = 0;
-    int hovertimer = 0;
-    private int hoverAnimationTimer = 0;
-    protected BooleanSupplier shouldRender = () -> true; // Default to true
     public int heightCompact = 18;
     public float animationProgress = 0;
     public float animationSpeed = 0.13f;
     public boolean animationDone = false;
+    protected int moduleWidth = CategoryPane.getWidth();
+    protected int x = 0;
+    protected int y = 0;
+    protected BooleanSupplier shouldRender; // Default to true
+    int hovertimer = 0;
+    private int hoverAnimationTimer = 0;
     private float targetY;
-    public fxFontRenderer iconRenderer;
 
     public Setting(BooleanSupplier shouldRender, T defaultValue) {
         this.shouldRender = shouldRender;
         this.defaultValue = defaultValue;
         EventManager.register(this);
-        if (HeliosClient.MC.getWindow() != null) {
-            compactFont = new fxFontRenderer(FontManager.fonts, 6);
-            iconRenderer = new fxFontRenderer(FontManager.iconFonts,8f);
-        }
     }
 
     public void update(float targetY) {
@@ -70,15 +60,9 @@ public abstract class Setting<T> implements Listener {
         }
     }
 
-
-    @SubscribeEvent
-    private void onFontChange(FontChangeEvent event) {
-        compactFont = new fxFontRenderer(FontManager.fonts, 6);
-        iconRenderer = new fxFontRenderer(FontManager.iconFonts,7f);
-    }
-
     /**
      * Renders setting in GUI.
+     *
      * @param drawContext
      * @param x
      * @param y
@@ -98,17 +82,15 @@ public abstract class Setting<T> implements Listener {
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 195, y + (float) this.height / 2 - 5.5f, 11, 11, Color.black.getRGB());
             Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 195, y + (float) this.height / 2 - 5.5f, 11, 11, 0.4f, (hoveredOverReset(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
 
-            if(iconRenderer!=null) {
-                iconRenderer.drawString(drawContext.getMatrices(), "\uEA1D", (x + 203.9f - iconRenderer.getStringWidth("\uEA1D")), (y + height / 2 - 3.8f), -1);
-            }else{
-                iconRenderer = new fxFontRenderer(FontManager.iconFonts,7f);
-            }
+
+            FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uEA1D", (x + 203.5f - FontRenderers.Small_iconRenderer.getStringWidth("\uEA1D")), (y + (float) height / 2 - 3.6f), -1);
         }
     }
 
     public boolean hoveredOverReset(double mouseX, double mouseY) {
         return mouseX >= x + 195 && mouseX <= x + 206 && mouseY >= y + (double) this.height / 2 - 5.5f && mouseY <= y + (double) this.height / 2 + 5.5f;
     }
+
     /**
      * Compact rendering for clickGUI.
      */
@@ -124,6 +106,7 @@ public abstract class Setting<T> implements Listener {
 
     /**
      * If setting should render, Meant to be used for overrides for settings that are meant to be shown only if condition is met.
+     *
      * @return If should render.
      */
     public boolean shouldRender() {
@@ -132,6 +115,7 @@ public abstract class Setting<T> implements Listener {
 
     /**
      * Called every time mouse gets clicked.
+     *
      * @param mouseX X coordinate of mouse.
      * @param mouseY Y coordinate of mouse.
      * @param button Which button is being clicked.
@@ -144,6 +128,7 @@ public abstract class Setting<T> implements Listener {
 
     /**
      * Called every time mouse gets released.
+     *
      * @param mouseX X coordinate of mouse.
      * @param mouseY Y coordinate of mouse,
      * @param button Which button got released.
@@ -153,8 +138,9 @@ public abstract class Setting<T> implements Listener {
 
     /**
      * Called every time key gets pressed.
-     * @param keyCode GLFW keycode of key that got pressed.
-     * @param scanCode Scan code.
+     *
+     * @param keyCode   GLFW keycode of key that got pressed.
+     * @param scanCode  Scan code.
      * @param modifiers Modifiers eg. Ctrl, Shift.
      */
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -162,6 +148,7 @@ public abstract class Setting<T> implements Listener {
 
     /**
      * Gets called every time mouse gets dragged.
+     *
      * @param mouseX
      * @param mouseY
      * @param button
@@ -173,8 +160,9 @@ public abstract class Setting<T> implements Listener {
 
     /**
      * Gets called every time key gets released.
-     * @param keyCode GLFW keycode of key that got pressed.
-     * @param scanCode Scan code.
+     *
+     * @param keyCode   GLFW keycode of key that got pressed.
+     * @param scanCode  Scan code.
      * @param modifiers Modifiers eg. Ctrl, Shift.
      */
     public void keyReleased(int keyCode, int scanCode, int modifiers) {
@@ -182,7 +170,8 @@ public abstract class Setting<T> implements Listener {
 
     /**
      * Gets called every time char gets typed.
-     * @param chr Char in question.
+     *
+     * @param chr       Char in question.
      * @param modifiers Modifiers eg. Ctrl, Shift.
      */
     public void charTyped(char chr, int modifiers) {
@@ -190,6 +179,7 @@ public abstract class Setting<T> implements Listener {
 
     /**
      * Boolean that tells if mouse is hovering this setting.
+     *
      * @param mouseX Current mouseX.
      * @param mouseY Current mouseY.
      * @return If mouse is hovering.
@@ -241,6 +231,7 @@ public abstract class Setting<T> implements Listener {
         protected V value;
         protected BooleanSupplier shouldRender = () -> true; // Default to true
         protected V defaultValue;
+
         protected SettingBuilder(V value) {
             this.value = value;
             this.defaultValue = value;

@@ -8,11 +8,10 @@ import java.util.HashSet;
 import java.util.Objects;
 
 public class FriendManager {
+    private static final HashSet<String> friendsName = new HashSet<>();
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-
     // Declare a list of friends
     private static HashSet<Friend> friends = new HashSet<>();
-    private static final HashSet<String> friendsName = new HashSet<>();
 
     public FriendManager() {
         for (Friend friend : friends) {

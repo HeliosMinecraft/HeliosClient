@@ -63,9 +63,8 @@ public class Help extends Command {
             ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + "Commands:");
 
             for (Command cmd : CommandManager.get().getAll()) {
-                List<String> aliases = new ArrayList<>();
 
-                for (String alias : cmd.getAliases()) aliases.add(alias);
+                List<String> aliases = new ArrayList<>(cmd.getAliases());
                 aliases.add(0, ColorUtils.bold + ColorUtils.aqua + cmd.getName());
 
                 ChatUtils.sendMsg(ColorUtils.aqua + String.join(ColorUtils.reset + ", ", aliases) + ColorUtils.gray + ": " + cmd.getDescription());

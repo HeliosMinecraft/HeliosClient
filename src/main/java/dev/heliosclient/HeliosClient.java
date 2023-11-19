@@ -43,6 +43,7 @@ public class HeliosClient implements ModInitializer {
         AddonManager.initializeAddons();
 
         Categories.registerCategories();
+        SoundUtils.registerSounds();
         loadConfig();
 
         EventManager.register(fontManager);
@@ -55,8 +56,6 @@ public class HeliosClient implements ModInitializer {
             quadTree = new Quadtree(0);
         }
         ClickGUIScreen.INSTANCE.onLoad();
-
-        SoundUtils.registerSounds();
     }
 
     public void loadConfig() {
