@@ -73,7 +73,7 @@ public class ClickGUIScreen extends Screen {
                 }
             }
         }
-        searchBar.render(drawContext, drawContext.getScaledWindowWidth() / 2 - searchBar.width / 2 + 5, drawContext.getScaledWindowHeight() - searchBar.height - 10, mouseX, mouseY, textRenderer);
+        searchBar.render(drawContext, drawContext.getScaledWindowWidth() / 2 - searchBar.width / 2 + 7, drawContext.getScaledWindowHeight() - searchBar.height - 11, mouseX, mouseY, textRenderer);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
         scrollY = 0;

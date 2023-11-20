@@ -6,6 +6,7 @@ import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.MinecraftClient;
@@ -16,33 +17,13 @@ import net.minecraft.text.Text;
 import java.util.AbstractMap;
 import java.util.List;
 
-public class SettingsScreen extends Screen implements IWindowContentRenderer {
-    protected static MinecraftClient mc = MinecraftClient.getInstance();
-    private final Module_ module;
-    private final Window window;
+public class SettingsScreen extends AbstractSettingScreen implements IWindowContentRenderer {
     private final Screen parentScreen;
     private final float delayBetweenSettings = 0.2f;
-    int x, y, windowWidth = 224, windowHeight;
-    float delay = 0;
 
     public SettingsScreen(Module_ module, Screen parentScreen) {
-        super(Text.literal("Settings"));
-        this.module = module;
-        window = new Window(windowHeight, windowWidth, true, this);
+        super(Text.literal("Settings"),module,0,224);
         this.parentScreen = parentScreen;
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        window.mouseScrolled(mouseX, mouseY, verticalAmount);
-        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-    }
-
-
-    @Override
-    protected void init() {
-        super.init();
-        window.init();
     }
 
     public void updateSetting() {
@@ -87,50 +68,6 @@ public class SettingsScreen extends Screen implements IWindowContentRenderer {
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
         FontManager.fontSize = (int) ClickGUI.FontSize.value;
     }
-
-    @Override
-    public boolean shouldPause() {
-        return ClickGUI.pause;
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        window.mouseClicked(mouseX, mouseY);
-        for (SettingGroup settingGroup : module.settingGroups) {
-            settingGroup.mouseClickedBuilder(mouseX, mouseY);
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.mouseClicked(mouseX, mouseY, button);
-        }
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        for (SettingGroup settingGroup : module.settingGroups) {
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.mouseReleased(mouseX, mouseY, button);
-        }
-        return super.mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (SettingGroup settingGroup : module.settingGroups) {
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.keyPressed(keyCode, scanCode, modifiers);
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean charTyped(char chr, int modifiers) {
-        for (SettingGroup settingGroup : module.settingGroups) {
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.charTyped(chr, modifiers);
-        }
-        return super.charTyped(chr, modifiers);
-    }
-
     @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         updateSetting();

@@ -6,6 +6,7 @@ import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
@@ -18,31 +19,14 @@ import java.util.AbstractMap;
 import java.util.List;
 
 
-public class ClientSettingsScreen extends Screen implements IWindowContentRenderer {
+public class ClientSettingsScreen extends AbstractSettingScreen implements IWindowContentRenderer {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    private final Module_ module;
-    private final Window window;
     private final float delayBetweenSettings = 0.2f;
     public NavBar navBar = new NavBar();
     int x, y, windowWidth = 224, windowHeight;
-    float delay = 0;
 
     public ClientSettingsScreen(Module_ module) {
-        super(Text.literal("Client Settings"));
-        this.module = module;
-        window = new Window(windowHeight, windowWidth, true, this);
-    }
-
-    @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        window.mouseScrolled(mouseX, mouseY, verticalAmount);
-        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
-    }
-
-    @Override
-    protected void init() {
-        super.init();
-        window.init();
+        super(Text.literal("Client Settings"),module,0,224);
     }
 
     public void updateSetting() {
@@ -92,50 +76,6 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
     }
 
     @Override
-    public boolean shouldPause() {
-        return ClickGUI.pause;
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        window.mouseClicked(mouseX, mouseY);
-        for (SettingGroup settingGroup : module.settingGroups) {
-            settingGroup.mouseClickedBuilder(mouseX, mouseY);
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.mouseClicked(mouseX, mouseY, button);
-        }
-        navBar.mouseClicked((int) mouseX, (int) mouseY, button);
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        for (SettingGroup settingGroup : module.settingGroups) {
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.mouseReleased(mouseX, mouseY, button);
-        }
-        return super.mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (SettingGroup settingGroup : module.settingGroups) {
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.keyPressed(keyCode, scanCode, modifiers);
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean charTyped(char chr, int modifiers) {
-        for (SettingGroup settingGroup : module.settingGroups) {
-            if (!settingGroup.shouldRender()) continue;
-            settingGroup.charTyped(chr, modifiers);
-        }
-        return super.charTyped(chr, modifiers);
-    }
-
-    @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         updateSetting();
 
@@ -144,8 +84,8 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
             yOffset += Math.round(settingGroup.getGroupNameHeight() + 3);
             settingGroup.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
 
-            if (settingGroup.shouldRender()) {
-                List<Setting> settings = settingGroup.getSettings();
+           if (settingGroup.shouldRender()) {
+                  List<Setting> settings = settingGroup.getSettings();
                 for (Setting setting : settings) {
                     if (setting.shouldRender()) {
                         if (setting instanceof RGBASetting rgbaSetting) {
@@ -166,6 +106,12 @@ public class ClientSettingsScreen extends Screen implements IWindowContentRender
 
             yOffset += Math.round(settingGroup.getGroupNameHeight() + 1);
         }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        navBar.mouseClicked((int) mouseX, (int) mouseY,button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     private void resetSettingAnimation(Setting setting) {

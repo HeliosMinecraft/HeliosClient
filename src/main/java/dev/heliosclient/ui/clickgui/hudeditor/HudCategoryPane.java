@@ -21,12 +21,27 @@ public class HudCategoryPane {
     public ArrayList<HudElementButton> hudElementButtons = new ArrayList<HudElementButton>();
 
     public HudCategoryPane() {
+        float maxWidth = 0;
+        for (HudElement element : HudElementList.INSTANCE.hudElements) {
+            HudElementButton button = new HudElementButton(element);
+            float elementWidth = Renderer2D.getCustomStringWidth(button.hudElement.name + " [" + button.count + "]", FontRenderers.Small_fxfontRenderer) + 4;
+            maxWidth = Math.max(maxWidth, elementWidth);
+        }
+        width = Math.round(maxWidth);
+
         for (HudElement element : HudElementList.INSTANCE.hudElements) {
             HudElementButton button = new HudElementButton(element);
             button.width = width;
-            width = Math.round(Math.max(width,Renderer2D.getCustomStringWidth(button.hudElement.name + " [" + button.count + "]",FontRenderers.Small_fxfontRenderer) + 4));
             hudElementButtons.add(button);
         }
+    }
+    private float calculateMaxWidth() {
+        float maxWidth = 0;
+        for (HudElementButton elementButton : hudElementButtons) {
+            float elementWidth = Renderer2D.getCustomStringWidth(elementButton.hudElement.name + " [" + elementButton.count + "]", FontRenderers.Small_fxfontRenderer) + 4;
+            maxWidth = Math.max(maxWidth, elementWidth);
+        }
+        return Math.round(maxWidth);
     }
 
     public void render(DrawContext drawContext, TextRenderer textRenderer, int mouseX, int mouseY, float delta) {
@@ -37,9 +52,11 @@ public class HudCategoryPane {
 
         int offsetY = y + 12;
         if (!collapsed) {
+            float maxWidth = calculateMaxWidth();
+
+            width = Math.round(maxWidth);
             for (HudElementButton elementButton : hudElementButtons) {
                 elementButton.render(drawContext, textRenderer, x, offsetY, delta);
-                width = Math.round(Math.max(width,Renderer2D.getCustomStringWidth(elementButton.hudElement.name + " [" + elementButton.count + "]",FontRenderers.Small_fxfontRenderer) + 4));
                 elementButton.width = width;
                 offsetY += 12;
             }

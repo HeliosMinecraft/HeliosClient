@@ -52,7 +52,7 @@ public class ModuleManager {
                 moduleS.add(module);
                 return moduleS;
             }
-            if (!moduleName.isEmpty() && (module.name.trim().toLowerCase().startsWith(moduleName.trim().toLowerCase()) || module.description.trim().toLowerCase().contains(moduleName.trim().toLowerCase()))) {
+            if (!moduleName.isEmpty() && module.name.trim().toLowerCase().startsWith(moduleName.trim().toLowerCase())) {
                 moduleS.add(module);
             }
         }

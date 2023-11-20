@@ -145,7 +145,7 @@ public class ModuleButton {
             updateSetting();
             buttonYOffset = y + this.height + 4;
             for (SettingGroup settingGroup : module.quickSettingGroups) {
-                buttonYOffset += Math.round(settingGroup.getGroupNameHeight());
+                buttonYOffset += Math.round(settingGroup.getGroupNameHeight() + 6);
 
                 if (buttonYOffset >= y) {
                     settingGroup.renderBuilder(drawContext, x - 1, buttonYOffset, width);
@@ -164,7 +164,7 @@ public class ModuleButton {
 
                         int animatedY = Math.round(setting.getY() + (buttonYOffset - setting.getY()) * setting.getAnimationProgress());
                         setting.renderCompact(drawContext, x, animatedY + 5, mouseX, mouseY, textRenderer);
-                        buttonYOffset += setting.heightCompact;
+                        buttonYOffset += setting.heightCompact + 1;
                     }
                 }
             }
