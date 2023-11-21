@@ -25,7 +25,7 @@ public class EventManager {
     public static void postEvent(Event event) {
         if (!INSTANCE.isEmpty()) {
             for (Listener listener : INSTANCE) {
-                for (Method method : listener.getClass().getDeclaredMethods()) {
+                for (Method method : listener.getClass().getMethods()) {
                     if (method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(event.getClass()) && method.isAnnotationPresent(SubscribeEvent.class)) {
                         try {
                             method.invoke(listener, event);

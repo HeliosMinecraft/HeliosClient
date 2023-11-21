@@ -50,7 +50,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
 
             windowHeight = 50;
             for (SettingGroup settingGroup : module.settingGroups) {
-                windowHeight += Math.round(settingGroup.getGroupNameHeight() + 3);
+                windowHeight += Math.round(settingGroup.getGroupNameHeight() + 13);
                 if (!settingGroup.shouldRender()) continue;
                 for (Setting setting : settingGroup.getSettings()) {
                     if (!setting.shouldRender()) continue;
@@ -76,7 +76,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
 
             int yOffset = y;
             for (SettingGroup settingGroup : module.settingGroups) {
-                yOffset += Math.round(settingGroup.getGroupNameHeight() + 3);
+                yOffset += Math.round(settingGroup.getGroupNameHeight() + 12);
                 settingGroup.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
 
                 if (settingGroup.shouldRender()) {
@@ -99,7 +99,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
                     settingGroup.getSettings().forEach(this::resetSettingAnimation);
                 }
 
-                yOffset += Math.round(settingGroup.getGroupNameHeight() + 1);
+                yOffset += Math.round(settingGroup.getGroupNameHeight() + 3);
             }
         }
 

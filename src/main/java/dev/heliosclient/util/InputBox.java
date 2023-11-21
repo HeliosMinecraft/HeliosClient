@@ -246,6 +246,31 @@ public class InputBox implements Listener {
                 case GLFW.GLFW_KEY_ENTER,
                         GLFW.GLFW_KEY_KP_ENTER -> focused = false;
             }
+            if(keyCode == GLFW.GLFW_KEY_HOME ) {
+                if (Screen.hasShiftDown()) {
+                    if (!selecting) {
+                        selecting = true;
+                        selectionStart = 0;
+                    }
+                    selectionEnd = cursorPosition;
+                } else {
+                    selecting = false;
+                }
+                selectedAll = false;
+                cursorPosition = 0;
+            }
+            if( keyCode ==  GLFW.GLFW_KEY_END) {
+                if (Screen.hasShiftDown()) {
+                    if (!selecting) {
+                        selecting = true;
+                        selectionStart = cursorPosition;
+                    }
+                    selectionEnd = value.length();;
+                } else {
+                    selecting = false;
+                }
+                cursorPosition = value.length();
+            }
         }
     }
 

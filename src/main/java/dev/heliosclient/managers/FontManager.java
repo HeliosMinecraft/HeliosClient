@@ -46,8 +46,8 @@ public class FontManager implements Listener {
             FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
             FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
 
-            FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 11f);
-            FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 11f);
+            FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
+            FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
 
             EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
             HeliosClient.quadTree = new Quadtree(0);

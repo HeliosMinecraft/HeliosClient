@@ -100,8 +100,8 @@ public class CycleSetting extends Setting<Integer> {
             }
             module.onSettingChange(this);
         } else if (hovered((int) mouseX, (int) mouseY) && button == 1) {
-            if (value == options.size() - 1) {
-                value = 0;
+            if (value <= 0) {
+                value = options.size() - 1;
             } else {
                 value--;
             }

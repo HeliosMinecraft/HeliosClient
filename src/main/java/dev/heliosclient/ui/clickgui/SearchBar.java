@@ -1,6 +1,9 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.event.events.KeyHeldEvent;
+import dev.heliosclient.event.events.KeyPressedEvent;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
@@ -12,7 +15,7 @@ import java.awt.*;
 
 public class SearchBar extends InputBox {
     public SearchBar() {
-        super(145, 16, "", 25, InputMode.DIGITS_AND_CHARACTERS_AND_WHITESPACE);
+        super(145, 16, "", 25, InputMode.ALL);
     }
 
     @Override
@@ -54,6 +57,8 @@ public class SearchBar extends InputBox {
         }
         return true;
         */
-        return  super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
+
+
 }

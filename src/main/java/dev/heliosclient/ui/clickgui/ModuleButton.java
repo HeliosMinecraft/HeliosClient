@@ -10,6 +10,7 @@ import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.TimerUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
@@ -33,8 +34,6 @@ public class ModuleButton {
     public boolean settingsOpen = false;
     public int boxHeight = 0;
     public boolean animationDone = false;
-    AnimationUtils TextAnimation = new AnimationUtils();
-    AnimationUtils BackgroundAnimation = new AnimationUtils();
     float animationSpeed = 0.13f;
     float delay = 0;
     int settingHeight = 0;
@@ -42,22 +41,14 @@ public class ModuleButton {
     private float targetY;
     private float animationProgress = 0;
 
-
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
         this.width = CategoryPane.getWidth() - 2;
         this.height = 16;
         this.parentScreen = parentScreen;
-        BackgroundAnimation.FADE_SPEED = 0.2f;
-        TextAnimation.FADE_SPEED = 0.2f;
         hitBox = new Hitbox(x, y, width, height);
     }
 
-
-    public void startFading() {
-        BackgroundAnimation.startFading(faded, EasingType.LINEAR_IN);
-        TextAnimation.startFading(faded, EasingType.LINEAR_IN);
-    }
 
     public void updateSetting() {
         settingHeight = 2;
@@ -103,7 +94,8 @@ public class ModuleButton {
     public boolean hasFaded() {
         return faded;
     }
-
+    Color secondaryColor = new Color(ColorManager.INSTANCE.clickGuiSecondary());
+    Color primaryColor = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
     public void render(DrawContext drawContext, int mouseX, int mouseY, int x, int y, int maxWidth) {
         this.x = x;
         this.y = y;
@@ -120,22 +112,39 @@ public class ModuleButton {
 
         hitBox.set(x, y, width, height);
 
+     /*   float easedTime = Easing.ease(EasingType.CUBIC_IN_OUT, hoverAnimationTimer / 20.0f);
+        int alpha = (int) (easedTime * 255); // This will range alpha from 0 to 255
+        secondaryColor = new Color(ColorManager.INSTANCE.clickGuiSecondary());
+        primaryColor = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
+        Color fillColor =  module.isActive() ? secondaryColor : primaryColor;
+
+        fillColor = hitBox.contains(mouseX, mouseY) ? new Color(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(),alpha) : fillColor;
+      */
         Color fillColor = module.isActive() ? new Color(ColorManager.INSTANCE.clickGuiSecondary()) : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
-        BackgroundAnimation.drawFadingBox(drawContext, x + 1, y, width, height, fillColor.getRGB(), true, 2);
+      //  BackgroundAnimation.drawFadingBox(drawContext, x + 1, y, width, height, fillColor.getRGB(), true, 2);
+        if(hitBox.contains(mouseX,mouseY)) {
+            Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x + 1, y, width, height, 2, 4, fillColor.getRGB());
+        }
+        else{
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 1, y, width, height,2,fillColor.getRGB());
+        }
         if (settingsOpen && boxHeight >= 4) {
-            BackgroundAnimation.drawFadingBox(drawContext, x + 1, y + height, width, boxHeight + 2, ColorUtils.changeAlpha(fillColor, 100).getRGB(), true, 2);
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 1, y + height, width, boxHeight + 2,2,ColorUtils.changeAlpha(fillColor, 100).getRGB()); ;
         }
 
         int textY = y + (height - moduleNameHeight) / 2;
 
-        TextAnimation.drawFadingText(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor(), true);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor());
+        //TextAnimation.drawFadingText(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor(), true);
         if (hitBox.contains(mouseX, mouseY)) {
             Tooltip.tooltip.changeText(module.description);
         }
 
         if (module.keyBind.value != 0 && ClickGUI.keybinds) {
             String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
-            TextAnimation.drawFadingText(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor, true);
+            Renderer2D.drawFixedString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor);
+
+            //TextAnimation.drawFadingText(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor, true);
         }
     }
 
@@ -173,7 +182,10 @@ public class ModuleButton {
             }
             setBoxHeight(buttonYOffset - y - this.height - 2);
         }
-        return buttonYOffset > 0 ? buttonYOffset - y - this.height : 0;
+        else{
+            module.quickSettingGroups.forEach(settingGroup -> settingGroup.getSettings().forEach(this::resetAnimation));
+        }
+        return buttonYOffset > 2 ? buttonYOffset - y - this.height : 0;
     }
 
     private void resetAnimation(Setting setting) {

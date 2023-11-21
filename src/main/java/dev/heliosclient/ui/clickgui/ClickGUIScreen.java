@@ -82,10 +82,10 @@ public class ClickGUIScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        searchBar.mouseClicked(mouseX, mouseY, button);
         for (CategoryPane category : categoryPanes) {
             category.mouseClicked((int) mouseX, (int) mouseY, button);
         }
-        searchBar.mouseClicked(mouseX, mouseY, button);
         NavBar.navBar.mouseClicked((int) mouseX, (int) mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
