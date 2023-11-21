@@ -1,5 +1,8 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.KeyPressedEvent;
+import dev.heliosclient.event.events.KeyReleasedEvent;
 import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -33,6 +36,7 @@ public class ChatHighlight extends Module_ {
             .defaultValue(true)
             .build()
     );
+
 
     public ChatHighlight() {
         super("Chat Highlighter", "Highlights specified words in chat messages.", Categories.CHAT);

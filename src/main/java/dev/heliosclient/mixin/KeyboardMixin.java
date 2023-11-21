@@ -2,6 +2,7 @@ package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.events.CharTypedEvent;
+import dev.heliosclient.event.events.KeyHeldEvent;
 import dev.heliosclient.event.events.KeyPressedEvent;
 import dev.heliosclient.event.events.KeyReleasedEvent;
 import dev.heliosclient.managers.EventManager;
@@ -25,7 +26,7 @@ public abstract class KeyboardMixin {
 
     @Inject(method = "onKey", at = @At("TAIL"), cancellable = true)
     public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
-        if (action == GLFW.GLFW_PRESS || key == GLFW.GLFW_KEY_BACKSPACE || key == GLFW.GLFW_KEY_DELETE) { //Fixes a bug
+        if (action == GLFW.GLFW_PRESS) { //Fixes a bug
             KeyPressedEvent event = new KeyPressedEvent(window, key, scancode, action, modifiers);
             EventManager.postEvent(event);
             if (event.isCanceled()) {
@@ -43,6 +44,11 @@ public abstract class KeyboardMixin {
                 && !(mc.currentScreen instanceof GameMenuScreen)) {
             ClickGUIScreen.INSTANCE.onLoad();
             MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
+        }
+        KeyHeldEvent event = new KeyHeldEvent(window, key, scancode, action, modifiers);
+        EventManager.postEvent(event);
+        if (event.isCanceled()) {
+            info.cancel();
         }
     }
 

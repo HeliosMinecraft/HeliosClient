@@ -203,7 +203,7 @@ public class DamageUtils implements Listener {
     }
 
     @SubscribeEvent
-    private void onPlayerJoinEvent(PlayerJoinEvent event) {
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
         explosion = new Explosion(HeliosClient.MC.world, null, 0, 0, 0, 6, false, Explosion.DestructionType.DESTROY);
     }
 }

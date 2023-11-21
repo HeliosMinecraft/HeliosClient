@@ -2,9 +2,7 @@ package dev.heliosclient.module;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.PlayerMotionEvent;
-import dev.heliosclient.event.events.RenderEvent;
-import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.*;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.modules.NotificationModule;
@@ -65,6 +63,18 @@ public abstract class Module_ implements Listener {
             .defaultValue(0)
             .build()
     );
+    /**
+     * Key-bind setting. Don't remove, that will cause crash.
+     */
+    public BooleanSetting toggleOnBindRelease = sgbind.add(new BooleanSetting.Builder()
+            .name("Toggle On Bind Release")
+            .description("Toggle on if key is being held and off if key is released")
+            .module(this)
+            .value(false)
+            .defaultValue(false)
+            .build()
+    );
+
     /**
      * Value indicating if module is enabled. Don't remove, that will cause crash.
      */

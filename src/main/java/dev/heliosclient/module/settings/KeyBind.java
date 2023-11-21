@@ -1,6 +1,7 @@
 package dev.heliosclient.module.settings;
 
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.KeycodeToString;
@@ -25,6 +26,7 @@ public class KeyBind extends Setting<Integer> {
         this.description = description;
         this.value = value;
         this.height = 24;
+        EventManager.register(this);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package dev.heliosclient.managers;
 
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.KeyPressedEvent;
+import dev.heliosclient.event.events.KeyReleasedEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Module_;
@@ -11,14 +13,9 @@ import java.util.ArrayList;
 
 public class KeybindManager implements Listener {
     public static KeybindManager INSTANCE = new KeybindManager();
-    public static ArrayList<Integer> wasPressed = new ArrayList<>();
     protected static MinecraftClient mc = MinecraftClient.getInstance();
 
-    public KeybindManager() {
-        EventManager.register(this);
-    }
-
-    @SubscribeEvent
+  /*  @SubscribeEvent
     public static void onTick(TickEvent event) {
         if (mc == null || mc.player == null) return; // TO BE CHANGED
         if (mc.currentScreen != null) return;
@@ -42,6 +39,38 @@ public class KeybindManager implements Listener {
 
             } else {
                 wasPressed.remove(key);
+            }
+        }
+    }
+
+   */
+    public KeybindManager(){
+        EventManager.register(this);
+    }
+    @SubscribeEvent
+    public void keyPressedEvent(KeyPressedEvent event){
+        if (mc.currentScreen != null) return;
+
+        for (Module_ module : ModuleManager.INSTANCE.modules) {
+            if (module.getKeybind() != null && module.getKeybind() != 0 && event.getKey() == module.getKeybind()) {
+                if (module.toggleOnBindRelease.value) {
+                    module.onEnable();
+                } else {
+                    module.toggle();
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void keyReleasedEvent(KeyReleasedEvent event){
+        if (mc.currentScreen != null) return;
+
+        for (Module_ module : ModuleManager.INSTANCE.modules) {
+            if (module.getKeybind() != null && module.getKeybind() != 0 && event.getKey() == module.getKeybind()) {
+                if (module.toggleOnBindRelease.value) {
+                    module.onDisable();
+                }
             }
         }
     }

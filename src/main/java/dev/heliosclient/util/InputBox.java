@@ -2,6 +2,7 @@ package dev.heliosclient.util;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.CharTypedEvent;
+import dev.heliosclient.event.events.KeyHeldEvent;
 import dev.heliosclient.event.events.KeyPressedEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
@@ -241,6 +242,42 @@ public class InputBox implements Listener {
                     }
                     selectedAll = false;
 
+                }
+                case GLFW.GLFW_KEY_ENTER,
+                        GLFW.GLFW_KEY_KP_ENTER -> focused = false;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void keyHeld(KeyHeldEvent event) {
+        int keyCode = event.getKey();
+        if (focused && canWrite()) {
+            switch (keyCode) {
+                case GLFW.GLFW_KEY_BACKSPACE -> {
+                    if (!value.isEmpty() && cursorPosition > 0) {
+                        if (selecting) {
+                            value = value.substring(0, selectionStart) + value.substring(selectionEnd);
+                            cursorPosition = selectionStart;
+                            selecting = false;
+                            selectionStart = 0;
+                            selectionEnd = 0;
+                        } else {
+                            value = value.substring(0, cursorPosition - 1) + value.substring(cursorPosition);
+                            cursorPosition--;
+                        }
+                    }
+                }
+                case GLFW.GLFW_KEY_DELETE -> {
+                    if (selecting) {
+                        value = value.substring(0, selectionStart) + value.substring(selectionEnd);
+                        cursorPosition = selectionStart;
+                        selecting = false;
+                        selectionStart = 0;
+                        selectionEnd = 0;
+                    } else if (cursorPosition != value.length()) {
+                        value = value.substring(0, cursorPosition) + value.substring(cursorPosition + 1);
+                    }
                 }
                 case GLFW.GLFW_KEY_ENTER,
                         GLFW.GLFW_KEY_KP_ENTER -> focused = false;
