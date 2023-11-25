@@ -12,9 +12,11 @@
     "MixinServerPlayNetworkHandler"
   ],
   "client": [
+    "CapeFeatureRendererMixin",
     "ChatInputSuggestorMixin",
     "ClientConnectionMixin",
     "ClientPlayerEntityMixin",
+    "ElytraFeatureRendererMixin",
     "GameRendererMixin",
     "InGameHudMixin",
     "KeyboardMixin",

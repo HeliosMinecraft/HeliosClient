@@ -1,6 +1,6 @@
 package dev.heliosclient.mixin;
 
-import dev.heliosclient.event.events.BlockBreakEvent;
+import dev.heliosclient.event.events.block.BlockBreakEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.server.network.ServerPlayerEntity;

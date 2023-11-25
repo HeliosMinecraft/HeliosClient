@@ -2,7 +2,7 @@ package dev.heliosclient.util;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.PlayerJoinEvent;
+import dev.heliosclient.event.events.player.PlayerJoinEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.interfaces.IExplosion;
 import net.minecraft.enchantment.EnchantmentHelper;

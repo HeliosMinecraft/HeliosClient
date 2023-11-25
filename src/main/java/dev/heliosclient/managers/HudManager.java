@@ -2,7 +2,7 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.RenderEvent;
+import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;

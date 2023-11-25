@@ -1,7 +1,7 @@
 package dev.heliosclient.module.modules;
 
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.PlayerMotionEvent;
+import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.DoubleSetting;

@@ -28,6 +28,7 @@ public class FontLoader {
         if (!fontsDir.exists()) {
             fontsDir.mkdirs();
         }
+
         // Copy the default font file from the assets folder to the fonts directory
         for (String s : DEFAULT_FONT) {
             File defaultFontFile = new File(fontsDir, s);

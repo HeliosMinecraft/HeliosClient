@@ -1,15 +1,11 @@
 package dev.heliosclient.managers;
 
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.KeyPressedEvent;
-import dev.heliosclient.event.events.KeyReleasedEvent;
-import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.input.KeyPressedEvent;
+import dev.heliosclient.event.events.input.KeyReleasedEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Module_;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.InputUtil;
-
-import java.util.ArrayList;
 
 public class KeybindManager implements Listener {
     public static KeybindManager INSTANCE = new KeybindManager();

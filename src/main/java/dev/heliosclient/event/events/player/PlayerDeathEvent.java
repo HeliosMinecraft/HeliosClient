@@ -1,14 +1,15 @@
-package dev.heliosclient.event.events;
+package dev.heliosclient.event.events.player;
 
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 import net.minecraft.entity.player.PlayerEntity;
 
 @Cancelable
-public class PlayerJoinEvent extends Event {
+
+public class PlayerDeathEvent extends Event {
     private final PlayerEntity player;
 
-    public PlayerJoinEvent(PlayerEntity player) {
+    public PlayerDeathEvent(PlayerEntity player) {
         this.player = player;
     }
 
@@ -16,3 +17,4 @@ public class PlayerJoinEvent extends Event {
         return player;
     }
 }
+

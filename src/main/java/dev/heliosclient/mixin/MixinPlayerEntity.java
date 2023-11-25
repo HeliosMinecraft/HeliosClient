@@ -1,9 +1,9 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.events.ItemDropEvent;
-import dev.heliosclient.event.events.PlayerDamageEvent;
-import dev.heliosclient.event.events.PlayerDeathEvent;
+import dev.heliosclient.event.events.player.ItemDropEvent;
+import dev.heliosclient.event.events.player.PlayerDamageEvent;
+import dev.heliosclient.event.events.player.PlayerDeathEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;

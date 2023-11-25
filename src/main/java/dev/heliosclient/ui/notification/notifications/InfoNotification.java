@@ -2,6 +2,7 @@ package dev.heliosclient.ui.notification.notifications;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.NotificationModule;
 import dev.heliosclient.ui.notification.Notification;
 import dev.heliosclient.util.Renderer2D;
@@ -19,8 +20,8 @@ public class InfoNotification extends Notification {
         this.description = description;
         this.endDelay = endDelay;
         this.WIDTH = 50;
-        if (NotificationModule.INSTANCE.playSound.value && NotificationModule.INSTANCE.isActive()) {
-            SoundUtils.playSound(soundEvent, (float) (NotificationModule.INSTANCE.volume.value / 100f), pitch);
+        if (ModuleManager.notificationModule.playSound.value && ModuleManager.notificationModule.isActive()) {
+            SoundUtils.playSound(soundEvent, (float) (ModuleManager.notificationModule.volume.value / 100f), pitch);
         }
     }
 

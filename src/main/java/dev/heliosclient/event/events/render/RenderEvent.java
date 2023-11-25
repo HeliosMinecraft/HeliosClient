@@ -1,4 +1,4 @@
-package dev.heliosclient.event.events;
+package dev.heliosclient.event.events.render;
 
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;

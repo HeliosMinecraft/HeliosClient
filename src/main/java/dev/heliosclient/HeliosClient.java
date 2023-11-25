@@ -13,8 +13,13 @@ import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.DamageUtils;
 import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.managers.CapeManager;
+import dev.heliosclient.util.cape.CapeSynchronizer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +49,19 @@ public class HeliosClient implements ModInitializer {
 
         Categories.registerCategories();
         SoundUtils.registerSounds();
+
+
         loadConfig();
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            if(MC.player !=null) {
+                for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+                    Identifier capeTexture = CapeManager.cape;
+                    CapeSynchronizer.sendCapeSyncPacket(player, capeTexture, CapeManager.getElytraTexture(MC.player));
+                }
+            }
+        });
+
 
         EventManager.register(fontManager);
         EventManager.register(notificationManager);
@@ -56,6 +73,9 @@ public class HeliosClient implements ModInitializer {
             quadTree = new Quadtree(0);
         }
         ClickGUIScreen.INSTANCE.onLoad();
+
+        CapeManager.capes = CapeManager.loadCapes();
+        CapeSynchronizer.registerCapeSyncPacket();
     }
 
     public void loadConfig() {

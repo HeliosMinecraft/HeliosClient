@@ -2,7 +2,7 @@ package dev.heliosclient.module.settings;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.FontChangeEvent;
+import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
@@ -271,7 +271,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
             updateHandles();
         }
 
-        hexInput.mouseClicked(mouseX, mouseY, button);
         if (hoveredOverGradientBox(mouseX, mouseY)) {
             handleX = (int) (mouseX - x - offsetX);
             handleY = (int) (mouseY - y - offsetY);

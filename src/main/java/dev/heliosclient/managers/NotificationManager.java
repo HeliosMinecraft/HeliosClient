@@ -2,7 +2,7 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.RenderEvent;
+import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.modules.NotificationModule;
@@ -18,7 +18,7 @@ public class NotificationManager implements Listener {
     private final Deque<Notification> notifications = new ArrayDeque<>();
 
     public void addNotification(Notification notification) {
-        if (NotificationModule.INSTANCE.isActive()) {
+        if (ModuleManager.notificationModule.isActive()) {
             notifications.addFirst(notification);
             updatePositions();
         }
@@ -36,7 +36,7 @@ public class NotificationManager implements Listener {
 
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT tickEvent) {
-        if (NotificationModule.INSTANCE.isActive()) {
+        if (ModuleManager.notificationModule.isActive()) {
             notifications.removeIf(Notification::isExpired);
             for (Notification notification : notifications) {
                 notification.update();
@@ -47,7 +47,7 @@ public class NotificationManager implements Listener {
 
     @SubscribeEvent
     public void render(RenderEvent event) {
-        if (NotificationModule.INSTANCE.isActive()) {
+        if (ModuleManager.notificationModule.isActive()) {
             Iterator<Notification> iterator = notifications.descendingIterator();
             while (iterator.hasNext()) {
                 Notification notification = iterator.next();

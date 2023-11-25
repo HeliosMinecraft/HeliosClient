@@ -1,4 +1,4 @@
-package dev.heliosclient.event.events;
+package dev.heliosclient.event.events.render;
 
 import dev.heliosclient.event.Event;
 import net.minecraft.client.util.math.MatrixStack;

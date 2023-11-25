@@ -121,11 +121,10 @@ public class DoubleSetting extends Setting<Double> {
             value = defaultValue;
             module.onSettingChange(this);
         }
-
-        if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.mouseClicked(mouseX, mouseY, button)) {
+        if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.isFocused()) {
             this.sliding = true;
         }
-        if (!inputBox.mouseClicked(mouseX, mouseY, button)) {
+        if (!inputBox.isFocused()) {
             inputBox.setFocused(false);
         }
     }

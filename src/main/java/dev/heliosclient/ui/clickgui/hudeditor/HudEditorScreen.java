@@ -1,7 +1,7 @@
 package dev.heliosclient.ui.clickgui.hudeditor;
 
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.KeyPressedEvent;
+import dev.heliosclient.event.events.input.KeyPressedEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.managers.EventManager;

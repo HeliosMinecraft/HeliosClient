@@ -2,7 +2,7 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.FontChangeEvent;
+import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;

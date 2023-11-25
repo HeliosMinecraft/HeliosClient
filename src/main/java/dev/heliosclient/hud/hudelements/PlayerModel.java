@@ -27,7 +27,7 @@ public class PlayerModel extends HudElement {
         if (player == null) {
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, this.y, width - 1, height - 1, Color.BLACK.getRGB());
         } else {
-            Renderer2D.drawEntity(drawContext, x + width / 2, y + height - 3, 25, player);
+            Renderer2D.drawEntity(drawContext, x + width / 2 - 1, y + height - 6, 25, player);
         }
     }
 

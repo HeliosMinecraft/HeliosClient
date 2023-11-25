@@ -1,6 +1,11 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.input.MouseClickEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
@@ -23,7 +28,7 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 import java.util.AbstractMap;
 
-public class ModuleButton {
+public class ModuleButton implements Listener {
     public final Screen parentScreen;
     private final Hitbox hitBox;
     private final float delayBetweenSettings = 0.1f;
@@ -40,6 +45,8 @@ public class ModuleButton {
     private boolean faded = true;
     private float targetY;
     private float animationProgress = 0;
+    public Screen screen;
+    public boolean collapsed = false;
 
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
@@ -47,6 +54,7 @@ public class ModuleButton {
         this.height = 16;
         this.parentScreen = parentScreen;
         hitBox = new Hitbox(x, y, width, height);
+        EventManager.register(this);
     }
 
 
@@ -94,9 +102,9 @@ public class ModuleButton {
     public boolean hasFaded() {
         return faded;
     }
-    Color secondaryColor = new Color(ColorManager.INSTANCE.clickGuiSecondary());
-    Color primaryColor = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
+
     public void render(DrawContext drawContext, int mouseX, int mouseY, int x, int y, int maxWidth) {
+        this.screen = HeliosClient.MC.currentScreen;
         this.x = x;
         this.y = y;
 
@@ -112,16 +120,7 @@ public class ModuleButton {
 
         hitBox.set(x, y, width, height);
 
-     /*   float easedTime = Easing.ease(EasingType.CUBIC_IN_OUT, hoverAnimationTimer / 20.0f);
-        int alpha = (int) (easedTime * 255); // This will range alpha from 0 to 255
-        secondaryColor = new Color(ColorManager.INSTANCE.clickGuiSecondary());
-        primaryColor = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
-        Color fillColor =  module.isActive() ? secondaryColor : primaryColor;
-
-        fillColor = hitBox.contains(mouseX, mouseY) ? new Color(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(),alpha) : fillColor;
-      */
         Color fillColor = module.isActive() ? new Color(ColorManager.INSTANCE.clickGuiSecondary()) : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
-      //  BackgroundAnimation.drawFadingBox(drawContext, x + 1, y, width, height, fillColor.getRGB(), true, 2);
         if(hitBox.contains(mouseX,mouseY)) {
             Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x + 1, y, width, height, 2, 4, fillColor.getRGB());
         }
@@ -135,7 +134,6 @@ public class ModuleButton {
         int textY = y + (height - moduleNameHeight) / 2;
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor());
-        //TextAnimation.drawFadingText(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor(), true);
         if (hitBox.contains(mouseX, mouseY)) {
             Tooltip.tooltip.changeText(module.description);
         }
@@ -143,8 +141,6 @@ public class ModuleButton {
         if (module.keyBind.value != 0 && ClickGUI.keybinds) {
             String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
             Renderer2D.drawFixedString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor);
-
-            //TextAnimation.drawFadingText(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor, true);
         }
     }
 
@@ -194,30 +190,35 @@ public class ModuleButton {
         setting.setAnimationProgress(0.5f);
     }
 
-    public boolean mouseClicked(int mouseX, int mouseY, int button, boolean collapsed) {
-        if (!collapsed) {
-            setFaded(false);
-            if (hitBox.contains(mouseX, mouseY)) {
-                if (button == 0) {
-                    module.toggle();
-                    return true;
-                } else if (button == 1) {
-                    MinecraftClient.getInstance().setScreen(new SettingsScreen(module, parentScreen));
-                    return true;
-                } else if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
-                    this.module.settingsOpen = !this.module.settingsOpen;
-                    this.settingsOpen = this.module.settingsOpen;
-                    return true;
+   @SubscribeEvent
+    public boolean mouseClicked(MouseClickEvent event) {
+        if (screen != null && event.getScreen() == screen){
+            double mouseX = event.getMouseX();
+            double mouseY = event.getMouseY();
+            int button = event.getButton();
+            if (!collapsed) {
+                setFaded(false);
+                if (hitBox.contains(mouseX, mouseY)) {
+                    if (button == 0) {
+                        module.toggle();
+                        return true;
+                    } else if (button == 1) {
+                        MinecraftClient.getInstance().setScreen(new SettingsScreen(module, parentScreen));
+                        return true;
+                    } else if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
+                        this.module.settingsOpen = !this.module.settingsOpen;
+                        this.settingsOpen = this.module.settingsOpen;
+                        return true;
+                    }
+                }
+                if (this.module.settingsOpen) {
+                    for (SettingGroup settingGroup : module.quickSettingGroups) {
+                        settingGroup.mouseClickedBuilder(mouseX, mouseY);
+                        if (!settingGroup.shouldRender()) continue;
+                        settingGroup.mouseClicked(mouseX, mouseY, button);
+                    }
                 }
             }
-            if (this.module.settingsOpen) {
-                for (SettingGroup settingGroup : module.quickSettingGroups) {
-                    settingGroup.mouseClickedBuilder(mouseX, mouseY);
-                    if (!settingGroup.shouldRender()) continue;
-                    settingGroup.mouseClicked(mouseX, mouseY, button);
-                }
-            }
-        }
 
         if (collapsed) {
             for (SettingGroup settingGroup : module.quickSettingGroups) {
@@ -229,6 +230,7 @@ public class ModuleButton {
             animationDone = false;
             setAnimationProgress(0.0f);
         }
+    }
         return false;
     }
 

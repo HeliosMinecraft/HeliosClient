@@ -1,9 +1,11 @@
 package dev.heliosclient.util;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.CharTypedEvent;
-import dev.heliosclient.event.events.KeyHeldEvent;
-import dev.heliosclient.event.events.KeyPressedEvent;
+import dev.heliosclient.event.events.input.CharTypedEvent;
+import dev.heliosclient.event.events.input.KeyHeldEvent;
+import dev.heliosclient.event.events.input.KeyPressedEvent;
+import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.util.animation.AnimationUtils;
@@ -31,15 +33,15 @@ public class InputBox implements Listener {
     protected int characterLimit;
     protected boolean selecting = false;
     protected boolean selectedAll = false;
-
+    protected Screen screen;
     public InputBox(int width, int height, String value, int characterLimit, InputMode inputMode) {
         this.width = width;
         this.height = height;
         this.value = value;
         this.characterLimit = characterLimit;
         this.textSegments = new ArrayList<>();
-        EventManager.register(this);
         this.inputMode = inputMode;
+        EventManager.register(this);
     }
 
     public void setText(String text) {
@@ -57,14 +59,19 @@ public class InputBox implements Listener {
             startIndex = endIndex;
         }
     }
-
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y) && mouseY <= (y + height));
-        cursorPosition = value.length();
-        return focused;
+    @SubscribeEvent
+    public void mouseClicked(MouseClickEvent event) {
+        if(screen != null && event.getScreen()  == screen) {
+            double mouseX = event.getMouseX();
+            double mouseY = event.getMouseY();
+            focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y) && mouseY <= (y + height));
+            cursorPosition = value.length();
+        }
     }
 
+
     public void update(int x, int y) {
+        this.screen = HeliosClient.MC.currentScreen;
         setText(value);
 
         this.x = x;
@@ -148,7 +155,6 @@ public class InputBox implements Listener {
 
 
         drawSelectionBox(drawContext, textY, textHeight);
-
     }
 
     public void renderBackground(DrawContext drawContext) {

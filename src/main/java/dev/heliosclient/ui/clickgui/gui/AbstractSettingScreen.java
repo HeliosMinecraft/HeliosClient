@@ -44,7 +44,6 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        window.mouseClicked(mouseX, mouseY);
         for (SettingGroup settingGroup : module.settingGroups) {
             settingGroup.mouseClickedBuilder(mouseX, mouseY);
             if (!settingGroup.shouldRender()) continue;

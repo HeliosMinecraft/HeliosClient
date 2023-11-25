@@ -48,9 +48,11 @@ public class CycleSetting extends Setting<Integer> {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         if (options.isEmpty() || options.size() - 1 < value) {
-            Renderer2D.drawFixedString(drawContext.getMatrices(), "No option found!", x + 10, y + 28, 0xFFFF0000);
+            Renderer2D.drawFixedString(drawContext.getMatrices(), "No option found!", x + 2, y + 8, 0xFFFF0000);
         }
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + options.get(value), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
+        else {
+            Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + options.get(value), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
+        }
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -68,9 +70,11 @@ public class CycleSetting extends Setting<Integer> {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         if (options.isEmpty() || options.size() - 1 < value) {
-            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "No option found!", x + 10, y + 24, 0xFFFF0000);
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "No option found!", x + 2, y + 4, 0xFFFF0000);
         }
-        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
+        else {
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
+        }
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;

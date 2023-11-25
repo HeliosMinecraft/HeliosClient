@@ -1,17 +1,17 @@
-package dev.heliosclient.event.events;
+package dev.heliosclient.event.events.input;
 
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 
 @Cancelable
-public class KeyHeldEvent extends Event {
+public class KeyReleasedEvent extends Event {
     private final long window;
     private final int key;
     private final int scancode;
     private final int action;
     private final int modifiers;
 
-    public KeyHeldEvent(long window, int key, int scancode, int action, int modifiers) {
+    public KeyReleasedEvent(long window, int key, int scancode, int action, int modifiers) {
         this.window = window;
         this.key = key;
         this.scancode = scancode;

@@ -7,7 +7,6 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 
 public class NotificationModule extends Module_ {
-    public static NotificationModule INSTANCE = new NotificationModule();
     private final SettingGroup sgNotifications = new SettingGroup("Notifications");
     private final SettingGroup sgConfig = new SettingGroup("Config");
     public BooleanSetting moduleNotification = sgNotifications.add(new BooleanSetting.Builder()

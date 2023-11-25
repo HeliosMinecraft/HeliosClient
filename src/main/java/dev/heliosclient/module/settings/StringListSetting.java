@@ -78,8 +78,6 @@ public class StringListSetting extends Setting<String[]> {
             if (hoveredOverRemove(mouseX, mouseY, boxOffset)) {
                 inputBoxes.remove(i); // Remove the box at the current index
                 i--; // Decrement the index to account for the removal
-            } else {
-                box.mouseClicked(mouseX, mouseY, button);
             }
             boxOffset += 16;
         }

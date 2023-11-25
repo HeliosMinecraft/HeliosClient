@@ -83,7 +83,7 @@ public abstract class Setting<T> implements Listener {
             Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 195, y + (float) this.height / 2 - 5.5f, 11, 11, 0.4f, (hoveredOverReset(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
 
 
-            FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uEA1D", (x + 203.5f - FontRenderers.Small_iconRenderer.getStringWidth("\uEA1D")), (y + (float) height / 2 - 3.6f), -1);
+            FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uEA1D", (x + 203.5f - FontRenderers.Small_iconRenderer.getStringWidth("\uEA1D")), (y + (float) height / 2 - 3.4f), -1);
         }
     }
 

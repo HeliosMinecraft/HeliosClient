@@ -1,10 +1,10 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.events.CharTypedEvent;
-import dev.heliosclient.event.events.KeyHeldEvent;
-import dev.heliosclient.event.events.KeyPressedEvent;
-import dev.heliosclient.event.events.KeyReleasedEvent;
+import dev.heliosclient.event.events.input.CharTypedEvent;
+import dev.heliosclient.event.events.input.KeyHeldEvent;
+import dev.heliosclient.event.events.input.KeyPressedEvent;
+import dev.heliosclient.event.events.input.KeyReleasedEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import net.minecraft.client.Keyboard;

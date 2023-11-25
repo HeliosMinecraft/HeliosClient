@@ -1,7 +1,11 @@
 package dev.heliosclient.ui.clickgui.gui;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.input.MouseClickEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.util.ColorUtils;
@@ -12,11 +16,12 @@ import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.awt.*;
 import java.util.List;
 
-public class Window {
+public class Window implements Listener {
 
     private final IWindowContentRenderer contentRenderer;
     public TextButton backButton = new TextButton("< Back");
@@ -26,6 +31,7 @@ public class Window {
     private boolean isCollapsible;
     private boolean isCollapsed = false;
     private Runnable backButtonTask;
+    public Screen screen;
 
     public Window(int windowHeight, int windowWidth, boolean collapsible, IWindowContentRenderer contentRenderer) {
         this.windowHeight = windowHeight;
@@ -41,6 +47,7 @@ public class Window {
             ClickGUIScreen.INSTANCE.onLoad();
             MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
         };
+        EventManager.register(this);
     }
 
     public Window(int windowHeight, int windowWidth, boolean collapsible, int x, int y, IWindowContentRenderer contentRenderer) {
@@ -51,6 +58,7 @@ public class Window {
         offsetY = 0;
         this.isCollapsible = collapsible;
         this.contentRenderer = contentRenderer;
+        EventManager.register(this);
     }
 
     public void setCollapsible(boolean collapsible) {
@@ -65,6 +73,7 @@ public class Window {
     }
 
     public void render(DrawContext drawContext, int mouseX, int mouseY, String name, String description, TextRenderer textRenderer) {
+        this.screen = HeliosClient.MC.currentScreen;
         int screenHeight = drawContext.getScaledWindowHeight();
 
         if (screenHeight > windowHeight) {
@@ -107,13 +116,17 @@ public class Window {
             // Render the collapse button
             collapseButton.render(drawContext, textRenderer, x + windowWidth - collapseButton.width - 4, y + 4, mouseX, mouseY);
         }
-
     }
 
-    public void mouseClicked(double mouseX, double mouseY) {
-        backButton.mouseClicked((int) mouseX, (int) mouseY, backButtonTask);
-        if (isCollapsible) {
-            collapseButton.mouseClicked((int) mouseX, (int) mouseY, () -> isCollapsed = !isCollapsed);
+    @SubscribeEvent
+    public void mouseClicked(MouseClickEvent event) {
+        if(screen != null && event.getScreen()  == screen) {
+            double mouseX = event.getMouseX();
+            double mouseY = event.getMouseY();
+            backButton.mouseClicked((int) mouseX, (int) mouseY, backButtonTask);
+            if (isCollapsible) {
+                collapseButton.mouseClicked((int) mouseX, (int) mouseY, () -> isCollapsed = !isCollapsed);
+            }
         }
     }
 

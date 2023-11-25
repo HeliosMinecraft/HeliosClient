@@ -1,4 +1,4 @@
-package dev.heliosclient.event.events;
+package dev.heliosclient.event.events.client;
 
 import dev.heliosclient.event.Event;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;

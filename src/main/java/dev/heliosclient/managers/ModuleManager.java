@@ -9,8 +9,12 @@ import java.util.ArrayList;
 public class ModuleManager {
     public static ModuleManager INSTANCE = new ModuleManager();
     public ArrayList<Module_> modules = new ArrayList<>();
+    public static CapeModule capeModule;
+    public static NotificationModule notificationModule;
 
     public ModuleManager() {
+        capeModule = new CapeModule();
+        notificationModule = new NotificationModule();
         registerModules(
                 new Fly(),
                 new NoFall(),
@@ -21,7 +25,8 @@ public class ModuleManager {
                 new CustomFov(),
                 new Test(),
                 new ChatHighlight(),
-                NotificationModule.INSTANCE
+                notificationModule,
+                capeModule
         );
     }
 

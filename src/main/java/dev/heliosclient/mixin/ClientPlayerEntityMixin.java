@@ -1,7 +1,7 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.events.PlayerMotionEvent;
+import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;

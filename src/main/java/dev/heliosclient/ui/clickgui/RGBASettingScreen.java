@@ -46,7 +46,6 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
                 HeliosClient.MC.setScreen(setting.getParentScreen());
             }
         });
-        window.mouseClicked(mouseX, mouseY);
         setting.mouse(mouseX, mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }

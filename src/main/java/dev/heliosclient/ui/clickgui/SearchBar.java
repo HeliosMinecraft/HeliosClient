@@ -1,9 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.event.events.KeyHeldEvent;
-import dev.heliosclient.event.events.KeyPressedEvent;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
@@ -47,17 +44,6 @@ public class SearchBar extends InputBox {
         }
 
         drawSelectionBox(drawContext, textY, textHeight);
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-       /* if(!super.mouseClicked(mouseX, mouseY, button)){
-            setText("");
-            return false;
-        }
-        return true;
-        */
-        return super.mouseClicked(mouseX, mouseY, button);
     }
 
 

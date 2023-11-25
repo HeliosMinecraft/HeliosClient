@@ -1,4 +1,4 @@
-package dev.heliosclient.event.events;
+package dev.heliosclient.event.events.player;
 
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
@@ -6,10 +6,10 @@ import net.minecraft.item.ItemStack;
 
 @Cancelable
 
-public class ItemPickupEvent extends Event {
+public class ItemDropEvent extends Event {
     private final ItemStack stack;
 
-    public ItemPickupEvent(ItemStack stack) {
+    public ItemDropEvent(ItemStack stack) {
         this.stack = stack;
     }
 
@@ -17,4 +17,3 @@ public class ItemPickupEvent extends Event {
         return stack;
     }
 }
-

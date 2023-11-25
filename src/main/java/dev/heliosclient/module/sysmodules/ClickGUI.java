@@ -1,7 +1,7 @@
 package dev.heliosclient.module.sysmodules;
 
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.FontChangeEvent;
+import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
@@ -185,7 +185,7 @@ public class ClickGUI extends Module_ {
        Tooltip.tooltip.fixedPos = TooltipPos.value;
 
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
-       pause = Pause.value;
+        pause = Pause.value;
         keybinds = Keybinds.value;
 
         fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);

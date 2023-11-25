@@ -57,6 +57,7 @@ public class ClickGUIScreen extends Screen {
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
+
         for (CategoryPane category : categoryPanes) {
             category.y += scrollY * 10;
             category.x += scrollX * 10;
@@ -82,10 +83,6 @@ public class ClickGUIScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        searchBar.mouseClicked(mouseX, mouseY, button);
-        for (CategoryPane category : categoryPanes) {
-            category.mouseClicked((int) mouseX, (int) mouseY, button);
-        }
         NavBar.navBar.mouseClicked((int) mouseX, (int) mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }

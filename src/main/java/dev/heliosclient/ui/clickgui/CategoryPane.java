@@ -1,12 +1,13 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.FontChangeEvent;
+import dev.heliosclient.event.events.client.FontChangeEvent;
+import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
-import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -43,6 +44,7 @@ public class CategoryPane implements Listener {
     float delay = 0;
     int categoryNameHeight = 2;
     private int scrollOffset = 0;
+    public Screen screen;
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
         this.category = category;
@@ -116,6 +118,7 @@ public class CategoryPane implements Listener {
     }
 
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
+        this.screen = HeliosClient.MC.currentScreen;
         int maxWidth = 0;
         height = 4;
         for (ModuleButton m : moduleButtons) {
@@ -185,20 +188,27 @@ public class CategoryPane implements Listener {
         return mouseX > x + 2 && mouseX < x + (width - 2) && mouseY > y + categoryNameHeight + 14 && mouseY < y + height;
     }
 
-    public void mouseClicked(int mouseX, int mouseY, int button) {
-        for (ModuleButton moduleButton : moduleButtons) {
-            if (moduleButton.mouseClicked(mouseX, mouseY, button, collapsed)) return;
-        }
-        if (hovered(mouseX, mouseY) && button == 1) collapsed = !collapsed;
-        else if (hovered(mouseX, mouseY) && button == 0) {
-            startX = mouseX - x;
-            startY = mouseY - y;
-            dragging = true;
-        }
-        if (button == 2) {
-            startX = mouseX - x;
-            startY = mouseY - y;
-            dragging = true;
+    @SubscribeEvent
+    public void mouseClicked(MouseClickEvent event) {
+        if(screen != null && event.getScreen() == screen) {
+            int mouseX = (int) event.getMouseX();
+            int mouseY = (int) event.getMouseY();
+            int button = event.getButton();
+
+            if (hovered(mouseX, mouseY) && button == 1) collapsed = !collapsed;
+            else if (hovered(mouseX, mouseY) && button == 0) {
+                startX = mouseX - x;
+                startY = mouseY - y;
+                dragging = true;
+            }
+            if (button == 2) {
+                startX = mouseX - x;
+                startY = mouseY - y;
+                dragging = true;
+            }
+            for (ModuleButton moduleButton : moduleButtons) {
+                moduleButton.collapsed = collapsed;
+            }
         }
     }
 

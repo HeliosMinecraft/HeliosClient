@@ -1,6 +1,6 @@
 package dev.heliosclient.mixin;
 
-import dev.heliosclient.event.events.ItemPickupEvent;
+import dev.heliosclient.event.events.player.ItemPickupEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
