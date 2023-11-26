@@ -39,13 +39,6 @@ public class Fullbright extends Module_ {
             .shouldRender(() -> mode.value == 0)
             .roundingPlace(0)
             .build());
-    CycleSetting stringSetting = new CycleSetting.Builder()
-            .module(this)
-            .listValue(0)
-            .value(Arrays.asList("Option 1", "Option 2"))
-            .defaultValue(Arrays.asList("Option 1", "Option 2"))
-            .build();
-
 
     public Fullbright() {
         super("Fullbright", "Allows you to see in the dark.", Categories.RENDER);
@@ -53,21 +46,26 @@ public class Fullbright extends Module_ {
 
         addSettingGroup(sgGeneral);
 
-        addQuickSettingGroup(sgGeneral);
+        addQuickSettings(sgGeneral.getSettings());
     }
 
     @Override
     public void onEnable() {
         super.onEnable();
+        if (mode.value == 0 && mc.player != null) {
+            ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(gamma.value);
+            mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
+        } else if (mc.player != null && mode.value == 1) {
+            mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 254, true, false, false));
+        }
     }
 
     @Override
     public void onSettingChange(Setting setting) {
         super.onSettingChange(setting);
         if (active.value) {
-            if (mode.value == 0) {
+            if (mode.value == 0 && mc.player != null) {
                 ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(gamma.value);
-                assert mc.player != null;
                 mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
             } else if (mc.player != null && mode.value == 1) {
                 mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 254, true, false, false));

@@ -27,7 +27,8 @@ public class CustomFov extends Module_ {
     public CustomFov() {
         super("CustomFOV", "Allows you to set custom field of view.", Categories.RENDER);
         addSettingGroup(sgGeneral);
-        addQuickSettingGroup(sgGeneral);
+
+        addQuickSetting(FOV);
     }
 
     @SubscribeEvent

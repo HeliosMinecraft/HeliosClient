@@ -19,6 +19,7 @@ import dev.heliosclient.util.SoundUtils;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Template for modules.
@@ -29,7 +30,7 @@ public abstract class Module_ implements Listener {
     public String description;
     public Category category;
     public ArrayList<SettingGroup> settingGroups;
-    public ArrayList<SettingGroup> quickSettingGroups;
+    public ArrayList<Setting> quickSettings;
     public boolean settingsOpen = false;
     public SettingGroup sgbind = new SettingGroup("Bind");
 
@@ -94,15 +95,18 @@ public abstract class Module_ implements Listener {
         this.description = description;
         this.category = category;
         settingGroups = new ArrayList<>();
-        quickSettingGroups = new ArrayList<>();
+        quickSettings = new ArrayList<>();
     }
 
     public void addSettingGroup(SettingGroup settingGroup) {
         this.settingGroups.add(settingGroup);
     }
 
-    public void addQuickSettingGroup(SettingGroup settingGroup) {
-        this.quickSettingGroups.add(settingGroup);
+    public void addQuickSetting(Setting setting) {
+        this.quickSettings.add(setting);
+    }
+    public void addQuickSettings(List<Setting> setting) {
+        this.quickSettings.addAll(setting);
     }
 
     /**

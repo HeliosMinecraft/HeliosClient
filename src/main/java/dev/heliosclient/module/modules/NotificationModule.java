@@ -43,8 +43,8 @@ public class NotificationModule extends Module_ {
         addSettingGroup(sgNotifications);
         addSettingGroup(sgConfig);
 
-        addQuickSettingGroup(sgNotifications);
-        addQuickSettingGroup(sgConfig);
+        addQuickSettings(sgNotifications.getSettings());
+        addQuickSettings(sgConfig.getSettings());
     }
 
     @Override

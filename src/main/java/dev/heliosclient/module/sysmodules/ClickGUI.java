@@ -170,7 +170,7 @@ public class ClickGUI extends Module_ {
         addSettingGroup(sgGeneral);
         addSettingGroup(sgTooltip);
 
-       active.value = true;
+        active.value = true;
         loadFonts.addButton("Load Fonts", 0, 0, () -> {
             FontManager.INSTANCE = new FontManager();
             Font.setOptions(FontManager.fontNames);
@@ -188,23 +188,27 @@ public class ClickGUI extends Module_ {
         pause = Pause.value;
         keybinds = Keybinds.value;
 
-        fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
+        if(setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font){
+            fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
+            FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
+            EventManager.postEvent(new FontChangeEvent(fonts));
+        }
 
-        FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
-        FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
-        FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 11f);
+       if(setting == FontRenderer || setting == Font) {
+           FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
+           FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 11f);
 
-        FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
-        FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
+           FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
+           FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
 
-        FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
-        FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
+           FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
+           FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
 
-        FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
-        FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
+           FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
+           FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
 
-
-        EventManager.postEvent(new FontChangeEvent(fonts));
+           EventManager.postEvent(new FontChangeEvent(fonts));
+       }
     }
 
     @SubscribeEvent
@@ -227,7 +231,6 @@ public class ClickGUI extends Module_ {
 
     @Override
     public void onLoad() {
-        super.onLoad();
         Tooltip.tooltip.mode = TooltipMode.value;
         Tooltip.tooltip.fixedPos = TooltipPos.value;
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
@@ -266,7 +269,6 @@ public class ClickGUI extends Module_ {
     @Override
     public void toggle() {
     }
-
     public enum ScrollTypes {
         OLD,
         NEW

@@ -26,7 +26,8 @@ public class Speed extends Module_ {
         super("Speed", "Allows you to move faster.", Categories.MOVEMENT);
 
         addSettingGroup(sgGeneral);
-        addQuickSettingGroup(sgGeneral);
+
+        addQuickSettings(sgGeneral.getSettings());
     }
 
     @SubscribeEvent

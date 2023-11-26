@@ -5,13 +5,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * This annotation indicates that a method is a listener for an event
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface SubscribeEvent {
-    // This attribute specifies the priority of the listener
+    enum Priority {
+        LOWEST,
+        LOW,
+        NORMAL,
+        HIGH,
+        HIGHEST
+    }
+
+    Priority priority() default Priority.NORMAL;
 }
+
 
 

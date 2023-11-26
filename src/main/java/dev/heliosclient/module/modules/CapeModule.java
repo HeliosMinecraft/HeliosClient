@@ -35,8 +35,8 @@ public class CapeModule extends Module_ {
     );
     public BooleanSetting elytra = sgCape.add(new BooleanSetting.Builder()
             .name("Elytra")
-            .description("Cape Texture for elytra (bad most of times)")
-            .value(true)
+            .description("Cape Texture for elytra (Bad most of times with improper textures)")
+            .value(false)
             .defaultValue(false)
             .module(this)
             .build()
@@ -47,10 +47,17 @@ public class CapeModule extends Module_ {
     );
 
     public CapeModule() {
-        super("Custom Capes", "Use Custom Capes from `heliosclient/capes` directory", Categories.MISC);
+        super("Capes", "Use Custom Capes from `heliosclient/capes` directory", Categories.MISC);
 
         capes.options = List.of(CapeManager.capes);
         addSettingGroup(sgCape);
+
+
+        addQuickSetting(capes);
+        addQuickSetting(customPhysics);
+        addQuickSetting(elytra);
+
+
         loadCapes.addButton("Reload Capes",0,0,()->{
             CapeManager.loadCapes();
             capes.options = List.of(CapeManager.capes);

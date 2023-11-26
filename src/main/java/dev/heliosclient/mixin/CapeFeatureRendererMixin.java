@@ -19,6 +19,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -27,6 +28,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CapeFeatureRenderer.class)
 public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
+    @Unique
+    private int ticksInWater = 0;
     public CapeFeatureRendererMixin(FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> context) {
         super(context);
     }
@@ -71,11 +74,24 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
                     }
 
                     if (ModuleManager.capeModule.customPhysics.value) {
-                        // New physics
-                        double playerSpeed = Math.sqrt(abstractClientPlayerEntity.getVelocity().x * abstractClientPlayerEntity.getVelocity().x + abstractClientPlayerEntity.getVelocity().z * abstractClientPlayerEntity.getVelocity().z);
-                        float speedModifier = (float) Math.min(1, playerSpeed / 0.5);
-                        float windEffect = (float) Math.sin(System.currentTimeMillis() % 2000 / 2000.0 * 2 * Math.PI) * 0.05F; // Wind effect
-                        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(6.0F + r / 2.0F + q + speedModifier * 15.0F + windEffect));
+                        //New physics
+                        if (abstractClientPlayerEntity.isSubmergedInWater()) {
+                            if(ticksInWater >= 800){
+                                ticksInWater = 800;
+                            }
+                            else{
+                                ticksInWater++;
+                            }
+                            // Adjust the cape's rotation to make it float upwards
+                            float rotation = ticksInWater * 0.09F;
+                            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(6.0F + r / 2.0F + q + rotation));
+                        } else {
+                            ticksInWater = 0;
+                            double playerSpeed = Math.sqrt(abstractClientPlayerEntity.getVelocity().x * abstractClientPlayerEntity.getVelocity().x + abstractClientPlayerEntity.getVelocity().z * abstractClientPlayerEntity.getVelocity().z);
+                            float speedModifier = (float) Math.min(1, playerSpeed / 0.5);
+                            float windEffect = (float) Math.sin(System.currentTimeMillis() % 2000 / 2000.0 * 2 * Math.PI) * 0.08F;// Wind effect
+                            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(6.0F + r / 2.0F + q + speedModifier * 15.0F + windEffect));
+                        }
                     } else {
                         // Old physics
                         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(6.0F + r / 2.0F + q));

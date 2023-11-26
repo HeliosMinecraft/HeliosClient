@@ -37,7 +37,7 @@ public class Step extends Module_ {
 
         addSettingGroup(sgGeneral);
 
-        addQuickSettingGroup(sgGeneral);
+        addQuickSettings(sgGeneral.getSettings());
     }
 
     @SubscribeEvent

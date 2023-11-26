@@ -10,17 +10,13 @@ public class Fly extends Module_ {
         super("Fly", "Allows you to fly in survival mode.", Categories.MOVEMENT);
     }
 
-    @SubscribeEvent
-    public void onTick(TickEvent.PLAYER event) {
-        assert mc.player != null;
-        mc.player.getAbilities().flying = true;
-    }
-
 
     @Override
     public void onEnable() {
         super.onEnable();
-
+        if (mc.player != null) {
+            mc.player.getAbilities().flying = true;
+        }
     }
 
     @Override

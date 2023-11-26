@@ -83,15 +83,28 @@ public class DoubleSetting extends Setting<Double> {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         //  inputBox = null;
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
-        double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
+        //double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
+        double diff = Math.min(100, Math.max(0, (mouseX - x) / 1.9));
+        double scaledValue = (value - min) / (max - min);
 
+      /*  if (sliding) {
+            if (diff == 0) {
+                value = min;
+            } else {
+                value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
+            }
+            module.onSettingChange(this);
+        }
+
+       */
+
+        int scaledValueInt = (int) (scaledValue * 188) + 2;
         if (sliding) {
             if (diff == 0) {
                 value = min;
             } else {
                 value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
             }
-            module.onSettingChange(this);
         }
 
         String valueString = "" + MathUtils.round(value, roundingPlace);
@@ -99,9 +112,9 @@ public class DoubleSetting extends Setting<Double> {
 
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, moduleWidth - 8, 1, 1, 0xFFAAAAAA);
 
-        int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 10)) + 2;
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, scaledValue, 1, 1, 0xFF55FFFF);
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue + 2, y + 11, 1, 5, 1, 0xFFFFFFFF);
+
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, scaledValueInt, 1, 1, 0xFF55FFFF);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValueInt + 2, y + 11, 1, 5, 1, 0xFFFFFFFF);
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {
@@ -132,12 +145,12 @@ public class DoubleSetting extends Setting<Double> {
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
         sliding = false;
+        module.onSettingChange(this);
     }
 
     @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         super.keyPressed(keyCode, scanCode, modifiers);
-        // inputBox.keyPressed(keyCode, scanCode, modifiers);
         if ((keyCode == GLFW.GLFW_KEY_KP_ENTER || keyCode == GLFW.GLFW_KEY_ENTER) && inputBox.isFocused()) {
             try {
                 double newVal = Double.parseDouble(inputBox.getValue());

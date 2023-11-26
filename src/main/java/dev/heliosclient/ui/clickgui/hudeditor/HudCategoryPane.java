@@ -65,7 +65,7 @@ public class HudCategoryPane {
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 12, width, 1, ColorManager.INSTANCE.clickGuiSecondary());
 
         Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer,drawContext.getMatrices(), "Hud elements", x + 4, y + 3,ColorManager.INSTANCE.clickGuiPaneText());
-        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer,drawContext.getMatrices(), collapsed ? "+" : "-", x + width - Renderer2D.getCustomStringWidth(collapsed ? "+" : "-",FontRenderers.Small_fxfontRenderer) - 3, y + 3, ColorManager.INSTANCE.clickGuiPaneText());
+        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer,drawContext.getMatrices(), collapsed ? "+" : "-", x + width - Renderer2D.getCustomStringWidth(collapsed ? "+" : "-",FontRenderers.Small_fxfontRenderer) - 2, y + 3, ColorManager.INSTANCE.clickGuiPaneText());
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {

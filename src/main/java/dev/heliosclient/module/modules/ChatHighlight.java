@@ -40,7 +40,7 @@ public class ChatHighlight extends Module_ {
 
         addSettingGroup(sgGeneral);
 
-        addQuickSettingGroup(sgGeneral);
+        addQuickSettings(sgGeneral.getSettings());
 
         this.highlightList.add("ElBe_Gaming");
         ChatUtils.sendHeliosMsg("" + this.highlightList);

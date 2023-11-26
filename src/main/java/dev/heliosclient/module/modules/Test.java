@@ -46,8 +46,7 @@ public class Test extends Module_ {
         super("Test", "Render Test", Categories.RENDER);
 
         addSettingGroup(sgGeneral);
-        addQuickSettingGroup(sgGeneral);
-
+        addQuickSettings(sgGeneral.getSettings());
     }
 
     @Override

@@ -17,6 +17,8 @@ import net.minecraft.text.Text;
 
 import java.util.AbstractMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class ClientSettingsScreen extends AbstractSettingScreen implements IWindowContentRenderer {
@@ -24,26 +26,29 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     private final float delayBetweenSettings = 0.2f;
     public NavBar navBar = new NavBar();
     int x, y, windowWidth = 224, windowHeight;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public ClientSettingsScreen(Module_ module) {
         super(Text.literal("Client Settings"),module,0,224);
     }
 
     public void updateSetting() {
-        module.settingGroups.stream()
-                .filter(SettingGroup::shouldRender)
-                .flatMap(settingGroup -> settingGroup.getSettings().stream()
-                        .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
-                .filter(entry -> entry.getValue().shouldRender())
-                .forEach(entry -> {
-                    SettingGroup settingGroup = entry.getKey();
-                    Setting setting = entry.getValue();
-                    setting.update(settingGroup.getY());
-                    if (!setting.isAnimationDone() && delay <= 0) {
-                        delay = delayBetweenSettings;
-                        delay -= setting.animationSpeed;
-                    }
-                });
+        executor.submit(() -> {
+            module.settingGroups.stream()
+                    .filter(SettingGroup::shouldRender)
+                    .flatMap(settingGroup -> settingGroup.getSettings().stream()
+                            .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
+                    .filter(entry -> entry.getValue().shouldRender())
+                    .forEach(entry -> {
+                        SettingGroup settingGroup = entry.getKey();
+                        Setting setting = entry.getValue();
+                        setting.update(settingGroup.getY());
+                        if (!setting.isAnimationDone() && delay <= 0) {
+                            delay = delayBetweenSettings;
+                            delay -= setting.animationSpeed;
+                        }
+                    });
+        });
     }
 
 
@@ -53,14 +58,15 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
         windowHeight = 50;
         for (SettingGroup settingGroup : module.settingGroups) {
-            windowHeight += Math.round(settingGroup.getGroupNameHeight() + 3);
+            float groupNameHeight = settingGroup.getGroupNameHeight();
+            windowHeight += Math.round(groupNameHeight + 3);
             if (!settingGroup.shouldRender()) continue;
             for (Setting setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
                 windowHeight += setting.height + 1;
             }
-            windowHeight += Math.round(settingGroup.getGroupNameHeight() + 2);
+            windowHeight += Math.round(groupNameHeight + 2);
         }
 
         window.setWindowHeight(windowHeight);
@@ -81,11 +87,12 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
         int yOffset = y;
         for (SettingGroup settingGroup : module.settingGroups) {
-            yOffset += Math.round(settingGroup.getGroupNameHeight() + 3);
+            float groupNameHeight = settingGroup.getGroupNameHeight();
+            yOffset += Math.round(groupNameHeight + 3);
             settingGroup.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
 
            if (settingGroup.shouldRender()) {
-                  List<Setting> settings = settingGroup.getSettings();
+               List<Setting> settings = settingGroup.getSettings();
                 for (Setting setting : settings) {
                     if (setting.shouldRender()) {
                         if (setting instanceof RGBASetting rgbaSetting) {
@@ -104,7 +111,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
                 settingGroup.getSettings().forEach(this::resetSettingAnimation);
             }
 
-            yOffset += Math.round(settingGroup.getGroupNameHeight() + 1);
+            yOffset += Math.round(groupNameHeight + 1);
         }
     }
 

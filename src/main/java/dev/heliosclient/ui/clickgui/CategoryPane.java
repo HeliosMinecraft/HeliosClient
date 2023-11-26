@@ -10,6 +10,7 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
@@ -24,11 +25,15 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CategoryPane implements Listener {
     public static int width = 83;
     public static int MAX_HEIGHT = 150;
     public static List<Hitbox> hitboxes = new CopyOnWriteArrayList<>();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
     public final char icon;
     private final Screen parentScreen;
     private final float delayBetweenButtons = 0.0f;
@@ -64,6 +69,7 @@ public class CategoryPane implements Listener {
         hitboxes.add(hitBox);
 
         EventManager.register(this);
+        update();
     }
 
     public static int getWidth() {
@@ -99,17 +105,19 @@ public class CategoryPane implements Listener {
     }
 
     public void update() {
-        float prevbuttonY = y;
-        for (ModuleButton button : moduleButtons) {
-            button.update(prevbuttonY);
-            if (!button.isAnimationDone()) {
-                if (delay <= 0) {
-                    delay = delayBetweenButtons;
+        executor.submit(() -> {
+            float prevbuttonY = y;
+            for (ModuleButton button : moduleButtons) {
+                button.update(prevbuttonY);
+                if (!button.isAnimationDone()) {
+                    if (delay <= 0) {
+                        delay = delayBetweenButtons;
+                    }
+                    delay -= button.animationSpeed;
                 }
-                delay -= button.animationSpeed;
+                prevbuttonY = button.y;
             }
-            prevbuttonY = button.y;
-        }
+        });
     }
 
     @SubscribeEvent
@@ -227,9 +235,9 @@ public class CategoryPane implements Listener {
     public void mouseReleased(int mouseX, int mouseY, int button) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.settingsOpen) {
-                for (SettingGroup settingGroup : moduleButton.module.quickSettingGroups) {
-                    if (!settingGroup.shouldRender()) continue;
-                    settingGroup.mouseReleased(mouseX, mouseY, button);
+                for (Setting setting : moduleButton.module.quickSettings) {
+                    if (!setting.shouldRender()) continue;
+                    setting.mouseReleased(mouseX, mouseY, button);
                 }
             }
         }
@@ -239,9 +247,9 @@ public class CategoryPane implements Listener {
     public void charTyped(char chr, int modifiers) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.settingsOpen) {
-                for (SettingGroup settingGroup : moduleButton.module.quickSettingGroups) {
-                    if (!settingGroup.shouldRender()) continue;
-                    settingGroup.charTyped(chr, modifiers);
+                for (Setting setting : moduleButton.module.quickSettings) {
+                    if (!setting.shouldRender()) continue;
+                    setting.charTyped(chr, modifiers);
                 }
             }
         }

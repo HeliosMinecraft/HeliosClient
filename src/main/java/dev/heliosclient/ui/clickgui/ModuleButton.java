@@ -27,6 +27,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.AbstractMap;
+import java.util.Set;
 
 public class ModuleButton implements Listener {
     public final Screen parentScreen;
@@ -60,18 +61,13 @@ public class ModuleButton implements Listener {
 
     public void updateSetting() {
         settingHeight = 2;
-        module.quickSettingGroups.stream()
-                .filter(SettingGroup::shouldRender)
-                .flatMap(settingGroup -> settingGroup.getSettings().stream().map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
-                .filter(entry -> entry.getValue().shouldRender())
+        module.quickSettings.stream().filter(Setting::shouldRender)
                 .forEach(entry -> {
-                    SettingGroup settingGroup = entry.getKey();
-                    Setting setting = entry.getValue();
-                    setting.update(settingGroup.getY());
-                    settingHeight += setting.heightCompact;
-                    if (!setting.isAnimationDone() && delay <= 0) {
+                    entry.update(entry.getY());
+                    settingHeight += entry.heightCompact;
+                    if (!entry.isAnimationDone() && delay <= 0) {
                         delay = delayBetweenSettings;
-                        delay -= setting.animationSpeed;
+                        delay -= entry.animationSpeed;
                     }
                 });
     }
@@ -148,16 +144,9 @@ public class ModuleButton implements Listener {
         int buttonYOffset = 0;
         if (settingsOpen) {
             updateSetting();
-            buttonYOffset = y + this.height + 4;
-            for (SettingGroup settingGroup : module.quickSettingGroups) {
-                buttonYOffset += Math.round(settingGroup.getGroupNameHeight() + 6);
-
-                if (buttonYOffset >= y) {
-                    settingGroup.renderBuilder(drawContext, x - 1, buttonYOffset, width);
-                }
-
-                for (Setting setting : settingGroup.getSettings()) {
-                    if (!settingGroup.shouldRender() || !setting.shouldRender()) {
+            buttonYOffset = y + this.height + 2;
+                for (Setting setting : module.quickSettings) {
+                    if (!setting.shouldRender()) {
                         resetAnimation(setting);
                         continue;
                     }
@@ -172,16 +161,15 @@ public class ModuleButton implements Listener {
                         buttonYOffset += setting.heightCompact + 1;
                     }
                 }
-            }
-            if (!module.quickSettingGroups.isEmpty()) {
+            if (!module.quickSettings.isEmpty()) {
                 buttonYOffset += 2;
             }
             setBoxHeight(buttonYOffset - y - this.height - 2);
         }
         else{
-            module.quickSettingGroups.forEach(settingGroup -> settingGroup.getSettings().forEach(this::resetAnimation));
+            module.quickSettings.forEach(this::resetAnimation);
         }
-        return buttonYOffset > 2 ? buttonYOffset - y - this.height : 0;
+        return buttonYOffset > 2 ? buttonYOffset - y - this.height - 2 : 0;
     }
 
     private void resetAnimation(Setting setting) {
@@ -203,7 +191,7 @@ public class ModuleButton implements Listener {
                         module.toggle();
                         return true;
                     } else if (button == 1) {
-                        MinecraftClient.getInstance().setScreen(new SettingsScreen(module, parentScreen));
+                        HeliosClient.MC.setScreen(new SettingsScreen(module, parentScreen));
                         return true;
                     } else if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
                         this.module.settingsOpen = !this.module.settingsOpen;
@@ -212,19 +200,16 @@ public class ModuleButton implements Listener {
                     }
                 }
                 if (this.module.settingsOpen) {
-                    for (SettingGroup settingGroup : module.quickSettingGroups) {
-                        settingGroup.mouseClickedBuilder(mouseX, mouseY);
-                        if (!settingGroup.shouldRender()) continue;
-                        settingGroup.mouseClicked(mouseX, mouseY, button);
+                    for (Setting setting : module.quickSettings) {
+                        if (!setting.shouldRender()) continue;
+                        setting.mouseClicked(mouseX, mouseY, button);
                     }
                 }
             }
 
         if (collapsed) {
-            for (SettingGroup settingGroup : module.quickSettingGroups) {
-                for (Setting setting : settingGroup.getSettings()) {
-                    resetAnimation(setting);
-                }
+            for (Setting setting : module.quickSettings) {
+               resetAnimation(setting);
             }
             setFaded(true);
             animationDone = false;

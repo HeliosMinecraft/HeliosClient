@@ -87,7 +87,6 @@ public class Window implements Listener {
         x = Math.max(drawContext.getScaledWindowWidth() / 2 - windowWidth / 2, 0);
 
         if (!isCollapsed && contentRenderer != null) {
-            // Calculate the color and text width only once
             int color = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 180).getRGB();
             List<String> wrappedText = Renderer2D.wrapText("§o" + description, windowWidth - 2);
 

@@ -17,30 +17,37 @@ import net.minecraft.text.Text;
 
 import java.util.AbstractMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SettingsScreen extends AbstractSettingScreen implements IWindowContentRenderer {
         private final float delayBetweenSettings = 0.2f;
         int x, y, windowWidth = 224, windowHeight;
+         private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
         public SettingsScreen(Module_ module, Screen parentScreen) {
             super(Text.literal("Settings"),module,0,224);
+            updateSetting();
+
         }
 
         public void updateSetting() {
-            module.settingGroups.stream()
-                    .filter(SettingGroup::shouldRender)
-                    .flatMap(settingGroup -> settingGroup.getSettings().stream()
-                            .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
-                    .filter(entry -> entry.getValue().shouldRender())
-                    .forEach(entry -> {
-                        SettingGroup settingGroup = entry.getKey();
-                        Setting setting = entry.getValue();
-                        setting.update(settingGroup.getY());
-                        if (!setting.isAnimationDone() && delay <= 0) {
-                            delay = delayBetweenSettings;
-                            delay -= setting.animationSpeed;
-                        }
-                    });
+            executor.submit(() -> {
+                module.settingGroups.stream()
+                        .filter(SettingGroup::shouldRender)
+                        .flatMap(settingGroup -> settingGroup.getSettings().stream()
+                                .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
+                        .filter(entry -> entry.getValue().shouldRender())
+                        .forEach(entry -> {
+                            SettingGroup settingGroup = entry.getKey();
+                            Setting setting = entry.getValue();
+                            setting.update(settingGroup.getY());
+                            if (!setting.isAnimationDone() && delay <= 0) {
+                                delay = delayBetweenSettings;
+                                delay -= setting.animationSpeed;
+                            }
+                        });
+            });
         }
 
 
