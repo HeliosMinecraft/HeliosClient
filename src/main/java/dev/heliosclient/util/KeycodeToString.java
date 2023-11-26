@@ -179,6 +179,15 @@ public class KeycodeToString {
                 case GLFW.GLFW_KEY_ENTER -> {
                     return "ENTER";
                 }
+                case GLFW.GLFW_MOUSE_BUTTON_LEFT -> {
+                    return "MOUSE_LEFT";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> {
+                    return "MOUSE_RIGHT";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> {
+                    return "MOUSE_MIDDLE";
+                }
                 default -> {
                     //If none of the translation methods work return in format of KEY_KEYCODE
                     return "KEY_" + keyCode;
@@ -356,6 +365,15 @@ public class KeycodeToString {
                 }
                 case GLFW.GLFW_KEY_ENTER -> {
                     return "ENTER";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_LEFT -> {
+                    return "M_LEFT";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> {
+                    return "M_RIGHT";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> {
+                    return "M_MIDDLE";
                 }
                 default -> {
                     return "KEY_" + keyCode;

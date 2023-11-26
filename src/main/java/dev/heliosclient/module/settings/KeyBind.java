@@ -15,6 +15,7 @@ import java.util.function.BooleanSupplier;
 
 public class KeyBind extends Setting<Integer> {
     public static boolean listeningKey = false;
+    public static boolean listeningMouse = false;
     public int value;
     public boolean listening = false;
     Module_ module;
@@ -36,7 +37,7 @@ public class KeyBind extends Setting<Integer> {
 
         if (listening) {
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": §lLISTENING", x + 2, y + 8, defaultColor);
-        } else if (value == 0) {
+        } else if (value == -1) {
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": None", x + 2, y + 8, defaultColor);
         } else {
             String keyName = KeycodeToString.translate(value);
@@ -61,7 +62,7 @@ public class KeyBind extends Setting<Integer> {
 
         if (listening) {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": §lLISTENING", x + 2, y + 6, defaultColor);
-        } else if (value == 0) {
+        } else if (value == -1) {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": None", x + 2, y + 6, defaultColor);
         } else {
             String keyName = KeycodeToString.translate(value);
@@ -83,7 +84,7 @@ public class KeyBind extends Setting<Integer> {
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
         if (listening) {
             if (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_ESCAPE) {
-                this.value = 0;
+                this.value = -1;
             } else {
                 this.value = keyCode;
             }
@@ -96,17 +97,29 @@ public class KeyBind extends Setting<Integer> {
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
-        if (hovered((int) mouseX, (int) mouseY) && button == 0) {
+        if(listeningMouse && listening){
+            value = button;
+            module.onSettingChange(this);
+            listening = !listening;
+            listeningMouse = false;
+        }
+        if (hovered((int) mouseX, (int) mouseY) && button == 0 && !listeningMouse) {
             listening = !listening;
             listeningKey = !listeningKey;
+            listeningMouse = true;
         }
+    }
+
+    @Override
+    public void mouseReleased(double mouseX, double mouseY, int button) {
+        super.mouseReleased(mouseX, mouseY, button);
     }
 
     public static class Builder extends SettingBuilder<Builder, Integer, KeyBind> {
         Module_ module;
 
         public Builder() {
-            super(0);
+            super(-1);
         }
 
         public Builder module(Module_ module) {
