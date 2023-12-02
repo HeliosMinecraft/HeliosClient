@@ -20,7 +20,7 @@ public class KeybindManager implements Listener {
         if (mc.currentScreen != null) return;
 
         for (Module_ module : ModuleManager.INSTANCE.modules) {
-            if (module.getKeybind() != null && module.getKeybind() != 0 && event.getKey() == module.getKeybind()) {
+            if (module.getKeybind() != null && module.getKeybind() != -1 && event.getKey() == module.getKeybind()) {
                 if (module.toggleOnBindRelease.value) {
                     module.onEnable();
                 } else {
@@ -35,7 +35,7 @@ public class KeybindManager implements Listener {
         if (mc.currentScreen != null) return;
 
         for (Module_ module : ModuleManager.INSTANCE.modules) {
-            if (module.getKeybind() != null && module.getKeybind() != 0 && event.getKey() == module.getKeybind()) {
+            if (module.getKeybind() != null && module.getKeybind() != -1 && event.getKey() == module.getKeybind()) {
                 if (module.toggleOnBindRelease.value) {
                     module.onDisable();
                 }
@@ -47,7 +47,7 @@ public class KeybindManager implements Listener {
         if (mc.currentScreen != null) return;
 
         for (Module_ module : ModuleManager.INSTANCE.modules) {
-            if (module.getKeybind() != null && module.getKeybind() != 0 && event.getButton() == module.getKeybind()) {
+            if (module.getKeybind() != null && module.getKeybind() != -1 && event.getButton() == module.getKeybind()) {
                 if (module.toggleOnBindRelease.value) {
                     module.onEnable();
                 } else {

@@ -139,7 +139,7 @@ public class ModuleButton implements Listener {
             Tooltip.tooltip.changeText(module.description);
         }
 
-        if (module.keyBind.value != 0 && ClickGUI.keybinds) {
+        if (module.keyBind.value != -1 && ClickGUI.keybinds) {
             String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
             Renderer2D.drawFixedString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor);
         }
