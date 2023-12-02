@@ -7,6 +7,7 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -116,15 +117,19 @@ public class ModuleButton implements Listener {
 
         hitBox.set(x, y, width, height);
 
-        Color fillColor = module.isActive() ? new Color(ColorManager.INSTANCE.clickGuiSecondary()) : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
+        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
+        Color fillColorEnd = module.isActive() ?ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
+        Color blendedColor = ColorUtils.blend(fillColorStart,fillColorEnd,1/2f);
+
         if(hitBox.contains(mouseX,mouseY)) {
-            Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x + 1, y, width, height, 2, 4, fillColor.getRGB());
+            Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y, width, height,fillColorStart,fillColorEnd,fillColorEnd,fillColorStart, 2,5,blendedColor);
         }
         else{
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 1, y, width, height,2,fillColor.getRGB());
+            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart,fillColorEnd,fillColorEnd,fillColorStart,x + 1, y, width, height, 2);
         }
         if (settingsOpen && boxHeight >= 4) {
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 1, y + height, width, boxHeight + 2,2,ColorUtils.changeAlpha(fillColor, 100).getRGB()); ;
+            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100),  ColorUtils.changeAlpha(fillColorStart, 100),x + 1, y + height, width, boxHeight + 2, 2);
+           // Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 1, y + height, width, boxHeight + 2,2,ColorUtils.changeAlpha(blendedColor, 100).getRGB()); ;
         }
 
         int textY = y + (height - moduleNameHeight) / 2;
@@ -152,6 +157,8 @@ public class ModuleButton implements Listener {
                     }
                     if (setting instanceof RGBASetting rgbaSetting) {
                         rgbaSetting.setParentScreen(ClickGUIScreen.INSTANCE);
+                    } else if (setting instanceof ListSetting listSetting) {
+                        listSetting.setParentScreen(ClickGUIScreen.INSTANCE);
                     }
                     if (buttonYOffset >= y) {
                         setting.quickSettings = settingsOpen;

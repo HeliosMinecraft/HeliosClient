@@ -24,6 +24,7 @@ public class CycleSetting extends Setting<Integer> {
         this.description = description;
         this.options = options;
         this.height = 24;
+        this.heightCompact = 15;
         this.module = module;
         this.value = value;
     }
@@ -48,10 +49,10 @@ public class CycleSetting extends Setting<Integer> {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         if (options.isEmpty() || options.size() - 1 < value) {
-            Renderer2D.drawFixedString(drawContext.getMatrices(), "No option found!", x + 2, y + 8, 0xFFFF0000);
+            Renderer2D.drawFixedString(drawContext.getMatrices(), "No option found!", x + 2, y + 4, 0xFFFF0000);
         }
         else {
-            Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + options.get(value), x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
+            Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + options.get(value), x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
         }
 
         if (hovered(mouseX, mouseY)) {

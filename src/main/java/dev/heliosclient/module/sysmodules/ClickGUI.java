@@ -11,6 +11,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
@@ -139,6 +140,53 @@ public class ClickGUI extends Module_ {
             .value(true)
             .build()
     );
+    public SettingGroup sgRender = new SettingGroup("Render");
+
+    public CycleSetting ColorMode = sgRender.add(new CycleSetting.Builder()
+            .name("Color Mode")
+            .description("Color mode for parts of the client")
+            .module(INSTANCE)
+            .value(new ArrayList<>(List.of("Static", "Gradient")))
+            .listValue(0)
+            .build()
+    );
+    RGBASetting staticColor = sgRender.add(new RGBASetting.Builder()
+            .name("Color")
+            .description("Simple single color for parts of the client")
+            .module(this)
+            .value(new Color(ColorManager.INSTANCE.clickGuiSecondary))
+            .defaultValue(new Color(ColorManager.INSTANCE.clickGuiSecondary))
+            .shouldRender(()-> ColorMode.value == 0)
+            .build()
+    );
+    public CycleSetting GradientType = sgRender.add(new CycleSetting.Builder()
+            .name("Gradient Type")
+            .description("Gradient type for the gradient color mode")
+            .module(INSTANCE)
+            .value(new ArrayList<>(List.of("Rainbow", "DaySky", "EveningSky", "NightSky","Linear2D")))
+            .listValue(0)
+            .shouldRender(()-> ColorMode.value == 1)
+            .build()
+    );
+    RGBASetting linear2Start = sgRender.add(new RGBASetting.Builder()
+            .name("Linear-Start")
+            .description("Linear Color Start of Linear mode")
+            .module(this)
+            .value(Color.GREEN)
+            .defaultValue(Color.GREEN)
+            .shouldRender(()-> GradientType.value == 4 && ColorMode.value == 1)
+            .build()
+    );
+    RGBASetting linear2end = sgRender.add(new RGBASetting.Builder()
+            .name("Linear-End")
+            .description("Linear Color End of Linear mode")
+            .module(this)
+            .value(Color.YELLOW)
+            .shouldRender(()-> GradientType.value == 4 && ColorMode.value == 1)
+            .defaultValue(Color.YELLOW)
+            .build()
+    );
+
     RGBASetting AccentColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Accent color")
             .description("Accent color of Click GUI.")
@@ -167,10 +215,11 @@ public class ClickGUI extends Module_ {
         super("ClickGUI", "ClickGui related stuff.", Categories.RENDER);
 
         addSettingGroup(sgUI);
-        addSettingGroup(sgGeneral);
+       addSettingGroup(sgRender);
+       addSettingGroup(sgGeneral);
         addSettingGroup(sgTooltip);
 
-        active.value = true;
+         active.value = true;
         loadFonts.addButton("Load Fonts", 0, 0, () -> {
             FontManager.INSTANCE = new FontManager();
             Font.setOptions(FontManager.fontNames);
@@ -212,11 +261,41 @@ public class ClickGUI extends Module_ {
     }
 
     @SubscribeEvent
-    @Override
     public void onTick(TickEvent event) {
-        super.onTick(event);
         Tooltip.tooltip.mode = TooltipMode.value;
         Tooltip.tooltip.fixedPos = TooltipPos.value;
+
+        float hue = (System.currentTimeMillis() % 10000) / 10000f;
+
+        if(ColorMode.value == 0) {
+            ColorManager.INSTANCE.primaryGradientStart = staticColor.getColor();
+            ColorManager.INSTANCE.primaryGradientEnd = staticColor.getColor();
+        }
+        if(ColorMode.value == 1) {
+            switch(GradientType.value){
+                case 0->{
+                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
+                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor2();
+                }
+                case 1 ->{
+                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getDaySkyColors(hue)[0];
+                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getDaySkyColors(hue)[1];
+                }
+                case 2 ->{
+                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getEveningSkyColors(hue)[0];
+                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getEveningSkyColors(hue)[1];
+                }
+                case 3 ->{
+                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getNightSkyColors(hue)[0];
+                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getNightSkyColors(hue)[1];
+                }
+                case 4->{
+                    ColorManager.INSTANCE.primaryGradientStart = linear2Start.getColor();
+                    ColorManager.INSTANCE.primaryGradientEnd = linear2end.getColor();
+                }
+            }
+        }
+
 
         ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getColor().getAlpha();
         ColorManager.INSTANCE.clickGuiSecondary = AccentColor.getColor().getRGB();
@@ -264,6 +343,27 @@ public class ClickGUI extends Module_ {
         FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
 
         EventManager.postEvent(new FontChangeEvent(fonts));
+
+        if(ColorMode.value == 0) {
+            ColorManager.INSTANCE.primaryGradientStart = staticColor.getColor();
+            ColorManager.INSTANCE.primaryGradientEnd = staticColor.getColor();
+        }
+        if(ColorMode.value == 1) {
+            switch(GradientType.value){
+                case 0->{
+                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
+                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor2();
+                }
+                case 1, 2, 3 ->{
+                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
+                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor();
+                }
+                case 4->{
+                    ColorManager.INSTANCE.primaryGradientStart = linear2Start.getColor();
+                    ColorManager.INSTANCE.primaryGradientEnd = linear2end.getColor();
+                }
+            }
+        }
     }
 
     @Override

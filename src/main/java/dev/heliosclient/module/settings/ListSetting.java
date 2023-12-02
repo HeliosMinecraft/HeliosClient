@@ -1,6 +1,7 @@
 package dev.heliosclient.module.settings;
 
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ListSettingScreen;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
@@ -15,12 +16,12 @@ public class ListSetting extends Setting<ArrayList<String>> {
     public ArrayList<String> options;
     Screen parentScreen;
 
-    public ListSetting(String name, String description, Screen parentScreen, ArrayList<String> options, ArrayList<String> value, BooleanSupplier shouldRender, ArrayList<String> defaultValue) {
+    public ListSetting(String name, String description, ArrayList<String> options, ArrayList<String> value, BooleanSupplier shouldRender, ArrayList<String> defaultValue) {
         super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
         this.options = options;
-        this.parentScreen = parentScreen;
+        this.parentScreen = ClickGUIScreen.INSTANCE;
         this.value = value;
     }
 
@@ -44,6 +45,10 @@ public class ListSetting extends Setting<ArrayList<String>> {
         return value.contains(option);
     }
 
+    public void setParentScreen(Screen parentScreen) {
+        this.parentScreen = parentScreen;
+    }
+
     public static class Builder extends SettingBuilder<Builder, ArrayList<String>, ListSetting> {
         ArrayList<String> options;
         Screen parentScreen;
@@ -64,7 +69,7 @@ public class ListSetting extends Setting<ArrayList<String>> {
 
         @Override
         public ListSetting build() {
-            return new ListSetting(name, description, parentScreen, options, value, shouldRender, defaultValue);
+            return new ListSetting(name, description, options, value, shouldRender, defaultValue);
         }
     }
 }

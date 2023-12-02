@@ -2,6 +2,7 @@ package dev.heliosclient.module.settings;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
@@ -112,7 +113,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
         int value3 = hoveredOverBrightnessSaturationBox(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
 
         if (rainbow) {
-            value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), value.getAlpha());
             updateHandles();
         }
         this.gradientBoxX = x + offsetX;
@@ -245,10 +245,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 1, -1);
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 71, y + 1, 10, 10, 2, value.getRGB());
-
-        if (rainbow) {
-            value = ColorUtils.getRainbowColor();
-        }
     }
 
     public void mouse(double mouseX, double mouseY, int button) {
@@ -356,7 +352,12 @@ public class RGBASetting extends Setting<Color> implements Listener {
     public void onFontChange(FontChangeEvent event) {
         fxFontRenderer = new fxFontRenderer(event.getFonts(), 5f);
         iconRenderer = new fxFontRenderer(FontManager.iconFonts, 9f);
-
+    }
+    @SubscribeEvent
+    public void onTick(TickEvent.CLIENT event) {
+        if(rainbow){
+            value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), value.getAlpha());
+        }
     }
 
     public Screen getParentScreen() {

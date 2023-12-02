@@ -9,6 +9,7 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.GaussianBlur;
+import dev.heliosclient.util.render.GradientUtils;
 import dev.heliosclient.util.render.Texture;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -167,6 +168,42 @@ public class Renderer2D implements Listener {
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
+        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
+        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
+        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
+
+        tessellator.draw();
+
+        RenderSystem.disableBlend();
+    }
+
+    public static void drawGradient(Matrix4f matrix4f, GradientUtils gradient, float x, float y, float width, float height, int shiftSpeed) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        float scrollOffset = (System.currentTimeMillis() % (shiftSpeed * 100)) / (shiftSpeed * 100.0f);
+
+        Color startColor = gradient.getColor(scrollOffset);
+        Color endColor = gradient.getColor((scrollOffset + 0.5f) % 1.0f);
+
+        float startRed = startColor.getRed() / 255.0F;
+        float startGreen = startColor.getGreen() / 255.0F;
+        float startBlue = startColor.getBlue() / 255.0F;
+        float startAlpha = startColor.getAlpha() / 255.0F;
+
+        float endRed = endColor.getRed() / 255.0F;
+        float endGreen = endColor.getGreen() / 255.0F;
+        float endBlue = endColor.getBlue() / 255.0F;
+        float endAlpha = endColor.getAlpha() / 255.0F;
 
         bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
         bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
@@ -834,10 +871,10 @@ public class Renderer2D implements Listener {
      * Draws a rounded gradient rectangle
      *
      * @param matrix Matrix4f object to draw the rounded gradient rectangle
-     * @param color1 Main color of the gradient
-     * @param color2 Primary color of the gradient
-     * @param color3 Secondary color of the gradient
-     * @param color4 4th color of the gradient
+     * @param color1 is applied to the bottom-left vertex (x, y + height).
+     * @param color2 is applied to the bottom-right vertex (x + width, y + height).
+     * @param color3 is applied to the top-right vertex (x + width, y).
+     * @param color4 is applied to the top-left vertex (x, y).
      * @param x      X pos
      * @param y      Y pos
      * @param width  Width of rounded gradient rectangle
@@ -870,6 +907,44 @@ public class Renderer2D implements Listener {
 
         RenderSystem.defaultBlendFunc();
     }
+    public static void drawRoundedGradientRectangle(Matrix4f matrix, GradientUtils gradient, float x, float y, float width, float height, float radius, int shiftSpeed) {
+        // Get the colors from the gradient
+        Color color1 = gradient.getColor(0.0f); // Start color
+        Color color2 = gradient.getColor(0.33f); // Middle color
+        Color color3 = gradient.getColor(0.67f); // Middle color
+        Color color4 = gradient.getColor(1.0f); // End color
+
+        RenderSystem.enableBlend();
+        RenderSystem.colorMask(false, false, false, true);
+        RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.colorMask(true, true, true, true);
+
+        drawRoundedRectangle(matrix, x, y, width, height, (int) radius, color1.getRGB());
+
+        RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
+
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+
+        // Calculate the scroll offset
+        float scrollOffset = (System.currentTimeMillis() % (shiftSpeed * 100)) / (shiftSpeed * 100.0f);;
+
+        // Apply the scroll offset to the texture coordinates
+        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB()).texture(0.0f + scrollOffset, 0.0f).next();
+        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB()).texture(1.0f + scrollOffset, 0.0f).next();
+        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB()).texture(1.0f + scrollOffset, 1.0f).next();
+        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB()).texture(0.0f + scrollOffset, 1.0f).next();
+
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        RenderSystem.disableBlend();
+
+        RenderSystem.defaultBlendFunc();
+    }
 
     /**
      * Draws a rounded gradient rectangle with a shadow
@@ -880,10 +955,10 @@ public class Renderer2D implements Listener {
      * @param width      Width of rounded gradient rectangle
      * @param height     Height of rounded gradient rectangle
      * @param radius     Radius of the quadrants / the rounded gradient rectangle
-     * @param color1     Main color of the gradient
-     * @param color2     Primary color of the gradient
-     * @param color3     Secondary color of the gradient
-     * @param color4     4th color of the gradient
+     * @param color1     is applied to the bottom-left vertex (x, y + height).
+     * @param color2     is applied to the bottom-right vertex (x + width, y + height).
+     * @param color3     is applied to the top-right vertex (x + width, y).
+     * @param color4     is applied to the top-left vertex (x, y).
      * @param blurRadius blur radius of the shadow
      */
     public static void drawRoundedGradientRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, Color color1, Color color2, Color color3, Color color4, float radius, int blurRadius, Color blurColor) {

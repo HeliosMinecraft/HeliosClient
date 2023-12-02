@@ -72,6 +72,14 @@ public class Window implements Listener {
         }
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
     public void render(DrawContext drawContext, int mouseX, int mouseY, String name, String description, TextRenderer textRenderer) {
         this.screen = HeliosClient.MC.currentScreen;
         int screenHeight = drawContext.getScaledWindowHeight();

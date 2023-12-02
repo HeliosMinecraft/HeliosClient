@@ -2,6 +2,7 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -92,6 +93,8 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
                         if (setting.shouldRender()) {
                             if (setting instanceof RGBASetting rgbaSetting) {
                                 rgbaSetting.setParentScreen(this);
+                            } else if (setting instanceof ListSetting listSetting) {
+                                listSetting.setParentScreen(this);
                             }
 
                             // Update the y position of the setting based on its animation progress

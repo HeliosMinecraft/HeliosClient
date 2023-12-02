@@ -39,6 +39,7 @@ public abstract class MinecraftClientMixin {
 
     @Inject(at = @At("TAIL"), method = "scheduleStop")
     public void onShutdown(CallbackInfo ci) {
+        // FUCK LAG
         HeliosClient.INSTANCE.saveConfig();
     }
 

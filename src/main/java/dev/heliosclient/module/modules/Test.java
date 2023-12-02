@@ -14,17 +14,21 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.GradientUtils;
 import me.x150.renderer.render.Renderer3d;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 
 public class Test extends Module_ {
     private final SettingGroup sgGeneral = new SettingGroup("General");
     BooleanSetting rectangle = sgGeneral.add(new BooleanSetting("Rectangle", "", this, false, () -> true, false));
+    BooleanSetting rectangle2 = sgGeneral.add(new BooleanSetting("rectangle2 with gradient", "", this, false, () -> true, false));
+
     BooleanSetting rounded = sgGeneral.add(new BooleanSetting("Rounded", "", this, false, () -> true, false));
     BooleanSetting Circle = sgGeneral.add(new BooleanSetting("Circle", "", this, false, () -> true, false));
     BooleanSetting Triangle = sgGeneral.add(new BooleanSetting("Triangle", "", this, false, () -> true, false));
@@ -40,6 +44,7 @@ public class Test extends Module_ {
     BooleanSetting TracerLine = sgGeneral.add(new BooleanSetting("TracerLine", "", this, false, () -> true, false));
     BooleanSetting blockOutlineAndFIll = sgGeneral.add(new BooleanSetting("blockOutlineAndFIll", "", this, false, () -> true, false));
     RGBASetting color = sgGeneral.add(new RGBASetting("Color", "color", Color.WHITE, false, this, () -> true));
+    GradientUtils rainbowGradient = new GradientUtils();
 
 
     public Test() {
@@ -47,6 +52,13 @@ public class Test extends Module_ {
 
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
+        rainbowGradient.addColor(Color.RED);
+        rainbowGradient.addColor(Color.ORANGE);
+        rainbowGradient.addColor(Color.YELLOW);
+        rainbowGradient.addColor(Color.GREEN);
+        rainbowGradient.addColor(Color.BLUE);
+        rainbowGradient.addColor(new Color(75, 0, 130)); // Indigo
+        rainbowGradient.addColor(new Color(238, 130, 238)); // Violet
     }
 
     @Override

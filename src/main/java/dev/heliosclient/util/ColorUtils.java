@@ -99,6 +99,16 @@ public class ColorUtils {
         float hue = (System.currentTimeMillis() % ((int) ClickGUI.RainbowSpeed.value * 1000)) / ((int) ClickGUI.RainbowSpeed.value * 1000.0f);
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
+    /**
+     * Rainbow cycle 2.
+     *
+     * @return Current rainbow color.
+     */
+    public static Color getRainbowColor2() {
+        float hue = (System.currentTimeMillis() % ((int) ClickGUI.RainbowSpeed.value * 500)) / ((int) ClickGUI.RainbowSpeed.value * 500.0f);
+        return Color.getHSBColor(hue, 1.0f, 1.0f);
+    }
+
 
     /**
      * Changes alpha on color.
@@ -201,5 +211,30 @@ public class ColorUtils {
                 Integer.valueOf(hex.substring(3, 5), 16),
                 Integer.valueOf(hex.substring(5, 7), 16)
         );
+    }
+
+    public static Color blend(Color color1, Color color2, float fraction) {
+        int r = (int) (color1.getRed() * (1 - fraction) + color2.getRed() * fraction);
+        int g = (int) (color1.getGreen() * (1 - fraction) + color2.getGreen() * fraction);
+        int b = (int) (color1.getBlue() * (1 - fraction) + color2.getBlue() * fraction);
+        return new Color(r, g, b);
+    }
+    // The fraction parameter is used to adjust the hue of the colors over time, creating a constantly changing effect.
+    public static Color[] getDaySkyColors(float fraction) {
+        Color color1 = Color.getHSBColor(fraction, 0.6f, 1.0f); // Sky blue
+        Color color2 = Color.getHSBColor(fraction, 0.2f, 1.0f); // Light yellow
+        return new Color[]{color1, color2};
+    }
+
+    public static Color[] getEveningSkyColors(float fraction) {
+        Color color1 = Color.getHSBColor(fraction, 0.5f, 0.8f); // Orange
+        Color color2 = Color.getHSBColor(fraction, 0.0f, 0.5f); // Dark blue
+        return new Color[]{color1, color2};
+    }
+
+    public static Color[] getNightSkyColors(float fraction) {
+        Color color1 = Color.getHSBColor(fraction, 0.66f, 0.2f); // Dark blue
+        Color color2 = Color.getHSBColor(fraction, 0.66f, 0.4f); // Lighter blue
+        return new Color[]{color1, color2};
     }
 }

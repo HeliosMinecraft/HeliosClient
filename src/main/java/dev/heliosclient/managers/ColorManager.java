@@ -22,8 +22,18 @@ public class ColorManager {
     public int clickGuiPaneText = 0xFFFFFFFF;
     public int clickGuiPaneTextAlpha = 255;
 
+    public Color primaryGradientStart = new Color(0);
+    public Color primaryGradientEnd = new Color(0);
     public int defaultTextColor() {
         return defaultTextColor;
+    }
+
+    public Color getPrimaryGradientStart() {
+        return primaryGradientStart;
+    }
+
+    public Color getPrimaryGradientEnd() {
+        return primaryGradientEnd;
     }
 
     public int clickGuiSecondary() {

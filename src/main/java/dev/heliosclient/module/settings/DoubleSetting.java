@@ -83,11 +83,8 @@ public class DoubleSetting extends Setting<Double> {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         //  inputBox = null;
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
-        //double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
-        double diff = Math.min(100, Math.max(0, (mouseX - x) / 1.9));
-        double scaledValue = (value - min) / (max - min);
-
-      /*  if (sliding) {
+        double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
+        if (sliding) {
             if (diff == 0) {
                 value = min;
             } else {
@@ -95,17 +92,7 @@ public class DoubleSetting extends Setting<Double> {
             }
             module.onSettingChange(this);
         }
-
-       */
-
-        int scaledValueInt = (int) (scaledValue * 188) + 2;
-        if (sliding) {
-            if (diff == 0) {
-                value = min;
-            } else {
-                value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
-            }
-        }
+        int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth)) + 2;
 
         String valueString = "" + MathUtils.round(value, roundingPlace);
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), valueString, (x + moduleWidth - 10) - FontRenderers.Small_fxfontRenderer.getStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
@@ -113,8 +100,8 @@ public class DoubleSetting extends Setting<Double> {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, moduleWidth - 8, 1, 1, 0xFFAAAAAA);
 
 
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, scaledValueInt, 1, 1, 0xFF55FFFF);
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValueInt + 2, y + 11, 1, 5, 1, 0xFFFFFFFF);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, scaledValue, 1, 1, 0xFF55FFFF);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue + 2, y + 11, 1, 5, 1, 0xFFFFFFFF);
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {
