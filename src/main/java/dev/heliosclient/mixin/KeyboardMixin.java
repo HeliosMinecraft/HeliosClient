@@ -45,10 +45,12 @@ public abstract class KeyboardMixin {
             ClickGUIScreen.INSTANCE.onLoad();
             MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
         }
-        KeyHeldEvent event = new KeyHeldEvent(window, key, scancode, action, modifiers);
-        EventManager.postEvent(event);
-        if (event.isCanceled()) {
-            info.cancel();
+        if (action != GLFW.GLFW_RELEASE && action == GLFW.GLFW_PRESS) {
+            KeyHeldEvent event = new KeyHeldEvent(window, key, scancode, action, modifiers);
+            EventManager.postEvent(event);
+            if (event.isCanceled()) {
+                info.cancel();
+            }
         }
     }
 

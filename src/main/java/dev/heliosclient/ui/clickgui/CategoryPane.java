@@ -106,7 +106,7 @@ public class CategoryPane implements Listener {
 
     public void update() {
         executor.submit(() -> {
-            float prevbuttonY = y;
+            float prevbuttonY = y + 20;
             for (ModuleButton button : moduleButtons) {
                 button.update(prevbuttonY);
                 if (!button.isAnimationDone()) {

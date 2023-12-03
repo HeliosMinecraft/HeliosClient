@@ -55,7 +55,7 @@ public class CycleSetting extends Setting<Integer> {
             Renderer2D.drawFixedString(drawContext.getMatrices(), "No option found!", x + 2, y + 4, 0xFFFF0000);
         }
         else {
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + Renderer2D.getFxStringWidth(name + ": ") + 2 , y + 2, Renderer2D.getFxStringWidth(options.get(value).toString()) + 4,Renderer2D.getFxStringHeight(options.get(value).toString()) + 2, color.getRGB());
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + Renderer2D.getFxStringWidth(name + ": ") , y + 2, Renderer2D.getFxStringWidth(options.get(value).toString()) + 4,Renderer2D.getFxStringHeight(options.get(value).toString()) + 3,3, color.getRGB());
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + options.get(value), x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
         }
 

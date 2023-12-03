@@ -262,6 +262,8 @@ public class ClickGUI extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent event) {
+       System.out.print("");
+
         Tooltip.tooltip.mode = TooltipMode.value;
         Tooltip.tooltip.fixedPos = TooltipPos.value;
 
