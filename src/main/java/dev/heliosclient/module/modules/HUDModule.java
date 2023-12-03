@@ -17,7 +17,7 @@ public class HUDModule extends Module_ implements Listener {
     public RGBASetting colorSetting = sgGeneral.add(new RGBASetting.Builder()
             .name("Color")
             .description("Color of HUD.")
-            .module(this)
+            .onSettingChange(this)
             .value(new Color(241, 83, 92, 255))
             .defaultValue(new Color(241, 83, 92, 255))
             .build()

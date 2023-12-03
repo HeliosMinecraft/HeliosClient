@@ -7,6 +7,7 @@ import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
@@ -18,10 +19,10 @@ public class DoubleSetting extends Setting<Double> {
     private final int roundingPlace;
     private final InputBox inputBox;
     public double value;
-    Module_ module;
+    ISettingChange ISettingChange;
     boolean sliding = false;
 
-    public DoubleSetting(String name, String description, Module_ module, double value, double min, double max, int roundingPlace, BooleanSupplier shouldRender, double defaultValue) {
+    public DoubleSetting(String name, String description, ISettingChange ISettingChange, double value, double min, double max, int roundingPlace, BooleanSupplier shouldRender, double defaultValue) {
         super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
@@ -29,7 +30,7 @@ public class DoubleSetting extends Setting<Double> {
         this.min = min;
         this.max = max;
         this.heightCompact = 20;
-        this.module = module;
+        this.ISettingChange = ISettingChange;
         this.roundingPlace = roundingPlace;
         inputBox = new InputBox(String.valueOf(max).length() * 6, 11, String.valueOf(value), 10, InputBox.InputMode.DIGITS);
     }
@@ -48,7 +49,7 @@ public class DoubleSetting extends Setting<Double> {
             } else {
                 value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
             }
-            module.onSettingChange(this);
+            ISettingChange.onSettingChange(this);
         }
 
         float valueWidth = Renderer2D.getFxStringWidth(value + ".00") + 3;
@@ -90,7 +91,7 @@ public class DoubleSetting extends Setting<Double> {
             } else {
                 value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
             }
-            module.onSettingChange(this);
+            ISettingChange.onSettingChange(this);
         }
         int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth)) + 2;
 
@@ -119,7 +120,7 @@ public class DoubleSetting extends Setting<Double> {
         super.mouseClicked(mouseX, mouseY, button);
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             value = defaultValue;
-            module.onSettingChange(this);
+            ISettingChange.onSettingChange(this);
         }
         if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.isFocused()) {
             this.sliding = true;
@@ -132,7 +133,7 @@ public class DoubleSetting extends Setting<Double> {
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
         sliding = false;
-        module.onSettingChange(this);
+        ISettingChange.onSettingChange(this);
     }
 
     @Override
@@ -170,14 +171,14 @@ public class DoubleSetting extends Setting<Double> {
                 }
                 value = newVal;
                 inputBox.setValue(String.valueOf(value));
-                module.onSettingChange(this);
+                ISettingChange.onSettingChange(this);
             } catch (NumberFormatException ignored) {
             }
         }
     }
 
     public static class Builder extends SettingBuilder<Builder, Double, DoubleSetting> {
-        Module_ module;
+        ISettingChange ISettingChange;
         double min, max;
         int roundingPlace;
 
@@ -185,8 +186,8 @@ public class DoubleSetting extends Setting<Double> {
             super(0.0D);
         }
 
-        public Builder module(Module_ module) {
-            this.module = module;
+        public Builder onSettingChange(ISettingChange ISettingChange) {
+            this.ISettingChange = ISettingChange;
             return this;
         }
 
@@ -207,7 +208,7 @@ public class DoubleSetting extends Setting<Double> {
 
         @Override
         public DoubleSetting build() {
-            return new DoubleSetting(name, description, module, value, min, max, roundingPlace, shouldRender, defaultValue);
+            return new DoubleSetting(name, description, ISettingChange, value, min, max, roundingPlace, shouldRender, defaultValue);
         }
     }
 }

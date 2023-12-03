@@ -14,6 +14,7 @@ import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
+import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.Framebuffer;
@@ -36,9 +37,8 @@ public class RGBASetting extends Setting<Color> implements Listener {
     private final int offsetX = 10; // Offset from the left
     private final int offsetY = 20; // Offset from the top
     private final boolean defaultRainbow;
-    private final Module_ module;
+    private final ISettingChange ISettingChange;
     public Color value;
-    public fxFontRenderer iconRenderer;
     public InputBox hexInput;
     public boolean isPicking = false;
     private float hue, saturation, brightness, alpha;
@@ -48,10 +48,9 @@ public class RGBASetting extends Setting<Color> implements Listener {
     private int gradientBoxX, gradientBoxY, gradientBoxWidth, gradientBoxHeight;
     private int alphaSliderX, alphaSliderY, alphaSliderWidth, alphaSliderHeight;
     private int brightnessSaturationBoxX, brightnessSaturationBoxY, brightnessSaturationBoxWidth, brightnessSaturationBoxHeight;
-    private fxFontRenderer fxFontRenderer;
     private Screen parentScreen = null;
 
-    public RGBASetting(String name, String description, Color defaultColor, boolean rainbow, Module_ module, BooleanSupplier shouldRender) {
+    public RGBASetting(String name, String description, Color defaultColor, boolean rainbow, ISettingChange ISettingChange, BooleanSupplier shouldRender) {
         super(shouldRender, defaultColor);
         this.name = name;
         this.description = description;
@@ -60,11 +59,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.defaultRainbow = rainbow;
         this.height = 25;
         this.heightCompact = 17;
-        this.module = module;
-
-        if (MinecraftClient.getInstance().getWindow() != null) {
-            fxFontRenderer = new fxFontRenderer(FontManager.fonts, 5f);
-        }
+        this.ISettingChange = ISettingChange;
         EventManager.register(this);
 
         // Calculate values once and store them
@@ -139,8 +134,8 @@ public class RGBASetting extends Setting<Color> implements Listener {
         Renderer2D.drawFixedString(drawContext.getMatrices(), "Rainbow ", x + offsetX + 1, y + offsetY + gradientBoxHeight + 7, rainbow ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
         //Draw picker button
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 5, y + offsetY + gradientBoxHeight + 6, iconRenderer.getStringWidth("\uF17C ") + 3, iconRenderer.getStringHeight("\uF17C ") + 1, 2, Color.LIGHT_GRAY.getRGB());
-        iconRenderer.drawString(drawContext.getMatrices(), "\uF14B", x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 6.5f, y + offsetY + gradientBoxHeight + 6.5f, isPicking ? Color.GREEN.getRGB() : Color.RED.getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 5, y + offsetY + gradientBoxHeight + 6, FontRenderers.Small_iconRenderer.getStringWidth("\uF17C ") + 3, FontRenderers.Small_iconRenderer.getStringHeight("\uF17C ") + 1, 2, Color.LIGHT_GRAY.getRGB());
+       FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF14B", x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 6.5f, y + offsetY + gradientBoxHeight + 6.5f, isPicking ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
         //Render the texts
         Renderer2D.drawFixedString(drawContext.getMatrices(), "Alpha: " + value.getAlpha(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 9, -1);
@@ -198,7 +193,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, sliderWidth + 2, boxHeight + 2, 1, 1, value3);
 
-        fxFontRenderer.drawString(drawContext.getMatrices(), "Alpha", x - 2, y + boxHeight + 1, -1); // Below the alpha slider
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Alpha", x - 2, y + boxHeight + 1, -1); // Below the alpha slider
     }
 
     public void drawBrightnessSaturationBox(DrawContext drawContext, int x, int y, float hue, int value3) {
@@ -221,7 +216,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
 
     public boolean hoveredOverPickBool(double mouseX, double mouseY) {
-        return mouseX > gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 && mouseX < gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 + iconRenderer.getStringWidth("\uF17C ") + 3 && mouseY > y + offsetY + gradientBoxHeight + 5 && mouseY < y + offsetY + gradientBoxHeight + 6 + Renderer2D.getFxStringHeight("\uF17C ") + 2;
+        return mouseX > gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 && mouseX < gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 +  FontRenderers.Small_iconRenderer.getStringWidth("\uF17C ") + 3 && mouseY > y + offsetY + gradientBoxHeight + 5 && mouseY < y + offsetY + gradientBoxHeight + 6 + Renderer2D.getFxStringHeight("\uF17C ") + 2;
     }
 
     public boolean hoveredOverRainbowBool(double mouseX, double mouseY) {
@@ -347,12 +342,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
     public boolean isDefaultRainbow() {
         return defaultRainbow;
     }
-
-    @SubscribeEvent
-    public void onFontChange(FontChangeEvent event) {
-        fxFontRenderer = new fxFontRenderer(event.getFonts(), 5f);
-        iconRenderer = new fxFontRenderer(FontManager.iconFonts, 9f);
-    }
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
         if(rainbow){
@@ -370,7 +359,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
     public static class Builder extends SettingBuilder<Builder, Color, RGBASetting> {
         boolean rainbow = false;
-        Module_ module;
+        ISettingChange ISettingChange;
 
         public Builder() {
             super(new Color(-1));
@@ -381,14 +370,14 @@ public class RGBASetting extends Setting<Color> implements Listener {
             return this;
         }
 
-        public Builder module(Module_ module) {
-            this.module = module;
+        public Builder onSettingChange(ISettingChange ISettingChange) {
+            this.ISettingChange = ISettingChange;
             return this;
         }
 
         @Override
         public RGBASetting build() {
-            return new RGBASetting(name, description, value, rainbow, module, shouldRender);
+            return new RGBASetting(name, description, value, rainbow, ISettingChange, shouldRender);
         }
     }
 }

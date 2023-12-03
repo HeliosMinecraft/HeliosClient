@@ -16,6 +16,7 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import java.util.List;
 /**
  * Template for modules.
  */
-public abstract class Module_ implements Listener {
+public abstract class Module_ implements Listener, ISettingChange {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
     public String name;
     public String description;
@@ -40,7 +41,7 @@ public abstract class Module_ implements Listener {
     public BooleanSetting chatFeedback = sgbind.add(new BooleanSetting.Builder()
             .name("Enable chat feedback")
             .description("Toggles feedback in chat.")
-            .module(this)
+            .onSettingChange(this)
             .value(false)
             .build()
     );
@@ -51,7 +52,7 @@ public abstract class Module_ implements Listener {
     public BooleanSetting showInModulesList = sgbind.add(new BooleanSetting.Builder()
             .name("Show in Modules List")
             .description("If this module should show up in Module List.")
-            .module(this)
+            .onSettingChange(this)
             .value(true)
             .defaultValue(true)
             .build()
@@ -62,9 +63,9 @@ public abstract class Module_ implements Listener {
     public KeyBind keyBind = sgbind.add(new KeyBind.Builder()
             .name("Keybind")
             .description("Key to toggle this module.")
-            .module(this)
-            .value(0)
-            .defaultValue(0)
+            .onSettingChange(this)
+            .value(-1)
+            .defaultValue(-1)
             .build()
     );
     /**
@@ -73,7 +74,7 @@ public abstract class Module_ implements Listener {
     public BooleanSetting toggleOnBindRelease = sgbind.add(new BooleanSetting.Builder()
             .name("Toggle On Bind Release")
             .description("Toggle on if key is being held and off if key is released")
-            .module(this)
+            .onSettingChange(this)
             .value(false)
             .defaultValue(false)
             .build()
@@ -85,7 +86,7 @@ public abstract class Module_ implements Listener {
     public BooleanSetting active = sgbind.add(new BooleanSetting.Builder()
             .name("Active")
             .description("State of this module.")
-            .module(this)
+            .onSettingChange(this)
             .value(false)
             .build()
     );

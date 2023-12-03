@@ -1,5 +1,6 @@
 package dev.heliosclient.ui.clickgui.hudeditor;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.input.KeyPressedEvent;
 import dev.heliosclient.event.listener.Listener;
@@ -26,9 +27,10 @@ public class HudEditorScreen extends Screen implements Listener {
     // Variables to track the drag state and initial position
     private boolean isDragging = false;
     private Hitbox dragBox = null;
+    public static HudEditorScreen INSTANCE = new HudEditorScreen();
 
 
-    public HudEditorScreen() {
+    private HudEditorScreen() {
         super(Text.of("Hud editor"));
         EventManager.register(this);
         dragBox = new Hitbox(0, 0, 0, 0);
@@ -97,19 +99,23 @@ public class HudEditorScreen extends Screen implements Listener {
         HudCategoryPane.INSTANCE.mouseClicked(mouseX, mouseY, button);
 
         if (button == 0) {
-            if (!selectedElements.isEmpty() && !isDragging && dragBox == null && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX,mouseY)) {
+            if (!selectedElements.isEmpty() && !isDragging && dragBox == null && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX, mouseY)) {
                 for (HudElement element : selectedElements) {
                     if (dragBox == null && !isDragging) {
                         element.mouseClicked(mouseX, mouseY, button);
                     }
                 }
             }
+        }
             selectedElements.clear();
 
             int lastHoveredIndex = -1;
             for (int i = HudManager.INSTANCE.hudElements.size() - 1; i >= 0; i--) {
                 if (HudManager.INSTANCE.hudElements.get(i).hovered(mouseX, mouseY)) {
                     HudManager.INSTANCE.hudElements.get(i).selected = true;
+                    if(button == 1){
+                        HeliosClient.MC.setScreen(new HudEditorSettingScreen(HudManager.INSTANCE.hudElements.get(i),180,180));
+                    }
                     lastHoveredIndex = i;
                     break;
                 }
@@ -124,6 +130,7 @@ public class HudEditorScreen extends Screen implements Listener {
                 }
             }
 
+        if (button == 0) {
             if (lastHoveredIndex == -1 && selectedElements.isEmpty() && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX,mouseY)) {
                 isDragging = true;
                 int dragStartX = (int) mouseX;

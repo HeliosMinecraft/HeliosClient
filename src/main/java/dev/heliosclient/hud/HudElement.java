@@ -2,10 +2,18 @@ package dev.heliosclient.hud;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.module.settings.BooleanSetting;
+import dev.heliosclient.module.settings.RGBASetting;
+import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class for creating HudElements for HUD
@@ -17,7 +25,7 @@ import net.minecraft.client.gui.DrawContext;
  *
  * <h4>Warning: Makes sure the element is centered along the x and y position. If this is not met they will go off-screen and hit-boxes will be broken.</h4>
  */
-public class HudElement {
+public class HudElement implements ISettingChange {
     public String name;
     public String description;
     public int height = FontManager.fontSize;
@@ -35,13 +43,32 @@ public class HudElement {
     public Hitbox hitbox;
     public boolean shiftDown = false;
     int startX, startY, snapSize = 100;
+    public List<Setting> settings = new ArrayList<>();
 
 
     public HudElement(String name, String description) {
         this.name = name;
         this.description = description;
         hitbox = new Hitbox(x, y, width, height);
+        addSetting(renderBg);
+        addSetting(backgroundColor);
     }
+
+    public BooleanSetting renderBg = new BooleanSetting.Builder()
+                    .name("Render background")
+                    .description("Render the background for the element")
+                    .value(false)
+                    .defaultValue(false)
+                    .onSettingChange(this)
+                    .build();
+    public RGBASetting backgroundColor = new RGBASetting.Builder()
+            .name("Background Color")
+            .description("Render the background for the element")
+            .value(new Color(4, 3, 3, 157))
+            .defaultValue(new Color(4, 3, 3, 157))
+            .shouldRender(()-> renderBg.value)
+            .onSettingChange(this)
+            .build();
 
     /**
      * Method for rendering in the editor. You probably shouldn't override this.
@@ -142,6 +169,12 @@ public class HudElement {
         //Set default height value
         this.height = Math.round(Renderer2D.getStringHeight());
 
+        if(renderBg.value){
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().translate(0,0,-69D);
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, width + 1, height + 1, backgroundColor.getColor().getRGB());
+            drawContext.getMatrices().pop();
+        }
         //Renders element
         renderElement(drawContext, textRenderer);
 
@@ -196,14 +229,17 @@ public class HudElement {
      * Called on load.
      */
     public void onLoad() {
+        addSetting(renderBg);
+        addSetting(backgroundColor);
     }
 
     /**
-     * Called when setting gets changed.
+     * Add a setting to the settings list
+     * @param setting setting to be added
      */
-    public void onSettingChange() {
+    public void addSetting(Setting setting){
+        settings.add(setting);
     }
-
     /**
      * Mouse click event.
      *
@@ -274,5 +310,12 @@ public class HudElement {
 
     public void setWidth(int width) {
         this.width = width;
+    }
+
+    /**
+     * Called when setting gets changed.
+     */
+    public void onSettingChange(Setting setting) {
+
     }
 }

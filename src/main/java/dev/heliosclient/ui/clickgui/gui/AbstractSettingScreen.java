@@ -1,6 +1,7 @@
 package dev.heliosclient.ui.clickgui.gui;
 
 
+import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -16,6 +17,7 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
     protected Module_ module;
     protected final Window window;
     protected Setting setting;
+    protected HudElement hudElement;
     protected int x, y, windowWidth, windowHeight;
     public float delay = 0;
 
@@ -29,7 +31,11 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
         this.setting = setting;
         this.window = new Window(windowHeight, windowWidth, true, this);
     }
-
+    public AbstractSettingScreen(Text title, HudElement hudElement, int windowHeight, int windowWidth) {
+        super(title);
+        this.hudElement = hudElement;
+        this.window = new Window(windowHeight, windowWidth, true, this);
+    }
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         window.mouseScrolled(mouseX, mouseY, verticalAmount);
@@ -48,7 +54,10 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
             window.render(drawContext, mouseX, mouseY, module.name, module.description, textRenderer);
         }else if(setting != null){
             window.render(drawContext, mouseX, mouseY, setting.name, setting.description, textRenderer);
+        } else if(hudElement != null){
+            window.render(drawContext, mouseX, mouseY, hudElement.name, hudElement.description, textRenderer);
         }
+
         x = window.getX();
         y = window.getY();
     }
@@ -64,6 +73,12 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
         } else if (setting != null) {
             setting.mouseClicked(mouseX, mouseY, button);
         }
+        else if(hudElement != null){
+            for (Setting setting : hudElement.settings) {
+                if (!setting.shouldRender()) continue;
+                setting.mouseClicked(mouseX, mouseY, button);
+            }
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -76,6 +91,12 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
             }
         } else if (setting != null) {
             setting.mouseReleased(mouseX, mouseY, button);
+        }
+        else if(hudElement != null){
+            for (Setting setting : hudElement.settings) {
+                if (!setting.shouldRender()) continue;
+                setting.mouseReleased(mouseX, mouseY, button);
+            }
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
@@ -90,6 +111,12 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
         } else if (setting != null) {
             setting.keyPressed(keyCode, scanCode, modifiers);
         }
+        else if(hudElement != null){
+            for (Setting setting : hudElement.settings) {
+                if (!setting.shouldRender()) continue;
+                setting.keyPressed(keyCode, scanCode, modifiers);
+            }
+        }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
@@ -102,6 +129,12 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
             }
         } else if (setting != null) {
             setting.charTyped(chr, modifiers);
+        }
+        else if(hudElement != null){
+            for (Setting setting : hudElement.settings) {
+                if (!setting.shouldRender()) continue;
+                setting.charTyped(chr, modifiers);
+            }
         }
         return super.charTyped(chr, modifiers);
     }

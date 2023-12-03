@@ -29,7 +29,6 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
         public SettingsScreen(Module_ module, Screen parentScreen) {
             super(Text.literal("Settings"),module,0,224);
             updateSetting();
-
         }
 
         public void updateSetting() {

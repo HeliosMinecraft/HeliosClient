@@ -21,7 +21,7 @@ public class NavBarManager {
         registerItems(
                 new NavBarItem("ClickGUI", "ClickGUI", ClickGUIScreen.INSTANCE),
                 new NavBarItem("Settings", "ClickGUI Setting", new ClientSettingsScreen(clickGUI)),
-                new NavBarItem("HudEditor", "HUD editor", new HudEditorScreen())
+                new NavBarItem("HudEditor", "HUD editor", HudEditorScreen.INSTANCE)
         );
     }
 

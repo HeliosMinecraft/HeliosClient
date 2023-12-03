@@ -7,6 +7,7 @@ import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -14,13 +15,13 @@ import java.util.function.BooleanSupplier;
 
 public class BooleanSetting extends Setting<Boolean> {
     public boolean value;
-    Module_ module;
+    ISettingChange iSettingChange;
     String description;
     AnimationUtils CheckBoxAnimation = new AnimationUtils();
 
-    public BooleanSetting(String name, String description, Module_ module, boolean value, BooleanSupplier shouldRender, boolean defaultValue) {
+    public BooleanSetting(String name, String description, ISettingChange iSettingChange, boolean value, BooleanSupplier shouldRender, boolean defaultValue) {
         super(shouldRender, defaultValue);
-        this.module = module;
+        this.iSettingChange = iSettingChange;
         this.name = name;
         this.description = description;
         this.heightCompact = 14;
@@ -73,31 +74,31 @@ public class BooleanSetting extends Setting<Boolean> {
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             value = defaultValue;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
             CheckBoxAnimation.startFading(value, EasingType.QUADRATIC_OUT);
         }
         if (hovered((int) mouseX, (int) mouseY) && button == 0) {
             this.value = !value;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
             CheckBoxAnimation.startFading(value, EasingType.QUADRATIC_OUT);
         }
     }
 
     public static class Builder extends SettingBuilder<Builder, Boolean, BooleanSetting> {
-        Module_ module;
+        ISettingChange ISettingChange;
 
         public Builder() {
             super(false);
         }
 
-        public Builder module(Module_ module) {
-            this.module = module;
+        public Builder onSettingChange(ISettingChange ISettingChange) {
+            this.ISettingChange = ISettingChange;
             return this;
         }
 
         @Override
         public BooleanSetting build() {
-            return new BooleanSetting(name, description, module, value, shouldRender, defaultValue);
+            return new BooleanSetting(name, description, ISettingChange, value, shouldRender, defaultValue);
         }
     }
 }

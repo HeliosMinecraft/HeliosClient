@@ -22,7 +22,7 @@ public class CapeModule extends Module_ {
             .description("Custom cape texture to use. Turn on modules to see options")
             .value(List.of(CapeManager.capes))
             .listValue(0)
-            .module(this)
+            .onSettingChange(this)
             .build()
     );
     public BooleanSetting customPhysics = sgCape.add(new BooleanSetting.Builder()
@@ -30,7 +30,7 @@ public class CapeModule extends Module_ {
             .description("Improved physics for capes")
             .value(true)
             .defaultValue(false)
-            .module(this)
+            .onSettingChange(this)
             .build()
     );
     public BooleanSetting elytra = sgCape.add(new BooleanSetting.Builder()
@@ -38,7 +38,7 @@ public class CapeModule extends Module_ {
             .description("Cape Texture for elytra (Bad most of times with improper textures)")
             .value(false)
             .defaultValue(false)
-            .module(this)
+            .onSettingChange(this)
             .build()
     );
     public ButtonSetting loadCapes = sgCape.add(new ButtonSetting.Builder()

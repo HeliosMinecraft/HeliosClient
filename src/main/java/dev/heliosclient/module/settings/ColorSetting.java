@@ -5,6 +5,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -20,17 +21,17 @@ public class ColorSetting extends Setting<Integer> {
     boolean slidingGreen = false;
     boolean slidingBlue = false;
     boolean slidingAlpha = false;
-    Module_ module;
+    ISettingChange iSettingChange;
     int boxSize = 20;
 
-    public ColorSetting(String name, String description, Module_ module, int value, BooleanSupplier shouldRender, int defaultValue) {
+    public ColorSetting(String name, String description, ISettingChange iSettingChange, int value, BooleanSupplier shouldRender, int defaultValue) {
         super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
         this.value = value;
         this.height = 80;
         this.heightCompact = 80;
-        this.module = module;
+        this.iSettingChange = iSettingChange;
         this.a = (value >> 24) & 0xFF;
         this.r = (value >> 16) & 0xFF;
         this.g = (value >> 8) & 0xFF;
@@ -45,19 +46,19 @@ public class ColorSetting extends Setting<Integer> {
         int colorValue = (int) MathUtils.round(((diff / 100) * 255), 0);
         if (slidingAlpha) {
             a = 255 - colorValue;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
         if (slidingRed) {
             r = 255 - colorValue;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
         if (slidingGreen) {
             g = 255 - colorValue;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
         if (slidingBlue) {
             b = 255 - colorValue;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
 
         value = new Color(r, g, b, a).getRGB();
@@ -107,19 +108,19 @@ public class ColorSetting extends Setting<Integer> {
         int colorValue = (int) MathUtils.round(((diff / 100) * 255), 0);
         if (slidingAlpha) {
             a = 255 - colorValue;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
         if (slidingRed) {
             r = 255 - colorValue;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
         if (slidingGreen) {
             g = 255 - colorValue;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
         if (slidingBlue) {
             b = 255 - colorValue;
-            module.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
 
         value = new Color(r, g, b, a).getRGB();
@@ -232,20 +233,20 @@ public class ColorSetting extends Setting<Integer> {
     }
 
     public static class Builder extends SettingBuilder<Builder, Integer, ColorSetting> {
-        Module_ module;
+        ISettingChange ISettingChange;
 
         public Builder() {
             super(-1);
         }
 
-        public Builder module(Module_ module) {
-            this.module = module;
+        public Builder onSettingChange(ISettingChange ISettingChange) {
+            this.ISettingChange = ISettingChange;
             return this;
         }
 
         @Override
         public ColorSetting build() {
-            return new ColorSetting(name, description, module, value, shouldRender, defaultValue);
+            return new ColorSetting(name, description, ISettingChange, value, shouldRender, defaultValue);
         }
     }
 }

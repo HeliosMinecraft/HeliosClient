@@ -13,7 +13,7 @@ public class CustomFov extends Module_ {
     DoubleSetting FOV = sgGeneral.add(new DoubleSetting.Builder()
             .name("FOV")
             .description("Desired FOV")
-            .module(this)
+            .onSettingChange(this)
             .value(140.0)
             .defaultValue(140.0)
             .min(1)

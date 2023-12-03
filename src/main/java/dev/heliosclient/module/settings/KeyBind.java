@@ -7,6 +7,7 @@ import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
@@ -18,11 +19,11 @@ public class KeyBind extends Setting<Integer> {
     public static boolean listeningMouse = false;
     public int value;
     public boolean listening = false;
-    Module_ module;
+    ISettingChange ISettingChange;
 
-    public KeyBind(String name, String description, Module_ module, Integer value, BooleanSupplier shouldRender, int defaultValue) {
+    public KeyBind(String name, String description, ISettingChange ISettingChange, Integer value, BooleanSupplier shouldRender, int defaultValue) {
         super(shouldRender, defaultValue);
-        this.module = module;
+        this.ISettingChange = ISettingChange;
         this.name = name;
         this.description = description;
         this.value = value;
@@ -90,7 +91,7 @@ public class KeyBind extends Setting<Integer> {
             }
             listening = false;
             listeningKey = false;
-            module.onSettingChange(this);
+            ISettingChange.onSettingChange(this);
         }
     }
 
@@ -99,7 +100,7 @@ public class KeyBind extends Setting<Integer> {
         super.mouseClicked(mouseX, mouseY, button);
         if(listeningMouse && listening){
             value = button;
-            module.onSettingChange(this);
+            ISettingChange.onSettingChange(this);
             listening = !listening;
             listeningMouse = false;
         }
@@ -116,20 +117,20 @@ public class KeyBind extends Setting<Integer> {
     }
 
     public static class Builder extends SettingBuilder<Builder, Integer, KeyBind> {
-        Module_ module;
+        ISettingChange ISettingChange;
 
         public Builder() {
             super(-1);
         }
 
-        public Builder module(Module_ module) {
-            this.module = module;
+        public Builder onSettingChange(ISettingChange ISettingChange) {
+            this.ISettingChange = ISettingChange;
             return this;
         }
 
         @Override
         public KeyBind build() {
-            return new KeyBind(name, description, module, value, shouldRender, defaultValue);
+            return new KeyBind(name, description, ISettingChange, value, shouldRender, defaultValue);
         }
     }
 }

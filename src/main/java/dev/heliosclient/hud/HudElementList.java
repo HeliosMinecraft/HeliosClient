@@ -9,7 +9,6 @@ public class HudElementList {
     public ArrayList<HudElement> hudElements = new ArrayList<>();
 
     public HudElementList() {
-
         registerElements(new Coords());
         registerElement(new Fps());
         registerElement(new PlayerModel());
@@ -18,11 +17,11 @@ public class HudElementList {
         registerElement(new Ping());
         registerElement(new ModuleList());
         registerElement(new TestHud());
-
     }
 
     public void registerElement(HudElement module) {
         hudElements.add(module);
+        module.onLoad();
     }
 
     public void registerElements(HudElement... modules) {

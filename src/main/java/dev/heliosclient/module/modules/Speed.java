@@ -13,7 +13,7 @@ public class Speed extends Module_ {
     DoubleSetting speed = sgGeneral.add(new DoubleSetting.Builder()
             .name("Speed")
             .description("Multiplier of speed.")
-            .module(this)
+            .onSettingChange(this)
             .value(2.0)
             .defaultValue(2.0)
             .min(0.1)
