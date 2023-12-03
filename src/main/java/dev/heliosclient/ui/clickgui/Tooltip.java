@@ -14,7 +14,7 @@ public class Tooltip {
     public Integer mode = 0;
     public Integer fixedPos = 3;
 
-    public Tooltip() {
+    private Tooltip() {
     }
 
     public void render(DrawContext drawContext, TextRenderer textRenderer, int mouseX, int mouseY) {

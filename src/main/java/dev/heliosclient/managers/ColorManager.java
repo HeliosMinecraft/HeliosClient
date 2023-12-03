@@ -59,4 +59,7 @@ public class ColorManager {
             return clickGuiPaneText;
         }
     }
+    private ColorManager(){
+
+    }
 }

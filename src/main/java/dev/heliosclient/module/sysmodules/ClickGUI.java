@@ -215,8 +215,8 @@ public class ClickGUI extends Module_ {
         super("ClickGUI", "ClickGui related stuff.", Categories.RENDER);
 
         addSettingGroup(sgUI);
-       addSettingGroup(sgRender);
-       addSettingGroup(sgGeneral);
+        addSettingGroup(sgRender);
+        addSettingGroup(sgGeneral);
         addSettingGroup(sgTooltip);
 
          active.value = true;
@@ -225,11 +225,13 @@ public class ClickGUI extends Module_ {
             Font.setOptions(FontManager.fontNames);
         });
 
+        onEnable();
         EventManager.register(this);
    }
    @Override
    public void onSettingChange(Setting setting) {
        super.onSettingChange(setting);
+
        Tooltip.tooltip.mode = TooltipMode.value;
        Tooltip.tooltip.fixedPos = TooltipPos.value;
 
@@ -261,9 +263,8 @@ public class ClickGUI extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
        System.out.print("");
-
         Tooltip.tooltip.mode = TooltipMode.value;
         Tooltip.tooltip.fixedPos = TooltipPos.value;
 
