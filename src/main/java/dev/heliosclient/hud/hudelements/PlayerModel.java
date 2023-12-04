@@ -21,6 +21,7 @@ public class PlayerModel extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
+        super.renderElement(drawContext,textRenderer);
         this.width = 30;
         this.height = 55;
         ClientPlayerEntity player = MinecraftClient.getInstance().player;

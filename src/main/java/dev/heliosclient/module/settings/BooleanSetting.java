@@ -72,6 +72,7 @@ public class BooleanSetting extends Setting<Boolean> {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             value = defaultValue;
             iSettingChange.onSettingChange(this);

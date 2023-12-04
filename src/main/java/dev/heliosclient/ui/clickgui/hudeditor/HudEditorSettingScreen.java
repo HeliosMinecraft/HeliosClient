@@ -27,6 +27,9 @@ public class HudEditorSettingScreen extends AbstractSettingScreen {
     public void updateSetting() {
         executor.submit(() -> {
             Setting previousSetting = new Space(1, () -> false, false);
+            if(window != null) {
+                previousSetting.setY(window.getY());
+            }
             for (Setting setting : hudElement.settings) {
                 if (!setting.shouldRender()) continue;
                 setting.update(previousSetting.getY());

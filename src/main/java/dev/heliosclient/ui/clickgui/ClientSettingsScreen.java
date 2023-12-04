@@ -60,14 +60,14 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
         windowHeight = 50;
         for (SettingGroup settingGroup : module.settingGroups) {
             float groupNameHeight = settingGroup.getGroupNameHeight();
-            windowHeight += Math.round(groupNameHeight + 3);
+            windowHeight += Math.round(groupNameHeight + 12);
             if (!settingGroup.shouldRender()) continue;
             for (Setting setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
                 windowHeight += setting.height + 1;
             }
-            windowHeight += Math.round(groupNameHeight + 2);
+            windowHeight += Math.round(groupNameHeight + 4);
         }
 
         window.setWindowHeight(windowHeight);
@@ -91,7 +91,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
         int yOffset = y;
         for (SettingGroup settingGroup : module.settingGroups) {
             float groupNameHeight = settingGroup.getGroupNameHeight();
-            yOffset += Math.round(groupNameHeight + 3);
+            yOffset += Math.round(groupNameHeight + 12);
             settingGroup.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
 
            if (settingGroup.shouldRender()) {
@@ -116,7 +116,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
                 settingGroup.getSettings().forEach(this::resetSettingAnimation);
             }
 
-            yOffset += Math.round(groupNameHeight + 1);
+            yOffset += Math.round(groupNameHeight + 3);
         }
     }
 

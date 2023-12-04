@@ -121,9 +121,12 @@ public abstract class Setting<T> implements Listener {
      * @param button Which button is being clicked.
      */
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
+        if(getAnimationProgress() <=1) return;
+       /* if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             value = defaultValue;
         }
+
+        */
     }
 
     /**
@@ -211,6 +214,10 @@ public abstract class Setting<T> implements Listener {
 
     public float getY() {
         return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 
     public float getAnimationProgress() {

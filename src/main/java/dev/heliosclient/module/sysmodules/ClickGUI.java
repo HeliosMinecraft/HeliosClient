@@ -31,7 +31,7 @@ public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
     public static SettingGroup sgUI = new SettingGroup("UI");
-    static ClickGUI INSTANCE = new ClickGUI();
+    public static ClickGUI INSTANCE = new ClickGUI();
     public static CycleSetting ScrollType = sgUI.add(new CycleSetting.Builder()
             .name("Scrolling System")
             .description("Scrolling for the ClickGui")
@@ -92,8 +92,8 @@ public class ClickGUI extends Module_ {
             .build()
     );
     public static DoubleSetting RainbowSpeed = sgUI.add(new DoubleSetting.Builder()
-            .name("Rainbow speed")
-            .description("Speed of the rainbow throughout the client")
+            .name("Rainbow/Gradient speed")
+            .description("Speed of the rainbow and gradients throughout the client")
             .onSettingChange(ClickGUI.INSTANCE)
             .value(7.0)
             .max(20)
@@ -107,7 +107,7 @@ public class ClickGUI extends Module_ {
     public CycleSetting TooltipMode = sgTooltip.add(new CycleSetting.Builder()
             .name("Tooltip mode")
             .description("Mode in what tooltips should be shown.")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(new ArrayList<String>(List.of("Normal", "Fixed", "Vanilla")))
             .listValue(0)
             .shouldRender(() -> true)
@@ -116,7 +116,7 @@ public class ClickGUI extends Module_ {
     public CycleSetting TooltipPos = sgTooltip.add(new CycleSetting.Builder()
             .name("Tooltip position")
             .description("Position of fixed tooltip.")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(new ArrayList<>(List.of("Top-left", "Top-right", "Bottom-left", "Bottom-right", "Center")))
             .listValue(3)
             .shouldRender(() -> TooltipMode.value == 1)
@@ -145,12 +145,12 @@ public class ClickGUI extends Module_ {
     public CycleSetting ColorMode = sgRender.add(new CycleSetting.Builder()
             .name("Color Mode")
             .description("Color mode for parts of the client")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(new ArrayList<>(List.of("Static", "Gradient")))
             .listValue(0)
             .build()
     );
-    RGBASetting staticColor = sgRender.add(new RGBASetting.Builder()
+    public RGBASetting staticColor = sgRender.add(new RGBASetting.Builder()
             .name("Color")
             .description("Simple single color for parts of the client")
             .onSettingChange(this)
@@ -162,13 +162,13 @@ public class ClickGUI extends Module_ {
     public CycleSetting GradientType = sgRender.add(new CycleSetting.Builder()
             .name("Gradient Type")
             .description("Gradient type for the gradient color mode")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(new ArrayList<>(List.of("Rainbow", "DaySky", "EveningSky", "NightSky","Linear2D")))
             .listValue(0)
             .shouldRender(()-> ColorMode.value == 1)
             .build()
     );
-    RGBASetting linear2Start = sgRender.add(new RGBASetting.Builder()
+    public RGBASetting linear2Start = sgRender.add(new RGBASetting.Builder()
             .name("Linear-Start")
             .description("Linear Color Start of Linear mode")
             .onSettingChange(this)
@@ -177,7 +177,7 @@ public class ClickGUI extends Module_ {
             .shouldRender(()-> GradientType.value == 4 && ColorMode.value == 1)
             .build()
     );
-    RGBASetting linear2end = sgRender.add(new RGBASetting.Builder()
+    public RGBASetting linear2end = sgRender.add(new RGBASetting.Builder()
             .name("Linear-End")
             .description("Linear Color End of Linear mode")
             .onSettingChange(this)
@@ -187,7 +187,7 @@ public class ClickGUI extends Module_ {
             .build()
     );
 
-    RGBASetting AccentColor = sgGeneral.add(new RGBASetting.Builder()
+    public RGBASetting AccentColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Accent color")
             .description("Accent color of Click GUI.")
             .onSettingChange(this)
@@ -195,7 +195,7 @@ public class ClickGUI extends Module_ {
             .defaultValue(new Color(ColorManager.INSTANCE.clickGuiSecondary))
             .build()
     );
-    RGBASetting PaneTextColor = sgGeneral.add(new RGBASetting.Builder()
+    public RGBASetting PaneTextColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Category pane text color")
             .description("Color of pane text.")
             .onSettingChange(this)
@@ -203,7 +203,7 @@ public class ClickGUI extends Module_ {
             .defaultValue(new Color(ColorManager.INSTANCE.clickGuiPaneText))
             .build()
     );
-    RGBASetting TextColor = sgGeneral.add(new RGBASetting.Builder()
+    public RGBASetting TextColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Text color")
             .description("Color of text all through out the client.")
             .onSettingChange(this)
@@ -225,7 +225,6 @@ public class ClickGUI extends Module_ {
             Font.setOptions(FontManager.fontNames);
         });
 
-        onEnable();
         EventManager.register(this);
    }
    @Override
@@ -262,54 +261,7 @@ public class ClickGUI extends Module_ {
        }
     }
 
-    @SubscribeEvent
-    public void onTick(TickEvent.CLIENT event) {
-       System.out.print("");
-        Tooltip.tooltip.mode = TooltipMode.value;
-        Tooltip.tooltip.fixedPos = TooltipPos.value;
 
-        float hue = (System.currentTimeMillis() % 10000) / 10000f;
-
-        if(ColorMode.value == 0) {
-            ColorManager.INSTANCE.primaryGradientStart = staticColor.getColor();
-            ColorManager.INSTANCE.primaryGradientEnd = staticColor.getColor();
-        }
-        if(ColorMode.value == 1) {
-            switch(GradientType.value){
-                case 0->{
-                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
-                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor2();
-                }
-                case 1 ->{
-                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getDaySkyColors(hue)[0];
-                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getDaySkyColors(hue)[1];
-                }
-                case 2 ->{
-                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getEveningSkyColors(hue)[0];
-                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getEveningSkyColors(hue)[1];
-                }
-                case 3 ->{
-                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getNightSkyColors(hue)[0];
-                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getNightSkyColors(hue)[1];
-                }
-                case 4->{
-                    ColorManager.INSTANCE.primaryGradientStart = linear2Start.getColor();
-                    ColorManager.INSTANCE.primaryGradientEnd = linear2end.getColor();
-                }
-            }
-        }
-
-
-        ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getColor().getAlpha();
-        ColorManager.INSTANCE.clickGuiSecondary = AccentColor.getColor().getRGB();
-        ColorManager.INSTANCE.clickGuiSecondaryRainbow = AccentColor.isRainbow();
-
-        ColorManager.INSTANCE.defaultTextColor = TextColor.getColor().getRGB();
-
-        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getColor().getAlpha();
-        ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.getColor().getRGB();
-        ColorManager.INSTANCE.clickGuiPaneTextRainbow = PaneTextColor.isRainbow();
-    }
 
     @Override
     public void onLoad() {

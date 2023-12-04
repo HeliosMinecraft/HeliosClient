@@ -134,8 +134,8 @@ public class RGBASetting extends Setting<Color> implements Listener {
         Renderer2D.drawFixedString(drawContext.getMatrices(), "Rainbow ", x + offsetX + 1, y + offsetY + gradientBoxHeight + 7, rainbow ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
         //Draw picker button
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 5, y + offsetY + gradientBoxHeight + 6, FontRenderers.Small_iconRenderer.getStringWidth("\uF17C ") + 3, FontRenderers.Small_iconRenderer.getStringHeight("\uF17C ") + 1, 2, Color.LIGHT_GRAY.getRGB());
-       FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF14B", x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 6.5f, y + offsetY + gradientBoxHeight + 6.5f, isPicking ? Color.GREEN.getRGB() : Color.RED.getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 5, y + offsetY + gradientBoxHeight + 6, FontRenderers.Mid_iconRenderer.getStringWidth("\uF17C ") + 3, FontRenderers.Mid_iconRenderer.getStringHeight("\uF17C ") + 1, 2, Color.LIGHT_GRAY.getRGB());
+        FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), "\uF14B", x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 6.5f, y + offsetY + gradientBoxHeight + 6.5f, isPicking ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
         //Render the texts
         Renderer2D.drawFixedString(drawContext.getMatrices(), "Alpha: " + value.getAlpha(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 9, -1);
@@ -193,7 +193,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, sliderWidth + 2, boxHeight + 2, 1, 1, value3);
 
-        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Alpha", x - 2, y + boxHeight + 1, -1); // Below the alpha slider
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Alpha", x - 3, y + boxHeight + 1, -1); // Below the alpha slider
     }
 
     public void drawBrightnessSaturationBox(DrawContext drawContext, int x, int y, float hue, int value3) {

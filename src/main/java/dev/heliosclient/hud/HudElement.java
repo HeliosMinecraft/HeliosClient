@@ -1,11 +1,14 @@
 package dev.heliosclient.hud;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.settings.BooleanSetting;
+import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
@@ -42,33 +45,69 @@ public class HudElement implements ISettingChange {
     public boolean renderOutLineBox = true;
     public Hitbox hitbox;
     public boolean shiftDown = false;
-    int startX, startY, snapSize = 100;
     public List<Setting> settings = new ArrayList<>();
-
-
-    public HudElement(String name, String description) {
-        this.name = name;
-        this.description = description;
-        hitbox = new Hitbox(x, y, width, height);
-        addSetting(renderBg);
-        addSetting(backgroundColor);
-    }
-
     public BooleanSetting renderBg = new BooleanSetting.Builder()
-                    .name("Render background")
-                    .description("Render the background for the element")
-                    .value(false)
-                    .defaultValue(false)
-                    .onSettingChange(this)
-                    .build();
+            .name("Render background")
+            .description("Render the background for the element")
+            .value(false)
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build();
+    public BooleanSetting clientColorCycle = new BooleanSetting.Builder()
+            .name("Client Color Cycle")
+            .description("Use the client default color cycle for the background of the element")
+            .value(false)
+            .defaultValue(false)
+            .onSettingChange(this)
+            .shouldRender(() -> renderBg.value)
+            .build();
     public RGBASetting backgroundColor = new RGBASetting.Builder()
             .name("Background Color")
             .description("Render the background for the element")
             .value(new Color(4, 3, 3, 157))
             .defaultValue(new Color(4, 3, 3, 157))
-            .shouldRender(()-> renderBg.value)
+            .shouldRender(() -> renderBg.value && !clientColorCycle.value)
             .onSettingChange(this)
             .build();
+    public DoubleSetting padding = new DoubleSetting.Builder()
+            .name("Padding")
+            .description("Amount of Padding around the borders")
+            .value(0D)
+            .min(0)
+            .max(15)
+            .defaultValue(0D)
+            .shouldRender(() -> renderBg.value)
+            .onSettingChange(this)
+            .build();
+    public BooleanSetting rounded = new BooleanSetting.Builder()
+            .name("Rounded background")
+            .description("Rounds the background of the element for better visuals")
+            .value(false)
+            .defaultValue(false)
+            .onSettingChange(this)
+            .shouldRender(() -> renderBg.value)
+            .build();
+    public BooleanSetting shadow = new BooleanSetting.Builder()
+            .name("Shadow")
+            .description("Shadow for the background of the element")
+            .value(false)
+            .defaultValue(false)
+            .onSettingChange(this)
+            .shouldRender(() -> renderBg.value)
+            .build();
+    int startX, startY, snapSize = 100;
+    public HudElement(String name, String description) {
+        this.name = name;
+        this.description = description;
+        hitbox = new Hitbox(x, y, width, height);
+
+        addSetting(renderBg);
+        addSetting(clientColorCycle);
+        addSetting(backgroundColor);
+        addSetting(padding);
+        addSetting(shadow);
+        addSetting(rounded);
+    }
 
     /**
      * Method for rendering in the editor. You probably shouldn't override this.
@@ -163,18 +202,10 @@ public class HudElement implements ISettingChange {
                     Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 0, (float) drawContext.getScaledWindowHeight() / 2 - 1, drawContext.getScaledWindowWidth(), 2, 0xFF00FF00);
                 }
             }
-
-            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, width + 1, height + 1, 0.4f, 0xFFFFFFFF);
+            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(),   (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value), 0.4f, 0xFFFFFFFF);
         }
         //Set default height value
         this.height = Math.round(Renderer2D.getStringHeight());
-
-        if(renderBg.value){
-            drawContext.getMatrices().push();
-            drawContext.getMatrices().translate(0,0,-69D);
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, width + 1, height + 1, backgroundColor.getColor().getRGB());
-            drawContext.getMatrices().pop();
-        }
         //Renders element
         renderElement(drawContext, textRenderer);
 
@@ -218,11 +249,42 @@ public class HudElement implements ISettingChange {
 
     /**
      * Rendering function. Put everything you want to render here. Don't forget to set height and width.
+     * Defaults add background rendering which can be easy replaced by overriding without super call.
+     * Call the super method after defining your width and height so it is rendered with appropriate coordinates behind the text or item displayed
+     *
      *
      * @param drawContext
      * @param textRenderer
      */
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
+        if (renderBg.value) {
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().translate(0, 0, -69D);
+            Color bgStart, bgEnd;
+            if(clientColorCycle.value){
+                bgStart = ColorManager.INSTANCE.getPrimaryGradientStart();
+                bgEnd = ColorManager.INSTANCE.getPrimaryGradientEnd();
+            }else{
+                bgStart = backgroundColor.getColor();
+                bgEnd = bgStart;
+            }
+            Color blended = ColorUtils.blend(bgStart,bgEnd,1/2f);
+
+            if (rounded.value && !shadow.value) {
+                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(),bgStart,bgEnd,bgEnd,bgStart, (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value), 2);
+            } else if (!shadow.value) {
+                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value), bgStart.getRGB(), bgEnd.getRGB());
+            }
+
+            if (rounded.value && shadow.value) {
+                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value),bgStart,bgEnd,bgEnd,bgStart,2,4,blended);
+            }
+            if (!rounded.value && shadow.value) {
+                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value),4, bgStart.getRGB(), bgEnd.getRGB());
+            }
+
+            drawContext.getMatrices().pop();
+        }
     }
 
     /**
@@ -235,11 +297,13 @@ public class HudElement implements ISettingChange {
 
     /**
      * Add a setting to the settings list
+     *
      * @param setting setting to be added
      */
-    public void addSetting(Setting setting){
+    public void addSetting(Setting setting) {
         settings.add(setting);
     }
+
     /**
      * Mouse click event.
      *

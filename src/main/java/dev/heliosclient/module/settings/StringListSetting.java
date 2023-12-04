@@ -63,6 +63,7 @@ public class StringListSetting extends Setting<String[]> {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             inputBoxes.clear();
             inputBoxes.addAll(defaultInputBoxes);

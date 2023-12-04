@@ -85,7 +85,6 @@ public class EventManager {
     private static void handleException(Throwable e, Listener listener, Event event) {
         HeliosClient.LOGGER.info("Exception occurred while processing event: " + event.getClass().getName() + " \n Following was the listener: " + listener, e);
         HeliosClient.LOGGER.warn("An error occurred while processing an event. Please check the log file for details.");
-        System.err.println("An error occurred while processing an event. Please check the log file for details.");
     }
 
 }

@@ -45,6 +45,9 @@ public class ModuleList extends HudElement implements Listener {
         Collections.sort(enabledModules, Comparator.comparing(module -> module.name.length(), Comparator.reverseOrder()));
         this.width = maxWidth + 5;
         this.height = totalY + 2;
+
+        super.renderElement(drawContext,textRenderer);
+
         for (Module_ m : enabledModules) {
             if (!m.showInModulesList.value) continue;
             float nameWidth = Renderer2D.getStringWidth(m.name);

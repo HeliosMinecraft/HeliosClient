@@ -6,6 +6,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
@@ -40,6 +41,8 @@ public class HeliosClient implements ModInitializer {
     public static FontManager fontManager = new FontManager();
     public static NotificationManager notificationManager = new NotificationManager();
     public static AddonManager addonManager = new AddonManager();
+    public static ClickGUI clickGUI = new ClickGUI();
+
 
     @Override
     public void onInitialize() {
@@ -67,6 +70,7 @@ public class HeliosClient implements ModInitializer {
         EventManager.register(notificationManager);
         EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
         EventManager.register(KeybindManager.INSTANCE);
+        EventManager.register(ColorManager.INSTANCE);
         EventManager.register(new DamageUtils());
 
         if (MC.getWindow() != null) {

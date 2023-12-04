@@ -22,6 +22,7 @@ public class TestHud extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
+        super.renderElement(drawContext,textRenderer);
         String text = "CrystalDamage: ";
         String value = ColorUtils.gray + "0";
         this.width = Math.round(Renderer2D.getStringWidth(text + value));

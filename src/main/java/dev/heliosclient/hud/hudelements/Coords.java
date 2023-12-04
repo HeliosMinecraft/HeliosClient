@@ -21,6 +21,7 @@ public class Coords extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
+        super.renderElement(drawContext,textRenderer);
         int coordX, coordY, coordZ;
         if (mc.player == null) {
             coordX = 0;
