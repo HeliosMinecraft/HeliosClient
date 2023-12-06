@@ -27,7 +27,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
          private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
         public SettingsScreen(Module_ module, Screen parentScreen) {
-            super(Text.literal("Settings"),module,0,224);
+            super(Text.literal(module.name +" Settings"),module,0,224);
             updateSetting();
         }
 

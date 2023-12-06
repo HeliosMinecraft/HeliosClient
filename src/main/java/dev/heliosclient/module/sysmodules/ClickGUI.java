@@ -95,10 +95,10 @@ public class ClickGUI extends Module_ {
             .name("Rainbow/Gradient speed")
             .description("Speed of the rainbow and gradients throughout the client")
             .onSettingChange(ClickGUI.INSTANCE)
-            .value(7.0)
+            .value(14.0)
             .max(20)
             .min(1)
-            .defaultValue(8.0)
+            .defaultValue(10.0)
             .roundingPlace(0)
             .build()
     );

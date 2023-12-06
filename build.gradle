@@ -29,6 +29,15 @@ repositories {
 	maven { url 'https://jitpack.io' }
 
 }
+configurations {
+	// include mods
+	modImplementation.extendsFrom(modInclude)
+	include.extendsFrom(modInclude)
+
+	// include libraries
+	implementation.extendsFrom(library)
+	shadow.extendsFrom(library)
+}
 
 dependencies {
 	// To change the versions see the gradle.properties file
@@ -40,6 +49,13 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
 
+	// Baritone API
+	implementation 'com.github.wagyourtail:baritone:v1.5.3'
+
+
+	library "io.github.llamalad7:mixinextras-fabric:${project.extra_mixins_version}"
+	annotationProcessor "io.github.llamalad7:mixinextras-fabric:${project.extra_mixins_version}"
+//	library "de.florianmichael:WaybackAuthLib:1.0.0"
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 

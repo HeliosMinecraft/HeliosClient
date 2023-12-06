@@ -81,6 +81,41 @@ public class EventManager {
             }
         }
     }
+    private static final Map<Class<?>, Long> LAST_POSTED = new ConcurrentHashMap<>();
+    private static final long TIME_FRAME = TimeUnit.MINUTES.toMillis(1); // 1 minute timeframe
+
+    /**
+     * Posts an event but make sure that the event hasn't been posted before within the given timeframe.
+     * If it has been posted within the said timeframe before, it won't post another one.
+     *
+     * @param event Event to be posted
+     * @param TIME_FRAME Time frame to check
+     */
+    public static void postEvent(Event event, long TIME_FRAME) {
+        Class<?> eventType = event.getClass();
+        Long lastPosted = LAST_POSTED.get(eventType);
+        long currentTime = System.currentTimeMillis();
+
+        if (lastPosted != null && (currentTime - lastPosted) < TIME_FRAME) {
+            return; // Skip posting this event as it was already posted within the timeframe
+        }
+
+        LAST_POSTED.put(eventType, currentTime); // Update the last posted time
+
+        for (Map.Entry<Listener, Map<Class<?>, List<MethodHandle>>> entry : INSTANCE.entrySet()) {
+            List<MethodHandle> methodHandles = entry.getValue().get(eventType);
+            if (methodHandles != null) {
+                for (MethodHandle methodHandle : methodHandles) {
+                    try {
+                        methodHandle.invoke(entry.getKey(), event);
+                    } catch (Throwable e) {
+                        handleException(e, entry.getKey(), event);
+                    }
+                }
+            }
+        }
+    }
+
 
     private static void handleException(Throwable e, Listener listener, Event event) {
         HeliosClient.LOGGER.info("Exception occurred while processing event: " + event.getClass().getName() + " \n Following was the listener: " + listener, e);

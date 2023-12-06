@@ -105,7 +105,7 @@ public class ColorUtils {
      * @return Current rainbow color.
      */
     public static Color getRainbowColor2() {
-        float hue = (System.currentTimeMillis() % ((int) ClickGUI.RainbowSpeed.value * 950)) / ((int) ClickGUI.RainbowSpeed.value * 950.0f);
+        float hue = (System.currentTimeMillis() % ((int) ClickGUI.RainbowSpeed.value * 930)) / ((int) ClickGUI.RainbowSpeed.value * 930.0f);
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
 

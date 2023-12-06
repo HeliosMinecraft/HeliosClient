@@ -31,6 +31,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
     public ClientSettingsScreen(Module_ module) {
         super(Text.literal("Client Settings"),module,0,224);
+        window.setCollapsible(false);
     }
 
     public void updateSetting() {
