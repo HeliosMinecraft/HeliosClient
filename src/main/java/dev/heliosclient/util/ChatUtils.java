@@ -15,11 +15,6 @@ public class ChatUtils {
     public static void sendMsg(@Nullable String prefixTitle, @Nullable Formatting prefixColor, Text msg) {
         if (mc.world == null) return;
 
-        //Text message = Text.literal("");
-        //message.append(CommandManager.get().getPrefix());
-        //if (prefixTitle != null) message.append(CommandManager.get().getPrefix());
-        //message.append(msg);
-
         mc.inGameHud.getChatHud().addMessage(msg);
     }
 

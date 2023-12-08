@@ -61,5 +61,9 @@ public class Easing {
             return 0.5f * f * f * f + 1;
         }
     }
+
+    public static float easeInOutSine(float t) {
+        return (1 - (float) Math.cos(t * Math.PI)) / 2;
+    }
     // rest of the Easing class
 }

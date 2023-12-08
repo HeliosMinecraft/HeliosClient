@@ -1,13 +1,15 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.managers.CategoryManager;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -20,7 +22,7 @@ public class ClickGUIScreen extends Screen {
     static int scrollX = 0;
     static int scrollY = 0;
     public ArrayList<CategoryPane> categoryPanes;
-    public InputBox searchBox;
+    public SearchBar searchBar;
 
     public ClickGUIScreen() {
         super(Text.literal("ClickGUI"));
@@ -28,61 +30,67 @@ public class ClickGUIScreen extends Screen {
         scrollY = 0;
         categoryPanes = new ArrayList<CategoryPane>();
         Map<String, Object> panePos = ((Map<String, Object>) HeliosClient.CONFIG.config.get("panes"));
-        for (Category category : Category.values()) {
-            int xOffset = MathUtils.d2iSafe(((Map<String, Object>) panePos.get(category.name)).get("x"));
-            int yOffset = MathUtils.d2iSafe(((Map<String, Object>) panePos.get(category.name)).get("y"));
-            boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
-            categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
-        }
-        searchBox = new InputBox(92, 13, "", 20, InputBox.InputMode.DIGITS_AND_CHARACTERS_AND_WHITESPACE);
+
+        CategoryManager.getCategories().forEach((s, category) -> {
+                    int xOffset = MathUtils.d2iSafe((((Map<String, Object>) panePos.get(category.name)).get("x")));
+                    int yOffset = MathUtils.d2iSafe(((Map<String, Object>) panePos.get(category.name)).get("y"));
+                    boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
+                    categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
+                }
+        );
+
+        searchBar = new SearchBar();
     }
 
-    public static void onScroll(double horizontal, double vertical) {
-        scrollX += horizontal;
-        scrollY += vertical;
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        for (CategoryPane category : categoryPanes) {
+            category.mouseScrolled((int) mouseX, (int) mouseY, verticalAmount);
+        }
+        if (ClickGUI.ScrollTypes.values()[ClickGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
+            // Old mode: scroll the whole screen
+            scrollY += (int) verticalAmount;
+        }
+        scrollX += (int) horizontalAmount;
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
+        this.renderBackground(drawContext, mouseX, mouseY, delta);
+
+        if(HeliosClient.CLICKGUI.ScreenHelp.value) {
+            float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Toggle Module", 2, drawContext.getScaledWindowHeight() - (3 * fontHeight) - 3 * 2, -1);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Middle Click - Open QuickSettings", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (fontHeight) - 2, -1);
+        }
         for (CategoryPane category : categoryPanes) {
             category.y += scrollY * 10;
             category.x += scrollX * 10;
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
-            if (category.category == Category.SEARCH && !category.collapsed) {
+            if (category.category == Categories.SEARCH && !category.collapsed) {
+                category.addModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()));
 
-                Renderer2D.drawRectangle(drawContext, category.x, category.y + 19, 96, 18, 0xFF1B1B1B);
-
-                searchBox.render(drawContext, category.x, (int) (category.y + 21), mouseX, mouseY, textRenderer);
-
-                category.addModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()));
-
-                if (ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()).size() == 1) {
-                    category.keepOnlyModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBox.getValue()).get(0));
+                if (ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()).size() == 1) {
+                    category.keepOnlyModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()).get(0));
                 }
 
-                if (searchBox.getValue().isEmpty()) {
+                if (searchBar.getValue().isEmpty()) {
                     category.removeModules();
                 }
-
             }
         }
+        searchBar.render(drawContext, drawContext.getScaledWindowWidth() / 2 - searchBar.width / 2 + 7, drawContext.getScaledWindowHeight() - searchBar.height - 11, mouseX, mouseY, textRenderer);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
         scrollY = 0;
         scrollX = 0;
-        //HeliosClient.fontRenderer.drawString(drawContext.getMatrices(),"This is testing font", (float) client.getWindow().getScaledWidth() /2,client.getWindow().getScaledWidth()-10, 255,255 , 255, 255);
-    }
 
+    }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (CategoryPane category : categoryPanes) {
-            if (category.category == Category.SEARCH && !category.collapsed) {
-                searchBox.mouseClicked(mouseX, mouseY, button);
-            }
-            category.mouseClicked((int) mouseX, (int) mouseY, button);
-        }
         NavBar.navBar.mouseClicked((int) mouseX, (int) mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
     }

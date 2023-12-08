@@ -1,19 +1,30 @@
 package dev.heliosclient.module;
 
-public enum Category {
-    COMBAT("Combat"),
-    MOVEMENT("Movement"),
-    RENDER("Render"),
-    WORLD("World"),
-    PLAYER("Player"),
-    CHAT("Chat"),
-    MISC("Misc"),
-    SEARCH("Search");
+import dev.heliosclient.util.render.Texture;
 
-
+public class Category {
     public String name;
+    public Texture svgiconSrc;
+    public char icon;
 
-    Category(String name) {
+
+    public Category(String name) {
         this.name = name;
+    }
+
+    public Category(String name, String svgIconSrc) {
+        this.name = name;
+        this.svgiconSrc = new Texture(svgIconSrc);
+
+    }
+
+    public Category(String name, Texture iconSrc) {
+        this.name = name;
+        this.svgiconSrc = iconSrc;
+    }
+
+    public Category(String name, char icon) {
+        this.name = name;
+        this.icon = icon;
     }
 }

@@ -2,10 +2,22 @@ package dev.heliosclient.util;
 
 import org.lwjgl.glfw.GLFW;
 
+/**
+ * Utils for working with GLFW keycodes.
+ */
 public class KeycodeToString {
 
+    /**
+     * Translates GLFW keycode to readable string.
+     *
+     * @param keyCode Target GLFW keycode integer.
+     * @return Translated string.
+     */
     public static String translate(Integer keyCode) {
+        //Automatic translation. Works for simple keys like numbers or letters.
         String keyName = GLFW.glfwGetKeyName(keyCode, 0);
+
+        //If automatic translation doesn't work convert to manual.
         if (keyName == null) {
             switch (keyCode) {
                 case GLFW.GLFW_KEY_RIGHT_SHIFT -> {
@@ -167,7 +179,17 @@ public class KeycodeToString {
                 case GLFW.GLFW_KEY_ENTER -> {
                     return "ENTER";
                 }
+                case GLFW.GLFW_MOUSE_BUTTON_LEFT -> {
+                    return "MOUSE_LEFT";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> {
+                    return "MOUSE_RIGHT";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> {
+                    return "MOUSE_MIDDLE";
+                }
                 default -> {
+                    //If none of the translation methods work return in format of KEY_KEYCODE
                     return "KEY_" + keyCode;
                 }
             }
@@ -175,6 +197,12 @@ public class KeycodeToString {
         return keyName;
     }
 
+    /**
+     * Translates GLFW keycode to readable string. Shortened version for certain uses.
+     *
+     * @param keyCode Target GLFW keycode integer.
+     * @return Translated string.
+     */
     public static String translateShort(Integer keyCode) {
         String keyName = GLFW.glfwGetKeyName(keyCode, 0);
         if (keyName == null) {
@@ -337,6 +365,15 @@ public class KeycodeToString {
                 }
                 case GLFW.GLFW_KEY_ENTER -> {
                     return "ENTER";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_LEFT -> {
+                    return "M_LEFT";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_RIGHT -> {
+                    return "M_RIGHT";
+                }
+                case GLFW.GLFW_MOUSE_BUTTON_MIDDLE -> {
+                    return "M_MIDDLE";
                 }
                 default -> {
                     return "KEY_" + keyCode;

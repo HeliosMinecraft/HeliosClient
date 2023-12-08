@@ -1,10 +1,10 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.events.player.ItemDropEvent;
+import dev.heliosclient.event.events.player.PlayerDamageEvent;
+import dev.heliosclient.event.events.player.PlayerDeathEvent;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.event.events.ItemDropEvent;
-import dev.heliosclient.event.events.PlayerDamageEvent;
-import dev.heliosclient.event.events.PlayerDeathEvent;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin( PlayerEntity.class)
+@Mixin(PlayerEntity.class)
 public abstract class MixinPlayerEntity {
 
 

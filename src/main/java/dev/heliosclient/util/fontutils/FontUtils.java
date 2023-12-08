@@ -1,6 +1,6 @@
 package dev.heliosclient.util.fontutils;
 
-import java.awt.Font;
+import java.awt.*;
 
 public class FontUtils {
     public static void rearrangeFonts(Font[] fonts, Font fontToMove) {
@@ -26,6 +26,7 @@ public class FontUtils {
         // Place the fontToMove at index 0
         fonts[0] = fontToMove;
     }
+
     public static Font[] rearrangeFontsArray(Font[] fonts, Font fontToMove) {
         // Find the index of the fontToMove in the array
         int index = -1;

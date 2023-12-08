@@ -1,5 +1,6 @@
 package dev.heliosclient.managers;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
@@ -15,13 +16,10 @@ public class NavBarManager {
     public ArrayList<NavBarItem> navBarItems = new ArrayList<>();
 
     public NavBarManager() {
-        Module_ clickGUI = new ClickGUI();
-        clickGUI.onLoad();
-
         registerItems(
                 new NavBarItem("ClickGUI", "ClickGUI", ClickGUIScreen.INSTANCE),
-                new NavBarItem("Settings", "ClickGUI Setting", new ClientSettingsScreen(clickGUI)),
-                new NavBarItem("HudEditor", "HUD editor", new HudEditorScreen())
+                new NavBarItem("Settings", "ClickGUI Setting", new ClientSettingsScreen(HeliosClient.CLICKGUI)),
+                new NavBarItem("HudEditor", "HUD editor", HudEditorScreen.INSTANCE)
         );
     }
 

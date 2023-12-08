@@ -2,9 +2,10 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.RenderEvent;
+import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -14,12 +15,13 @@ import java.util.ArrayList;
 
 public class HudManager implements Listener {
     public static HudManager INSTANCE = new HudManager();
-
+    public static Quadtree quadtree;
     public ArrayList<HudElement> hudElements = new ArrayList<>();
-
     protected MinecraftClient mc = MinecraftClient.getInstance();
 
     public HudManager() {
+        quadtree = new Quadtree(0);
+        quadtree.clear();
         EventManager.register(this);
     }
 
@@ -36,5 +38,15 @@ public class HudManager implements Listener {
         for (HudElement element : hudElements) {
             element.renderEditor(drawContext, textRenderer, mouseX, mouseY);
         }
+    }
+
+    public void addHudElement(HudElement element) {
+        this.hudElements.add(element);
+        quadtree.insert(element.hitbox);
+    }
+
+    public void removeHudElement(HudElement element) {
+        this.hudElements.remove(element);
+        quadtree.remove(element.hitbox);
     }
 }

@@ -5,9 +5,7 @@ import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
 
@@ -23,17 +21,14 @@ public class PlayerModel extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
+        super.renderElement(drawContext,textRenderer);
         this.width = 30;
         this.height = 55;
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) {
-            Renderer2D.drawRectangle(drawContext, this.x - (float) width/2, this.y - height/2, width, height - 1, Color.BLACK.getRGB());
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, this.y, width - 1, height - 1, Color.BLACK.getRGB());
         } else {
-            float yaw = MathHelper.wrapDegrees(player.prevYaw + (player.getYaw() - player.prevYaw) * mc.getTickDelta());
-            float pitch = player.getPitch();
-            int x = this.x;
-            int y = this.y;
-            InventoryScreen.drawEntity(drawContext, x, y + height - 3, 25, -yaw, -pitch, player);
+            Renderer2D.drawEntity(drawContext, x + width / 2 - 1, y + height - 6, 25, player);
         }
     }
 

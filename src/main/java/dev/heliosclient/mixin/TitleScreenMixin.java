@@ -3,12 +3,18 @@ package dev.heliosclient.mixin;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.ui.HeliosClientInfoScreen;
 import dev.heliosclient.ui.altmanager.AltManagerScreen;
-import net.minecraft.client.MinecraftClient;
+import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.Renderer2D;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.PressableTextWidget;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
@@ -47,8 +53,27 @@ public abstract class TitleScreenMixin extends Screen {
         //drawContext.drawTextWithShadow(this.textRenderer, HeliosClient.clientTag + " " + HeliosClient.versionTag, 2, 2, 16777215 | l);
 
         this.addDrawableChild(new PressableTextWidget(2, 2, 150, 10, Text.literal(HeliosClient.clientTag + " " + HeliosClient.versionTag), (button) -> {
-            this.client.setScreen(HeliosClientInfoScreen.INSTANCE);
+            if (this.client != null) {
+                this.client.setScreen(HeliosClientInfoScreen.INSTANCE);
+            }
         }, this.textRenderer));
+    }
+
+    @Inject(at = @At("TAIL"), method = "render")
+    private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        Renderer2D.setDrawContext(context);
+
+        TextRenderer textRenderer = HeliosClient.MC.textRenderer;
+
+        // Create the text for the subtitle
+        MutableText subtitleText = Text.literal("Made with " + ColorUtils.red + "♥" + ColorUtils.white + " by HeliosDevelopment").setStyle(Style.EMPTY.withColor(Formatting.WHITE));
+
+        // Calculate the position for the subtitle
+        int subtitleX = (this.width - textRenderer.getWidth(subtitleText)) / 2;
+        int subtitleY = this.height / 4 + 48 + 72 + 12 + 25;
+
+        // Draw the subtitle
+        context.drawText(textRenderer, subtitleText, subtitleX, subtitleY, 0xFFFFFF, true);
     }
 
     @Inject(at = @At("TAIL"), method = "init")
@@ -60,6 +85,6 @@ public abstract class TitleScreenMixin extends Screen {
     }
 
     private void gotoAltManagerScreen(ButtonWidget button) {
-        MinecraftClient.getInstance().setScreen(AltManagerScreen.INSTANCE);
+        HeliosClient.MC.setScreen(AltManagerScreen.INSTANCE);
     }
 }

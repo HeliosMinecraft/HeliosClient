@@ -9,8 +9,12 @@ import java.util.ArrayList;
 public class ModuleManager {
     public static ModuleManager INSTANCE = new ModuleManager();
     public ArrayList<Module_> modules = new ArrayList<>();
+    public static CapeModule capeModule;
+    public static NotificationModule notificationModule;
 
     public ModuleManager() {
+        capeModule = new CapeModule();
+        notificationModule = new NotificationModule();
         registerModules(
                 new Fly(),
                 new NoFall(),
@@ -18,10 +22,11 @@ public class ModuleManager {
                 new Step(),
                 new Fullbright(),
                 new Speed(),
-                new ModulesList(),
                 new CustomFov(),
                 new Test(),
-                new ChatHighlight()
+                new ChatHighlight(),
+                notificationModule,
+                capeModule
         );
     }
 
@@ -59,22 +64,25 @@ public class ModuleManager {
         moduleS.sort((m1, m2) -> {
             int m1Score = getRelevanceScore(m1.name, moduleName);
             int m2Score = getRelevanceScore(m2.name, moduleName);
-            return Integer.compare(m1Score, m2Score);
+            return Integer.compare(m2Score, m1Score);
         });
         return moduleS;
     }
 
     private int getRelevanceScore(String name, String query) {
-        if (name.equalsIgnoreCase(query)) {
+        String lowerCaseName = name.toLowerCase();
+        String lowerCaseQuery = query.toLowerCase();
+        if (lowerCaseName.equals(lowerCaseQuery)) {
             return 3;
-        } else if (name.toLowerCase().startsWith(query.toLowerCase())) {
+        } else if (lowerCaseName.startsWith(lowerCaseQuery)) {
             return 2;
-        } else if (name.toLowerCase().contains(query.toLowerCase())) {
+        } else if (lowerCaseName.contains(lowerCaseQuery)) {
             return 1;
         } else {
             return 0;
         }
     }
+
 
 
     public ArrayList<Module_> getModulesByCategory(Category category) {

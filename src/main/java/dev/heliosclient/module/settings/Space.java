@@ -3,10 +3,12 @@ package dev.heliosclient.module.settings;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
-public class Space extends Setting {
-    public boolean value;
+import java.util.function.BooleanSupplier;
 
-    public Space(int height) {
+public class Space extends Setting<Boolean> {
+
+    public Space(int height, BooleanSupplier shouldRender, boolean defaultValue) {
+        super(shouldRender, defaultValue);
         this.height = height;
         this.heightCompact = height;
     }

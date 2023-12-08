@@ -1,18 +1,17 @@
 package dev.heliosclient.ui.clickgui.hudeditor;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
-import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class HudElementButton {
     public int count = 0;
     public HudElement hudElement;
-    int x, y;
+    int x, y, width;
     DrawContext drawContext;
 
     public HudElementButton(HudElement hudElement) {
@@ -23,13 +22,11 @@ public class HudElementButton {
         this.drawContext = drawContext;
         this.x = x;
         this.y = y;
-        Renderer2D.drawRectangle(drawContext, x, y, 96, 14, 0xFF222222);
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor(),10f);
-        //drawContext.drawText(textRenderer, hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor(), false);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width, 12, 0xFF222222);
+        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer,drawContext.getMatrices(), hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor());
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
-
         if (hovered(mouseX, mouseY) && button == 0) {
             addInstanceToList(hudElement.getClass());
             count++;
@@ -43,7 +40,7 @@ public class HudElementButton {
     public <T extends HudElement> void addInstanceToList(Class<? extends T> clazz) {
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
-            HudManager.INSTANCE.hudElements.add(instance);
+            HudManager.INSTANCE.addHudElement(instance);
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).posX = 1;
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).posY = 1;
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).distanceX = 0;

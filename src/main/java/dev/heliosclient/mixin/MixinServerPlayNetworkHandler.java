@@ -1,10 +1,10 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.events.block.BlockInteractEvent;
+import dev.heliosclient.event.events.player.ChatMessageEvent;
+import dev.heliosclient.event.events.player.PlayerLeaveEvent;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.event.events.BlockInteractEvent;
-import dev.heliosclient.event.events.ChatMessageEvent;
-import dev.heliosclient.event.events.PlayerLeaveEvent;
 import net.minecraft.block.BlockState;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;

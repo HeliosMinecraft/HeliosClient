@@ -5,6 +5,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 public class AltManagerScreen extends Screen {
+    //WIP
+
     public static AltManagerScreen INSTANCE = new AltManagerScreen();
 
     protected AltManagerScreen() {

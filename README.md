@@ -2,7 +2,7 @@
     <img src="https://github.com/HeliosClient/HeliosClient/blob/main/.github/images/text.png?raw=true" height="150px">
 </p>
 <div align="center">
-    <h3>Fabric anarchy focused utility mod at latest Minecraft version.</h3>
+    <h3>Fabric anarchy utility mod for the latest Minecraft version.</h3>
     <img src="https://img.shields.io/github/last-commit/HeliosClient/HeliosClient" alt="GitHub last commit"/>
     <img src="https://img.shields.io/github/commit-activity/w/HeliosClient/HeliosClient" alt="GitHub commit activity"/>
     <img src="https://img.shields.io/github/contributors/HeliosClient/HeliosClient" alt="GitHub contributors"/>
@@ -33,10 +33,9 @@ To submit a bug open an issue in this repository. Before doing so please assure 
 
 ## Known issues
 
-- Settings can go off screen sometimes.
-- Colors code is a mess.
 - Unfinished/placeholder modules.
 - When new features are added, a crash is caused by an incomplete config file.
+- Non functional config system.
 
 ## Contributing
 

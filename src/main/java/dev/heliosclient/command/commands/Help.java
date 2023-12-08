@@ -3,10 +3,11 @@ package dev.heliosclient.command.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.heliosclient.command.Command;
 import dev.heliosclient.command.CommandArgumentType;
-import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.command.ModuleArgumentType;
+import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -49,8 +50,10 @@ public class Help extends Command {
             ChatUtils.sendMsg(module.description);
             ChatUtils.sendMsg("");
 
-            for (Setting setting : module.settings) {
-                ChatUtils.sendMsg(ColorUtils.aqua + setting.name + ColorUtils.gray + ": " + setting.description);
+            for (SettingGroup settingBuilder : module.settingGroups) {
+                for (Setting setting : settingBuilder.getSettings()) {
+                    ChatUtils.sendMsg(ColorUtils.aqua + setting.name + ColorUtils.gray + ": " + setting.description);
+                }
             }
 
             return SINGLE_SUCCESS;
@@ -60,9 +63,8 @@ public class Help extends Command {
             ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + "Commands:");
 
             for (Command cmd : CommandManager.get().getAll()) {
-                List<String> aliases = new ArrayList<>();
 
-                for (String alias : cmd.getAliases()) aliases.add(alias);
+                List<String> aliases = new ArrayList<>(cmd.getAliases());
                 aliases.add(0, ColorUtils.bold + ColorUtils.aqua + cmd.getName());
 
                 ChatUtils.sendMsg(ColorUtils.aqua + String.join(ColorUtils.reset + ", ", aliases) + ColorUtils.gray + ": " + cmd.getDescription());

@@ -6,8 +6,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 
+/**
+ * Something really important
+ */
 @Cancelable
-
 public class TickEvent extends Event {
 
     //Called for every Client tick

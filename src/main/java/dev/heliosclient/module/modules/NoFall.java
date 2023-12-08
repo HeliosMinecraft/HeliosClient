@@ -2,10 +2,11 @@ package dev.heliosclient.module.modules;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.module.Category;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
+import dev.heliosclient.module.settings.SettingGroup;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
@@ -14,17 +15,34 @@ import java.util.List;
 
 public class NoFall extends Module_ {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
-    public DoubleSetting fallHeight = new DoubleSetting("Trigger height", "Height on which No Fall triggers", this, 2.5, 2, 22, 1);
-    public CycleSetting mode = new CycleSetting("Mode", "Mode which should save player from fall height ", this, new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")), 0);
+    private final SettingGroup sgGeneral = new SettingGroup("General");
+    DoubleSetting fallHeight = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Trigger height")
+            .description("Height on which No Fall triggers")
+            .onSettingChange(this)
+            .value(2.5)
+            .defaultValue(2.5)
+            .min(2)
+            .max(22)
+            .roundingPlace(1)
+            .build()
+    );
+    CycleSetting mode = sgGeneral.add(new CycleSetting.Builder()
+            .name("Mode")
+            .description("Mode which should save player from fall height ")
+            .onSettingChange(this)
+            .value(new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")))
+            .defaultValue(new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")))
+            .listValue(0)
+            .build()
+    );
 
     public NoFall() {
-        super("NoFall", "Prevents you from taking fall damage.", Category.PLAYER);
+        super("NoFall", "Prevents you from taking fall damage.", Categories.PLAYER);
 
-        settings.add(fallHeight);
-        settings.add(mode);
+        addSettingGroup(sgGeneral);
 
-        quickSettings.add(fallHeight);
-        quickSettings.add(mode);
+        addQuickSettings(sgGeneral.getSettings());
     }
 
     @SubscribeEvent
@@ -47,6 +65,9 @@ public class NoFall extends Module_ {
                 }
                 if (distance <= 2) {
                     assert mc.world != null;
+                    mc.player.networkHandler.sendPacket(
+                            new PlayerMoveC2SPacket.OnGroundOnly(true)
+                    );
                     mc.world.disconnect();
                 }
             }

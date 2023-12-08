@@ -1,27 +1,27 @@
 package dev.heliosclient.module.settings;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ListSettingScreen;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 
-public class ListSetting extends Setting {
-    public ArrayList<String> value;
+public class ListSetting extends Setting<ArrayList<String>> {
     public ArrayList<String> options;
     Screen parentScreen;
 
-    public ListSetting(String name, String description, Screen parentScreen, ArrayList<String> options, ArrayList<String> value) {
+    public ListSetting(String name, String description, ArrayList<String> options, ArrayList<String> value, BooleanSupplier shouldRender, ArrayList<String> defaultValue) {
+        super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
         this.options = options;
-        this.parentScreen = parentScreen;
+        this.parentScreen = ClickGUIScreen.INSTANCE;
         this.value = value;
     }
 
@@ -30,11 +30,12 @@ public class ListSetting extends Setting {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        FontManager.fxfontRenderer.drawString(drawContext.getMatrices(),name, x + 2, y + 8,defaultColor,10f);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 8, defaultColor);
     }
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         if (hovered((int) mouseX, (int) mouseY) && button == 0) {
             MinecraftClient.getInstance().setScreen(new ListSettingScreen(this, parentScreen));
         }
@@ -44,4 +45,31 @@ public class ListSetting extends Setting {
         return value.contains(option);
     }
 
+    public void setParentScreen(Screen parentScreen) {
+        this.parentScreen = parentScreen;
+    }
+
+    public static class Builder extends SettingBuilder<Builder, ArrayList<String>, ListSetting> {
+        ArrayList<String> options;
+        Screen parentScreen;
+
+        public Builder() {
+            super(new ArrayList<>());
+        }
+
+        public Builder parentScreen(Screen parentScreen) {
+            this.parentScreen = parentScreen;
+            return this;
+        }
+
+        public Builder options(ArrayList<String> options) {
+            this.options = options;
+            return this;
+        }
+
+        @Override
+        public ListSetting build() {
+            return new ListSetting(name, description, options, value, shouldRender, defaultValue);
+        }
+    }
 }

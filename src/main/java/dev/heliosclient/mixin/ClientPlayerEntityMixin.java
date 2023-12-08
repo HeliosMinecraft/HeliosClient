@@ -1,9 +1,9 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.event.events.PlayerMotionEvent;
+import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -31,6 +31,7 @@ public class ClientPlayerEntityMixin {
             m.onEnable();
         }
     }
+
     @Inject(method = "tick", at = @At(value = "TAIL"), cancellable = true)
     public void onTick(CallbackInfo ci) {
         if (HeliosClient.MC.player != null) {

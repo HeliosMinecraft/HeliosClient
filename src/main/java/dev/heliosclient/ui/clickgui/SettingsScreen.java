@@ -1,131 +1,121 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.ListSetting;
+import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.animation.Easing;
-import dev.heliosclient.util.animation.EasingType;
+import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
+import dev.heliosclient.ui.clickgui.gui.Window;
+import dev.heliosclient.ui.clickgui.navbar.NavBar;
+import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import org.lwjgl.glfw.GLFW;
 
-public class SettingsScreen extends Screen {
-    protected static MinecraftClient mc = MinecraftClient.getInstance();
-    static int offsetY = 0;
-    public TextButton backButton = new TextButton("< Back");
+import java.util.AbstractMap;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-    int x, y, windowWidth = 224, windowHeight;
-    private final Module_ module;
-    private final Screen parentScreen;
+public class SettingsScreen extends AbstractSettingScreen implements IWindowContentRenderer {
+        private final float delayBetweenSettings = 0.2f;
+        int x, y, windowWidth = 224, windowHeight;
+         private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    public SettingsScreen(Module_ module, Screen parentScreen) {
-        super(Text.literal("Settings"));
-        this.module = module;
-        offsetY = 0;
-        this.parentScreen = parentScreen;
-    }
-
-    public static void onScroll(double horizontal, double vertical) {
-        offsetY += vertical * (Easing.ease(EasingType.QUADRATIC_IN, (float) ClickGUI.ScrollSpeed.value));
-    }
-
-    @Override
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext);
-
-        windowHeight = 52;
-        for (Setting setting : module.settings) {
-            if (!setting.shouldRender()) continue;
-            setting.quickSettings = false;
-            windowHeight += setting.height + 1;
+        public SettingsScreen(Module_ module, Screen parentScreen) {
+            super(Text.literal(module.name +" Settings"),module,0,224);
+            updateSetting();
         }
 
-        int screenHeight = drawContext.getScaledWindowHeight();
-
-        if (drawContext.getScaledWindowHeight() > windowHeight) {
-            offsetY = 0;
-            y = drawContext.getScaledWindowHeight() / 2 - (windowHeight) / 2;
-        } else {
-            offsetY = Math.max(Math.min(offsetY, 0), screenHeight - windowHeight);
-            y = offsetY;
+        public void updateSetting() {
+            executor.submit(() -> {
+                module.settingGroups.stream()
+                        .filter(SettingGroup::shouldRender)
+                        .flatMap(settingGroup -> settingGroup.getSettings().stream()
+                                .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
+                        .filter(entry -> entry.getValue().shouldRender())
+                        .forEach(entry -> {
+                            SettingGroup settingGroup = entry.getKey();
+                            Setting setting = entry.getValue();
+                            setting.update(settingGroup.getY());
+                            if (!setting.isAnimationDone() && delay <= 0) {
+                                delay = delayBetweenSettings;
+                                delay -= setting.animationSpeed;
+                            }
+                        });
+            });
         }
 
-        x = Math.max(drawContext.getScaledWindowWidth() / 2 - windowWidth / 2, 0);
 
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, windowWidth, windowHeight, 5, 0xFF222222);
-        Renderer2D.drawRoundedRectangle(drawContext, x, y, true, true, false, false, windowWidth, 18, 5, 0xFF1B1B1B);
-        Renderer2D.drawRectangle(drawContext, x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
-        drawContext.drawText(textRenderer, module.name, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth(module.name) / 2, y + 4, ColorManager.INSTANCE.clickGuiPaneText(), false);
-        drawContext.drawText(textRenderer, "§o" + module.description, drawContext.getScaledWindowWidth() / 2 - textRenderer.getWidth("§o" + module.description) / 2, y + 26, ColorManager.INSTANCE.defaultTextColor(), false);
-        backButton.render(drawContext, textRenderer, x + 4, y + 4, mouseX, mouseY);
-        int yOffset = y + 44;
-        for (Setting setting : module.settings) {
-            if (!setting.shouldRender()) continue;
-            setting.render(drawContext, x + 16, yOffset, mouseX, mouseY, textRenderer);
-            yOffset += setting.height + 1;
+        @Override
+        public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+            this.renderBackground(drawContext, mouseX, mouseY, delta);
+
+            windowHeight = 50;
+            for (SettingGroup settingGroup : module.settingGroups) {
+                windowHeight += Math.round(settingGroup.getGroupNameHeight() + 13);
+                if (!settingGroup.shouldRender()) continue;
+                for (Setting setting : settingGroup.getSettings()) {
+                    if (!setting.shouldRender()) continue;
+                    setting.quickSettings = false;
+                    windowHeight += setting.height + 1;
+                }
+                windowHeight += Math.round(settingGroup.getGroupNameHeight() + 2);
+            }
+
+            window.setWindowHeight(windowHeight);
+            window.setWindowWidth(windowWidth);
+            window.render(drawContext, mouseX, mouseY, module.name, module.description, textRenderer);
+
+            x = window.getX();
+            y = window.getY();
+
+            Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
         }
-        Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-    }
 
-    public boolean barHovered(double mouseX, double mouseY) {
-        return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + 16;
-    }
+        @Override
+        public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+            updateSetting();
 
-    @Override
-    public boolean shouldPause() {
-        return ClickGUI.pause;
-    }
+            int yOffset = y;
+            for (SettingGroup settingGroup : module.settingGroups) {
+                yOffset += Math.round(settingGroup.getGroupNameHeight() + 12);
+                settingGroup.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        backButton.mouseClicked((int) mouseX, (int) mouseY);
-        for (Setting setting : module.settings) {
-            setting.mouseClicked(mouseX, mouseY, button);
+                if (settingGroup.shouldRender()) {
+                    List<Setting> settings = settingGroup.getSettings();
+                    for (Setting setting : settings) {
+                        if (setting.shouldRender()) {
+                            if (setting instanceof RGBASetting rgbaSetting) {
+                                rgbaSetting.setParentScreen(this);
+                            } else if (setting instanceof ListSetting listSetting) {
+                                listSetting.setParentScreen(this);
+                            }
+
+                            // Update the y position of the setting based on its animation progress
+                            int animatedY = Math.round(setting.getY() + (yOffset - setting.getY()) * setting.getAnimationProgress());
+                            setting.render(drawContext, x + 16, animatedY + 6, mouseX, mouseY, textRenderer);
+                            yOffset += setting.height + 1;
+                        } else {
+                            resetSettingAnimation(setting);
+                        }
+                    }
+                } else {
+                    settingGroup.getSettings().forEach(this::resetSettingAnimation);
+                }
+
+                yOffset += Math.round(settingGroup.getGroupNameHeight() + 3);
+            }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+
+        private void resetSettingAnimation(Setting setting) {
+            setting.animationDone = false;
+            delay = 0;
+            setting.setAnimationProgress(0.5f);
+        }
     }
 
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        for (Setting setting : module.settings) {
-            setting.mouseReleased(mouseX, mouseY, button);
-        }
-        return super.mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        for (Setting setting : module.settings) {
-            setting.keyReleased(keyCode, scanCode, modifiers);
-        }
-        return super.keyReleased(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            MinecraftClient.getInstance().setScreen(parentScreen);
-        }
-        for (Setting setting : module.settings) {
-            setting.keyPressed(keyCode, scanCode, modifiers);
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean charTyped(char chr, int modifiers) {
-        for (Setting setting : module.settings) {
-            setting.charTyped(chr, modifiers);
-        }
-        return super.charTyped(chr, modifiers);
-    }
-
-    @Override
-    public boolean shouldCloseOnEsc() {
-        return false;
-    }
-}
