@@ -9,6 +9,7 @@ import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -58,6 +59,12 @@ public class ClickGUIScreen extends Screen {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
 
+        if(HeliosClient.CLICKGUI.ScreenHelp.value) {
+            float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Toggle Module", 2, drawContext.getScaledWindowHeight() - (3 * fontHeight) - 3 * 2, -1);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Middle Click - Open QuickSettings", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (fontHeight) - 2, -1);
+        }
         for (CategoryPane category : categoryPanes) {
             category.y += scrollY * 10;
             category.x += scrollX * 10;
@@ -79,6 +86,7 @@ public class ClickGUIScreen extends Screen {
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
         scrollY = 0;
         scrollX = 0;
+
     }
 
     @Override

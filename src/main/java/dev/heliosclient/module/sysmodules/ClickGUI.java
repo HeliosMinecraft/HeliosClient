@@ -133,6 +133,13 @@ public class ClickGUI extends Module_ {
             .value(false)
             .build()
     );
+    public BooleanSetting ScreenHelp = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Show keybind Help")
+            .description("Show keybind Help for client screens.")
+            .onSettingChange(this)
+            .value(true)
+            .build()
+    );
     BooleanSetting Keybinds = sgGeneral.add(new BooleanSetting.Builder()
             .name("Show Keybinds")
             .description("Show keybinds in the Module Button.")
@@ -245,19 +252,7 @@ public class ClickGUI extends Module_ {
         }
 
        if(setting == FontRenderer || setting == Font) {
-           FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
-           FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 11f);
-
-           FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
-           FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
-
-           FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
-           FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
-
-           FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
-           FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
-
-           EventManager.postEvent(new FontChangeEvent(fonts));
+           FontManager.INSTANCE.registerFonts();
        }
     }
 
@@ -284,20 +279,7 @@ public class ClickGUI extends Module_ {
 
         fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
 
-        FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
-        FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
-        FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 11f);
-
-        FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
-        FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
-
-        FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
-        FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
-
-        FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
-        FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
-
-        EventManager.postEvent(new FontChangeEvent(fonts));
+        FontManager.INSTANCE.registerFonts();
 
         if(ColorMode.value == 0) {
             ColorManager.INSTANCE.primaryGradientStart = staticColor.getColor();

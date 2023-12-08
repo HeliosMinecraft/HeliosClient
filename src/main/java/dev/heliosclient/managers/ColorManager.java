@@ -67,20 +67,18 @@ public class ColorManager implements Listener {
     }
     @SubscribeEvent
     public void onTick(TickEvent event) {
-        if(HeliosClient.clickGUI == null) return;
-        Tooltip.tooltip.mode = HeliosClient.clickGUI.TooltipMode.value;
-        Tooltip.tooltip.fixedPos = HeliosClient.clickGUI.TooltipPos.value;
+        if(HeliosClient.CLICKGUI == null) return;
+        Tooltip.tooltip.mode = HeliosClient.CLICKGUI.TooltipMode.value;
+        Tooltip.tooltip.fixedPos = HeliosClient.CLICKGUI.TooltipPos.value;
 
         float hue = (System.currentTimeMillis() % 10000) / 10000f;
-        //System.out.println(ColorMode.value+ ": ");
-        //System.out.print(" ");
 
-        if(HeliosClient.clickGUI.ColorMode.value == 0) {
-            this.primaryGradientStart = HeliosClient.clickGUI.staticColor.getColor();
-            this.primaryGradientEnd = HeliosClient.clickGUI.staticColor.getColor();
+        if(HeliosClient.CLICKGUI.ColorMode.value == 0) {
+            this.primaryGradientStart = HeliosClient.CLICKGUI.staticColor.getColor();
+            this.primaryGradientEnd = HeliosClient.CLICKGUI.staticColor.getColor();
         }
-        if(HeliosClient.clickGUI.ColorMode.value == 1) {
-            switch(HeliosClient.clickGUI.GradientType.value){
+        if(HeliosClient.CLICKGUI.ColorMode.value == 1) {
+            switch(HeliosClient.CLICKGUI.GradientType.value){
                 case 0->{
                     this.primaryGradientStart = ColorUtils.getRainbowColor();
                     this.primaryGradientEnd = ColorUtils.getRainbowColor2();
@@ -98,21 +96,21 @@ public class ColorManager implements Listener {
                     this.primaryGradientEnd = ColorUtils.getNightSkyColors(hue)[1];
                 }
                 case 4->{
-                    this.primaryGradientStart = HeliosClient.clickGUI.linear2Start.getColor();
-                    this.primaryGradientEnd = HeliosClient.clickGUI.linear2end.getColor();
+                    this.primaryGradientStart = HeliosClient.CLICKGUI.linear2Start.getColor();
+                    this.primaryGradientEnd = HeliosClient.CLICKGUI.linear2end.getColor();
                 }
             }
         }
 
 
-        this.clickGuiSecondaryAlpha = HeliosClient.clickGUI.AccentColor.getColor().getAlpha();
-        this.clickGuiSecondary = HeliosClient.clickGUI.AccentColor.getColor().getRGB();
-        this.clickGuiSecondaryRainbow = HeliosClient.clickGUI.AccentColor.isRainbow();
+        this.clickGuiSecondaryAlpha = HeliosClient.CLICKGUI.AccentColor.getColor().getAlpha();
+        this.clickGuiSecondary = HeliosClient.CLICKGUI.AccentColor.getColor().getRGB();
+        this.clickGuiSecondaryRainbow = HeliosClient.CLICKGUI.AccentColor.isRainbow();
 
-        this.defaultTextColor = HeliosClient.clickGUI.TextColor.getColor().getRGB();
+        this.defaultTextColor = HeliosClient.CLICKGUI.TextColor.getColor().getRGB();
 
-        this.clickGuiPaneTextAlpha = HeliosClient.clickGUI.PaneTextColor.getColor().getAlpha();
-        this.clickGuiPaneText = HeliosClient.clickGUI.PaneTextColor.getColor().getRGB();
-        this.clickGuiPaneTextRainbow = HeliosClient.clickGUI.PaneTextColor.isRainbow();
+        this.clickGuiPaneTextAlpha = HeliosClient.CLICKGUI.PaneTextColor.getColor().getAlpha();
+        this.clickGuiPaneText = HeliosClient.CLICKGUI.PaneTextColor.getColor().getRGB();
+        this.clickGuiPaneTextRainbow = HeliosClient.CLICKGUI.PaneTextColor.isRainbow();
     }
 }

@@ -122,7 +122,7 @@ public class DoubleSetting extends Setting<Double> {
             value = defaultValue;
             ISettingChange.onSettingChange(this);
         }
-        if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.isFocused()) {
+        if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.isFocused() && !inputBox.isFocusedHover(mouseX,mouseY)) {
             this.sliding = true;
         }
         if (!inputBox.isFocused()) {

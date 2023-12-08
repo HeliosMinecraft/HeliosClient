@@ -36,9 +36,17 @@ public class FontManager implements Listener {
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
         if (HeliosClient.MC.getWindow() != null) {
+            registerFonts();
+            EventManager.unregister(this);
+        }
+    }
+    public void registerFonts(){
             FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
             FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
             FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 10f);
+
+            FontRenderers.Super_Small_fxfontRenderer = new fxFontRenderer(fonts, 4f);
+            FontRenderers.Super_Small_iconRenderer = new fxFontRenderer(iconFonts, 4f);
 
             FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
             FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
@@ -51,7 +59,5 @@ public class FontManager implements Listener {
 
             EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
             HeliosClient.quadTree = new Quadtree(0);
-            EventManager.unregister(this);
-        }
     }
 }

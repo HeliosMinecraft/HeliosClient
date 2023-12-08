@@ -3,10 +3,7 @@ package dev.heliosclient.hud;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.DoubleSetting;
-import dev.heliosclient.module.settings.RGBASetting;
-import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.*;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
@@ -45,31 +42,33 @@ public class HudElement implements ISettingChange {
     public boolean renderOutLineBox = true;
     public Hitbox hitbox;
     public boolean shiftDown = false;
-    public List<Setting> settings = new ArrayList<>();
-    public BooleanSetting renderBg = new BooleanSetting.Builder()
+    public List<SettingGroup> settingGroups = new ArrayList<>();
+
+    public SettingGroup sgUI = new SettingGroup("UI");
+    public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
             .description("Render the background for the element")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
-            .build();
-    public BooleanSetting clientColorCycle = new BooleanSetting.Builder()
+            .build());
+    public BooleanSetting clientColorCycle = sgUI.add(new BooleanSetting.Builder()
             .name("Client Color Cycle")
             .description("Use the client default color cycle for the background of the element")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
             .shouldRender(() -> renderBg.value)
-            .build();
-    public RGBASetting backgroundColor = new RGBASetting.Builder()
+            .build());
+    public RGBASetting backgroundColor = sgUI.add(new RGBASetting.Builder()
             .name("Background Color")
             .description("Render the background for the element")
             .value(new Color(4, 3, 3, 157))
             .defaultValue(new Color(4, 3, 3, 157))
             .shouldRender(() -> renderBg.value && !clientColorCycle.value)
             .onSettingChange(this)
-            .build();
-    public DoubleSetting padding = new DoubleSetting.Builder()
+            .build());
+    public DoubleSetting padding = sgUI.add(new DoubleSetting.Builder()
             .name("Padding")
             .description("Amount of Padding around the borders")
             .value(0D)
@@ -78,35 +77,30 @@ public class HudElement implements ISettingChange {
             .defaultValue(0D)
             .shouldRender(() -> renderBg.value)
             .onSettingChange(this)
-            .build();
-    public BooleanSetting rounded = new BooleanSetting.Builder()
+            .build());
+    public BooleanSetting rounded = sgUI.add(new BooleanSetting.Builder()
             .name("Rounded background")
             .description("Rounds the background of the element for better visuals")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
             .shouldRender(() -> renderBg.value)
-            .build();
-    public BooleanSetting shadow = new BooleanSetting.Builder()
+            .build());
+    public BooleanSetting shadow = sgUI.add(new BooleanSetting.Builder()
             .name("Shadow")
             .description("Shadow for the background of the element")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
             .shouldRender(() -> renderBg.value)
-            .build();
+            .build());
     int startX, startY, snapSize = 100;
     public HudElement(String name, String description) {
         this.name = name;
         this.description = description;
         hitbox = new Hitbox(x, y, width, height);
 
-        addSetting(renderBg);
-        addSetting(clientColorCycle);
-        addSetting(backgroundColor);
-        addSetting(padding);
-        addSetting(shadow);
-        addSetting(rounded);
+       addSettingGroup(sgUI);
     }
 
     /**
@@ -202,7 +196,7 @@ public class HudElement implements ISettingChange {
                     Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 0, (float) drawContext.getScaledWindowHeight() / 2 - 1, drawContext.getScaledWindowWidth(), 2, 0xFF00FF00);
                 }
             }
-            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(),   (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value), 0.4f, 0xFFFFFFFF);
+            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(),   (float) (x - 1 - padding.value / 2 - 1), (float) (y - 1 - padding.value / 2 - 1), (float) (width + 1 + padding.value + 3), (float) (height + 1 + padding.value + 2), 0.4f, 0xFFFFFFFF);
         }
         //Set default height value
         this.height = Math.round(Renderer2D.getStringHeight());
@@ -258,8 +252,9 @@ public class HudElement implements ISettingChange {
      */
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         if (renderBg.value) {
+            float width = hitbox.getWidth();
             drawContext.getMatrices().push();
-            drawContext.getMatrices().translate(0, 0, -69D);
+            drawContext.getMatrices().translate(0, 0, 0D);
             Color bgStart, bgEnd;
             if(clientColorCycle.value){
                 bgStart = ColorManager.INSTANCE.getPrimaryGradientStart();
@@ -291,17 +286,16 @@ public class HudElement implements ISettingChange {
      * Called on load.
      */
     public void onLoad() {
-        addSetting(renderBg);
-        addSetting(backgroundColor);
+        //addSettingGroup(sgUI);
     }
 
     /**
-     * Add a setting to the settings list
+     * Add a setting group to the setting groups list
      *
-     * @param setting setting to be added
+     * @param settingGroup setting group to be added
      */
-    public void addSetting(Setting setting) {
-        settings.add(setting);
+    public void addSettingGroup(SettingGroup settingGroup) {
+        settingGroups.add(settingGroup);
     }
 
     /**

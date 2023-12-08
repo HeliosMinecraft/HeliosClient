@@ -64,9 +64,12 @@ public class InputBox implements Listener {
         if(screen != null && event.getScreen()  == screen) {
             double mouseX = event.getMouseX();
             double mouseY = event.getMouseY();
-            focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y) && mouseY <= (y + height));
+            isFocusedHover(mouseX,mouseY);
             cursorPosition = value.length();
         }
+    }
+    public boolean isFocusedHover(double mouseX, double mouseY){
+        return focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y) && mouseY <= (y + height));
     }
 
 

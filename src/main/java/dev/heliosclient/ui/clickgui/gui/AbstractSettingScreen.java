@@ -6,6 +6,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -60,6 +61,8 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
 
         x = window.getX();
         y = window.getY();
+
+        Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
     }
 
     @Override
@@ -74,9 +77,10 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
             setting.mouseClicked(mouseX, mouseY, button);
         }
         else if(hudElement != null){
-            for (Setting setting : hudElement.settings) {
-                if (!setting.shouldRender()) continue;
-                setting.mouseClicked(mouseX, mouseY, button);
+            for (SettingGroup settingGroup : hudElement.settingGroups) {
+                settingGroup.mouseClickedBuilder(mouseX, mouseY);
+                if (!settingGroup.shouldRender()) continue;
+                settingGroup.mouseClicked(mouseX, mouseY, button);
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -93,9 +97,9 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
             setting.mouseReleased(mouseX, mouseY, button);
         }
         else if(hudElement != null){
-            for (Setting setting : hudElement.settings) {
-                if (!setting.shouldRender()) continue;
-                setting.mouseReleased(mouseX, mouseY, button);
+            for (SettingGroup settingGroup : hudElement.settingGroups) {
+                if (!settingGroup.shouldRender()) continue;
+                settingGroup.mouseReleased(mouseX, mouseY, button);
             }
         }
         return super.mouseReleased(mouseX, mouseY, button);
@@ -112,9 +116,9 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
             setting.keyPressed(keyCode, scanCode, modifiers);
         }
         else if(hudElement != null){
-            for (Setting setting : hudElement.settings) {
-                if (!setting.shouldRender()) continue;
-                setting.keyPressed(keyCode, scanCode, modifiers);
+            for (SettingGroup settingGroup : hudElement.settingGroups) {
+                if (!settingGroup.shouldRender()) continue;
+                settingGroup.keyPressed(keyCode, scanCode, modifiers);
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -131,9 +135,9 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
             setting.charTyped(chr, modifiers);
         }
         else if(hudElement != null){
-            for (Setting setting : hudElement.settings) {
-                if (!setting.shouldRender()) continue;
-                setting.charTyped(chr, modifiers);
+            for (SettingGroup settingGroup : hudElement.settingGroups) {
+                if (!settingGroup.shouldRender()) continue;
+                settingGroup.charTyped(chr, modifiers);
             }
         }
         return super.charTyped(chr, modifiers);

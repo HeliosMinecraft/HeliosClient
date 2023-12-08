@@ -7,6 +7,8 @@ public class FontRenderers {
     public static fxFontRenderer iconRenderer;
     public static fxFontRenderer fxfontRenderer;
 
+    public static fxFontRenderer Super_Small_iconRenderer;
+    public static fxFontRenderer Super_Small_fxfontRenderer;
     public static fxFontRenderer Small_iconRenderer;
     public static fxFontRenderer Small_fxfontRenderer;
 

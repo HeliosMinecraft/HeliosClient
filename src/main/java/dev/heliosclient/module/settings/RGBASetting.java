@@ -88,7 +88,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         this.x = x;
         this.y = y;
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 3, y + 2, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 4, -1);
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, value.getRGB());
 
         if (rainbow) {

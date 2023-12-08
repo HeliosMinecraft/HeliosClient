@@ -41,7 +41,7 @@ public class HeliosClient implements ModInitializer {
     public static FontManager fontManager = new FontManager();
     public static NotificationManager notificationManager = new NotificationManager();
     public static AddonManager addonManager = new AddonManager();
-    public static ClickGUI clickGUI = new ClickGUI();
+    public static ClickGUI CLICKGUI = new ClickGUI();
 
 
     @Override

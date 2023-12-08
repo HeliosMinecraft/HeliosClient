@@ -18,7 +18,7 @@ public class NavBarManager {
     public NavBarManager() {
         registerItems(
                 new NavBarItem("ClickGUI", "ClickGUI", ClickGUIScreen.INSTANCE),
-                new NavBarItem("Settings", "ClickGUI Setting", new ClientSettingsScreen(HeliosClient.clickGUI)),
+                new NavBarItem("Settings", "ClickGUI Setting", new ClientSettingsScreen(HeliosClient.CLICKGUI)),
                 new NavBarItem("HudEditor", "HUD editor", HudEditorScreen.INSTANCE)
         );
     }

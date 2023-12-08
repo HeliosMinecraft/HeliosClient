@@ -11,8 +11,10 @@ import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
@@ -40,11 +42,21 @@ public class HudEditorScreen extends Screen implements Listener {
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
+        if(HeliosClient.CLICKGUI.ScreenHelp.value) {
+            float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Select Element", 2, drawContext.getScaledWindowHeight() - (4 * fontHeight) - 4 * 2, -1);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (3 * fontHeight) - 3 * 2, -1);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Delete / Backspace - Remove Element", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Hold Shift Key - Enable Snapping", 2, drawContext.getScaledWindowHeight() - fontHeight - 2, -1);
+        }
         checkAlignmentAndDrawLines(drawContext);
 
         if (dragBox != null && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX,mouseY)) {
-            drawContext.fill(Math.round(dragBox.getX()), Math.round(dragBox.getY()), Math.round(dragBox.getX() + dragBox.getWidth()), Math.round(dragBox.getY() + dragBox.getHeight()), new Color(255, 255, 255, 75).getRGB());
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().translate(0,0,-0.0D);
+            drawContext.fill(Math.round(dragBox.getX()), Math.round(dragBox.getY()), Math.round(dragBox.getX() + dragBox.getWidth()), Math.round(dragBox.getY() + dragBox.getHeight()), new Color(255, 255, 255, 45).getRGB());
             drawContext.drawBorder(Math.round(dragBox.getX() - 1), Math.round(dragBox.getY() - 1), Math.round(dragBox.getWidth() + 1), Math.round(dragBox.getHeight() + 1), new Color(255, 255, 255, 155).getRGB());
+            drawContext.getMatrices().pop();
         }
 
         HudManager.INSTANCE.renderEditor(drawContext, textRenderer, mouseX, mouseY);
@@ -131,7 +143,7 @@ public class HudEditorScreen extends Screen implements Listener {
             }
 
         if (button == 0) {
-            if (lastHoveredIndex == -1 && selectedElements.isEmpty() && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX,mouseY)) {
+            if (lastHoveredIndex == -1 && selectedElements.isEmpty() && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX,mouseY) && dragBox == null) {
                 isDragging = true;
                 int dragStartX = (int) mouseX;
                 int dragStartY = (int) mouseY;
@@ -161,7 +173,7 @@ public class HudEditorScreen extends Screen implements Listener {
             element.mouseReleased(mouseX, mouseY, button);
         }
         // Stop dragging when the user releases the left mouse button
-        if (button == 0 && dragBox != null) {
+        if (button == 0 && dragBox != null && selectedElements.isEmpty()) {
             dragBox.setWidth((float) (mouseX - dragBox.getX()));
             dragBox.setHeight((float) (mouseY - dragBox.getY()));
             isDragging = false;
@@ -174,7 +186,7 @@ public class HudEditorScreen extends Screen implements Listener {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (button == 0 && dragBox != null && isDragging) {
+        if (button == 0 && dragBox != null && isDragging && selectedElements.isEmpty()) {
             dragBox.setWidth((float) (mouseX - dragBox.getX()));
             dragBox.setHeight((float) (mouseY - dragBox.getY()));
         }
