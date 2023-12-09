@@ -3,6 +3,7 @@ package dev.heliosclient.module.settings;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
@@ -12,6 +13,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
+import java.awt.*;
 import java.util.function.BooleanSupplier;
 
 public class DoubleSetting extends Setting<Double> {
@@ -63,7 +65,8 @@ public class DoubleSetting extends Setting<Double> {
         // Slider background
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, scaledValue, 2, 1, ColorManager.INSTANCE.clickGuiSecondary());
         // Slider
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 14, 2, 6, 1, 0xFFFFFFFF);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 14f, 2, 6, 1, 0xFFFFFFFF);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19f, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY,105).getRGB());
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -85,24 +88,25 @@ public class DoubleSetting extends Setting<Double> {
         //  inputBox = null;
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
         double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
+
         if (sliding) {
             if (diff == 0) {
                 value = min;
             } else {
-                value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
+                value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
             }
             ISettingChange.onSettingChange(this);
         }
-        int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth)) + 2;
 
         String valueString = "" + MathUtils.round(value, roundingPlace);
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), valueString, (x + moduleWidth - 10) - FontRenderers.Small_fxfontRenderer.getStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, moduleWidth - 8, 2, 1, 0xFFAAAAAA);
+        int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 10)) + 2;
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, scaledValue, 2, 1, 0xFF55FFFF);
 
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, moduleWidth - 8, 1, 1, 0xFFAAAAAA);
-
-
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 13, scaledValue, 1, 1, 0xFF55FFFF);
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue + 2, y + 11, 1, 5, 1, 0xFFFFFFFF);
+        // Bar to move
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 14, 2, 6, 1, 0xFFFFFFFF);
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY,105).getRGB());
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {

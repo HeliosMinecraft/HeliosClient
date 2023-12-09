@@ -14,7 +14,6 @@ import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 

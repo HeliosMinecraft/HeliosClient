@@ -27,7 +27,8 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     private final float delayBetweenSettings = 0.2f;
     public NavBar navBar = new NavBar();
     int x, y, windowWidth = 224, windowHeight;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorUpdate = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorReset = Executors.newSingleThreadExecutor();
 
     public ClientSettingsScreen(Module_ module) {
         super(Text.literal("Client Settings"),module,0,224);
@@ -35,7 +36,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     }
 
     public void updateSetting() {
-        executor.submit(() -> {
+        executorUpdate.submit(() -> {
             module.settingGroups.stream()
                     .filter(SettingGroup::shouldRender)
                     .flatMap(settingGroup -> settingGroup.getSettings().stream()
@@ -107,14 +108,16 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
                         // Update the y position of the setting based on its animation progress
                         int animatedY = Math.round(setting.getY() + (yOffset - setting.getY()) * setting.getAnimationProgress());
-                        setting.render(drawContext, x + 16, animatedY + 6, mouseX, mouseY, textRenderer);
+                        if(animatedY <= yOffset + setting.height + 5 && animatedY >= yOffset - 5) {
+                            setting.render(drawContext, x + 16, animatedY + 6, mouseX, mouseY, textRenderer);
+                        }
                         yOffset += setting.height + 1;
                     } else {
-                        resetSettingAnimation(setting);
+                        resetSettingAnimation(setting,settingGroup);
                     }
                 }
-            } else {
-                settingGroup.getSettings().forEach(this::resetSettingAnimation);
+           } else {
+                settingGroup.getSettings().forEach(setting1 -> resetSettingAnimation(setting1,settingGroup));
             }
 
             yOffset += Math.round(groupNameHeight + 3);
@@ -130,6 +133,19 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     private void resetSettingAnimation(Setting setting) {
         setting.animationDone = false;
         delay = 0;
+        setting.setAnimationProgress(0.5f);
+    }
+    public void resetSettingAnimation(Setting setting, SettingGroup settingGroup) {
+        setting.animationDone = false;
+        delay = 0;
+        setting.setAnimationProgress(0);
+        executorReset.submit(() -> {
+            setting.reset(settingGroup.getY());
+            if (setting.isAnimationDone() && delay <= 0) {
+                delay = delayBetweenSettings;
+                delay -= setting.animationSpeed;
+            }
+        });
         setting.setAnimationProgress(0.5f);
     }
 }

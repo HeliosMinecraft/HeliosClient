@@ -27,7 +27,7 @@ public class CycleSetting extends Setting<Integer> {
         this.description = description;
         this.options = options;
         this.height = 24;
-        this.heightCompact = 15;
+        this.heightCompact = 12;
         this.iSettingChange = iSettingChange;
         this.value = value;
     }
@@ -38,6 +38,7 @@ public class CycleSetting extends Setting<Integer> {
         this.description = description;
         this.options = Arrays.asList(options);
         this.height = 24;
+        this.heightCompact = 12;
         this.iSettingChange = iSettingChange;
         this.value = value;
     }
@@ -75,10 +76,10 @@ public class CycleSetting extends Setting<Integer> {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         if (options.isEmpty() || options.size() - 1 < value) {
-            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "No option found!", x + 2, y + 4, 0xFFFF0000);
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "No option found!", x + 2, y + 1, 0xFFFF0000);
         }
         else {
-            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 1, ColorManager.INSTANCE.defaultTextColor());
         }
 
         if (hovered(mouseX, mouseY)) {

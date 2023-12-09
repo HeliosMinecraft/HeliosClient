@@ -32,6 +32,7 @@ public class HudElement implements ISettingChange {
     public int width = 10;
     public int x = 90;
     public int y = 90;
+    int startX, startY, snapSize = 120;
     public boolean dragging;
     public int posY = 0;
     public int posX = 0;
@@ -94,7 +95,6 @@ public class HudElement implements ISettingChange {
             .onSettingChange(this)
             .shouldRender(() -> renderBg.value)
             .build());
-    int startX, startY, snapSize = 100;
     public HudElement(String name, String description) {
         this.name = name;
         this.description = description;

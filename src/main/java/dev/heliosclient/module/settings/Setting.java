@@ -59,6 +59,24 @@ public abstract class Setting<T> implements Listener {
             }
         }
     }
+    public void reset(float targetY) {
+        if (!animationDone) {
+            //the first update, set the initial position above the target
+            if (animationProgress == 0) {
+                y = (int) (targetY);
+            }
+
+            this.targetY = targetY;
+            animationProgress += animationSpeed;
+            animationProgress = Math.min(animationProgress, 1);
+
+            float easedProgress = Easing.ease(EasingType.LINEAR_IN_OUT, animationProgress);
+            y = Math.round(AnimationUtils.lerp(y, this.targetY, -easedProgress));
+            if (animationProgress >= 1) {
+                animationDone = true;
+            }
+        }
+    }
 
     /**
      * Renders setting in GUI.

@@ -162,7 +162,7 @@ public class CategoryPane implements Listener {
             for (ModuleButton m : moduleButtons) {
 
                 int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
-                if (visible(animatedY)) {
+                if (visible(animatedY) && visible(buttonYOffset)) {
                     m.render(drawContext, mouseX, mouseY, x, animatedY, maxWidth);
                 }
 
@@ -184,8 +184,10 @@ public class CategoryPane implements Listener {
     }
 
     public boolean visible(int buttonYOffset) {
-        return buttonYOffset >= hitBox.getY() + categoryNameHeight && buttonYOffset < hitBox.getY() + MAX_HEIGHT;
+        int buffer = 20; // Adjust this value as needed
+        return buttonYOffset >= hitBox.getY() + categoryNameHeight - buffer && buttonYOffset < hitBox.getY() + MAX_HEIGHT + buffer;
     }
+
 
     public boolean hovered(double mouseX, double mouseY) {
         return mouseX >= x - 2 && mouseX <= x + width + 4.5f && mouseY >= y && mouseY <= y + categoryNameHeight + 8;

@@ -193,7 +193,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, sliderWidth + 2, boxHeight + 2, 1, 1, value3);
 
-        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Alpha", x - 3, y + boxHeight + 1, -1); // Below the alpha slider
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Alpha", x - 5, y + boxHeight + 2, -1); // Below the alpha slider
     }
 
     public void drawBrightnessSaturationBox(DrawContext drawContext, int x, int y, float hue, int value3) {

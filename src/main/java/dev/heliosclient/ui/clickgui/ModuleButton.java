@@ -164,7 +164,7 @@ public class ModuleButton implements Listener {
                         setting.quickSettings = settingsOpen;
 
                         int animatedY = Math.round(setting.getY() + (buttonYOffset - setting.getY()) * setting.getAnimationProgress());
-                        setting.renderCompact(drawContext, x, animatedY + 5, mouseX, mouseY, textRenderer);
+                        setting.renderCompact(drawContext, x, animatedY + 1, mouseX, mouseY, textRenderer);
                         buttonYOffset += setting.heightCompact + 1;
                     }
                 }
