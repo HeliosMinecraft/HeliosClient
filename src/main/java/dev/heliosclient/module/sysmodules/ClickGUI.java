@@ -276,9 +276,9 @@ public class ClickGUI extends Module_ {
         ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.getColor().getRGB();
         ColorManager.INSTANCE.clickGuiPaneTextRainbow = PaneTextColor.isRainbow();
 
-        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getA();
-        ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value;
-        ColorManager.INSTANCE.clickGuiPaneTextRainbow = RainbowPane.value;
+        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getColor().getAlpha();
+        ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value.getRGB();
+        ColorManager.INSTANCE.clickGuiPaneTextRainbow = PaneTextColor.isRainbow();
 
         pause = Pause.value;
         keybinds = Keybinds.value;
