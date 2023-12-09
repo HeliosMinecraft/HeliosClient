@@ -52,6 +52,8 @@ dependencies {
 	// Baritone API
 	implementation 'com.github.wagyourtail:baritone:v1.5.3'
 
+	// TOML parser
+	implementation 'org.tomlj:tomlj:1.1.0'
 
 	library "io.github.llamalad7:mixinextras-fabric:${project.extra_mixins_version}"
 	annotationProcessor "io.github.llamalad7:mixinextras-fabric:${project.extra_mixins_version}"
