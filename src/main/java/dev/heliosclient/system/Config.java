@@ -1,12 +1,15 @@
 package dev.heliosclient.system;
 
 import com.google.gson.Gson;
+import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 import dev.heliosclient.managers.CategoryManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
+import dev.heliosclient.util.FileUtils;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,13 +23,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Config {
     protected static Gson gson = new Gson();
     public Map<String, Object> config = new HashMap<>();
+    public Map<String, Object> moduleConfigtoml = new HashMap<>();
     MinecraftClient mc = MinecraftClient.getInstance();
     public File configDir = new File(mc.runDirectory.getPath() + "/heliosclient");
-    public File configFile = new File(configDir, "config.json");
+    public File configFile = new File(configDir, "config.toml");
+   public TomlWriter tomlWriter = new TomlWriter();
+   public Toml moduleToml = new Toml();
 
     public Config() {
-        configDir.mkdirs();
+        if(!configDir.exists()) {
+            configDir.mkdirs();
+        }
     }
+
 
     @NotNull
     private static Map<String, Object> getPi() {
@@ -48,33 +57,36 @@ public class Config {
         return pi;
     }
 
-    public boolean doesConfigExist() {
-        return Files.exists(configFile.toPath());
-    }
-
     public void loadDefaultConfig() {
         ModuleManager.INSTANCE = new ModuleManager();
+        setConfig();
+        ClickGUIScreen.INSTANCE = new ClickGUIScreen();
+    }
+    public void setConfig(){
+        moduleConfigtoml.clear();
         Map<String, Object> moduleConfig = new HashMap<>();
         for (Module_ module : ModuleManager.INSTANCE.modules) {
             Map<String, Object> singleModuleConfig = new HashMap<>();
-            for (SettingGroup settingBuilder : module.settingGroups) {
-                for (Setting setting : settingBuilder.getSettings()) {
-                    singleModuleConfig.put(setting.name, setting.value);
+            for (SettingGroup settingGroup : module.settingGroups) {
+                for (Setting setting : settingGroup.getSettings()) {
+                    if(setting.name != null) {
+                        singleModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new HashMap<>()));
+                    }
                 }
             }
-            moduleConfig.put(module.name, singleModuleConfig);
+            moduleConfig.put(module.name.replace(" ",""), singleModuleConfig);
         }
-        config.put("modules", moduleConfig);
+        moduleConfigtoml.put("modules", moduleConfig);
         Map<String, Object> pi = getPi();
-        config.put("panes", pi);
-        config.put("prefix", ".");
-        ClickGUIScreen.INSTANCE = new ClickGUIScreen();
+        moduleConfigtoml.put("panes", pi);
+        moduleConfigtoml.put("prefix", ".");
     }
 
     public void load() {
         try {
             String configText = new String(Files.readAllBytes(configFile.toPath()));
-            config = (Map<String, Object>) gson.fromJson(configText, Map.class);
+           // config = (Map<String, Object>) gson.fromJson(configText, Map.class);
+            moduleConfigtoml = moduleToml.read(configFile).toMap();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,17 +94,25 @@ public class Config {
 
     public void save() {
         try {
-            if (!doesConfigExist()) configFile.createNewFile();
+            if (!FileUtils.doesFileInPathExist(configFile.getPath())) configFile.createNewFile();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        try {
-            String configText = gson.toJson(config);
+      /*  try {
+            String configText = gson.toJson(config);;
             FileWriter writer = new FileWriter(configFile);
             writer.write(configText);
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+       */
+        try {
+            System.out.println("Modules during saving: " + moduleConfigtoml.get("modules"));
+            tomlWriter.write(moduleConfigtoml, configFile);
+        }catch (Exception feelings){
+            feelings.printStackTrace();
         }
     }
 }

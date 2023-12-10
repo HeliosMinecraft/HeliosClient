@@ -1,5 +1,6 @@
 package dev.heliosclient.module.settings;
 
+import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ListSettingScreen;
@@ -10,6 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class ListSetting extends Setting<ArrayList<String>> {
@@ -40,7 +42,16 @@ public class ListSetting extends Setting<ArrayList<String>> {
             MinecraftClient.getInstance().setScreen(new ListSettingScreen(this, parentScreen));
         }
     }
+    @Override
+    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
+        MAP.put("value",value);
+        return MAP;
+    }
 
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        value =(ArrayList<String>) ((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value");
+    }
     public boolean isOptionEnabled(String option) {
         return value.contains(option);
     }

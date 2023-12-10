@@ -1,5 +1,6 @@
 package dev.heliosclient.module.settings;
 
+import com.moandjiezana.toml.Toml;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
@@ -26,6 +27,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class RGBASetting extends Setting<Color> implements Listener {
@@ -348,7 +350,19 @@ public class RGBASetting extends Setting<Color> implements Listener {
             value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), value.getAlpha());
         }
     }
+    @Override
+    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
+        MAP.put("value",value.getRGB());
+        MAP.put("rainbow",rainbow);
+        return MAP;
+    }
 
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        value = ColorUtils.intToColor(Integer.parseInt(((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value").toString()));
+        rainbow = (boolean) ((Map<String,Object>) MAP.get(name.replace(" ",""))).get("rainbow");
+        updateHandles();
+    }
     public Screen getParentScreen() {
         return parentScreen;
     }

@@ -13,6 +13,7 @@ import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.DamageUtils;
+import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.util.cape.CapeSynchronizer;
@@ -54,7 +55,6 @@ public class HeliosClient implements ModInitializer {
         SoundUtils.registerSounds();
 
 
-        loadConfig();
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             if(MC.player !=null) {
@@ -76,54 +76,37 @@ public class HeliosClient implements ModInitializer {
         if (MC.getWindow() != null) {
             quadTree = new Quadtree(0);
         }
-        ClickGUIScreen.INSTANCE.onLoad();
-
         CapeManager.capes = CapeManager.loadCapes();
         CapeSynchronizer.registerCapeSyncPacket();
+        loadConfig();
+        ClickGUIScreen.INSTANCE.onLoad();
     }
 
     public void loadConfig() {
         LOGGER.info("Loading config...");
-        if (!CONFIG.doesConfigExist()) {
+        if(!FileUtils.doesFileInPathExist(CONFIG.configFile.getPath())){
             CONFIG.loadDefaultConfig();
             CONFIG.save();
         }
         CONFIG.load();
 
         for (Module_ m : ModuleManager.INSTANCE.modules) {
-            for (SettingGroup settingBuilder : m.settingGroups) {
-                for (Setting s : settingBuilder.getSettings()) {
-                    s.value = ((Map<String, Object>) ((Map<String, Object>) CONFIG.config.get("modules")).get(m.name))
-                            .get(s.name);
+            for (SettingGroup settingGroup : m.settingGroups) {
+                for (Setting s : settingGroup.getSettings()) {
+                    Map<String, Object> map = (Map<String, Object>)((Map<String, Object>) CONFIG.moduleToml.toMap().get("modules")).get(m.name);
+                    if(map != null) {
+                        s.loadFromToml(map, CONFIG.moduleToml.getTable("modules").getTable(m.name));
+                    }
+                    //s.value = ((Map<String, Object>)((Map<String, Object>) CONFIG.moduleToml.toMap().get("modules")).get(m.name)).get(s.name);
                 }
             }
         }
-        CommandManager.prefix = (String) CONFIG.config.get("prefix");
+        CommandManager.prefix = (String) CONFIG.moduleConfigtoml.get("prefix");
     }
 
     public void saveConfig() {
         LOGGER.info("Saving config...");
-        Map<String, Object> mi = new HashMap<>();
-        for (Module_ m : ModuleManager.INSTANCE.modules) {
-            Map<String, Object> mo = new HashMap<>();
-            for (SettingGroup settingBuilder : m.settingGroups) {
-                for (Setting s : settingBuilder.getSettings()) {
-                    mo.put(s.name, s.value);
-                }
-                mi.put(m.name, mo);
-            }
-        }
-        CONFIG.config.put("modules", mi);
-        Map<String, Object> pi = new HashMap<>();
-        for (CategoryPane c : ClickGUIScreen.INSTANCE.categoryPanes) {
-            Map<String, Object> po = new HashMap<>();
-            po.put("x", c.x);
-            po.put("y", c.y);
-            po.put("collapsed", c.collapsed);
-            pi.put(c.category.name, po);
-        }
-        CONFIG.config.put("panes", pi);
-        CONFIG.config.put("prefix", CommandManager.get().getPrefix());
+        CONFIG.setConfig();
         CONFIG.save();
     }
 }

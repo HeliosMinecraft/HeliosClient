@@ -1,5 +1,6 @@
 package dev.heliosclient.module.settings;
 
+import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
@@ -13,6 +14,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class CycleSetting extends Setting<Integer> {
@@ -76,10 +78,10 @@ public class CycleSetting extends Setting<Integer> {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         if (options.isEmpty() || options.size() - 1 < value) {
-            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "No option found!", x + 2, y + 1, 0xFFFF0000);
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "No option found!", x + 2, y + 2, 0xFFFF0000);
         }
         else {
-            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 1, ColorManager.INSTANCE.defaultTextColor());
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
         }
 
         if (hovered(mouseX, mouseY)) {
@@ -118,6 +120,18 @@ public class CycleSetting extends Setting<Integer> {
             }
             iSettingChange.onSettingChange(this);
         }
+    }
+    @Override
+    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
+        MAP.put("value",value);
+        MAP.put("options",options);
+        return MAP;
+    }
+
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        value = Integer.parseInt(((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value").toString());
+        options = (List)((Map<String,Object>) MAP.get(name.replace(" ",""))).get("options");
     }
 
     public static class Builder extends SettingBuilder<Builder, List, CycleSetting> {

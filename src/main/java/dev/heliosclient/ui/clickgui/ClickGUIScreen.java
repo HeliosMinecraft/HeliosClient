@@ -29,11 +29,11 @@ public class ClickGUIScreen extends Screen {
         scrollX = 0;
         scrollY = 0;
         categoryPanes = new ArrayList<CategoryPane>();
-        Map<String, Object> panePos = ((Map<String, Object>) HeliosClient.CONFIG.config.get("panes"));
+        Map<String, Object> panePos = ((Map<String, Object>) HeliosClient.CONFIG.moduleConfigtoml.get("panes"));
 
         CategoryManager.getCategories().forEach((s, category) -> {
-                    int xOffset = MathUtils.d2iSafe((((Map<String, Object>) panePos.get(category.name)).get("x")));
-                    int yOffset = MathUtils.d2iSafe(((Map<String, Object>) panePos.get(category.name)).get("y"));
+                    int xOffset = MathUtils.d2iSafe(Integer.parseInt(((Map<String, Object>) panePos.get(category.name)).get("x").toString()));
+                    int yOffset =  MathUtils.d2iSafe(Integer.parseInt(((Map<String, Object>) panePos.get(category.name)).get("y").toString()));
                     boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
                     categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
                 }

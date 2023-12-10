@@ -1,14 +1,19 @@
 package dev.heliosclient.module.settings;
 
+import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
+import io.netty.util.internal.StringUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class StringListSetting extends Setting<String[]> {
@@ -81,6 +86,30 @@ public class StringListSetting extends Setting<String[]> {
                 i--; // Decrement the index to account for the removal
             }
             boxOffset += 16;
+        }
+    }
+    @Override
+    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
+        int a = 0;
+        for (InputBox inputBox:
+             inputBoxes) {
+            MAP.put("inputbox_" + a,inputBox.getValue());
+            a++;
+        }
+        return MAP;
+    }
+
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        int a;
+        inputBoxes.clear();
+        for (a = 0;true; a++) {
+            Map<String, Object> replacedMap = (Map<String,Object>) MAP.get(name.replace(" ",""));
+            if(replacedMap.containsKey("inputbox_" + a)) {
+                inputBoxes.add(new InputBox(160,12,replacedMap.get("inputbox_" + a).toString(),characterLimit,inputMode));
+            } else{
+                break;
+            }
         }
     }
 

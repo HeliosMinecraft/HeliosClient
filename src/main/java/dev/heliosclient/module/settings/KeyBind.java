@@ -1,5 +1,6 @@
 package dev.heliosclient.module.settings;
 
+import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.Module_;
@@ -12,6 +13,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class KeyBind extends Setting<Integer> {
@@ -109,6 +111,16 @@ public class KeyBind extends Setting<Integer> {
             listeningKey = !listeningKey;
             listeningMouse = true;
         }
+    }
+    @Override
+    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
+        MAP.put("value",value);
+        return MAP;
+    }
+
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        value = Integer.parseInt(((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value").toString());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package dev.heliosclient.module.settings;
 
+import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
@@ -14,6 +15,8 @@ import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class DoubleSetting extends Setting<Double> {
@@ -138,6 +141,16 @@ public class DoubleSetting extends Setting<Double> {
     public void mouseReleased(double mouseX, double mouseY, int button) {
         sliding = false;
         ISettingChange.onSettingChange(this);
+    }
+    @Override
+    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
+        MAP.put("value",value);
+        return MAP;
+    }
+
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        value = Double.parseDouble(((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value").toString());
     }
 
     @Override

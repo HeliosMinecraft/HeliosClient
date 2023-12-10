@@ -1,5 +1,7 @@
 package dev.heliosclient.module.settings;
 
+import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
@@ -11,6 +13,7 @@ import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class BooleanSetting extends Setting<Boolean> {
@@ -83,6 +86,17 @@ public class BooleanSetting extends Setting<Boolean> {
             iSettingChange.onSettingChange(this);
             CheckBoxAnimation.startFading(value, EasingType.QUADRATIC_OUT);
         }
+    }
+
+    @Override
+    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
+        MAP.put("value",value);
+        return MAP;
+    }
+
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        value = (boolean)((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value");
     }
 
     public static class Builder extends SettingBuilder<Builder, Boolean, BooleanSetting> {

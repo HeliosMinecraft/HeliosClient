@@ -1,5 +1,7 @@
 package dev.heliosclient.module.settings;
 
+import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.CategoryPane;
@@ -8,13 +10,15 @@ import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
-public abstract class Setting<T> implements Listener {
+public abstract class Setting<T> implements Listener, ISaveAndLoad {
     public final T defaultValue;
     public String name;
     public String description;
@@ -248,6 +252,15 @@ public abstract class Setting<T> implements Listener {
 
     public void setAnimationSpeed(float animationSpeed) {
         this.animationSpeed = animationSpeed;
+    }
+    @Override
+    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
+        return MAP;
+    }
+
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+
     }
 
     // Credits: Meteor client

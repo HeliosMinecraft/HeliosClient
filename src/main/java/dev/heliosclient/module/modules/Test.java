@@ -32,7 +32,7 @@ public class Test extends Module_ {
     BooleanSetting rounded = sgGeneral.add(new BooleanSetting("Rounded", "", this, false, () -> true, false));
     BooleanSetting Circle = sgGeneral.add(new BooleanSetting("Circle", "", this, false, () -> true, false));
     BooleanSetting Triangle = sgGeneral.add(new BooleanSetting("Triangle", "", this, false, () -> true, false));
-    StringSetting num = sgGeneral.add(new StringSetting("Enter a number", "DESCRIPTION", "E", 100, InputBox.InputMode.ALL, () -> true, "E"));
+    StringSetting num = sgGeneral.add(new StringSetting("Enter a number 2", "DESCRIPTION", "E", 100, InputBox.InputMode.ALL, () -> true, "E"));
     String[] list = new String[]{"1ST", "2ND", "3RD", "LMAO"};
     StringListSetting stringListSetting = sgGeneral.add(new StringListSetting("Enter a number", "DESCRIPTION", list, 4, 100, InputBox.InputMode.DIGITS_AND_CHARACTERS, () -> true));
 
