@@ -39,6 +39,7 @@ public class ClickGUIScreen extends Screen {
                 Object categoryObject = panePos.get(category.name);
                 if (categoryObject instanceof Map) {
                     Map<String, Object> categoryMap = (Map<String, Object>) panePos.get(category.name);
+                    System.out.println(categoryMap);
                     int xOffset = MathUtils.d2iSafe(Integer.parseInt(categoryMap.get("x").toString()));
                     int yOffset = MathUtils.d2iSafe(Integer.parseInt(categoryMap.get("y").toString()));
                     boolean collapsed = (boolean) categoryMap.get("collapsed");

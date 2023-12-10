@@ -85,8 +85,8 @@ public class HeliosClient implements ModInitializer {
 
     public void loadConfig() {
         CONFIG.loadConfig();
-        CONFIG.loadModules();
         CommandManager.prefix = (String) CONFIG.clientConfigMap.get("prefix");
+        CONFIG.loadModules();
     }
 
     public void saveConfig() {

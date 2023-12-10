@@ -13,8 +13,7 @@ public class Reset extends Command {
 
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
-        builder.executes(context ->
-        {
+        builder.executes(context -> {
             HeliosClient.CONFIG.getDefaultModuleConfig();
 
             ChatUtils.sendHeliosMsg("Reset config.");

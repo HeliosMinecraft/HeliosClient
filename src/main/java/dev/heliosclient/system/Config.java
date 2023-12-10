@@ -74,28 +74,58 @@ public class Config {
     }
 
     public void getModuleConfig() {
-        Map<String, Object> categoryPaneMap = new HashMap<>();
-        CategoryManager.getCategories().forEach((s, category) -> {
-            Map<String, Object> paneConfigMap = new HashMap<>();
-            CategoryPane categoryPane = CategoryManager.findCategoryPane(category);
-                paneConfigMap.put("x", categoryPane.x);
-                paneConfigMap.put("y", categoryPane.y);
-                paneConfigMap.put("collapsed", categoryPane.collapsed);
-                for (Module_ module : ModuleManager.INSTANCE.getModulesByCategory(category)) {
-                    Map<String, Object> ModuleConfig = new HashMap<>();
-                    for (SettingGroup settingGroup : module.settingGroups) {
-                        for (Setting setting : settingGroup.getSettings()) {
-                            if (setting.name != null) {
-                                ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new HashMap<>()));
+        try {
+            Map<String, Object> categoryPaneMap = new HashMap<>();
+            CategoryManager.getCategories().forEach((s, category) -> {
+                Map<String, Object> paneConfigMap = new HashMap<>();
+                CategoryPane categoryPane = CategoryManager.findCategoryPane(category);
+                if (categoryPane != null) {
+                    paneConfigMap.put("x", categoryPane.x);
+                    paneConfigMap.put("y", categoryPane.y);
+                    paneConfigMap.put("collapsed", categoryPane.collapsed);
+                    for (Module_ module : ModuleManager.INSTANCE.getModulesByCategory(category)) {
+                        Map<String, Object> ModuleConfig = new HashMap<>();
+                        for (SettingGroup settingGroup : module.settingGroups) {
+                            for (Setting setting : settingGroup.getSettings()) {
+                                if (setting.name != null) {
+                                    ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new HashMap<>()));
+                                }
                             }
                         }
+                        paneConfigMap.put(module.name.replace(" ", ""), ModuleConfig);
                     }
-                    paneConfigMap.put(module.name.replace(" ", ""), ModuleConfig);
+                    categoryPaneMap.put(category.name, paneConfigMap);
+                    moduleConfigMap.put("panes", categoryPaneMap);
+                }else{
+                    this.getDefaultModuleConfig();
                 }
-                categoryPaneMap.put(category.name, paneConfigMap);
-                moduleConfigMap.put("panes", categoryPaneMap);
-        });
+            });
+        } catch (Exception e) {
+            LOGGER.error("Error occurred while getting module config. Loading default config.", e);
+            this.getDefaultModuleConfig();
+        }
     }
+
+    public void load() {
+        try {
+            moduleToml = new Toml().read(moduleConfigFile);
+            clientToml = new Toml().read(configFile);
+            if (moduleToml != null) {
+                moduleConfigMap = moduleToml.toMap();
+            } else {
+                throw new Exception("ModuleToml is null");
+            }
+            if (clientToml != null) {
+                clientConfigMap = clientToml.toMap();
+            } else {
+                throw new Exception("ClientToml is null");
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error occurred while loading config. Loading default config.", e);
+            this.getDefaultModuleConfig();
+        }
+    }
+
 
     public void getClientConfig() {
         clientConfigMap.put("prefix", ".");
@@ -125,18 +155,7 @@ public class Config {
            this.getModuleConfig();
        }
        this.getClientConfig();
-    }
-
-    public void load() {
-        try {
-            moduleToml = new Toml().read(moduleConfigFile);
-            clientToml = new Toml().read(configFile);
-            moduleConfigMap = moduleToml.toMap();
-            clientConfigMap = clientToml.toMap();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+   }
 
     public void loadModules() {
         CategoryManager.getCategories().forEach((s, category) -> {

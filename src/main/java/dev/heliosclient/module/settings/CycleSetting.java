@@ -130,7 +130,6 @@ public class CycleSetting extends Setting<Integer> {
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
         value = Integer.parseInt(((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value").toString());
-        System.out.println(value);
     }
 
     public static class Builder extends SettingBuilder<Builder, List, CycleSetting> {

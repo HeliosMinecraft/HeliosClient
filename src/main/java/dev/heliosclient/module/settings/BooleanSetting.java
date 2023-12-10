@@ -97,7 +97,6 @@ public class BooleanSetting extends Setting<Boolean> {
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
         value = (boolean)((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value");
-        System.out.println(name +": " + value);
     }
 
     public static class Builder extends SettingBuilder<Builder, Boolean, BooleanSetting> {
