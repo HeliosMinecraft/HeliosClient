@@ -4,6 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CategoryManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
+import dev.heliosclient.module.Category;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.InputBox;
@@ -29,18 +30,27 @@ public class ClickGUIScreen extends Screen {
         scrollX = 0;
         scrollY = 0;
         categoryPanes = new ArrayList<CategoryPane>();
-        Map<String, Object> panePos = ((Map<String, Object>) HeliosClient.CONFIG.moduleConfigtoml.get("panes"));
 
-        CategoryManager.getCategories().forEach((s, category) -> {
-                    int xOffset = MathUtils.d2iSafe(Integer.parseInt(((Map<String, Object>) panePos.get(category.name)).get("x").toString()));
-                    int yOffset =  MathUtils.d2iSafe(Integer.parseInt(((Map<String, Object>) panePos.get(category.name)).get("y").toString()));
-                    boolean collapsed = (boolean) ((Map<String, Object>) panePos.get(category.name)).get("collapsed");
+        Object panesObject = HeliosClient.CONFIG.moduleConfigMap.get("panes");
+        if (panesObject instanceof Map) {
+            Map<String, Object> panePos = (Map<String, Object>) panesObject;
+
+            CategoryManager.getCategories().forEach((s, category) -> {
+                Object categoryObject = panePos.get(category.name);
+                if (categoryObject instanceof Map) {
+                    Map<String, Object> categoryMap = (Map<String, Object>) panePos.get(category.name);
+                    int xOffset = MathUtils.d2iSafe(Integer.parseInt(categoryMap.get("x").toString()));
+                    int yOffset = MathUtils.d2iSafe(Integer.parseInt(categoryMap.get("y").toString()));
+                    boolean collapsed = (boolean) categoryMap.get("collapsed");
                     categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
                 }
-        );
+            });
+        }
 
         searchBar = new SearchBar();
     }
+
+
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {

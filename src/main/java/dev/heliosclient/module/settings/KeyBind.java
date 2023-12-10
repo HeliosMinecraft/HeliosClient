@@ -93,6 +93,7 @@ public class KeyBind extends Setting<Integer> {
             }
             listening = false;
             listeningKey = false;
+            listeningMouse = false;
             ISettingChange.onSettingChange(this);
         }
     }
@@ -104,6 +105,7 @@ public class KeyBind extends Setting<Integer> {
             value = button;
             ISettingChange.onSettingChange(this);
             listening = !listening;
+            listeningKey = false;
             listeningMouse = false;
         }
         if (hovered((int) mouseX, (int) mouseY) && button == 0 && !listeningMouse) {

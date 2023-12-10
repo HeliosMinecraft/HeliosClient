@@ -1,6 +1,8 @@
 package dev.heliosclient.managers;
 
 import dev.heliosclient.module.Category;
+import dev.heliosclient.ui.clickgui.CategoryPane;
+import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,5 +28,13 @@ public class CategoryManager {
 
     public static Map<String, Category> getCategories() {
         return categories;
+    }
+    public static CategoryPane findCategoryPane(Category category) {
+        for (CategoryPane pane : ClickGUIScreen.INSTANCE.categoryPanes) {
+            if (pane.category.equals(category)) {
+                return pane;
+            }
+        }
+        return null;
     }
 }

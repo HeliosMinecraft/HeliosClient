@@ -15,7 +15,7 @@ public class Reset extends Command {
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context ->
         {
-            HeliosClient.CONFIG.loadDefaultConfig();
+            HeliosClient.CONFIG.getDefaultModuleConfig();
 
             ChatUtils.sendHeliosMsg("Reset config.");
 

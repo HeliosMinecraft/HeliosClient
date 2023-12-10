@@ -124,14 +124,13 @@ public class CycleSetting extends Setting<Integer> {
     @Override
     public Map<String, Object> saveToToml(Map<String, Object> MAP) {
         MAP.put("value",value);
-        MAP.put("options",options);
         return MAP;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
         value = Integer.parseInt(((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value").toString());
-        options = (List)((Map<String,Object>) MAP.get(name.replace(" ",""))).get("options");
+        System.out.println(value);
     }
 
     public static class Builder extends SettingBuilder<Builder, List, CycleSetting> {

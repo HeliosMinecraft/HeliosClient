@@ -78,35 +78,21 @@ public class HeliosClient implements ModInitializer {
         }
         CapeManager.capes = CapeManager.loadCapes();
         CapeSynchronizer.registerCapeSyncPacket();
+
         loadConfig();
         ClickGUIScreen.INSTANCE.onLoad();
     }
 
     public void loadConfig() {
-        LOGGER.info("Loading config...");
-        if(!FileUtils.doesFileInPathExist(CONFIG.configFile.getPath())){
-            CONFIG.loadDefaultConfig();
-            CONFIG.save();
-        }
-        CONFIG.load();
-
-        for (Module_ m : ModuleManager.INSTANCE.modules) {
-            for (SettingGroup settingGroup : m.settingGroups) {
-                for (Setting s : settingGroup.getSettings()) {
-                    Map<String, Object> map = (Map<String, Object>)((Map<String, Object>) CONFIG.moduleToml.toMap().get("modules")).get(m.name);
-                    if(map != null) {
-                        s.loadFromToml(map, CONFIG.moduleToml.getTable("modules").getTable(m.name));
-                    }
-                    //s.value = ((Map<String, Object>)((Map<String, Object>) CONFIG.moduleToml.toMap().get("modules")).get(m.name)).get(s.name);
-                }
-            }
-        }
-        CommandManager.prefix = (String) CONFIG.moduleConfigtoml.get("prefix");
+        CONFIG.loadConfig();
+        CONFIG.loadModules();
+        CommandManager.prefix = (String) CONFIG.clientConfigMap.get("prefix");
     }
 
     public void saveConfig() {
         LOGGER.info("Saving config...");
-        CONFIG.setConfig();
+        CONFIG.getModuleConfig();
+        CONFIG.getClientConfig();
         CONFIG.save();
     }
 }
