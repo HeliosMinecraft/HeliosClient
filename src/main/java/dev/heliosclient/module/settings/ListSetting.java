@@ -11,6 +11,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
@@ -43,14 +44,13 @@ public class ListSetting extends Setting<ArrayList<String>> {
         }
     }
     @Override
-    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
-        MAP.put("value",value);
-        return MAP;
+    public Object saveToToml(List<Object> objectList) {
+        return value;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value =(ArrayList<String>) ((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value");
+        value =(ArrayList<String>) MAP.get(name.replace(" ",""));
     }
     public boolean isOptionEnabled(String option) {
         return value.contains(option);

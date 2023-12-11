@@ -17,6 +17,7 @@ import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
+import net.minecraft.client.MinecraftClient;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -285,6 +286,7 @@ public class ClickGUI extends Module_ {
 
         fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
 
+        if(MinecraftClient.getInstance().getWindow() != null)
         FontManager.INSTANCE.registerFonts();
 
         if(ColorMode.value == 0) {

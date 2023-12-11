@@ -143,14 +143,15 @@ public class DoubleSetting extends Setting<Double> {
         ISettingChange.onSettingChange(this);
     }
     @Override
-    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
-        MAP.put("value",value);
-        return MAP;
+    public Object saveToToml(List<Object> objectList) {
+        return value;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value = Double.parseDouble(((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value").toString());
+        if(toml.getDouble(name.replace(" ","")) != null) {
+            value = toml.getDouble(name.replace(" ", ""));
+        }
     }
 
     @Override

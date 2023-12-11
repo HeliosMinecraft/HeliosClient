@@ -1,20 +1,17 @@
 package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
+import de.javagl.obj.Obj;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -25,8 +22,9 @@ import net.minecraft.client.util.GlAllocationUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
+import java.awt.Color;
 import java.nio.ByteBuffer;
+import java.util.*;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
@@ -351,16 +349,16 @@ public class RGBASetting extends Setting<Color> implements Listener {
         }
     }
     @Override
-    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
-        MAP.put("value",value.getRGB());
-        MAP.put("rainbow",rainbow);
-        return MAP;
+    public Object saveToToml(List<Object> objectList) {
+        objectList.add(value.getRGB());
+        objectList.add(rainbow? 1:0);
+        return objectList;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value = ColorUtils.intToColor(Integer.parseInt(((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value").toString()));
-        rainbow = (boolean) ((Map<String,Object>) MAP.get(name.replace(" ",""))).get("rainbow");
+        value = ColorUtils.intToColor(Integer.parseInt(toml.getList(this.name.replace(" ","")).get(0).toString()));
+        rainbow = Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(1).toString()) == 1;
         updateHandles();
     }
     public Screen getParentScreen() {

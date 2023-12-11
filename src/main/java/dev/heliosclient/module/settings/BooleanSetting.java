@@ -13,6 +13,7 @@ import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
@@ -89,14 +90,13 @@ public class BooleanSetting extends Setting<Boolean> {
     }
 
     @Override
-    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
-        MAP.put("value",value);
-        return MAP;
+    public Object saveToToml(List<Object> objectList) {
+        return value;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value = (boolean)((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value");
+        value = (boolean) MAP.get(name.replace(" ",""));
     }
 
     public static class Builder extends SettingBuilder<Builder, Boolean, BooleanSetting> {

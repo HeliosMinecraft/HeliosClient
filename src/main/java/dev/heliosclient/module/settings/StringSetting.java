@@ -63,14 +63,13 @@ public class StringSetting extends Setting<String> {
         inputBoxCompact.setFocused(hovered((int) mouseX, (int) mouseY));
     }
     @Override
-    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
-        MAP.put("value", value);
-        return MAP;
+    public Object saveToToml(List<Object> objectList) {
+        return value;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value = ((Map<String, Object>) MAP.get(name.replace(" ", ""))).get("value").toString();
+        value = toml.getString(name.replace(" ", ""));
         inputBox.setValue(value);
     }
 

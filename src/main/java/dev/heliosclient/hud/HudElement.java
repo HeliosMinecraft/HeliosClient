@@ -1,5 +1,7 @@
 package dev.heliosclient.hud;
 
+import com.moandjiezana.toml.Toml;
+import de.javagl.obj.Obj;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.FontManager;
@@ -7,6 +9,7 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -14,6 +17,7 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class for creating HudElements for HUD
@@ -25,7 +29,7 @@ import java.util.List;
  *
  * <h4>Warning: Makes sure the element is centered along the x and y position. If this is not met they will go off-screen and hit-boxes will be broken.</h4>
  */
-public class HudElement implements ISettingChange {
+public class HudElement implements ISettingChange, ISaveAndLoad {
     public String name;
     public String description;
     public int height = FontManager.fontSize;
@@ -374,6 +378,20 @@ public class HudElement implements ISettingChange {
      * Called when setting gets changed.
      */
     public void onSettingChange(Setting setting) {
+
+    }
+
+    @Override
+    public Object saveToToml(List<Object> objects) {
+        objects.add(x);
+        objects.add(y);
+        objects.add(width);
+        objects.add(height);
+        return objects;
+    }
+
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
 
     }
 }

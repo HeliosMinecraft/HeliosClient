@@ -11,6 +11,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
@@ -234,14 +235,13 @@ public class ColorSetting extends Setting<Integer> {
         slidingBlue = false;
     }
     @Override
-    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
-        MAP.put("value",value);
-        return MAP;
+    public Object saveToToml(List<Object> objectList) {
+        return value;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value = (int) ((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value");
+        value = (int) MAP.get(name.replace(" ",""));
     }
 
     public static class Builder extends SettingBuilder<Builder, Integer, ColorSetting> {

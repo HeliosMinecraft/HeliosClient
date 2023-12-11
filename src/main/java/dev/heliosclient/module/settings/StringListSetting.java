@@ -89,27 +89,21 @@ public class StringListSetting extends Setting<String[]> {
         }
     }
     @Override
-    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
-        int a = 0;
+    public Object saveToToml(List<Object> objectList) {
         for (InputBox inputBox:
              inputBoxes) {
-            MAP.put("inputbox_" + a,inputBox.getValue());
-            a++;
+            objectList.add(inputBox.getValue());
         }
-        return MAP;
+        return objectList;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
         int a;
         inputBoxes.clear();
-        for (a = 0;true; a++) {
-            Map<String, Object> replacedMap = (Map<String,Object>) MAP.get(name.replace(" ",""));
-            if(replacedMap.containsKey("inputbox_" + a)) {
-                inputBoxes.add(new InputBox(160,12,replacedMap.get("inputbox_" + a).toString(),characterLimit,inputMode));
-            } else{
-                break;
-            }
+        List<String> list = toml.getList(name.replace(" ",""));
+        for (a = 0;a < list.size(); a++) {
+            inputBoxes.add(new InputBox(160,12, list.get(a),characterLimit,inputMode));
         }
     }
 

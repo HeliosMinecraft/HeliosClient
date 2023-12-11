@@ -73,20 +73,23 @@ public class HeliosClient implements ModInitializer {
         EventManager.register(ColorManager.INSTANCE);
         EventManager.register(new DamageUtils());
 
-        if (MC.getWindow() != null) {
-            quadTree = new Quadtree(0);
-        }
         CapeManager.capes = CapeManager.loadCapes();
         CapeSynchronizer.registerCapeSyncPacket();
 
         loadConfig();
         ClickGUIScreen.INSTANCE.onLoad();
+        HeliosClient.CLICKGUI.onLoad();
+        if (MC.getWindow() != null) {
+            quadTree = new Quadtree(0);
+        }
     }
 
     public void loadConfig() {
         CONFIG.loadConfig();
         CommandManager.prefix = (String) CONFIG.clientConfigMap.get("prefix");
         CONFIG.loadModules();
+        CONFIG.loadClientConfigModules();
+        CONFIG.loadHudElements();
     }
 
     public void saveConfig() {

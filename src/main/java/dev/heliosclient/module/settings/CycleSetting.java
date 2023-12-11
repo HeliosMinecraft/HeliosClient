@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
+import static com.mojang.text2speech.Narrator.LOGGER;
+
 public class CycleSetting extends Setting<Integer> {
     public List options;
     public int value;
@@ -122,14 +124,18 @@ public class CycleSetting extends Setting<Integer> {
         }
     }
     @Override
-    public Map<String, Object> saveToToml(Map<String, Object> MAP) {
-        MAP.put("value",value);
-        return MAP;
+    public Object saveToToml(List<Object> objectList) {
+        return options.get(value);
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value = Integer.parseInt(((Map<String,Object>) MAP.get(name.replace(" ",""))).get("value").toString());
+        int optionIndex = options.indexOf(MAP.get(name.replace(" ","")));
+        if(optionIndex != -1) {
+            value = optionIndex;
+        } else{
+            LOGGER.info("Option not found for: " + MAP.get(name.replace(" ","")) +", " + name + " Setting");
+        }
     }
 
     public static class Builder extends SettingBuilder<Builder, List, CycleSetting> {

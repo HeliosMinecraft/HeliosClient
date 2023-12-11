@@ -15,13 +15,10 @@ import java.util.ArrayList;
 
 public class HudManager implements Listener {
     public static HudManager INSTANCE = new HudManager();
-    public static Quadtree quadtree;
     public ArrayList<HudElement> hudElements = new ArrayList<>();
     protected MinecraftClient mc = MinecraftClient.getInstance();
 
     public HudManager() {
-        quadtree = new Quadtree(0);
-        quadtree.clear();
         EventManager.register(this);
     }
 
@@ -42,11 +39,9 @@ public class HudManager implements Listener {
 
     public void addHudElement(HudElement element) {
         this.hudElements.add(element);
-        quadtree.insert(element.hitbox);
     }
 
     public void removeHudElement(HudElement element) {
         this.hudElements.remove(element);
-        quadtree.remove(element.hitbox);
     }
 }
