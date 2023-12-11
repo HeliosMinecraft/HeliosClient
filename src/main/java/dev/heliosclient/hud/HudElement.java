@@ -16,8 +16,11 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.mojang.text2speech.Narrator.LOGGER;
 
 /**
  * Class for creating HudElements for HUD
@@ -391,7 +394,11 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-
+    public void loadFromToml(Map<String, Object> map, Toml toml) {
+        List<Object> obj = toml.getList("positions");
+        this.x = Integer.parseInt(obj.get(0).toString());
+        this.y = Integer.parseInt(obj.get(1).toString());
+        this.width = Integer.parseInt(obj.get(2).toString());
+        this.height = Integer.parseInt(obj.get(3).toString());
     }
 }

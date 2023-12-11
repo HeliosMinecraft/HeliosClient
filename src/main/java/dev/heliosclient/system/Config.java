@@ -4,6 +4,7 @@ import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.CategoryManager;
 import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.managers.ModuleManager;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
@@ -69,7 +71,7 @@ public class Config {
                 for (SettingGroup settingGroup : module.settingGroups) {
                     for (Setting setting : settingGroup.getSettings()) {
                         if (setting.name != null) {
-                                ModuleConfig.put(setting.name.replace(" ", ""),setting.saveToToml(new ArrayList<>()));
+                            ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
                         }
                     }
                 }
@@ -98,13 +100,13 @@ public class Config {
                                 if (setting.name != null) {
                                     ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
                                 }
-                                }
                             }
+                        }
                         paneConfigMap.put(module.name.replace(" ", ""), ModuleConfig);
                     }
                     categoryPaneMap.put(category.name, paneConfigMap);
                     moduleConfigMap.put("panes", categoryPaneMap);
-                }else{
+                } else {
                     this.getDefaultModuleConfig();
                 }
             });
@@ -113,23 +115,25 @@ public class Config {
             this.getDefaultModuleConfig();
         }
     }
+
     public void getHudConfig() {
         try {
             Map<String, Object> hudElements = new HashMap<>();
-            System.out.println("HUD ELEMENTS: "+HudManager.INSTANCE.hudElements);
+            Map<String, Object> hudSettings = new HashMap<>();
 
             for (HudElement hudElement : HudManager.INSTANCE.hudElements) {
-                hudElements.put(hudElement.name.replace(" ", ""), hudElement.saveToToml(new ArrayList<>()));
+                hudSettings.put("positions", hudElement.saveToToml(new ArrayList<>()));
                 for (SettingGroup settingGroup : hudElement.settingGroups) {
                     for (Setting setting : settingGroup.getSettings()) {
                         if (setting.name != null) {
-                            hudElements.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
+                            hudSettings.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
                         }
                     }
                 }
+                hudElements.put(hudElement.name.replace(" ", ""), hudSettings);
             }
             System.out.println(hudElements);
-            hudConfigMap.put("hudElements",hudElements);
+            hudConfigMap.put("hudElements", hudElements);
         } catch (Exception e) {
             LOGGER.error("Error occurred while getting Hud config.", e);
         }
@@ -162,49 +166,52 @@ public class Config {
     }
 
 
-
-    public boolean shouldLoadDefaultConfig(){
-       return !FileUtils.doesFileInPathExist(this.configFile.getPath()) || !FileUtils.doesFileInPathExist(this.moduleConfigFile.getPath()) || !FileUtils.doesFileInPathExist(this.hudConfigFile.getPath());
+    public boolean shouldLoadDefaultConfig() {
+        return !FileUtils.doesFileInPathExist(this.configFile.getPath()) || !FileUtils.doesFileInPathExist(this.moduleConfigFile.getPath()) || !FileUtils.doesFileInPathExist(this.hudConfigFile.getPath());
     }
-   public void loadConfig(){
-       ModuleManager.INSTANCE = new ModuleManager();
-       if(shouldLoadDefaultConfig()){
-           LOGGER.info("Loading default config...");
-           this.getDefaultModuleConfig();
-           this.save();
-       }else{
-           this.getModuleConfig();
-       }
-       this.getClientConfig();
-       this.getHudConfig();
-       this.load();
-       ClickGUIScreen.INSTANCE = new ClickGUIScreen();
-   }
+
+    public void loadConfig() {
+        ModuleManager.INSTANCE = new ModuleManager();
+        if (shouldLoadDefaultConfig()) {
+            LOGGER.info("Loading default config...");
+            this.getDefaultModuleConfig();
+            this.save();
+        } else {
+            this.getModuleConfig();
+        }
+        this.getClientConfig();
+        this.getHudConfig();
+        this.load();
+        ClickGUIScreen.INSTANCE = new ClickGUIScreen();
+    }
 
     public void loadModules() {
         CategoryManager.getCategories().forEach((s, category) -> {
             for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
                 for (SettingGroup settingGroup : m.settingGroups) {
                     for (Setting setting : settingGroup.getSettings()) {
-                            Toml newToml = moduleToml.getTable("panes").getTable(category.name).getTable(m.name.replace(" ", ""));
-                            if (newToml != null) {
-                                setting.loadFromToml(newToml.toMap(), newToml);
-                            }
+                        Toml newToml = moduleToml.getTable("panes").getTable(category.name).getTable(m.name.replace(" ", ""));
+                        if (newToml != null) {
+                            setting.loadFromToml(newToml.toMap(), newToml);
                         }
+                    }
                 }
             }
         });
     }
+
     public void loadClientConfigModules() {
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
                     Toml settingsToml = clientToml.getTable("settings");
-                    setting.loadFromToml(settingsToml.toMap(), settingsToml);
+                    if (settingsToml != null)
+                        setting.loadFromToml(settingsToml.toMap(), settingsToml);
                 }
             }
         }
     }
+
     public void getClientConfig() {
         clientConfigMap.put("prefix", ".");
         Map<String, Object> ModuleConfig = new HashMap<>();
@@ -217,14 +224,27 @@ public class Config {
         }
         clientConfigMap.put("settings", ModuleConfig);
     }
+
     public void loadHudElements() {
-            HudManager.INSTANCE.hudElements.clear();
-            if( hudToml.getTable("hudElements") !=null) {
-                Map<String, Object> replacedMap = hudToml.getTable("hudElements").toMap();
-                for (Object object : replacedMap.values()) {
-                    HudManager.INSTANCE.hudElements.add((HudElement) object);
+        HudManager.INSTANCE.hudElements.clear();
+        Toml toml = hudToml.getTable("hudElements");
+        if (toml != null) {
+            toml.toMap().forEach((string, object) -> {
+                try {
+                    for(HudElement hudElement: HudElementList.INSTANCE.hudElements){
+                        if(Objects.equals(hudElement.name, string)){
+                            HudElement hudElementDifferent = hudElement;
+                            hudElementDifferent.loadFromToml(toml.getTable(string).toMap(),toml.getTable(string));
+                            HudManager.INSTANCE.hudElements.add(hudElementDifferent);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    LOGGER.error("Error occurred while loading HUD element: " + string, e);
                 }
-            }
+            });
+        }
+        System.out.println(HudManager.INSTANCE.hudElements);
     }
 
 
@@ -232,12 +252,12 @@ public class Config {
         try {
             if (!FileUtils.doesFileInPathExist(this.configFile.getPath())) configFile.createNewFile();
             if (!FileUtils.doesFileInPathExist(this.moduleConfigFile.getPath())) moduleConfigFile.createNewFile();
-           if (!FileUtils.doesFileInPathExist(this.hudConfigFile.getPath())) hudConfigFile.createNewFile();
+            if (!FileUtils.doesFileInPathExist(this.hudConfigFile.getPath())) hudConfigFile.createNewFile();
 
+            getHudConfig();
             tomlWriter.write(clientConfigMap, configFile);
             tomlWriter.write(moduleConfigMap, moduleConfigFile);
             tomlWriter.write(hudConfigMap, hudConfigFile);
-            System.out.println("HudConfigMap: " +hudConfigMap);
         } catch (Exception feelings) {
             feelings.printStackTrace();
         }

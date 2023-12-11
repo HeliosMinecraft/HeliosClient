@@ -56,7 +56,7 @@ public class HudCategoryPane {
 
             width = Math.round(maxWidth);
             for (HudElementButton elementButton : hudElementButtons) {
-                elementButton.render(drawContext, textRenderer, x, offsetY, delta);
+                elementButton.render(drawContext, collapsed, x, offsetY, delta);
                 elementButton.width = width;
                 offsetY += 12;
             }
@@ -77,7 +77,7 @@ public class HudCategoryPane {
         }
 
         for (HudElementButton elementButton : hudElementButtons) {
-            elementButton.mouseClicked(mouseX, mouseY, button);
+            elementButton.mouseClicked(mouseX, mouseY, button,collapsed);
         }
     }
 

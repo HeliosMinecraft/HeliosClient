@@ -3,13 +3,14 @@ package dev.heliosclient.hud;
 import dev.heliosclient.hud.hudelements.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HudElementList {
     public static HudElementList INSTANCE = new HudElementList();
     public ArrayList<HudElement> hudElements = new ArrayList<>();
-
     public HudElementList() {
-        registerElements(new Coords());
+        registerElement(new Coords());
         registerElement(new Fps());
         registerElement(new PlayerModel());
         registerElement(new ClientTag());
