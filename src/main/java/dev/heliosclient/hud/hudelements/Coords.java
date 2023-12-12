@@ -2,6 +2,7 @@ package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
@@ -11,10 +12,10 @@ import net.minecraft.client.gui.DrawContext;
 
 public class Coords extends HudElement {
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    public static HudElementData<Coords> DATA = new HudElementData<>("Coords", "Shows player coords", Coords::new);
 
     public Coords() {
-        super("Coords", "Shows player coords");
+        super(DATA);
         this.width = 50;
         this.height = 10;
     }

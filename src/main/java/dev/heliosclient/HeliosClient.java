@@ -1,6 +1,7 @@
 package dev.heliosclient;
 
 import dev.heliosclient.addon.AddonManager;
+import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -53,6 +54,7 @@ public class HeliosClient implements ModInitializer {
 
         Categories.registerCategories();
         SoundUtils.registerSounds();
+        HudElementList.INSTANCE = new HudElementList();
 
 
 

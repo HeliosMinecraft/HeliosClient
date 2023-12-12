@@ -1,9 +1,11 @@
 package dev.heliosclient.system;
 
+import com.google.gson.Gson;
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.CategoryManager;
 import dev.heliosclient.managers.HudManager;
@@ -17,6 +19,7 @@ import dev.heliosclient.util.FileUtils;
 import net.minecraft.client.MinecraftClient;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,14 +29,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class Config {
+    private static final Gson gson = new Gson();
     public Map<String, Object> moduleConfigMap = new HashMap<>();
     public Map<String, Object> hudConfigMap = new HashMap<>();
 
     public Map<String, Object> clientConfigMap = new HashMap<>();
     public TomlWriter tomlWriter = new TomlWriter.Builder()
             .indentTablesBy(2)
-            .indentValuesBy(3)
-            .padArrayDelimitersBy(0)
             .build();
     public Toml moduleToml;
     public Toml clientToml;
@@ -119,23 +121,34 @@ public class Config {
     public void getHudConfig() {
         try {
             Map<String, Object> hudElements = new HashMap<>();
-            Map<String, Object> hudSettings = new HashMap<>();
 
+            int a = 0;
             for (HudElement hudElement : HudManager.INSTANCE.hudElements) {
-                hudSettings.put("positions", hudElement.saveToToml(new ArrayList<>()));
-                for (SettingGroup settingGroup : hudElement.settingGroups) {
-                    for (Setting setting : settingGroup.getSettings()) {
-                        if (setting.name != null) {
-                            hudSettings.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
-                        }
-                    }
-                }
-                hudElements.put(hudElement.name.replace(" ", ""), hudSettings);
+                hudElements.put("element_" + a, hudElement.saveToToml(new ArrayList<>()));
+                a++;
             }
+
             System.out.println(hudElements);
             hudConfigMap.put("hudElements", hudElements);
         } catch (Exception e) {
             LOGGER.error("Error occurred while getting Hud config.", e);
+        }
+    }
+    public void loadHudElements() {
+        HudManager.INSTANCE.hudElements.clear();
+        Toml toml = hudToml.getTable("hudElements");
+        if (toml != null) {
+            toml.toMap().forEach((string, object) -> {
+                Toml hudElementTable =  toml.getTable(string);
+                if(hudElementTable.contains("name")) {
+                    HudElementData hudElementData = HudElementList.INSTANCE.elementDataMap.get(hudElementTable.getString("name"));
+                   HudElement hudElement = hudElementData.create();
+                   if(hudElement != null){
+                       hudElement.loadFromToml(hudElementTable.toMap(),hudElementTable);
+                       HudManager.INSTANCE.addHudElement(hudElement);
+                   }
+                }
+            });
         }
     }
 
@@ -144,20 +157,12 @@ public class Config {
             moduleToml = new Toml().read(moduleConfigFile);
             clientToml = new Toml().read(configFile);
             hudToml = new Toml().read(hudConfigFile);
-            if (moduleToml != null) {
+            if (moduleToml != null && clientToml != null && hudToml != null) {
                 moduleConfigMap = moduleToml.toMap();
-            } else {
-                throw new Exception("ModuleToml is null");
-            }
-            if (clientToml != null) {
                 clientConfigMap = clientToml.toMap();
-            } else {
-                throw new Exception("ClientToml is null");
-            }
-            if (hudToml != null) {
                 hudConfigMap = hudToml.toMap();
             } else {
-                throw new Exception("HudToml is null");
+                throw new FileNotFoundException();
             }
         } catch (Exception e) {
             LOGGER.error("Error occurred while loading config. Loading default config.", e);
@@ -225,7 +230,7 @@ public class Config {
         clientConfigMap.put("settings", ModuleConfig);
     }
 
-    public void loadHudElements() {
+  /*  public void loadHudElements() {
         HudManager.INSTANCE.hudElements.clear();
         Toml toml = hudToml.getTable("hudElements");
         if (toml != null) {
@@ -246,6 +251,8 @@ public class Config {
         }
         System.out.println(HudManager.INSTANCE.hudElements);
     }
+
+   */
 
 
     public void save() {

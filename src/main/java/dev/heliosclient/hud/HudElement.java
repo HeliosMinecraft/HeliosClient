@@ -3,7 +3,11 @@ package dev.heliosclient.hud;
 import com.moandjiezana.toml.Toml;
 import de.javagl.obj.Obj;
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.client.FontChangeEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
@@ -11,6 +15,7 @@ import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -32,13 +37,13 @@ import static com.mojang.text2speech.Narrator.LOGGER;
  *
  * <h4>Warning: Makes sure the element is centered along the x and y position. If this is not met they will go off-screen and hit-boxes will be broken.</h4>
  */
-public class HudElement implements ISettingChange, ISaveAndLoad {
+public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public String name;
     public String description;
     public int height = FontManager.fontSize;
     public int width = 10;
-    public int x = 90;
-    public int y = 90;
+    public int x;
+    public int y;
     int startX, startY, snapSize = 120;
     public boolean dragging;
     public int posY = 0;
@@ -51,8 +56,10 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
     public Hitbox hitbox;
     public boolean shiftDown = false;
     public List<SettingGroup> settingGroups = new ArrayList<>();
-
+    protected static final MinecraftClient mc = MinecraftClient.getInstance();
     public SettingGroup sgUI = new SettingGroup("UI");
+
+    // Default settings
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
             .description("Render the background for the element")
@@ -102,12 +109,13 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
             .onSettingChange(this)
             .shouldRender(() -> renderBg.value)
             .build());
-    public HudElement(String name, String description) {
-        this.name = name;
-        this.description = description;
+    public HudElement(HudElementData hudElementInfo){
+        this.name = hudElementInfo.name();
+        this.description = hudElementInfo.description();
         hitbox = new Hitbox(x, y, width, height);
+        EventManager.register(this);
 
-       addSettingGroup(sgUI);
+        addSettingGroup(sgUI);
     }
 
     /**
@@ -123,7 +131,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
             int newX = mouseX - startX;
             int newY = mouseY - startY;
 
-            if (this.shiftDown) {
+            if (this.shiftDown && drawContext != null) {
                 // Calculate the size of each snap box
                 int snapBoxWidth = drawContext.getScaledWindowWidth() / this.snapSize;
                 int snapBoxHeight = drawContext.getScaledWindowHeight() / this.snapSize;
@@ -139,6 +147,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
 
             x = newX;
             y = newY;
+
 
             //Get right line to align to
             if (drawContext.getScaledWindowHeight() / 3 > y) {
@@ -193,7 +202,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
         }
 
         //Draw outline when selected
-        if (this.selected && renderOutLineBox) {
+        if (this.selected && renderOutLineBox && drawContext != null) {
             if (dragging) {
                 //Draw X and Y lines when centered
                 if (distanceX == 0 && posX == 1) {
@@ -205,13 +214,13 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
             }
             Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(),   (float) (x - 1 - padding.value / 2 - 1), (float) (y - 1 - padding.value / 2 - 1), (float) (width + 1 + padding.value + 3), (float) (height + 1 + padding.value + 2), 0.4f, 0xFFFFFFFF);
         }
-        //Set default height value
-        this.height = Math.round(Renderer2D.getStringHeight());
+        System.out.println("x: " + this.x+ " y: "+ this.y + ", " + this.name);
+
         //Renders element
         renderElement(drawContext, textRenderer);
 
         // Set the hitbox values after the render element incase any change of width/height occurs
-        hitbox.set(x - 1, y - 1, width + 1, height + 1);
+        hitbox.set((float) (x - 1 - padding.value / 2 - 1), (float) (y - 1 - padding.value / 2 - 1), (float) (width + 1 + padding.value + 3), (float) (height + 1 + padding.value + 2));
     }
 
     /**
@@ -243,9 +252,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
 
         //Render element
         renderElement(drawContext, textRenderer);
-
-        // Set the hitbox values after the render element incase any change of width/height occurs
-        hitbox.set(x - 1, y - 1, width + 1, height + 1);
     }
 
     /**
@@ -383,14 +389,33 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
     public void onSettingChange(Setting setting) {
 
     }
+    @SubscribeEvent
+    public void onFontChange(FontChangeEvent event){
+        this.height = (int) Renderer2D.getStringHeight();
+    }
 
     @Override
     public Object saveToToml(List<Object> objects) {
+        Map<String,Object> map = new HashMap<>();
+
+        map.put("name",name);
+
         objects.add(x);
         objects.add(y);
         objects.add(width);
         objects.add(height);
-        return objects;
+
+        map.put("positions",objects);
+
+        for (SettingGroup settingGroup : settingGroups) {
+            for (Setting setting : settingGroup.getSettings()) {
+                if (setting.name != null) {
+                    map.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
+                }
+            }
+        }
+
+        return map;
     }
 
     @Override
@@ -400,5 +425,14 @@ public class HudElement implements ISettingChange, ISaveAndLoad {
         this.y = Integer.parseInt(obj.get(1).toString());
         this.width = Integer.parseInt(obj.get(2).toString());
         this.height = Integer.parseInt(obj.get(3).toString());
+
+        for (SettingGroup settingGroup : settingGroups) {
+            for (Setting setting : settingGroup.getSettings()) {
+                if (setting.name != null) {
+                    setting.loadFromToml(map,toml);
+                }
+            }
+        }
+
     }
 }

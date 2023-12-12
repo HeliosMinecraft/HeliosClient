@@ -5,30 +5,30 @@ import dev.heliosclient.hud.hudelements.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class HudElementList {
-    public static HudElementList INSTANCE = new HudElementList();
-    public ArrayList<HudElement> hudElements = new ArrayList<>();
+    public static HudElementList INSTANCE;
+    public final Map<String, HudElementData<?>> elementDataMap = new TreeMap<>();
+
     public HudElementList() {
-        registerElement(new Coords());
-        registerElement(new Fps());
-        registerElement(new PlayerModel());
-        registerElement(new ClientTag());
-        registerElement(new Bps());
-        registerElement(new Ping());
-        registerElement(new ModuleList());
-        registerElement(new TestHud());
+        registerElement(Coords.DATA);
+        registerElement(Fps.DATA);
+        registerElement(PlayerModel.DATA);
+        registerElement(ClientTag.DATA);
+        registerElement(Bps.DATA);
+        registerElement(Ping.DATA);
+        registerElement(ModuleList.DATA);
+        registerElement(TestHud.DATA);
     }
 
-    public void registerElement(HudElement module) {
-        hudElements.add(module);
-        module.onLoad();
+    public void registerElement(HudElementData hudElementData) {
+        elementDataMap.put(hudElementData.name(),hudElementData);
     }
 
-    public void registerElements(HudElement... modules) {
-        for (HudElement module : modules) {
-            this.hudElements.add(module);
-            module.onLoad();
+    public void registerElements(HudElementData... datas) {
+        for (HudElementData module : datas){
+            elementDataMap.put(module.name(),module);
         }
     }
 }

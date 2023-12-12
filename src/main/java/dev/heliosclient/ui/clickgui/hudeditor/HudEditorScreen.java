@@ -48,6 +48,7 @@ public class HudEditorScreen extends Screen implements Listener {
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Delete / Backspace - Remove Element", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Hold Shift Key - Enable Snapping", 2, drawContext.getScaledWindowHeight() - fontHeight - 2, -1);
         }
+
         checkAlignmentAndDrawLines(drawContext);
 
         if (dragBox != null && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX,mouseY)) {

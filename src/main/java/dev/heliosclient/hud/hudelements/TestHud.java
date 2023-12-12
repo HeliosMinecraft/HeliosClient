@@ -2,6 +2,7 @@ package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.DamageUtils;
 import dev.heliosclient.util.EntityUtils;
@@ -11,11 +12,10 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class TestHud extends HudElement {
-
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    public static HudElementData<TestHud> DATA = new HudElementData<>("TestHUD", "Testing stuff", TestHud::new);
 
     public TestHud() {
-        super("TestHUD", "Testing stuff");
+        super(DATA);
         this.width = 40;
         this.height = 10;
     }

@@ -2,6 +2,7 @@ package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
@@ -11,10 +12,10 @@ import net.minecraft.client.network.PlayerListEntry;
 
 public class Ping extends HudElement {
 
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    public static HudElementData<Ping> DATA = new HudElementData<>("Ping", "Shows current player ping", Ping::new);
 
     public Ping() {
-        super("Ping", "Shows current player ping");
+        super(DATA);
         this.width = 20;
         this.height = 10;
     }

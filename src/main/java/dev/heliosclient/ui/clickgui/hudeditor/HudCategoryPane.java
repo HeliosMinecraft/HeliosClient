@@ -1,6 +1,7 @@
 package dev.heliosclient.ui.clickgui.hudeditor;
 
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.Renderer2D;
@@ -22,14 +23,16 @@ public class HudCategoryPane {
 
     public HudCategoryPane() {
         float maxWidth = 0;
-        for (HudElement element : HudElementList.INSTANCE.hudElements) {
+        for (HudElementData data : HudElementList.INSTANCE.elementDataMap.values()) {
+            HudElement element = data.create();
             HudElementButton button = new HudElementButton(element);
             float elementWidth = Renderer2D.getCustomStringWidth(button.hudElement.name + " [" + button.count + "]", FontRenderers.Small_fxfontRenderer) + 4;
             maxWidth = Math.max(maxWidth, elementWidth);
         }
         width = Math.round(maxWidth);
 
-        for (HudElement element : HudElementList.INSTANCE.hudElements) {
+        for (HudElementData data : HudElementList.INSTANCE.elementDataMap.values()) {
+            HudElement element = data.create();
             HudElementButton button = new HudElementButton(element);
             button.width = width;
             hudElementButtons.add(button);

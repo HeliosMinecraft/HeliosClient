@@ -2,6 +2,7 @@ package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
@@ -13,10 +14,10 @@ import net.minecraft.util.math.Vec3d;
 
 public class Bps extends HudElement {
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    public static HudElementData<Bps> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second", Bps::new);
 
     public Bps() {
-        super("Player Speed", "Shows player speed in blocks per second");
+        super(DATA);
         this.width = 40;
         this.height = 10;
     }

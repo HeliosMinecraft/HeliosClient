@@ -1,6 +1,7 @@
 package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -12,10 +13,11 @@ import java.util.List;
 
 public class PlayerModel extends HudElement {
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    public static HudElementData<PlayerModel> DATA = new HudElementData<>("Player Model", "Shows player model in a small cute way", PlayerModel::new);
+
 
     public PlayerModel() {
-        super("Player Model", "Shows player model in a small cute way");
+        super(DATA);
         this.width = 30;
         this.height = 55;
     }

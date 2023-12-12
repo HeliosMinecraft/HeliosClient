@@ -31,12 +31,17 @@ public class HudElementButton {
         if(collapsed)return;
         if (hovered(mouseX, mouseY) && button == 0) {
             addInstanceToList(hudElement.getClass());
-            count++;
+            count = 0;
+            HudManager.INSTANCE.hudElements.forEach(hudElement1 -> {
+                if(hudElement1 == hudElement){
+                    count++;
+                }
+            });
         }
     }
 
     public boolean hovered(double mouseX, double mouseY) {
-        return mouseX > x && mouseX < x + 96 && mouseY > y && mouseY < y + 14;
+        return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + 14;
     }
 
     public <T extends HudElement> void addInstanceToList(Class<? extends T> clazz) {

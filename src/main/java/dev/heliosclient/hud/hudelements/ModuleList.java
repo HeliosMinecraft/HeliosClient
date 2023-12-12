@@ -5,6 +5,7 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
@@ -21,9 +22,10 @@ import java.util.Comparator;
 public class ModuleList extends HudElement implements Listener {
 
     private ArrayList<Module_> enabledModules = ModuleManager.INSTANCE.getEnabledModules();
+    public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
 
     public ModuleList() {
-        super("Module List", "Shows enabled modules");
+        super(DATA);
         this.width = 50;
         EventManager.register(this);
     }
