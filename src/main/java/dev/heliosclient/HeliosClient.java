@@ -84,6 +84,7 @@ public class HeliosClient implements ModInitializer {
         if (MC.getWindow() != null) {
             quadTree = new Quadtree(0);
         }
+        Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
     }
 
     public void loadConfig() {

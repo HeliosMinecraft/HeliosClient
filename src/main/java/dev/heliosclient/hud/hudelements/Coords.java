@@ -38,7 +38,7 @@ public class Coords extends HudElement {
                 " Y: " + ColorUtils.gray + coordY + ColorUtils.reset +
                 " Z: " + ColorUtils.gray + coordZ;
 
-        this.width = Math.round(Renderer2D.getStringWidth(text) + 1);
+        this.width = Math.round(Renderer2D.getStringWidth(text));
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, HeliosClient.uiColor);
     }
 

@@ -28,6 +28,7 @@ public class HudEditorScreen extends Screen implements Listener {
     // Variables to track the drag state and initial position
     private boolean isDragging = false;
     private Hitbox dragBox = null;
+
     public static HudEditorScreen INSTANCE = new HudEditorScreen();
 
 

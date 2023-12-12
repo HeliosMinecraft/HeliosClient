@@ -18,14 +18,14 @@ public class Fps extends HudElement {
         super(DATA);
 
         this.width = 20;
-        this.height = 10;
+        this.height = 12;
     }
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         super.renderElement(drawContext,textRenderer);
         String text = "FPS: " + ColorUtils.gray + mc.getCurrentFps();
-        this.width = Math.round(Renderer2D.getStringWidth(text)) + 2;
+        this.width = Math.round(Renderer2D.getStringWidth(text)) + 1;
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x + 1, this.y, HeliosClient.uiColor);
     }
 
