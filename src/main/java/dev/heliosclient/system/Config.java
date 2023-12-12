@@ -128,7 +128,6 @@ public class Config {
                 a++;
             }
 
-            System.out.println(hudElements);
             hudConfigMap.put("hudElements", hudElements);
         } catch (Exception e) {
             LOGGER.error("Error occurred while getting Hud config.", e);
@@ -229,31 +228,6 @@ public class Config {
         }
         clientConfigMap.put("settings", ModuleConfig);
     }
-
-  /*  public void loadHudElements() {
-        HudManager.INSTANCE.hudElements.clear();
-        Toml toml = hudToml.getTable("hudElements");
-        if (toml != null) {
-            toml.toMap().forEach((string, object) -> {
-                try {
-                    for(HudElement hudElement: HudElementList.INSTANCE.hudElements){
-                        if(Objects.equals(hudElement.name, string)){
-                            HudElement hudElementDifferent = hudElement;
-                            hudElementDifferent.loadFromToml(toml.getTable(string).toMap(),toml.getTable(string));
-                            HudManager.INSTANCE.hudElements.add(hudElementDifferent);
-                        }
-                    }
-
-                } catch (Exception e) {
-                    LOGGER.error("Error occurred while loading HUD element: " + string, e);
-                }
-            });
-        }
-        System.out.println(HudManager.INSTANCE.hudElements);
-    }
-
-   */
-
 
     public void save() {
         try {

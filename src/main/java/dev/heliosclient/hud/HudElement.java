@@ -48,8 +48,8 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public boolean dragging;
     public int posY = 0;
     public int posX = 0;
-    public int distanceY = 90;
-    public int distanceX = 90;
+    public int distanceY = 0;
+    public int distanceX = 0;
     public boolean selected = false;
     public boolean draggable = true;
     public boolean renderOutLineBox = true;
@@ -214,8 +214,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             }
             Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(),   (float) (x - 1 - padding.value / 2 - 1), (float) (y - 1 - padding.value / 2 - 1), (float) (width + 1 + padding.value + 3), (float) (height + 1 + padding.value + 2), 0.4f, 0xFFFFFFFF);
         }
-        System.out.println("x: " + this.x+ " y: "+ this.y + ", " + this.name);
-
         //Renders element
         renderElement(drawContext, textRenderer);
 
@@ -279,16 +277,16 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             Color blended = ColorUtils.blend(bgStart,bgEnd,1/2f);
 
             if (rounded.value && !shadow.value) {
-                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(),bgStart,bgEnd,bgEnd,bgStart, (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value), 2);
+                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(),bgStart,bgEnd,bgEnd,bgStart, (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) hitbox.getWidth() - 1.3f, (float) (height + 1 + padding.value), 2);
             } else if (!shadow.value) {
-                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value), bgStart.getRGB(), bgEnd.getRGB());
+                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.3f, (float) (height + padding.value), bgStart.getRGB(), bgEnd.getRGB());
             }
 
             if (rounded.value && shadow.value) {
-                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value),bgStart,bgEnd,bgEnd,bgStart,2,4,blended);
+                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.3f, (float) (height + 1 + padding.value),bgStart,bgEnd,bgEnd,bgStart,2,4,blended);
             }
             if (!rounded.value && shadow.value) {
-                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) (width + 1 + padding.value), (float) (height + 1 + padding.value),4, bgStart.getRGB(), bgEnd.getRGB());
+                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.3f, (float) (height + 1 + padding.value),4, bgStart.getRGB(), bgEnd.getRGB());
             }
 
             drawContext.getMatrices().pop();
@@ -425,6 +423,8 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         this.y = Integer.parseInt(obj.get(1).toString());
         this.width = Integer.parseInt(obj.get(2).toString());
         this.height = Integer.parseInt(obj.get(3).toString());
+        this.distanceX = x;
+        this.distanceY = y;
 
         for (SettingGroup settingGroup : settingGroups) {
             for (Setting setting : settingGroup.getSettings()) {
