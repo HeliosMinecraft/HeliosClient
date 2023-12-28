@@ -81,7 +81,7 @@ public class HudEditorScreen extends Screen implements Listener {
 
                 checkAndDrawVerticalLine(drawContext, element1.hitbox.getRight(), element2.hitbox.getRight(), element2.hitbox.getX() + element2.hitbox.getWidth());
 
-                checkAndDrawHorizontalLine(drawContext, element1.hitbox.getTop(), element2.hitbox.getTop(), element2.hitbox.getY());
+                checkAndDrawHorizontalLine(drawContext, element1.hitbox.getTop(), element2.hitbox.getTop(), element2.hitbox.getY() - 1);
 
                 checkAndDrawHorizontalLine(drawContext, element1.hitbox.getBottom(), element2.hitbox.getBottom(), element2.hitbox.getY() + element2.hitbox.getHeight());
             }

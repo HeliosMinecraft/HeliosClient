@@ -28,7 +28,7 @@ public class TextButton {
         } else {
             hoverAnimationTimer = Math.max(hoverAnimationTimer - 2, 0);
         }
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 2, width + 2, 12, 0, new Color(255, 255, 255, hoverAnimationTimer).getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 2, width + 2, 12, 2, new Color(255, 255, 255, hoverAnimationTimer).getRGB());
         drawContext.drawText(textRenderer, Text.literal(text), x, y, ColorManager.INSTANCE.clickGuiPaneText(), true);
     }
 
