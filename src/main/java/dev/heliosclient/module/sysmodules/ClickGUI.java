@@ -1,5 +1,6 @@
 package dev.heliosclient.module.sysmodules;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.events.TickEvent;
@@ -229,10 +230,10 @@ public class ClickGUI extends Module_ {
 
          active.value = true;
         loadFonts.addButton("Load Fonts", 0, 0, () -> {
-            FontManager.INSTANCE = new FontManager();
+            FontManager.INSTANCE .refresh();
             Font.setOptions(FontManager.fontNames);
 
-            System.out.println("Reloaded fonts successfully!");
+            HeliosClient.LOGGER.info("Reloaded fonts successfully!");
         });
 
         EventManager.register(this);

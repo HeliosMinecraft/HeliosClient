@@ -32,8 +32,8 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
         }
 
         public void updateSetting() {
-            executor.submit(() -> {
-                module.settingGroups.stream()
+            synchronized (executor) {
+                executor.submit(() -> module.settingGroups.stream()
                         .filter(SettingGroup::shouldRender)
                         .flatMap(settingGroup -> settingGroup.getSettings().stream()
                                 .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
@@ -42,12 +42,12 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
                             SettingGroup settingGroup = entry.getKey();
                             Setting setting = entry.getValue();
                             setting.update(settingGroup.getY());
-                            if (!setting.isAnimationDone() && delay <= 0) {
-                                delay = delayBetweenSettings;
-                                delay -= setting.animationSpeed;
+                            if (!setting.isAnimationDone() && delay.get() <= 0) {
+                                delay.set(delayBetweenSettings);
+                                delay.set(delay.get() - setting.animationSpeed);
                             }
-                        });
-            });
+                        }));
+            }
         }
 
 
@@ -114,7 +114,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
 
         private void resetSettingAnimation(Setting setting) {
             setting.animationDone = false;
-            delay = 0;
+            delay.set(0);
             setting.setAnimationProgress(0.5f);
         }
     }

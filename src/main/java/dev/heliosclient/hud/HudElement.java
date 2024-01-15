@@ -202,7 +202,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         }
 
         //Draw outline when selected
-        if (this.selected && renderOutLineBox && drawContext != null) {
+        if (this.selected && renderOutLineBox) {
             if (dragging) {
                 //Draw X and Y lines when centered
                 if (distanceX == 0 && posX == 1) {

@@ -125,6 +125,9 @@ public class CycleSetting extends Setting<Integer> {
     }
     @Override
     public Object saveToToml(List<Object> objectList) {
+        if(options.isEmpty() || options.size() - 1 < value) {
+            return null;
+        }
         return options.get(value);
     }
 

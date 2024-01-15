@@ -55,6 +55,7 @@ public class ClickGUIScreen extends Screen {
         for (CategoryPane category : categoryPanes) {
             category.mouseScrolled((int) mouseX, (int) mouseY, verticalAmount);
         }
+
         if (ClickGUI.ScrollTypes.values()[ClickGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
             // Old mode: scroll the whole screen
             scrollY += (int) verticalAmount;

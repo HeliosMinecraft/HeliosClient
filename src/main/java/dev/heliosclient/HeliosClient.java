@@ -49,6 +49,7 @@ public class HeliosClient implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Helios Client loading...");
+        fontManager.refresh();
         addonManager.loadAddons();
         AddonManager.initializeAddons();
 

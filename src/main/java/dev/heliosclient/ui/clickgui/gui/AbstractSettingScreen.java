@@ -1,6 +1,7 @@
 package dev.heliosclient.ui.clickgui.gui;
 
 
+import com.google.common.util.concurrent.AtomicDouble;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
@@ -20,7 +21,7 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
     protected Setting setting;
     protected HudElement hudElement;
     protected int x, y, windowWidth, windowHeight;
-    public float delay = 0;
+    public volatile AtomicDouble delay = new AtomicDouble(0.0D);
 
     public AbstractSettingScreen(Text title, Module_ module, int windowHeight, int windowWidth) {
         super(title);

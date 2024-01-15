@@ -41,6 +41,21 @@ public class Renderer2D implements Listener {
     public static Renderers renderer = Renderers.CUSTOM;
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
 
+    public static void enableScissor(int x, int y, int width, int height) {
+        double scaleFactor = HeliosClient.MC.getWindow().getScaleFactor();
+
+        int scissorX = (int) (x * scaleFactor);
+        int scissorY = (int) ( HeliosClient.MC.getWindow().getHeight() - ((y + height) * scaleFactor));
+        int scissorWidth = (int) (width * scaleFactor);
+        int scissorHeight = (int) (height * scaleFactor);
+
+        RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
+    }
+
+    public static void disableScissor() {
+        RenderSystem.disableScissor();
+    }
+
     /* ==== Drawing Rectangles ==== */
 
     /**

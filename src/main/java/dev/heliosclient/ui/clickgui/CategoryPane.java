@@ -158,13 +158,10 @@ public class CategoryPane implements Listener {
         } else {
             update();
             int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
-
+            Renderer2D.enableScissor(x-2,y + 10,width + 2, Math.round(hitBox.getHeight()) + 6);
             for (ModuleButton m : moduleButtons) {
-
                 int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
-                if (visible(animatedY) && visible(buttonYOffset)) {
-                    m.render(drawContext, mouseX, mouseY, x, animatedY, maxWidth);
-                }
+                m.render(drawContext, mouseX, mouseY, x, animatedY, maxWidth);
 
                 int settingsHeight = m.renderSettings(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                 buttonYOffset += settingsHeight;
@@ -172,6 +169,7 @@ public class CategoryPane implements Listener {
 
                 buttonYOffset += categoryNameHeight + 10;
             }
+            Renderer2D.disableScissor();
         }
 
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 255).getRGB());
@@ -181,11 +179,6 @@ public class CategoryPane implements Listener {
 
         FontRenderers.iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), -1);
 
-    }
-
-    public boolean visible(int buttonYOffset) {
-        int buffer = 20; // Adjust this value as needed
-        return buttonYOffset >= hitBox.getY() + categoryNameHeight - buffer && buttonYOffset < hitBox.getY() + MAX_HEIGHT + buffer;
     }
 
 

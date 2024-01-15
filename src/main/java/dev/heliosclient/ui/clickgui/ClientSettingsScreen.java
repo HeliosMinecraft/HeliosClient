@@ -36,8 +36,8 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     }
 
     public void updateSetting() {
-        executorUpdate.submit(() -> {
-            module.settingGroups.stream()
+        synchronized(executorUpdate) {
+            executorUpdate.submit(() -> module.settingGroups.stream()
                     .filter(SettingGroup::shouldRender)
                     .flatMap(settingGroup -> settingGroup.getSettings().stream()
                             .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
@@ -46,12 +46,12 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
                         SettingGroup settingGroup = entry.getKey();
                         Setting setting = entry.getValue();
                         setting.update(settingGroup.getY());
-                        if (!setting.isAnimationDone() && delay <= 0) {
-                            delay = delayBetweenSettings;
-                            delay -= setting.animationSpeed;
+                        if (!setting.isAnimationDone() && delay.get() <= 0.0f) {
+                            delay.set(delayBetweenSettings);
+                            delay.set(delay.get() - setting.animationSpeed);
                         }
-                    });
-        });
+                    }));
+        }
     }
 
 
@@ -88,6 +88,9 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
     @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+        // This should not happen but just incase.
+        if(module.settingGroups == null) return;
+
         updateSetting();
 
         int yOffset = y;
@@ -129,23 +132,19 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
         navBar.mouseClicked((int) mouseX, (int) mouseY,button);
         return super.mouseClicked(mouseX, mouseY, button);
     }
-
-    private void resetSettingAnimation(Setting setting) {
-        setting.animationDone = false;
-        delay = 0;
-        setting.setAnimationProgress(0.5f);
-    }
     public void resetSettingAnimation(Setting setting, SettingGroup settingGroup) {
         setting.animationDone = false;
-        delay = 0;
         setting.setAnimationProgress(0);
-        executorReset.submit(() -> {
-            setting.reset(settingGroup.getY());
-            if (setting.isAnimationDone() && delay <= 0) {
-                delay = delayBetweenSettings;
-                delay -= setting.animationSpeed;
-            }
-        });
+        synchronized(executorReset) {
+            delay.set(0);
+            executorReset.submit(() -> {
+                setting.reset(settingGroup.getY());
+                if (setting.isAnimationDone() && delay.get() <= 0) {
+                    delay.set(delayBetweenSettings);
+                    delay.set(delay.get() - setting.animationSpeed);
+                }
+            });
+        }
         setting.setAnimationProgress(0.5f);
     }
 }

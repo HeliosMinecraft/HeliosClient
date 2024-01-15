@@ -22,7 +22,7 @@ public class FontManager implements Listener {
 
     public static FontManager INSTANCE = new FontManager();
 
-    public FontManager() {
+    public void refresh(){
         fontNames.clear();
         fonts = FontLoader.loadFonts();
         iconFonts = FontLoader.loadIconFonts();

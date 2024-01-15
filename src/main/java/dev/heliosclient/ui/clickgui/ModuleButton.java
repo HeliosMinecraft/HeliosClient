@@ -150,24 +150,32 @@ public class ModuleButton implements Listener {
         if (settingsOpen) {
             updateSetting();
             buttonYOffset = y + this.height + 2;
-                for (Setting setting : module.quickSettings) {
-                    if (!setting.shouldRender()) {
-                        resetAnimation(setting);
-                        continue;
-                    }
-                    if (setting instanceof RGBASetting rgbaSetting) {
-                        rgbaSetting.setParentScreen(ClickGUIScreen.INSTANCE);
-                    } else if (setting instanceof ListSetting listSetting) {
-                        listSetting.setParentScreen(ClickGUIScreen.INSTANCE);
-                    }
-                    if (buttonYOffset >= y) {
-                        setting.quickSettings = settingsOpen;
 
-                        int animatedY = Math.round(setting.getY() + (buttonYOffset - setting.getY()) * setting.getAnimationProgress());
-                        setting.renderCompact(drawContext, x, animatedY + 1, mouseX, mouseY, textRenderer);
-                        buttonYOffset += setting.heightCompact + 1;
-                    }
+            for (Setting setting : module.quickSettings) {
+
+                // Reset the animation if the setting is not visible.
+                if (!setting.shouldRender()) {
+                    resetAnimation(setting);
+                    continue;
                 }
+                // Set the screen for the settings
+                if (setting instanceof RGBASetting rgbaSetting) {
+                    rgbaSetting.setParentScreen(ClickGUIScreen.INSTANCE);
+                } else if (setting instanceof ListSetting listSetting) {
+                    listSetting.setParentScreen(ClickGUIScreen.INSTANCE);
+                }
+
+                // If offset is more than Y level, render the setting.
+                if(buttonYOffset >= y + 3) {
+                    setting.quickSettings = settingsOpen;
+
+                    int animatedY = getAnimatedY(setting, buttonYOffset);
+
+                    setting.renderCompact(drawContext, x, animatedY + 1, mouseX, mouseY, textRenderer);
+                    buttonYOffset += setting.heightCompact + 1;
+                }
+            }
+
             if (!module.quickSettings.isEmpty()) {
                 buttonYOffset += 2;
             }
@@ -176,7 +184,12 @@ public class ModuleButton implements Listener {
         else{
             module.quickSettings.forEach(this::resetAnimation);
         }
+        // Return the total height of the quick settings
         return buttonYOffset > 2 ? buttonYOffset - y - this.height - 2 : 0;
+    }
+
+    public int getAnimatedY(Setting setting, int offset){
+        return  Math.round(setting.getY() + (offset - setting.getY()) * setting.getAnimationProgress());
     }
 
     private void resetAnimation(Setting setting) {
