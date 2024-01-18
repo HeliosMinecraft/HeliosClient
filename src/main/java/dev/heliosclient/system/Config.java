@@ -34,7 +34,6 @@ public class Config {
     public static String CLIENT = "config";
     public static String HUD = "hud";
 
-    // MinecraftClient instance.
     MinecraftClient mc = MinecraftClient.getInstance();
 
     // Directory where the configuration files are stored.
@@ -101,29 +100,43 @@ public class Config {
     // Gets the configuration for the modules.
     public void getModuleConfig() {
         try {
-            Map<String, Object> categoryPaneMap = new HashMap<>();
+            // Map for all categoryPanes
+            Map<String, Object> All_Category_Panes_Map = new HashMap<>();
+
+            // Run a loop for each category
             CategoryManager.getCategories().forEach((s, category) -> {
-                Map<String, Object> paneConfigMap = new HashMap<>();
+                // Store values of each category pane
+                Map<String, Object> Single_Pane_Map = new HashMap<>();
                 CategoryPane categoryPane = CategoryManager.findCategoryPane(category);
-                if (categoryPane != null) {
-                    paneConfigMap.put("x", categoryPane.x);
-                    paneConfigMap.put("y", categoryPane.y);
-                    paneConfigMap.put("collapsed", categoryPane.collapsed);
+                if(categoryPane == null){
+                    // Load default config if there is no category pane to ensure that the config is not corrupted and all categories are present.
+                    this.getDefaultModuleConfig();
+                }else{
+                    // Put values of each category pane into the map
+                    Single_Pane_Map.put("x", categoryPane.x);
+                    Single_Pane_Map.put("y", categoryPane.y);
+                    Single_Pane_Map.put("collapsed", categoryPane.collapsed);
+                    // Put values of each module into the map
                     for (Module_ module : ModuleManager.INSTANCE.getModulesByCategory(category)) {
+
+                        // Map for storing the values of each module
                         Map<String, Object> ModuleConfig = new HashMap<>();
                         for (SettingGroup settingGroup : module.settingGroups) {
                             for (Setting setting : settingGroup.getSettings()) {
                                 if (setting.name != null) {
+                                    // Put the value of each setting into the map. Call the setting saveToToml method to get the value of the setting.
                                     ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
                                 }
                             }
                         }
-                        paneConfigMap.put(module.name.replace(" ", ""), ModuleConfig);
+                        // Put the map of the module into the map of the category pane. Save all values of the module into the pane map.
+                        Single_Pane_Map.put(module.name.replace(" ", ""), ModuleConfig);
                     }
-                    categoryPaneMap.put(category.name, paneConfigMap);
-                    getModuleMap().put("panes", categoryPaneMap);
-                } else {
-                    this.getDefaultModuleConfig();
+                    // Put all the data of the paneConfigMap into the universal CategoryPaneMap keyed with the name of the category.
+                    All_Category_Panes_Map.put(category.name, Single_Pane_Map);
+
+                    // Finally put all the panes into the module config map to be saved or loaded.
+                    getModuleMap().put("panes", All_Category_Panes_Map);
                 }
             });
         } catch (Exception e) {
@@ -156,13 +169,20 @@ public class Config {
      */
     public void loadHudElements() {
         HudManager.INSTANCE.hudElements.clear();
+        // Get the hudElements table from the config
         Toml toml = configManager.getTomls().get(HUD).getTable("hudElements");
         if (toml != null) {
+            // Maps the toml.
             toml.toMap().forEach((string, object) -> {
+                // Get the table of the hudElement
                 Toml hudElementTable =  toml.getTable(string);
+                // Get the name of the hudElement and check if it exists
                 if(hudElementTable.contains("name")) {
+                    // Creates the hudElement provided by the hudElementData Supplier.
                     HudElementData hudElementData = HudElementList.INSTANCE.elementDataMap.get(hudElementTable.getString("name"));
                    HudElement hudElement = hudElementData.create();
+
+                    // Load the hudElement from the toml and add it to the hudElements list.
                    if(hudElement != null){
                        hudElement.loadFromToml(hudElementTable.toMap(),hudElementTable);
                        HudManager.INSTANCE.addHudElement(hudElement);
