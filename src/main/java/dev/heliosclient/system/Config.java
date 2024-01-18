@@ -8,6 +8,7 @@ import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.CategoryManager;
+import dev.heliosclient.managers.ConfigManager;
 import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
@@ -19,42 +20,43 @@ import dev.heliosclient.util.FileUtils;
 import net.minecraft.client.MinecraftClient;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
 
+// Config class is responsible for managing the configuration of modules, client, and HUD.
 public class Config {
-    private static final Gson gson = new Gson();
-    public Map<String, Object> moduleConfigMap = new HashMap<>();
-    public Map<String, Object> hudConfigMap = new HashMap<>();
+    // Constants for the names of the configurations.
+    public static String MODULES = "modules";
+    public static String CLIENT = "config";
+    public static String HUD = "hud";
 
-    public Map<String, Object> clientConfigMap = new HashMap<>();
-    public TomlWriter tomlWriter = new TomlWriter.Builder()
-            .indentTablesBy(2)
-            .build();
-    public Toml moduleToml;
-    public Toml clientToml;
-    public Toml hudToml;
-
+    // MinecraftClient instance.
     MinecraftClient mc = MinecraftClient.getInstance();
+
+    // Directory where the configuration files are stored.
     public File configDir = new File(mc.runDirectory.getPath() + "/heliosclient");
-    public File configFile = new File(configDir, "config.toml");
-    public File moduleConfigFile = new File(configDir, "modules.toml");
-    public File hudConfigFile = new File(configDir, "hud.toml");
 
+    // ConfigManager instance.
+    public ConfigManager configManager;
 
+    // Constructor initializes the ConfigManager and registers the configurations.
     public Config() {
+        this.configManager = new ConfigManager(HeliosClient.MC);
+        this.configManager.registerConfig(MODULES, new HashMap<>());
+        this.configManager.registerConfig(CLIENT, new HashMap<>());
+        this.configManager.registerConfig(HUD, new HashMap<>());
+
+        // Create the configuration directory if it doesn't exist.
         if (!configDir.exists()) {
             configDir.mkdirs();
         }
     }
 
-
+    // Generates the default configuration for the modules.
     public void getDefaultModuleConfig() {
         final AtomicInteger[] xOffset = {new AtomicInteger(4)};
         final int[] yOffset = {4};
@@ -80,11 +82,23 @@ public class Config {
                 paneConfigMap.put(module.name.replace(" ", ""), ModuleConfig);
             }
             categoryPaneMap.put(category.name, paneConfigMap);
-            moduleConfigMap.put("panes", categoryPaneMap);
+            getModuleMap().put("panes", categoryPaneMap);
             xOffset[0].addAndGet(100);
         });
     }
 
+    public Map<String, Object> getModuleMap() {
+        return configManager.getConfigMaps().get(MODULES);
+    }
+    public Map<String, Object> getClientConfigMap() {
+        return configManager.getConfigMaps().get(CLIENT);
+    }
+    public Map<String, Object> getHudElementMap() {
+        return configManager.getConfigMaps().get(HUD);
+    }
+
+
+    // Gets the configuration for the modules.
     public void getModuleConfig() {
         try {
             Map<String, Object> categoryPaneMap = new HashMap<>();
@@ -107,7 +121,7 @@ public class Config {
                         paneConfigMap.put(module.name.replace(" ", ""), ModuleConfig);
                     }
                     categoryPaneMap.put(category.name, paneConfigMap);
-                    moduleConfigMap.put("panes", categoryPaneMap);
+                    getModuleMap().put("panes", categoryPaneMap);
                 } else {
                     this.getDefaultModuleConfig();
                 }
@@ -118,6 +132,9 @@ public class Config {
         }
     }
 
+    /**
+     * Gets the configuration for the client.
+     */
     public void getHudConfig() {
         try {
             Map<String, Object> hudElements = new HashMap<>();
@@ -128,14 +145,18 @@ public class Config {
                 a++;
             }
 
-            hudConfigMap.put("hudElements", hudElements);
+            getHudElementMap().put("hudElements", hudElements);
         } catch (Exception e) {
             LOGGER.error("Error occurred while getting Hud config.", e);
         }
     }
+
+    /**
+     * Loads the HudElements from the config.
+     */
     public void loadHudElements() {
         HudManager.INSTANCE.hudElements.clear();
-        Toml toml = hudToml.getTable("hudElements");
+        Toml toml = configManager.getTomls().get(HUD).getTable("hudElements");
         if (toml != null) {
             toml.toMap().forEach((string, object) -> {
                 Toml hudElementTable =  toml.getTable(string);
@@ -151,41 +172,21 @@ public class Config {
         }
     }
 
-    public void load() {
-        try {
-            moduleToml = new Toml().read(moduleConfigFile);
-            clientToml = new Toml().read(configFile);
-            hudToml = new Toml().read(hudConfigFile);
-            if (moduleToml != null && clientToml != null && hudToml != null) {
-                moduleConfigMap = moduleToml.toMap();
-                clientConfigMap = clientToml.toMap();
-                hudConfigMap = hudToml.toMap();
-            } else {
-                throw new FileNotFoundException();
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error occurred while loading config. Loading default config.", e);
-            this.getDefaultModuleConfig();
-        }
-    }
-
-
-    public boolean shouldLoadDefaultConfig() {
-        return !FileUtils.doesFileInPathExist(this.configFile.getPath()) || !FileUtils.doesFileInPathExist(this.moduleConfigFile.getPath()) || !FileUtils.doesFileInPathExist(this.hudConfigFile.getPath());
-    }
-
+    /**
+     * Gets the configuration for the client.
+     */
     public void loadConfig() {
         ModuleManager.INSTANCE = new ModuleManager();
-        if (shouldLoadDefaultConfig()) {
+        if (!configManager.load()){
             LOGGER.info("Loading default config...");
             this.getDefaultModuleConfig();
             this.save();
         } else {
             this.getModuleConfig();
         }
+
         this.getClientConfig();
         this.getHudConfig();
-        this.load();
         ClickGUIScreen.INSTANCE = new ClickGUIScreen();
     }
 
@@ -194,7 +195,7 @@ public class Config {
             for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
                 for (SettingGroup settingGroup : m.settingGroups) {
                     for (Setting setting : settingGroup.getSettings()) {
-                        Toml newToml = moduleToml.getTable("panes").getTable(category.name).getTable(m.name.replace(" ", ""));
+                        Toml newToml = configManager.getTomls().get(MODULES).getTable("panes").getTable(category.name).getTable(m.name.replace(" ", ""));
                         if (newToml != null) {
                             setting.loadFromToml(newToml.toMap(), newToml);
                         }
@@ -208,7 +209,7 @@ public class Config {
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
-                    Toml settingsToml = clientToml.getTable("settings");
+                    Toml settingsToml = configManager.getTomls().get(CLIENT).getTable("settings");
                     if (settingsToml != null)
                         setting.loadFromToml(settingsToml.toMap(), settingsToml);
                 }
@@ -217,7 +218,7 @@ public class Config {
     }
 
     public void getClientConfig() {
-        clientConfigMap.put("prefix", ".");
+        getClientConfigMap().put("prefix", ".");
         Map<String, Object> ModuleConfig = new HashMap<>();
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting setting : settingGroup.getSettings()) {
@@ -226,21 +227,11 @@ public class Config {
                 }
             }
         }
-        clientConfigMap.put("settings", ModuleConfig);
+        getClientConfigMap().put("settings", ModuleConfig);
     }
 
     public void save() {
-        try {
-            if (!FileUtils.doesFileInPathExist(this.configFile.getPath())) configFile.createNewFile();
-            if (!FileUtils.doesFileInPathExist(this.moduleConfigFile.getPath())) moduleConfigFile.createNewFile();
-            if (!FileUtils.doesFileInPathExist(this.hudConfigFile.getPath())) hudConfigFile.createNewFile();
-
-            getHudConfig();
-            tomlWriter.write(clientConfigMap, configFile);
-            tomlWriter.write(moduleConfigMap, moduleConfigFile);
-            tomlWriter.write(hudConfigMap, hudConfigFile);
-        } catch (Exception feelings) {
-            feelings.printStackTrace();
-        }
+        getHudConfig();
+        configManager.save();
     }
 }

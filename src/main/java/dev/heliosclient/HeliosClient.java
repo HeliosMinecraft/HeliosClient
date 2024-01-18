@@ -85,12 +85,13 @@ public class HeliosClient implements ModInitializer {
         if (MC.getWindow() != null) {
             quadTree = new Quadtree(0);
         }
+        // Save on shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(this::saveConfig));
     }
 
     public void loadConfig() {
         CONFIG.loadConfig();
-        CommandManager.prefix = (String) CONFIG.clientConfigMap.get("prefix");
+        CommandManager.prefix = (String) CONFIG.getClientConfigMap().get("prefix");
         CONFIG.loadModules();
         CONFIG.loadClientConfigModules();
         CONFIG.loadHudElements();
