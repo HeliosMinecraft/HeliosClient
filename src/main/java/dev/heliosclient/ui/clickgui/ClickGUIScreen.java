@@ -31,8 +31,7 @@ public class ClickGUIScreen extends Screen {
         scrollY = 0;
         categoryPanes = new ArrayList<CategoryPane>();
 
-        System.out.println(HeliosClient.CONFIG.configManager.getConfigMaps());
-        Object panesObject = HeliosClient.CONFIG.configManager.getConfigMaps().get("modules").get("panes");
+        Object panesObject = HeliosClient.CONFIG.modulesManager.getConfigMaps().get("modules").get("panes");
         if (panesObject instanceof Map panePos) {
             CategoryManager.getCategories().forEach((s, category) -> {
                 Object categoryObject = panePos.get(category.name);

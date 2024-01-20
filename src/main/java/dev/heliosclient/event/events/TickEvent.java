@@ -25,7 +25,7 @@ public class TickEvent extends Event {
         }
     }
 
-    //Called for every SinglePlayer world Tick
+    //Called for every world Tick
     public static class WORLD extends TickEvent {
         private final MinecraftServer server;
 

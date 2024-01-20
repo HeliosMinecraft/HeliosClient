@@ -33,7 +33,7 @@ public class NoFall extends Module_ {
             .onSettingChange(this)
             .value(new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")))
             .defaultValue(new ArrayList<String>(List.of("Classic", "Disconnect (annoying)")))
-            .listValue(0)
+            .defaultListIndex(0)
             .build()
     );
 

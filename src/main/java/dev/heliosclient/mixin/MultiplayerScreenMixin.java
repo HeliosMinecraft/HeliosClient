@@ -1,5 +1,6 @@
 package dev.heliosclient.mixin;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.ui.altmanager.AltManagerScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -7,6 +8,7 @@ import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -25,7 +27,8 @@ public class MultiplayerScreenMixin extends Screen {
                 .build());
     }
 
+    @Unique
     private void gotoAltManagerScreen(ButtonWidget button) {
-        MinecraftClient.getInstance().setScreen(AltManagerScreen.INSTANCE);
+        HeliosClient.MC.setScreen(AltManagerScreen.INSTANCE);
     }
 }

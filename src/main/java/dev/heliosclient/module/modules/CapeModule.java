@@ -21,7 +21,7 @@ public class CapeModule extends Module_ {
             .name("Cape")
             .description("Custom cape texture to use. Turn on modules to see options")
             .value(List.of(CapeManager.capes))
-            .listValue(0)
+            .defaultListIndex(0)
             .onSettingChange(this)
             .build()
     );

@@ -28,14 +28,14 @@ public abstract class ChatInputSuggestorMixin {
 
     @Shadow
     @Final
-    private TextFieldWidget textField;
+    TextFieldWidget textField;
 
     @Shadow
     @Final
-    private MinecraftClient client;
+    MinecraftClient client;
 
     @Shadow
-    private boolean completingSuggestions;
+    boolean completingSuggestions;
 
     @Shadow
     private CompletableFuture<Suggestions> pendingSuggestions;
@@ -44,7 +44,7 @@ public abstract class ChatInputSuggestorMixin {
     private SuggestionWindow window;
 
     @Shadow
-    abstract void showCommandSuggestions();
+    protected abstract void showCommandSuggestions();
 
     @Inject(method = "refresh",
             at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z", remap = false),

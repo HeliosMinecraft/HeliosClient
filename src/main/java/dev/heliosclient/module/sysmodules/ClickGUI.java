@@ -7,11 +7,15 @@ import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.managers.NavBarManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
+import dev.heliosclient.system.Config;
+import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
@@ -39,7 +43,7 @@ public class ClickGUI extends Module_ {
             .description("Scrolling for the ClickGui")
             .onSettingChange(INSTANCE)
             .value(new ArrayList<>(List.of(ScrollTypes.values())))
-            .listValue(0)
+            .defaultListIndex(0)
             .shouldRender(() -> true)
             .build()
     );
@@ -69,7 +73,7 @@ public class ClickGUI extends Module_ {
             .description("Font Rendering for the client")
             .onSettingChange(INSTANCE)
             .value(new ArrayList<>(List.of("Custom", "Vanilla")))
-            .listValue(0)
+            .defaultListIndex(0)
             .shouldRender(() -> true)
             .build()
     );
@@ -78,7 +82,7 @@ public class ClickGUI extends Module_ {
             .description("Font for the client")
             .onSettingChange(INSTANCE)
             .value(FontManager.fontNames)
-            .listValue(0)
+            .defaultListIndex(0)
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
@@ -104,6 +108,21 @@ public class ClickGUI extends Module_ {
             .roundingPlace(0)
             .build()
     );
+    private final SettingGroup sgConfig = new SettingGroup("Config");
+    public DropDownSetting switchConfigs = sgConfig.add(new DropDownSetting.Builder()
+            .name("Switch Module Config")
+            .defaultListIndex(0)
+            .description("Switch Module Configs")
+            .value(HeliosClient.CONFIG.MODULE_CONFIGS)
+            .onSettingChange(this)
+            .build()
+
+    );
+    public ButtonSetting reloadAllConfigs = sgConfig.add(new ButtonSetting.Builder()
+            .name("Reload configs")
+            .description("Reload Configs")
+            .build()
+    );
     public SettingGroup sgTooltip = new SettingGroup("ToolTip");
     public SettingGroup sgGeneral = new SettingGroup("General");
     public CycleSetting TooltipMode = sgTooltip.add(new CycleSetting.Builder()
@@ -111,7 +130,7 @@ public class ClickGUI extends Module_ {
             .description("Mode in what tooltips should be shown.")
             .onSettingChange(this)
             .value(new ArrayList<String>(List.of("Normal", "Fixed", "Vanilla")))
-            .listValue(0)
+            .defaultListIndex(0)
             .shouldRender(() -> true)
             .build()
     );
@@ -120,7 +139,7 @@ public class ClickGUI extends Module_ {
             .description("Position of fixed tooltip.")
             .onSettingChange(this)
             .value(new ArrayList<>(List.of("Top-left", "Top-right", "Bottom-left", "Bottom-right", "Center")))
-            .listValue(3)
+            .defaultListIndex(3)
             .shouldRender(() -> TooltipMode.value == 1)
             .build()
     );
@@ -156,7 +175,7 @@ public class ClickGUI extends Module_ {
             .description("Color mode for parts of the client")
             .onSettingChange(this)
             .value(new ArrayList<>(List.of("Static", "Gradient")))
-            .listValue(0)
+            .defaultListIndex(0)
             .build()
     );
     public RGBASetting staticColor = sgRender.add(new RGBASetting.Builder()
@@ -173,7 +192,7 @@ public class ClickGUI extends Module_ {
             .description("Gradient type for the gradient color mode")
             .onSettingChange(this)
             .value(new ArrayList<>(List.of("Rainbow", "DaySky", "EveningSky", "NightSky","Linear2D")))
-            .listValue(0)
+            .defaultListIndex(0)
             .shouldRender(()-> ColorMode.value == 1)
             .build()
     );
@@ -227,6 +246,7 @@ public class ClickGUI extends Module_ {
         addSettingGroup(sgRender);
         addSettingGroup(sgGeneral);
         addSettingGroup(sgTooltip);
+        addSettingGroup(sgConfig);
 
          active.value = true;
         loadFonts.addButton("Load Fonts", 0, 0, () -> {
@@ -236,6 +256,13 @@ public class ClickGUI extends Module_ {
             HeliosClient.LOGGER.info("Reloaded fonts successfully!");
         });
 
+       reloadAllConfigs.addButton("Reload All Configs",0,0,()->{
+           HeliosClient.CONFIG.init();
+           switchConfigs.options = HeliosClient.CONFIG.MODULE_CONFIGS;
+           int var = switchConfigs.value;
+           HeliosClient.loadConfig();
+           switchConfigs.value = var;
+       });
         EventManager.register(this);
    }
    @Override
@@ -258,7 +285,18 @@ public class ClickGUI extends Module_ {
        if(setting == FontRenderer || setting == Font) {
            FontManager.INSTANCE.registerFonts();
        }
-    }
+
+       if(setting == switchConfigs) {
+           HeliosClient.saveConfig();
+           Config.MODULES = HeliosClient.CONFIG.MODULE_CONFIGS.get(switchConfigs.value).replace(".toml", "");;
+           HeliosClient.loadConfig();
+           for(NavBarItem item:  NavBarManager.INSTANCE.navBarItems){
+               if(item.name.equalsIgnoreCase("ClickGUI")){
+                   item.target = ClickGUIScreen.INSTANCE;
+               }
+           }
+       }
+   }
 
 
 

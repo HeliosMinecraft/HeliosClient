@@ -7,12 +7,11 @@ import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.ISimpleOption;
+import dev.heliosclient.util.interfaces.ISimpleOption;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Fullbright extends Module_ {
@@ -25,7 +24,7 @@ public class Fullbright extends Module_ {
             .onSettingChange(this)
             .value(modes)
             .defaultValue(modes)
-            .listValue(0)
+            .defaultListIndex(0)
             .build()
     );
     DoubleSetting gamma = sgGeneral.add(new DoubleSetting.Builder()

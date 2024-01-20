@@ -22,6 +22,7 @@ import net.minecraft.client.MinecraftClient;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,24 +35,32 @@ public class Config {
     public static String CLIENT = "config";
     public static String HUD = "hud";
 
-    MinecraftClient mc = MinecraftClient.getInstance();
-
-    // Directory where the configuration files are stored.
-    public File configDir = new File(mc.runDirectory.getPath() + "/heliosclient");
-
     // ConfigManager instance.
     public ConfigManager configManager;
+    public ConfigManager modulesManager;
+    public List<String> CONFIGS, MODULE_CONFIGS;
 
     // Constructor initializes the ConfigManager and registers the configurations.
     public Config() {
         this.configManager = new ConfigManager(HeliosClient.MC);
-        this.configManager.registerConfig(MODULES, new HashMap<>());
+        this.modulesManager = new ConfigManager(HeliosClient.MC.runDirectory + "/heliosclient/modules");
+
+        this.modulesManager.registerConfig(MODULES, new HashMap<>());
+
         this.configManager.registerConfig(CLIENT, new HashMap<>());
         this.configManager.registerConfig(HUD, new HashMap<>());
 
-        // Create the configuration directory if it doesn't exist.
-        if (!configDir.exists()) {
-            configDir.mkdirs();
+       init();
+    }
+    public void init(){
+        CONFIGS = configManager.getTomlFiles(configManager.getConfigDir());
+        MODULE_CONFIGS = modulesManager.getTomlFiles(modulesManager.getConfigDir());
+
+        for(String string: CONFIGS){
+            configManager.registerConfig(string.replace(".toml",""),new HashMap<>());
+        }
+        for(String string: MODULE_CONFIGS){
+            modulesManager.registerConfig(string.replace(".toml",""),new HashMap<>());
         }
     }
 
@@ -87,7 +96,7 @@ public class Config {
     }
 
     public Map<String, Object> getModuleMap() {
-        return configManager.getConfigMaps().get(MODULES);
+        return modulesManager.getConfigMaps().get(MODULES);
     }
     public Map<String, Object> getClientConfigMap() {
         return configManager.getConfigMaps().get(CLIENT);
@@ -204,6 +213,13 @@ public class Config {
         } else {
             this.getModuleConfig();
         }
+        if (!modulesManager.load()){
+            LOGGER.info("Loading default modules config...");
+            this.getDefaultModuleConfig();
+            this.save();
+        } else {
+            this.getModuleConfig();
+        }
 
         this.getClientConfig();
         this.getHudConfig();
@@ -215,7 +231,7 @@ public class Config {
             for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
                 for (SettingGroup settingGroup : m.settingGroups) {
                     for (Setting setting : settingGroup.getSettings()) {
-                        Toml newToml = configManager.getTomls().get(MODULES).getTable("panes").getTable(category.name).getTable(m.name.replace(" ", ""));
+                        Toml newToml = modulesManager.getTomls().get(MODULES).getTable("panes").getTable(category.name).getTable(m.name.replace(" ", ""));
                         if (newToml != null) {
                             setting.loadFromToml(newToml.toMap(), newToml);
                         }
@@ -253,5 +269,6 @@ public class Config {
     public void save() {
         getHudConfig();
         configManager.save();
+        modulesManager.save(MODULES);
     }
 }

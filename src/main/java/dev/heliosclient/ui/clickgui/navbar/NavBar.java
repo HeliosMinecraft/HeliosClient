@@ -19,7 +19,7 @@ public class NavBar {
         int x = drawContext.getScaledWindowWidth() / 2 - width / 2;
         int textX = x + 4;
         for (NavBarItem item : NavBarManager.INSTANCE.navBarItems) {
-            item.render(drawContext, textRenderer, textX, 0, mouseX, mouseY, NavBarManager.INSTANCE.navBarItems.indexOf(item) == 0, NavBarManager.INSTANCE.navBarItems.size() == NavBarManager.INSTANCE.navBarItems.indexOf(item) + 1);
+            item.render(drawContext, textX, 0, mouseX, mouseY, NavBarManager.INSTANCE.navBarItems.indexOf(item) == 0, NavBarManager.INSTANCE.navBarItems.size() == NavBarManager.INSTANCE.navBarItems.indexOf(item) + 1);
             textX += item.width;
         }
     }

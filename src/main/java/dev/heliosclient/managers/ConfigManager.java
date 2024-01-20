@@ -8,8 +8,8 @@ import net.minecraft.client.MinecraftClient;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConfigManager {
     // Stores the configuration maps.
@@ -32,6 +32,12 @@ public class ConfigManager {
             configDir.mkdirs();
         }
     }
+    public ConfigManager(String pathName) {
+        this.configDir = new File(pathName);
+        if (!configDir.exists()) {
+            configDir.mkdirs();
+        }
+    }
 
     /**
      * Registers a new configuration.
@@ -39,6 +45,7 @@ public class ConfigManager {
      * @param hashmap The configuration map.
      */
     public void registerConfig(String name, Map<String,Object> hashmap) {
+        if(configMaps.containsKey(name) || tomls.containsKey(name) || configFiles.containsKey(name)) return;
         configMaps.put(name, hashmap);
         tomls.put(name, new Toml());
         configFiles.put(name, new File(configDir, name + ".toml"));
@@ -97,4 +104,51 @@ public class ConfigManager {
             }
         }
     }
+    /**
+     * Saves the configurations to the files.
+     */
+    public void save(String... names) {
+        for (String name : names) {
+            try {
+                if(!configFiles.containsKey(name) || !configMaps.containsKey(name)){
+                    HeliosClient.LOGGER.warn(name + " not found for saving configuration");
+                    throw new FileNotFoundException();
+                }
+                if (!FileUtils.doesFileInPathExist(configFiles.get(name).getPath())) {
+                    configFiles.get(name).createNewFile();
+                }
+                tomlWriter.write(configMaps.get(name), configFiles.get(name));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    /**
+     * Returns a sorted list of all .toml files in a directory.
+     * "modules" always appears in first
+     *
+     * @param dir The path of the directory.
+     * @return A sorted list of all .toml files in the directory.
+     */
+    public List<String> getTomlFiles(File dir) {
+        return Arrays.stream(Objects.requireNonNull(dir.listFiles()))
+                .map(File::getName)
+                .filter(name -> name.endsWith(".toml"))
+                .sorted((name1, name2) -> {
+                    if (name1.equals("modules")) {
+                        return 0;
+                    } else if (name2.equals("modules")) {
+                        return 1;
+                    } else {
+                        return name1.compareTo(name2);
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+    public void clear(){
+        configFiles.clear();
+        configMaps.clear();
+        tomls.clear();
+    }
+
 }

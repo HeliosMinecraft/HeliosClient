@@ -6,8 +6,10 @@ import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.managers.NavBarManager;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
+import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.Easing;
@@ -44,9 +46,14 @@ public class Window implements Listener {
         this.isCollapsible = collapsible;
         this.contentRenderer = contentRenderer;
         backButtonTask = () -> {
-            ClickGUIScreen.INSTANCE.onLoad();
-            MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
+            HeliosClient.MC.setScreen(ClickGUIScreen.INSTANCE);
+            for(NavBarItem item:  NavBarManager.INSTANCE.navBarItems){
+                if(item.name.equalsIgnoreCase("ClickGUI")){
+                    item.target = ClickGUIScreen.INSTANCE;
+                }
+            }
         };
+
         EventManager.register(this);
     }
 
