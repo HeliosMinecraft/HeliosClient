@@ -69,6 +69,7 @@ public class DropDownSetting extends Setting<Integer> {
         for (Object option: options){
             maxOptionWidth = Math.max(maxOptionWidth,Math.round(Renderer2D.getFxStringWidth(option.toString())));
         }
+        float nameX = x + Renderer2D.getFxStringWidth(name + ": ");
 
         if (options.isEmpty() || options.size() - 1 < value) {
             Renderer2D.drawFixedString(drawContext.getMatrices(), "No option found!", x + 2, y + 4, 0xFFFF0000);
@@ -76,11 +77,13 @@ public class DropDownSetting extends Setting<Integer> {
         else {
             if(!selecting){
                     this.height = 24;
-                    Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + Renderer2D.getFxStringWidth(name + ": ") , y + 2f, Renderer2D.getFxStringWidth(options.get(value).toString()) + 4,Renderer2D.getFxStringHeight() + 2,3, color.darker().darker().getRGB());
+                    Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), nameX , y + 2f, Renderer2D.getFxStringWidth(options.get(value).toString()) + 4,Renderer2D.getFxStringHeight() + 2,3, color.darker().darker().getRGB());
                     FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), "\uF11C", x + Renderer2D.getFxStringWidth(name + ": " + options.get(value)) + 5, y + 4, ColorManager.INSTANCE.defaultTextColor());
             }
             if(selecting) {
-                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),x + Renderer2D.getFxStringWidth(name + ": "), y + 2f,maxOptionWidth + 4, this.height - 2.0f, 3, color.brighter().getRGB());
+                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),nameX, y + 2f,maxOptionWidth + 4, this.height - 2.0f, 3, color.brighter().getRGB());
+
+
                 float offset = y + 5.0f + Renderer2D.getFxStringHeight();
                 for (Object option : options) {
                     if (option == options.get(value)) {
@@ -176,7 +179,7 @@ public class DropDownSetting extends Setting<Integer> {
         if(optionIndex != -1) {
             value = optionIndex;
         } else{
-            LOGGER.warn("Option not found for: " + MAP.get(name.replace(" ","")) +", " + name + " Setting during loading config "+ Config.MODULES);
+            LOGGER.error("List option not found for: " + MAP.get(name.replace(" ","")) +", " + name + " Setting during loading config: "+ Config.MODULES);
         }
     }
 

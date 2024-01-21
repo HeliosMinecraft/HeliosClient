@@ -295,6 +295,7 @@ public class ClickGUI extends Module_ {
                    item.target = ClickGUIScreen.INSTANCE;
                }
            }
+           EventManager.postEvent(new FontChangeEvent(fonts));
        }
    }
 

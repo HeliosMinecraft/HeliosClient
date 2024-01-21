@@ -12,10 +12,7 @@ import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
-import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.DamageUtils;
-import dev.heliosclient.util.FileUtils;
-import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.util.*;
 import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.util.cape.CapeSynchronizer;
 import net.fabricmc.api.ModInitializer;
@@ -44,6 +41,7 @@ public class HeliosClient implements ModInitializer {
     public static NotificationManager notificationManager = new NotificationManager();
     public static AddonManager addonManager = new AddonManager();
     public static ClickGUI CLICKGUI = new ClickGUI();
+    private static TimerUtils configTimer = new TimerUtils();
 
 
     @Override
@@ -90,17 +88,23 @@ public class HeliosClient implements ModInitializer {
     }
 
     public static void loadConfig() {
+        configTimer.startTimer();
         CONFIG.loadConfig();
         CommandManager.prefix = (String) CONFIG.getClientConfigMap().get("prefix");
         CONFIG.loadClientConfigModules();
         CONFIG.loadHudElements();
         CONFIG.loadModules();
+        LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
+        configTimer.resetTimer();
     }
 
     public static void saveConfig() {
-        LOGGER.info("Saving config..." + Config.MODULES);
+        LOGGER.info("Saving config... \t Module Config being saved: "+ Config.MODULES);
+        configTimer.startTimer();
         CONFIG.getModuleConfig();
         CONFIG.getClientConfig();
         CONFIG.save();
+        LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
+        configTimer.resetTimer();
     }
 }

@@ -138,7 +138,7 @@ public class CycleSetting extends Setting<Integer> {
         if(optionIndex != -1) {
             value = optionIndex;
         } else{
-            LOGGER.warn("Option not found for: " + MAP.get(name.replace(" ","")) +", " + name + " Setting during loading config "+ Config.MODULES);
+            LOGGER.error("Option not found for: " + MAP.get(name.replace(" ","")) +", " + name + " Setting during loading config: "+ Config.MODULES);
         }
     }
 

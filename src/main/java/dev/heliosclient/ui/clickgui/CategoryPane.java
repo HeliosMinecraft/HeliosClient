@@ -175,7 +175,7 @@ public class CategoryPane implements Listener {
                 buttonYOffset += settingsHeight;
                 MAX_HEIGHT = settingsHeight + MAX_HEIGHT;
 
-                buttonYOffset += categoryNameHeight + 10;
+                buttonYOffset += Math.round(Renderer2D.getFxStringHeight() + 10);
             }
             Renderer2D.disableScissor();
         }
