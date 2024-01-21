@@ -41,7 +41,7 @@ public class HeliosClient implements ModInitializer {
     public static NotificationManager notificationManager = new NotificationManager();
     public static AddonManager addonManager = new AddonManager();
     public static ClickGUI CLICKGUI = new ClickGUI();
-    private static TimerUtils configTimer = new TimerUtils();
+    private static final TimerUtils configTimer = new TimerUtils();
 
 
     @Override

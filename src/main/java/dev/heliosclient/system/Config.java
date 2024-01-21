@@ -223,7 +223,11 @@ public class Config {
 
         this.getClientConfig();
         this.getHudConfig();
-        ClickGUIScreen.INSTANCE = new ClickGUIScreen();
+        if(ClickGUIScreen.INSTANCE == null) {
+            ClickGUIScreen.INSTANCE = new ClickGUIScreen();
+        }else{
+            ClickGUIScreen.INSTANCE.reset();
+        }
     }
 
     public void loadModules() {

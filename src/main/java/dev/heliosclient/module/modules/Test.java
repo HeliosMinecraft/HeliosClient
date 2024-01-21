@@ -14,10 +14,15 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.Renderer3D;
 import dev.heliosclient.util.render.GradientUtils;
+import dev.heliosclient.util.render.WorldRenderer;
+import dev.heliosclient.util.render.color.LineColor;
 import me.x150.renderer.render.Renderer3d;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
@@ -130,8 +135,6 @@ public class Test extends Module_ {
 
     @SubscribeEvent
     public void renderer3d(Render3DEvent event) {
-
-
     }
 
 

@@ -47,6 +47,27 @@ public class ClickGUIScreen extends Screen {
 
         searchBar = new SearchBar();
     }
+    public void reset(){
+        scrollX = 0;
+        scrollY = 0;
+        categoryPanes = new ArrayList<CategoryPane>();
+
+        Object panesObject = HeliosClient.CONFIG.modulesManager.getConfigMaps().get("modules").get("panes");
+        if (panesObject instanceof Map panePos) {
+            CategoryManager.getCategories().forEach((s, category) -> {
+                Object categoryObject = panePos.get(category.name);
+                if (categoryObject instanceof Map) {
+                    Map<String, Object> categoryMap = (Map<String, Object>) panePos.get(category.name);
+                    int xOffset = MathUtils.d2iSafe(Integer.parseInt(categoryMap.get("x").toString()));
+                    int yOffset = MathUtils.d2iSafe(Integer.parseInt(categoryMap.get("y").toString()));
+                    boolean collapsed = (boolean) categoryMap.get("collapsed");
+                    categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
+                }
+            });
+        }
+
+        searchBar = new SearchBar();
+    }
 
 
 

@@ -18,6 +18,9 @@
   "entrypoints": {
     "main": [
       "dev.heliosclient.HeliosClient"
+    ],
+    "modmenu": [
+      "dev.heliosclient.ModMenuIntegration"
     ]
   },
   "accessWidener": "heliosclient.accesswidener",

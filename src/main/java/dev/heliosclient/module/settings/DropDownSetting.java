@@ -151,7 +151,7 @@ public class DropDownSetting extends Setting<Integer> {
                 if (option == options.get(value)) {
                     continue;
                 }
-                if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + Renderer2D.getFxStringWidth(String.valueOf(option)) && mouseY >= offset && mouseY <= offset + Renderer2D.getFxStringHeight() + 2.0f) {
+                if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + maxOptionWidth && mouseY >= offset && mouseY <= offset + Renderer2D.getFxStringHeight() + 2.0f) {
                     value = options.indexOf(option);
                     selecting = false;
                     iSettingChange.onSettingChange(this);

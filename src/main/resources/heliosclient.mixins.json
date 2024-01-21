@@ -12,6 +12,8 @@
     "MixinServerPlayNetworkHandler"
   ],
   "client": [
+    "AccessorFrustum",
+    "AccessorWorldRenderer",
     "CapeFeatureRendererMixin",
     "ChatInputSuggestorMixin",
     "ClientConnectionMixin",

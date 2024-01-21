@@ -25,6 +25,7 @@ repositories {
 			includeGroupByRegex 'dev\\.onyxstudios.*'
 		}
 	}
+	maven { url "https://maven.terraformersmc.com/releases/" }
 
 	maven { url 'https://jitpack.io' }
 
@@ -56,6 +57,8 @@ dependencies {
 
 	// TOML parser
 	implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+
+	modApi "com.terraformersmc:modmenu:9.0.0"
 //	library "de.florianmichael:WaybackAuthLib:1.0.0"
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.

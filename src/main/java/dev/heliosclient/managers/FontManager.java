@@ -21,6 +21,9 @@ public class FontManager implements Listener {
     public static ArrayList<String> fontNames = new ArrayList<>();
 
     public static FontManager INSTANCE = new FontManager();
+    public FontManager(){
+        refresh();
+    }
 
     public void refresh(){
         fontNames.clear();

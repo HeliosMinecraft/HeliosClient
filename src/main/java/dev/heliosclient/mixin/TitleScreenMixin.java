@@ -70,7 +70,7 @@ public abstract class TitleScreenMixin extends Screen {
 
         // Calculate the position for the subtitle
         int subtitleX = (this.width - textRenderer.getWidth(subtitleText)) / 2;
-        int subtitleY = this.height / 4 + 48 + 72 + 12 + 25;
+        int subtitleY = this.height / 4 + 48 + 72 + 12 + 50;
 
         // Draw the subtitle
         context.drawText(textRenderer, subtitleText, subtitleX, subtitleY, 0xFFFFFF, true);
@@ -79,7 +79,7 @@ public abstract class TitleScreenMixin extends Screen {
     @Inject(at = @At("TAIL"), method = "init")
     private void altManagerButton(CallbackInfo callbackInfo) {
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Alt Manager"), this::gotoAltManagerScreen)
-                .position(this.width - 102, 2)
+                .position(this.width - 102, 0)
                 .size(100, 20)
                 .build());
     }

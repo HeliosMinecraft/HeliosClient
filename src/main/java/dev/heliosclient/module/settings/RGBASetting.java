@@ -308,6 +308,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
             value = defaultValue;
             rainbow = defaultRainbow;
             updateHandles();
+            alphaHandleY = Math.round((1.0f - alpha) * (float)boxHeight);
         }
         super.mouseClicked(mouseX, mouseY, button);
         if (hovered((int) mouseX, (int) mouseY)) {
