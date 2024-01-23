@@ -3,24 +3,22 @@ package dev.heliosclient.module.settings;
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class StringSetting extends Setting<String> {
-    private InputBox inputBox;
     private final InputBox inputBoxCompact;
     private final int characterLimit;
     private final InputBox.InputMode inputMode;
     public String value;
     String description;
+    private final InputBox inputBox;
 
     public StringSetting(String name, String description, String value, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender, String defaultValue) {
         super(shouldRender, defaultValue);
@@ -62,6 +60,7 @@ public class StringSetting extends Setting<String> {
         inputBox.setFocused(hovered((int) mouseX, (int) mouseY));
         inputBoxCompact.setFocused(hovered((int) mouseX, (int) mouseY));
     }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
         return value;

@@ -17,11 +17,16 @@ Credits: BleachHack 1.19.4
 Todo: Replace this later with orignal code
  */
 public class Renderer3D {
-    /** Offsets this box so that minX, minY and minZ are all zero. **/
+    /**
+     * Offsets this box so that minX, minY and minZ are all zero.
+     **/
     public static Box moveToZero(Box box) {
         return box.offset(getMinVec(box).negate());
     }
-    /** Returns the vector of the min pos of this box. **/
+
+    /**
+     * Returns the vector of the min pos of this box.
+     **/
     public static Vec3d getMinVec(Box box) {
         return new Vec3d(box.minX, box.minY, box.minZ);
     }
@@ -231,6 +236,7 @@ public class Renderer3D {
     public static void cleanup() {
         RenderSystem.disableBlend();
     }
+
     /**
      * Creates a Box object from the coordinates of two points in 3D space.
      *
@@ -265,7 +271,7 @@ public class Renderer3D {
     /**
      * Creates a Box object from a Vec3d object and a size parameter.
      *
-     * @param vec The Vec3d object representing the center of the box.
+     * @param vec  The Vec3d object representing the center of the box.
      * @param size The size of the box.
      * @return A Box object representing a box centered at the Vec3d object with the given size.
      */

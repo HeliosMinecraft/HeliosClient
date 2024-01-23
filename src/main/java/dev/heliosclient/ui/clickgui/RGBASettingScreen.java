@@ -16,7 +16,7 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
 
 
     public RGBASettingScreen(RGBASetting setting) {
-        super(Text.literal(setting.name == null? "NULL":setting.name));
+        super(Text.literal(setting.name == null ? "NULL" : setting.name));
         this.setting = setting;
         window = new Window(windowHeight, windowWidth, true, this);
     }

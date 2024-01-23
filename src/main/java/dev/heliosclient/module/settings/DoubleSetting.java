@@ -2,7 +2,6 @@ package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
@@ -69,7 +68,7 @@ public class DoubleSetting extends Setting<Double> {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, scaledValue, 2, 1, ColorManager.INSTANCE.clickGuiSecondary());
         // Slider
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 14f, 2, 6, 1, 0xFFFFFFFF);
-        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19f, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY,105).getRGB());
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19f, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY, 105).getRGB());
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -109,7 +108,7 @@ public class DoubleSetting extends Setting<Double> {
 
         // Bar to move
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 14, 2, 6, 1, 0xFFFFFFFF);
-        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY,105).getRGB());
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY, 105).getRGB());
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {
@@ -129,7 +128,7 @@ public class DoubleSetting extends Setting<Double> {
             value = defaultValue;
             ISettingChange.onSettingChange(this);
         }
-        if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.isFocused() && !inputBox.isFocusedHover(mouseX,mouseY)) {
+        if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.isFocused() && !inputBox.isFocusedHover(mouseX, mouseY)) {
             this.sliding = true;
         }
         if (!inputBox.isFocused()) {
@@ -142,6 +141,7 @@ public class DoubleSetting extends Setting<Double> {
         sliding = false;
         ISettingChange.onSettingChange(this);
     }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
         return value;
@@ -149,7 +149,7 @@ public class DoubleSetting extends Setting<Double> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        if(toml.getDouble(name.replace(" ","")) != null) {
+        if (toml.getDouble(name.replace(" ", "")) != null) {
             value = toml.getDouble(name.replace(" ", ""));
         }
     }

@@ -12,6 +12,7 @@ public record HudElementData<T extends HudElement>(String name, String descripti
     public String description() {
         return description;
     }
+
     public HudElement create() {
         return elementFactory.get();
     }

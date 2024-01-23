@@ -1,7 +1,6 @@
 package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
-import de.javagl.obj.Obj;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
@@ -22,9 +21,9 @@ import net.minecraft.client.util.GlAllocationUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.Color;
+import java.awt.*;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
@@ -216,7 +215,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
 
     public boolean hoveredOverPickBool(double mouseX, double mouseY) {
-        return mouseX > gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 && mouseX < gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 +  FontRenderers.Small_iconRenderer.getStringWidth("\uF17C ") + 3 && mouseY > y + offsetY + gradientBoxHeight + 5 && mouseY < y + offsetY + gradientBoxHeight + 6 + Renderer2D.getFxStringHeight("\uF17C ") + 2;
+        return mouseX > gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 && mouseX < gradientBoxX + Renderer2D.getFxStringWidth("Rainbow ") + 5 + FontRenderers.Small_iconRenderer.getStringWidth("\uF17C ") + 3 && mouseY > y + offsetY + gradientBoxHeight + 5 && mouseY < y + offsetY + gradientBoxHeight + 6 + Renderer2D.getFxStringHeight("\uF17C ") + 2;
     }
 
     public boolean hoveredOverRainbowBool(double mouseX, double mouseY) {
@@ -308,7 +307,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
             value = defaultValue;
             rainbow = defaultRainbow;
             updateHandles();
-            alphaHandleY = Math.round((1.0f - alpha) * (float)boxHeight);
+            alphaHandleY = Math.round((1.0f - alpha) * (float) boxHeight);
         }
         super.mouseClicked(mouseX, mouseY, button);
         if (hovered((int) mouseX, (int) mouseY)) {
@@ -343,25 +342,28 @@ public class RGBASetting extends Setting<Color> implements Listener {
     public boolean isDefaultRainbow() {
         return defaultRainbow;
     }
+
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
-        if(rainbow){
+        if (rainbow) {
             value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), value.getAlpha());
         }
     }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
         objectList.add(value.getRGB());
-        objectList.add(rainbow? 1:0);
+        objectList.add(rainbow ? 1 : 0);
         return objectList;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value = ColorUtils.intToColor(Integer.parseInt(toml.getList(this.name.replace(" ","")).get(0).toString()));
+        value = ColorUtils.intToColor(Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(0).toString()));
         rainbow = Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(1).toString()) == 1;
         updateHandles();
     }
+
     public Screen getParentScreen() {
         return parentScreen;
     }

@@ -45,7 +45,7 @@ public class Renderer2D implements Listener {
         double scaleFactor = HeliosClient.MC.getWindow().getScaleFactor();
 
         int scissorX = (int) (x * scaleFactor);
-        int scissorY = (int) ( HeliosClient.MC.getWindow().getHeight() - ((y + height) * scaleFactor));
+        int scissorY = (int) (HeliosClient.MC.getWindow().getHeight() - ((y + height) * scaleFactor));
         int scissorWidth = (int) (width * scaleFactor);
         int scissorHeight = (int) (height * scaleFactor);
 
@@ -922,6 +922,7 @@ public class Renderer2D implements Listener {
 
         RenderSystem.defaultBlendFunc();
     }
+
     public static void drawRoundedGradientRectangle(Matrix4f matrix, GradientUtils gradient, float x, float y, float width, float height, float radius, int shiftSpeed) {
         // Get the colors from the gradient
         Color color1 = gradient.getColor(0.0f); // Start color
@@ -947,7 +948,7 @@ public class Renderer2D implements Listener {
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
         // Calculate the scroll offset
-        float scrollOffset = (System.currentTimeMillis() % (shiftSpeed * 100)) / (shiftSpeed * 100.0f);;
+        float scrollOffset = (System.currentTimeMillis() % (shiftSpeed * 100)) / (shiftSpeed * 100.0f);
 
         // Apply the scroll offset to the texture coordinates
         bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB()).texture(0.0f + scrollOffset, 0.0f).next();
@@ -1086,6 +1087,7 @@ public class Renderer2D implements Listener {
         }
         return getFontRenderer() != null ? getFontRenderer().getStringWidth(text) : 0;
     }
+
     public static float getCustomStringWidth(String text, FontRenderer fontRenderer) {
         if (isVanillaRenderer()) {
             return HeliosClient.MC.textRenderer.getWidth(text);
@@ -1096,6 +1098,7 @@ public class Renderer2D implements Listener {
     public static float getStringWidth() {
         return getStringWidth(TEXT);
     }
+
     public static float getCustomStringWidth(FontRenderer fontRenderer) {
         return fontRenderer.getStringWidth(TEXT);
     }
@@ -1117,6 +1120,7 @@ public class Renderer2D implements Listener {
         }
         return getFontRenderer() != null ? getFontRenderer().getStringHeight(text) : 0;
     }
+
     public static float getCustomStringHeight(String text, FontRenderer fontRenderer) {
         if (isVanillaRenderer()) {
             return HeliosClient.MC.textRenderer.fontHeight;
@@ -1128,6 +1132,7 @@ public class Renderer2D implements Listener {
     public static float getStringHeight() {
         return getStringHeight(TEXT);
     }
+
     public static float getCustomStringHeight(FontRenderer fontRenderer) {
         return fontRenderer.getStringHeight(TEXT);
     }
@@ -1186,15 +1191,16 @@ public class Renderer2D implements Listener {
             getFxFontRenderer().drawCenteredString(matrixStack, text, x, y, color);
         }
     }
+
     public static void drawCustomString(fxFontRenderer fontRenderer, MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
-        } else if (fontRenderer!= null) {
+        } else if (fontRenderer != null) {
             fontRenderer.drawString(matrixStack, text, x, y, color);
         }
     }
 
-    public static void drawCustomCenteredString(fxFontRenderer fontRenderer,MatrixStack matrixStack, String text, float x, float y, int color) {
+    public static void drawCustomCenteredString(fxFontRenderer fontRenderer, MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (fontRenderer != null) {

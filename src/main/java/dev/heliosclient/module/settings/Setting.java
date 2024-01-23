@@ -13,8 +13,9 @@ import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
-import java.awt.Color;
-import java.util.*;
+import java.awt.*;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public abstract class Setting<T> implements Listener, ISaveAndLoad {
@@ -62,6 +63,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
             }
         }
     }
+
     public void reset(float targetY) {
         if (!animationDone) {
             //the first update, set the initial position above the target
@@ -128,7 +130,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     /**
      * If setting should render, Meant to be used for overrides for settings that are meant to be shown only if condition is met.
      *
-     * @return If should render.
+     * @return Whether to render or not.
      */
     public boolean shouldRender() {
         return shouldRender.getAsBoolean();
@@ -142,12 +144,9 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
      * @param button Which button is being clicked.
      */
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        if(getAnimationProgress() <=1) return;
-       /* if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
-            value = defaultValue;
+        if (getAnimationProgress() <= 1) {
+            return;
         }
-
-        */
     }
 
     /**
@@ -252,6 +251,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     public void setAnimationSpeed(float animationSpeed) {
         this.animationSpeed = animationSpeed;
     }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
         return objectList;

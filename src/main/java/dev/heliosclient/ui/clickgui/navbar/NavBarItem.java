@@ -4,7 +4,6 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
@@ -24,6 +23,7 @@ public class NavBarItem {
         this.description = description;
         this.target = target;
     }
+
     public NavBarItem(String name, String description, Supplier<Screen> target) {
         this.name = name;
         this.description = description;

@@ -3,15 +3,12 @@ package dev.heliosclient.module.settings;
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
-import io.netty.util.internal.StringUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -88,10 +85,11 @@ public class StringListSetting extends Setting<String[]> {
             boxOffset += 16;
         }
     }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
-        for (InputBox inputBox:
-             inputBoxes) {
+        for (InputBox inputBox :
+                inputBoxes) {
             objectList.add(inputBox.getValue());
         }
         return objectList;
@@ -101,9 +99,9 @@ public class StringListSetting extends Setting<String[]> {
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
         int a;
         inputBoxes.clear();
-        List<String> list = toml.getList(name.replace(" ",""));
-        for (a = 0;a < list.size(); a++) {
-            inputBoxes.add(new InputBox(160,12, list.get(a),characterLimit,inputMode));
+        List<String> list = toml.getList(name.replace(" ", ""));
+        for (a = 0; a < list.size(); a++) {
+            inputBoxes.add(new InputBox(160, 12, list.get(a), characterLimit, inputMode));
         }
     }
 

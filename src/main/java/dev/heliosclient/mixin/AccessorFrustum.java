@@ -8,37 +8,35 @@
  */
 package dev.heliosclient.mixin;
 
+import net.minecraft.client.render.Frustum;
 import org.joml.FrustumIntersection;
-import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.client.render.Frustum;
-
 @Mixin(Frustum.class)
 public interface AccessorFrustum {
-	
-	@Accessor
-	public abstract FrustumIntersection getFrustumIntersection();
-	
-	@Accessor
-	public abstract void setFrustumIntersection(FrustumIntersection vector4f);
-	
-	@Accessor
-	public abstract double getX();
-	
-	@Accessor
-	public abstract void setX(double x);
-	
-	@Accessor
-	public abstract double getY();
-	
-	@Accessor
-	public abstract void setY(double y);
-	
-	@Accessor
-	public abstract double getZ();
-	
-	@Accessor
-	public abstract void setZ(double z);
+
+    @Accessor
+    FrustumIntersection getFrustumIntersection();
+
+    @Accessor
+    void setFrustumIntersection(FrustumIntersection vector4f);
+
+    @Accessor
+    double getX();
+
+    @Accessor
+    void setX(double x);
+
+    @Accessor
+    double getY();
+
+    @Accessor
+    void setY(double y);
+
+    @Accessor
+    double getZ();
+
+    @Accessor
+    void setZ(double z);
 }

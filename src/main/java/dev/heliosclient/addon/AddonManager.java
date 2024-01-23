@@ -17,7 +17,7 @@ public class AddonManager {
     private final Gson gson = new Gson();
 
     public static void initializeAddons() {
-        for (HeliosAddon addon : addons) {
+        for ( HeliosAddon addon : addons) {
             addon.onInitialize();
         }
     }

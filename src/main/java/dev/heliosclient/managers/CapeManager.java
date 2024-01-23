@@ -15,19 +15,18 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.List;
 
 public class CapeManager {
     private static final File CAPE_DIRECTORY = new File(HeliosClient.MC.runDirectory, "heliosclient/capes");
+    private static final String DEFAULT_CAPE = "helioscape.png";
+    public static final Identifier CAPE_TEXTURE = new Identifier("heliosclient", "capes/" + DEFAULT_CAPE);
+    public static final Identifier DEFAULT_CAPE_TEXTURE = new Identifier("heliosclient", "capes/" + DEFAULT_CAPE);
+    private static final Map<UUID, Identifier> CAPES = new HashMap<>();
+    private static final Map<UUID, Identifier> ELYTRAS = new HashMap<>();
     public static String[] capes = new String[]{};
     public static Identifier cape;
     public static List<Identifier> capeIdentifiers = new ArrayList<>();
     public static List<Identifier> elytraIdentifiers = new ArrayList<>();
-
-    private static final String DEFAULT_CAPE = "helioscape.png";
-    public static final Identifier CAPE_TEXTURE = new Identifier("heliosclient", "capes/" + DEFAULT_CAPE);
-    public static final Identifier DEFAULT_CAPE_TEXTURE = new Identifier("heliosclient", "capes/" + DEFAULT_CAPE);
-
 
     /**
      * Works similar to FontLoader#loadFonts
@@ -61,8 +60,7 @@ public class CapeManager {
         List<String> capeNames = new ArrayList<>();
 
         for (File file : capeFiles) {
-            try {
-                FileInputStream inputStream = new FileInputStream(file);
+            try(FileInputStream inputStream = new FileInputStream(file)) {
                 String fileName = file.getName();
                 String capeName = fileName.substring(0, fileName.lastIndexOf('.'));
                 capeNames.add(capeName);
@@ -91,7 +89,7 @@ public class CapeManager {
                 e.printStackTrace();
             }
         }
-        String[] capeNamesArray =  capeNames.toArray(new String[0]);
+        String[] capeNamesArray = capeNames.toArray(new String[0]);
         capes = capeNamesArray;
         return capeNamesArray;
     }
@@ -122,33 +120,29 @@ public class CapeManager {
         return imgNew;
     }
 
-
-
-
     private static byte[] toByteArray(BufferedImage bufferedImage, String format) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(bufferedImage, format, baos);
         return baos.toByteArray();
     }
 
-
     public static void loadCape(PlayerEntity player, Identifier capeTexture) {
-        if(HeliosClient.MC.getResourceManager() != null) {
+        if (HeliosClient.MC.getResourceManager() != null) {
             try (InputStream stream = MinecraftClient.getInstance().getResourceManager().getResource(capeTexture).orElseThrow().getInputStream()) {
                 NativeImage image = NativeImage.read(stream);
                 NativeImageBackedTexture texture = new NativeImageBackedTexture(image);
                 MinecraftClient.getInstance().getTextureManager().registerTexture(capeTexture, texture);
-                CapeManager.setCapeAndElytra(player, capeTexture,capeTexture);
+                CapeManager.setCapeAndElytra(player, capeTexture, capeTexture);
             } catch (IOException e) {
                 e.printStackTrace();
                 // If the cape texture fails to load, set the player's cape to the default cape
-                CapeManager.setCapeAndElytra(player, DEFAULT_CAPE_TEXTURE,DEFAULT_CAPE_TEXTURE);
+                CapeManager.setCapeAndElytra(player, DEFAULT_CAPE_TEXTURE, DEFAULT_CAPE_TEXTURE);
             }
         }
     }
 
     public static void loadCape() {
-        if(HeliosClient.MC.getResourceManager() != null) {
+        if (HeliosClient.MC.getResourceManager() != null) {
             try (InputStream stream = MinecraftClient.getInstance().getResourceManager().getResource(CAPE_TEXTURE).orElseThrow().getInputStream()) {
                 NativeImage image = NativeImage.read(stream);
                 NativeImageBackedTexture texture = new NativeImageBackedTexture(image);
@@ -171,10 +165,6 @@ public class CapeManager {
         return null;
     }
 
-    private static final Map<UUID, Identifier> CAPES = new HashMap<>();
-    private static final Map<UUID, Identifier> ELYTRAS = new HashMap<>();
-
-
     public static boolean shouldPlayerHaveCape(PlayerEntity player) {
         return CAPES.containsKey(player.getUuid()) || ELYTRAS.containsKey(player.getUuid());
     }
@@ -182,6 +172,7 @@ public class CapeManager {
     public static Identifier getCapeTexture(PlayerEntity player) {
         return CAPES.get(player.getUuid());
     }
+
     public static Identifier getElytraTexture(PlayerEntity player) {
         return ELYTRAS.get(player.getUuid());
     }
@@ -190,6 +181,7 @@ public class CapeManager {
         CAPES.put(player.getUuid(), texture);
         ELYTRAS.put(player.getUuid(), elytraTexture);
     }
+
     public static void setElytra(PlayerEntity player, Identifier texture) {
         ELYTRAS.put(player.getUuid(), texture); // New method for elytra textures
     }

@@ -34,6 +34,7 @@ public class InputBox implements Listener {
     protected boolean selecting = false;
     protected boolean selectedAll = false;
     protected Screen screen;
+
     public InputBox(int width, int height, String value, int characterLimit, InputMode inputMode) {
         this.width = width;
         this.height = height;
@@ -59,16 +60,18 @@ public class InputBox implements Listener {
             startIndex = endIndex;
         }
     }
+
     @SubscribeEvent
     public void mouseClicked(MouseClickEvent event) {
-        if(screen != null && event.getScreen()  == screen) {
+        if (screen != null && event.getScreen() == screen) {
             double mouseX = event.getMouseX();
             double mouseY = event.getMouseY();
-            isFocusedHover(mouseX,mouseY);
+            isFocusedHover(mouseX, mouseY);
             cursorPosition = value.length();
         }
     }
-    public boolean isFocusedHover(double mouseX, double mouseY){
+
+    public boolean isFocusedHover(double mouseX, double mouseY) {
         return focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y) && mouseY <= (y + height));
     }
 
@@ -230,7 +233,7 @@ public class InputBox implements Listener {
                 case GLFW.GLFW_KEY_ENTER,
                         GLFW.GLFW_KEY_KP_ENTER -> focused = false;
             }
-            if(keyCode == GLFW.GLFW_KEY_HOME ) {
+            if (keyCode == GLFW.GLFW_KEY_HOME) {
                 if (Screen.hasShiftDown()) {
                     if (!selecting) {
                         selecting = true;
@@ -243,13 +246,13 @@ public class InputBox implements Listener {
                 selectedAll = false;
                 cursorPosition = 0;
             }
-            if( keyCode ==  GLFW.GLFW_KEY_END) {
+            if (keyCode == GLFW.GLFW_KEY_END) {
                 if (Screen.hasShiftDown()) {
                     if (!selecting) {
                         selecting = true;
                         selectionStart = cursorPosition;
                     }
-                    selectionEnd = value.length();;
+                    selectionEnd = value.length();
                 } else {
                     selecting = false;
                 }

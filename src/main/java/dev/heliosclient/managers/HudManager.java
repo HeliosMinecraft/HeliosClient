@@ -5,7 +5,6 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
-import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

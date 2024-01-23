@@ -32,7 +32,7 @@ public class Help extends Command {
             ChatUtils.sendMsg(ColorUtils.bold + ColorUtils.yellow + command.getName());
             ChatUtils.sendMsg(command.getDescription());
 
-            if (command.getAliases().size() > 0) {
+            if (!command.getAliases().isEmpty()) {
                 ChatUtils.sendMsg(
                         ColorUtils.aqua + "Aliases" + ColorUtils.gray + ": " + String.join(", ", command.getAliases()));
             }

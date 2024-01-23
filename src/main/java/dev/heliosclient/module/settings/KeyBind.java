@@ -1,16 +1,13 @@
 package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
-import com.sun.jna.platform.KeyboardUtils;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
-import io.netty.util.internal.StringUtil;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
@@ -105,7 +102,7 @@ public class KeyBind extends Setting<Integer> {
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
-        if(listeningMouse && listening){
+        if (listeningMouse && listening) {
             value = button;
             ISettingChange.onSettingChange(this);
             listening = !listening;
@@ -118,16 +115,17 @@ public class KeyBind extends Setting<Integer> {
             listeningMouse = true;
         }
     }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
-        return value == -1? "None":(char)value;
+        return value == -1 ? "None" : (char) value;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        if(Objects.equals(toml.getString(name.replace(" ", "")), "None")) {
+        if (Objects.equals(toml.getString(name.replace(" ", "")), "None")) {
             value = -1;
-        }else{
+        } else {
             char ch = toml.getString(name.replace(" ", "")).toLowerCase().charAt(0);
             value = KeycodeToString.charToGLFWKeycode(ch);
         }

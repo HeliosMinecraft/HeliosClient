@@ -1,7 +1,6 @@
 package dev.heliosclient.hud;
 
 import com.moandjiezana.toml.Toml;
-import de.javagl.obj.Obj;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
@@ -25,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
-
 /**
  * Class for creating HudElements for HUD
  *
@@ -38,13 +35,13 @@ import static com.mojang.text2speech.Narrator.LOGGER;
  * <h4>Warning: Makes sure the element is centered along the x and y position. If this is not met they will go off-screen and hit-boxes will be broken.</h4>
  */
 public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
+    protected static final MinecraftClient mc = MinecraftClient.getInstance();
     public String name;
     public String description;
     public int height = FontManager.fontSize;
     public int width = 10;
     public int x;
     public int y;
-    int startX, startY, snapSize = 120;
     public boolean dragging;
     public int posY = 0;
     public int posX = 0;
@@ -56,9 +53,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public Hitbox hitbox;
     public boolean shiftDown = false;
     public List<SettingGroup> settingGroups = new ArrayList<>();
-    protected static final MinecraftClient mc = MinecraftClient.getInstance();
     public SettingGroup sgUI = new SettingGroup("UI");
-
     // Default settings
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
@@ -109,7 +104,9 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .onSettingChange(this)
             .shouldRender(() -> renderBg.value)
             .build());
-    public HudElement(HudElementData hudElementInfo){
+    int startX, startY, snapSize = 120;
+
+    public HudElement(HudElementData hudElementInfo) {
         this.name = hudElementInfo.name();
         this.description = hudElementInfo.description();
         hitbox = new Hitbox(x, y, width, height);
@@ -150,6 +147,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
 
 
             //Get right line to align to
+            assert drawContext != null;
             if (drawContext.getScaledWindowHeight() / 3 > y) {
                 posY = 0;
             } else if ((drawContext.getScaledWindowHeight() / 3) * 2 > y) {
@@ -212,13 +210,13 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
                     Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 0, (float) drawContext.getScaledWindowHeight() / 2 - 1, drawContext.getScaledWindowWidth(), 2, 0xFF00FF00);
                 }
             }
-            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(),   (float) (x - 1 - padding.value / 2 - 1), (float) (y - 1 - padding.value / 2 - 1), hitbox.getWidth(), hitbox.getHeight() + 2f, 0.4f, 0xFFFFFFFF);
+            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), (float) (x - 1 - padding.value / 2 - 1), (float) (y - 1 - padding.value / 2 - 1), hitbox.getWidth(), hitbox.getHeight() + 2f, 0.4f, 0xFFFFFFFF);
         }
         //Renders element
         renderElement(drawContext, textRenderer);
 
         // Set the hitbox values after the render element incase any change of width/height occurs
-        hitbox.set((float) (x - padding.value / 2 - 1), (float) (y - padding.value / 2 - 1), (float) (width + padding.value + 4f), (float) (height +  padding.value + 1));
+        hitbox.set((float) (x - padding.value / 2 - 1), (float) (y - padding.value / 2 - 1), (float) (width + padding.value + 4f), (float) (height + padding.value + 1));
     }
 
     /**
@@ -255,8 +253,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     /**
      * Rendering function. Put everything you want to render here. Don't forget to set height and width.
      * Defaults add background rendering which can be easy replaced by overriding without super call.
-     * Call the super method after defining your width and height so it is rendered with appropriate coordinates behind the text or item displayed
-     *
+     * Call the super method after defining your width and height, so it is rendered with appropriate coordinates behind the text or item displayed
      *
      * @param drawContext
      * @param textRenderer
@@ -267,26 +264,26 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             drawContext.getMatrices().push();
             drawContext.getMatrices().translate(0, 0, 0D);
             Color bgStart, bgEnd;
-            if(clientColorCycle.value){
+            if (clientColorCycle.value) {
                 bgStart = ColorManager.INSTANCE.getPrimaryGradientStart();
                 bgEnd = ColorManager.INSTANCE.getPrimaryGradientEnd();
-            }else{
+            } else {
                 bgStart = backgroundColor.getColor();
                 bgEnd = bgStart;
             }
-            Color blended = ColorUtils.blend(bgStart,bgEnd,1/2f);
+            Color blended = ColorUtils.blend(bgStart, bgEnd, 1 / 2f);
 
             if (rounded.value && !shadow.value) {
-                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(),bgStart,bgEnd,bgEnd,bgStart, (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), (float) hitbox.getWidth() - 1.9f, (float) (hitbox.getHeight()), 2);
+                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, hitbox.getHeight(), 2);
             } else if (!shadow.value) {
-                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, (float) (hitbox.getHeight()), bgStart.getRGB(), bgEnd.getRGB());
+                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, hitbox.getHeight(), bgStart.getRGB(), bgEnd.getRGB());
             }
 
             if (rounded.value && shadow.value) {
-                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, (float) (hitbox.getHeight()),bgStart,bgEnd,bgEnd,bgStart,2,4,blended);
+                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, hitbox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, 4, blended);
             }
             if (!rounded.value && shadow.value) {
-                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, (float) (hitbox.getHeight()),4, bgStart.getRGB(), bgEnd.getRGB());
+                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, hitbox.getHeight(), 4, bgStart.getRGB(), bgEnd.getRGB());
             }
 
             drawContext.getMatrices().pop();
@@ -387,23 +384,24 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public void onSettingChange(Setting setting) {
 
     }
+
     @SubscribeEvent
-    public void onFontChange(FontChangeEvent event){
+    public void onFontChange(FontChangeEvent event) {
         this.height = (int) Renderer2D.getStringHeight();
     }
 
     @Override
     public Object saveToToml(List<Object> objects) {
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
 
-        map.put("name",name);
+        map.put("name", name);
 
         objects.add(x);
         objects.add(y);
         objects.add(width);
         objects.add(height);
 
-        map.put("positions",objects);
+        map.put("positions", objects);
 
         for (SettingGroup settingGroup : settingGroups) {
             for (Setting setting : settingGroup.getSettings()) {
@@ -429,7 +427,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         for (SettingGroup settingGroup : settingGroups) {
             for (Setting setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
-                    setting.loadFromToml(map,toml);
+                    setting.loadFromToml(map, toml);
                 }
             }
         }

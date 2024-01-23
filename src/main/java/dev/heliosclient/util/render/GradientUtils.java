@@ -1,11 +1,21 @@
 package dev.heliosclient.util.render;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GradientUtils {
-    private List<Color> colors = new ArrayList<>();
+    private final List<Color> colors = new ArrayList<>();
+
+    // Creates a gradient from a string
+    public static GradientUtils fromString(String s) {
+        GradientUtils gradient = new GradientUtils();
+        String[] parts = s.split(" ");
+        for (String part : parts) {
+            gradient.addColor(new Color(Integer.parseInt(part)));
+        }
+        return gradient;
+    }
 
     // Adds a color to the gradient
     public void addColor(Color color) {
@@ -44,15 +54,5 @@ public class GradientUtils {
             sb.append(color.getRGB()).append(" ");
         }
         return sb.toString().trim();
-    }
-
-    // Creates a gradient from a string
-    public static GradientUtils fromString(String s) {
-        GradientUtils gradient = new GradientUtils();
-        String[] parts = s.split(" ");
-        for (String part : parts) {
-            gradient.addColor(new Color(Integer.parseInt(part)));
-        }
-        return gradient;
     }
 }

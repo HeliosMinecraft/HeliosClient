@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules;
 
+import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
@@ -7,7 +8,6 @@ import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
-import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.util.cape.CapeSynchronizer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -58,7 +58,7 @@ public class CapeModule extends Module_ {
         addQuickSetting(elytra);
 
 
-        loadCapes.addButton("Reload Capes",0,0,()->{
+        loadCapes.addButton("Reload Capes", 0, 0, () -> {
             CapeManager.loadCapes();
             capes.options = List.of(CapeManager.capes);
         });
@@ -67,17 +67,17 @@ public class CapeModule extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-        if(CapeManager.capeIdentifiers.isEmpty())return;
+        if (CapeManager.capeIdentifiers.isEmpty()) return;
         capes.options = List.of(CapeManager.capes);
 
         CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
 
-        if(mc.player != null) {
-            CapeManager.setCapeAndElytra(mc.player,CapeManager.cape,CapeManager.elytraIdentifiers.get(capes.value));
-            if(mc.player.getServer() != null){
+        if (mc.player != null) {
+            CapeManager.setCapeAndElytra(mc.player, CapeManager.cape, CapeManager.elytraIdentifiers.get(capes.value));
+            if (mc.player.getServer() != null) {
                 for (ServerPlayerEntity player : mc.player.getServer().getPlayerManager().getPlayerList()) {
                     Identifier capeTexture = CapeManager.cape;
-                    CapeSynchronizer.sendCapeSyncPacket(player, capeTexture,CapeManager.elytraIdentifiers.get(capes.value));
+                    CapeSynchronizer.sendCapeSyncPacket(player, capeTexture, CapeManager.elytraIdentifiers.get(capes.value));
                 }
             }
         }
@@ -87,12 +87,12 @@ public class CapeModule extends Module_ {
     @Override
     public void onSettingChange(Setting setting) {
         super.onSettingChange(setting);
-        if(CapeManager.capeIdentifiers.isEmpty())return;
+        if (CapeManager.capeIdentifiers.isEmpty()) return;
         CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
 
-        if(mc.player != null) {
-            CapeManager.setCapeAndElytra(mc.player,CapeManager.cape,CapeManager.elytraIdentifiers.get(capes.value));
-            if(mc.player.getServer() != null){
+        if (mc.player != null) {
+            CapeManager.setCapeAndElytra(mc.player, CapeManager.cape, CapeManager.elytraIdentifiers.get(capes.value));
+            if (mc.player.getServer() != null) {
                 for (ServerPlayerEntity player : mc.player.getServer().getPlayerManager().getPlayerList()) {
                     Identifier capeTexture = CapeManager.cape;
                     CapeSynchronizer.sendCapeSyncPacket(player, capeTexture, CapeManager.elytraIdentifiers.get(capes.value));
@@ -104,12 +104,12 @@ public class CapeModule extends Module_ {
     @Override
     public void onLoad() {
         super.onLoad();
-        if(CapeManager.capeIdentifiers.isEmpty())return;
+        if (CapeManager.capeIdentifiers.isEmpty()) return;
         CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
 
-        if(mc.player != null) {
-            CapeManager.setCapeAndElytra(mc.player,CapeManager.cape,CapeManager.elytraIdentifiers.get(capes.value));
-            if(mc.player.getServer() != null){
+        if (mc.player != null) {
+            CapeManager.setCapeAndElytra(mc.player, CapeManager.cape, CapeManager.elytraIdentifiers.get(capes.value));
+            if (mc.player.getServer() != null) {
                 for (ServerPlayerEntity player : mc.player.getServer().getPlayerManager().getPlayerList()) {
                     Identifier capeTexture = CapeManager.cape;
                     CapeSynchronizer.sendCapeSyncPacket(player, capeTexture, CapeManager.elytraIdentifiers.get(capes.value));

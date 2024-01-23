@@ -99,6 +99,7 @@ public class ColorUtils {
         float hue = (System.currentTimeMillis() % ((int) ClickGUI.RainbowSpeed.value * 1000)) / ((int) ClickGUI.RainbowSpeed.value * 1000.0f);
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
+
     /**
      * Rainbow cycle 2.
      *
@@ -219,6 +220,7 @@ public class ColorUtils {
         int b = (int) (color1.getBlue() * (1 - fraction) + color2.getBlue() * fraction);
         return new Color(r, g, b);
     }
+
     // The fraction parameter is used to adjust the hue of the colors over time, creating a constantly changing effect.
     public static Color[] getDaySkyColors(float fraction) {
         Color color1 = Color.getHSBColor(fraction, 0.6f, 1.0f); // Sky blue

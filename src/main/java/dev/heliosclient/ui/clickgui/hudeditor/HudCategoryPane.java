@@ -38,6 +38,7 @@ public class HudCategoryPane {
             hudElementButtons.add(button);
         }
     }
+
     private float calculateMaxWidth() {
         float maxWidth = 0;
         for (HudElementButton elementButton : hudElementButtons) {
@@ -67,8 +68,8 @@ public class HudCategoryPane {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, true, true, false, false, width, 12, 3, 0xFF1B1B1B);
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 12, width, 1, ColorManager.INSTANCE.clickGuiSecondary());
 
-        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer,drawContext.getMatrices(), "Hud elements", x + 4, y + 3,ColorManager.INSTANCE.clickGuiPaneText());
-        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer,drawContext.getMatrices(), collapsed ? "+" : "-", x + width - Renderer2D.getCustomStringWidth(collapsed ? "+" : "-",FontRenderers.Small_fxfontRenderer) - 2, y + 3, ColorManager.INSTANCE.clickGuiPaneText());
+        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), "Hud elements", x + 4, y + 3, ColorManager.INSTANCE.clickGuiPaneText());
+        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), collapsed ? "+" : "-", x + width - Renderer2D.getCustomStringWidth(collapsed ? "+" : "-", FontRenderers.Small_fxfontRenderer) - 2, y + 3, ColorManager.INSTANCE.clickGuiPaneText());
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
@@ -80,7 +81,7 @@ public class HudCategoryPane {
         }
 
         for (HudElementButton elementButton : hudElementButtons) {
-            elementButton.mouseClicked(mouseX, mouseY, button,collapsed);
+            elementButton.mouseClicked(mouseX, mouseY, button, collapsed);
         }
     }
 
@@ -91,6 +92,7 @@ public class HudCategoryPane {
     public boolean hovered(double mouseX, double mouseY) {
         return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + 13;
     }
+
     public boolean hoveredComplete(double mouseX, double mouseY) {
         return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + (hudElementButtons.size() * 12) + 13;
     }

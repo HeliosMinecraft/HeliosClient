@@ -10,9 +10,9 @@ import java.util.List;
 
 public class SettingGroup {
     private final String name;
+    private final float groupNameHeight;
     private List<Setting> settings = new ArrayList<>();
     private float height;
-    private final float groupNameHeight;
     private boolean shouldRender = true;
     private int x, y, windowWidth;
 

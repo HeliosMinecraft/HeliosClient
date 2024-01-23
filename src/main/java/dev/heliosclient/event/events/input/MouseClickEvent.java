@@ -12,7 +12,7 @@ public class MouseClickEvent extends Event {
     private final int modifiers;
     private final double mouseX;
     private final double mouseY;
-    private final  Screen screen;
+    private final Screen screen;
 
 
     public MouseClickEvent(long window, int button, int action, double mouseX, double mouseY, Screen screen, int modifiers) {

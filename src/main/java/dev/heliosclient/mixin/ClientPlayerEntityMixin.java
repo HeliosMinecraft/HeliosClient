@@ -1,8 +1,8 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
@@ -25,7 +25,7 @@ public class ClientPlayerEntityMixin {
         }
     }
 
-    @Inject(method = "init", at = @At(value = "TAIL"), cancellable = true)
+    @Inject(method = "init", at = @At(value = "TAIL"))
     public void onInit(CallbackInfo ci) {
         for (Module_ m : ModuleManager.INSTANCE.getEnabledModules()) {
             m.onEnable();

@@ -1,8 +1,6 @@
 package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ClientSettingsScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
@@ -17,7 +15,7 @@ public class NavBarManager {
 
     public NavBarManager() {
         registerItems(
-                new NavBarItem("ClickGUI", "ClickGUI", ()-> ClickGUIScreen.INSTANCE),
+                new NavBarItem("ClickGUI", "ClickGUI", () -> ClickGUIScreen.INSTANCE),
                 new NavBarItem("Settings", "ClickGUI Setting", new ClientSettingsScreen(HeliosClient.CLICKGUI)),
                 new NavBarItem("HudEditor", "HUD editor", HudEditorScreen.INSTANCE)
         );

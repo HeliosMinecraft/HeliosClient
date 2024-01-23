@@ -45,6 +45,7 @@ public class DamageUtils implements Listener {
 
     public static double calculateBedBlastDamage(LivingEntity target, Vec3d bedLocation) {
         if (target instanceof PlayerEntity && ((PlayerEntity) target).getAbilities().creativeMode) return 0;
+        assert HeliosClient.MC.world != null;
         explosion = new Explosion(HeliosClient.MC.world, null, 0, 0, 0, 6, false, Explosion.DestructionType.DESTROY);
 
         double distance = Math.sqrt(target.squaredDistanceTo(bedLocation));

@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 public class ModuleManager {
     public static ModuleManager INSTANCE = new ModuleManager();
-    public ArrayList<Module_> modules = new ArrayList<>();
     public static CapeModule capeModule;
     public static NotificationModule notificationModule;
+    public ArrayList<Module_> modules = new ArrayList<>();
 
     public ModuleManager() {
         capeModule = new CapeModule();
@@ -82,7 +82,6 @@ public class ModuleManager {
             return 0;
         }
     }
-
 
 
     public ArrayList<Module_> getModulesByCategory(Category category) {

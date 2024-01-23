@@ -22,14 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HudEditorScreen extends Screen implements Listener {
+    public static HudEditorScreen INSTANCE = new HudEditorScreen();
     private final List<HudElement> selectedElements = new ArrayList<>();
     float thickness = 0.5f;
     float threshold = 1;
     // Variables to track the drag state and initial position
     private boolean isDragging = false;
     private Hitbox dragBox = null;
-
-    public static HudEditorScreen INSTANCE = new HudEditorScreen();
 
 
     private HudEditorScreen() {
@@ -42,7 +41,7 @@ public class HudEditorScreen extends Screen implements Listener {
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
-        if(HeliosClient.CLICKGUI.ScreenHelp.value) {
+        if (HeliosClient.CLICKGUI.ScreenHelp.value) {
             float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Select Element", 2, drawContext.getScaledWindowHeight() - (4 * fontHeight) - 4 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (3 * fontHeight) - 3 * 2, -1);
@@ -52,9 +51,9 @@ public class HudEditorScreen extends Screen implements Listener {
 
         checkAlignmentAndDrawLines(drawContext);
 
-        if (dragBox != null && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX,mouseY)) {
+        if (dragBox != null && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX, mouseY)) {
             drawContext.getMatrices().push();
-            drawContext.getMatrices().translate(0,0,-0.0D);
+            drawContext.getMatrices().translate(0, 0, -0.0D);
             drawContext.fill(Math.round(dragBox.getX()), Math.round(dragBox.getY()), Math.round(dragBox.getX() + dragBox.getWidth()), Math.round(dragBox.getY() + dragBox.getHeight()), new Color(255, 255, 255, 45).getRGB());
             drawContext.drawBorder(Math.round(dragBox.getX() - 1), Math.round(dragBox.getY() - 1), Math.round(dragBox.getWidth() + 1), Math.round(dragBox.getHeight() + 1), new Color(255, 255, 255, 155).getRGB());
             drawContext.getMatrices().pop();
@@ -120,31 +119,31 @@ public class HudEditorScreen extends Screen implements Listener {
                 }
             }
         }
-            selectedElements.clear();
+        selectedElements.clear();
 
-            int lastHoveredIndex = -1;
-            for (int i = HudManager.INSTANCE.hudElements.size() - 1; i >= 0; i--) {
-                if (HudManager.INSTANCE.hudElements.get(i).hovered(mouseX, mouseY)) {
-                    HudManager.INSTANCE.hudElements.get(i).selected = true;
-                    if(button == 1){
-                        HeliosClient.MC.setScreen(new HudEditorSettingScreen(HudManager.INSTANCE.hudElements.get(i),180,180));
-                    }
-                    lastHoveredIndex = i;
-                    break;
+        int lastHoveredIndex = -1;
+        for (int i = HudManager.INSTANCE.hudElements.size() - 1; i >= 0; i--) {
+            if (HudManager.INSTANCE.hudElements.get(i).hovered(mouseX, mouseY)) {
+                HudManager.INSTANCE.hudElements.get(i).selected = true;
+                if (button == 1) {
+                    HeliosClient.MC.setScreen(new HudEditorSettingScreen(HudManager.INSTANCE.hudElements.get(i), 180, 180));
                 }
+                lastHoveredIndex = i;
+                break;
             }
+        }
 
-            for (int i = 0; i < HudManager.INSTANCE.hudElements.size(); i++) {
-                if (i != lastHoveredIndex) {
-                    HudManager.INSTANCE.hudElements.get(i).selected = false;
-                }
-                if (HudManager.INSTANCE.hudElements.get(i).selected) {
-                    HudManager.INSTANCE.hudElements.get(i).mouseClicked(mouseX, mouseY, button);
-                }
+        for (int i = 0; i < HudManager.INSTANCE.hudElements.size(); i++) {
+            if (i != lastHoveredIndex) {
+                HudManager.INSTANCE.hudElements.get(i).selected = false;
             }
+            if (HudManager.INSTANCE.hudElements.get(i).selected) {
+                HudManager.INSTANCE.hudElements.get(i).mouseClicked(mouseX, mouseY, button);
+            }
+        }
 
         if (button == 0) {
-            if (lastHoveredIndex == -1 && selectedElements.isEmpty() && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX,mouseY) && dragBox == null) {
+            if (lastHoveredIndex == -1 && selectedElements.isEmpty() && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX, mouseY) && dragBox == null) {
                 isDragging = true;
                 int dragStartX = (int) mouseX;
                 int dragStartY = (int) mouseY;

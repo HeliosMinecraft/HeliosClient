@@ -11,23 +11,14 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,9 +31,8 @@ public class CategoryPane implements Listener {
     public static int width = 83;
     public static int MAX_HEIGHT = 150;
     public static List<Hitbox> hitboxes = new CopyOnWriteArrayList<>();
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
-
     public final char icon;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Screen parentScreen;
     private final float delayBetweenButtons = 0.0f;
     private final Hitbox hitBox;
@@ -51,13 +41,13 @@ public class CategoryPane implements Listener {
     public int y;
     public int height;
     public boolean collapsed;
+    public Screen screen;
     int startX, startY;
     boolean dragging = false;
     ArrayList<ModuleButton> moduleButtons;
     float delay = 0;
     int categoryNameHeight = 2;
     private int scrollOffset = 0;
-    public Screen screen;
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
         this.category = category;
@@ -166,7 +156,7 @@ public class CategoryPane implements Listener {
         } else {
             update();
             int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
-            Renderer2D.enableScissor(x-2,y + 10,width + 2, Math.round(hitBox.getHeight()) + 6);
+            Renderer2D.enableScissor(x - 2, y + 10, width + 2, Math.round(hitBox.getHeight()) + 6);
             for (ModuleButton m : moduleButtons) {
                 int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
                 m.render(drawContext, mouseX, mouseY, x, animatedY, maxWidth);
@@ -201,7 +191,7 @@ public class CategoryPane implements Listener {
 
     @SubscribeEvent
     public void mouseClicked(MouseClickEvent event) {
-        if(screen != null && event.getScreen() == screen) {
+        if (screen != null && event.getScreen() == screen) {
             int mouseX = (int) event.getMouseX();
             int mouseY = (int) event.getMouseY();
             int button = event.getButton();

@@ -1,8 +1,6 @@
 package dev.heliosclient.system;
 
-import com.google.gson.Gson;
 import com.moandjiezana.toml.Toml;
-import com.moandjiezana.toml.TomlWriter;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
@@ -16,10 +14,7 @@ import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
-import dev.heliosclient.util.FileUtils;
-import net.minecraft.client.MinecraftClient;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,17 +45,18 @@ public class Config {
         this.configManager.registerConfig(CLIENT, new HashMap<>());
         this.configManager.registerConfig(HUD, new HashMap<>());
 
-       init();
+        init();
     }
-    public void init(){
+
+    public void init() {
         CONFIGS = configManager.getTomlFiles(configManager.getConfigDir());
         MODULE_CONFIGS = modulesManager.getTomlFiles(modulesManager.getConfigDir());
 
-        for(String string: CONFIGS){
-            configManager.registerConfig(string.replace(".toml",""),new HashMap<>());
+        for (String string : CONFIGS) {
+            configManager.registerConfig(string.replace(".toml", ""), new HashMap<>());
         }
-        for(String string: MODULE_CONFIGS){
-            modulesManager.registerConfig(string.replace(".toml",""),new HashMap<>());
+        for (String string : MODULE_CONFIGS) {
+            modulesManager.registerConfig(string.replace(".toml", ""), new HashMap<>());
         }
     }
 
@@ -98,9 +94,11 @@ public class Config {
     public Map<String, Object> getModuleMap() {
         return modulesManager.getConfigMaps().get(MODULES);
     }
+
     public Map<String, Object> getClientConfigMap() {
         return configManager.getConfigMaps().get(CLIENT);
     }
+
     public Map<String, Object> getHudElementMap() {
         return configManager.getConfigMaps().get(HUD);
     }
@@ -117,10 +115,10 @@ public class Config {
                 // Store values of each category pane
                 Map<String, Object> Single_Pane_Map = new HashMap<>();
                 CategoryPane categoryPane = CategoryManager.findCategoryPane(category);
-                if(categoryPane == null){
+                if (categoryPane == null) {
                     // Load default config if there is no category pane to ensure that the config is not corrupted and all categories are present.
                     this.getDefaultModuleConfig();
-                }else{
+                } else {
                     // Put values of each category pane into the map
                     Single_Pane_Map.put("x", categoryPane.x);
                     Single_Pane_Map.put("y", categoryPane.y);
@@ -184,18 +182,18 @@ public class Config {
             // Maps the toml.
             toml.toMap().forEach((string, object) -> {
                 // Get the table of the hudElement
-                Toml hudElementTable =  toml.getTable(string);
+                Toml hudElementTable = toml.getTable(string);
                 // Get the name of the hudElement and check if it exists
-                if(hudElementTable.contains("name")) {
+                if (hudElementTable.contains("name")) {
                     // Creates the hudElement provided by the hudElementData Supplier.
                     HudElementData hudElementData = HudElementList.INSTANCE.elementDataMap.get(hudElementTable.getString("name"));
-                   HudElement hudElement = hudElementData.create();
+                    HudElement hudElement = hudElementData.create();
 
                     // Load the hudElement from the toml and add it to the hudElements list.
-                   if(hudElement != null){
-                       hudElement.loadFromToml(hudElementTable.toMap(),hudElementTable);
-                       HudManager.INSTANCE.addHudElement(hudElement);
-                   }
+                    if (hudElement != null) {
+                        hudElement.loadFromToml(hudElementTable.toMap(), hudElementTable);
+                        HudManager.INSTANCE.addHudElement(hudElement);
+                    }
                 }
             });
         }
@@ -206,14 +204,14 @@ public class Config {
      */
     public void loadConfig() {
         ModuleManager.INSTANCE = new ModuleManager();
-        if (!configManager.load()){
+        if (!configManager.load()) {
             LOGGER.info("Loading default config...");
             this.getDefaultModuleConfig();
             this.save();
         } else {
             this.getModuleConfig();
         }
-        if (!modulesManager.load()){
+        if (!modulesManager.load()) {
             LOGGER.info("Loading default modules config...");
             this.getDefaultModuleConfig();
             this.save();
@@ -223,9 +221,9 @@ public class Config {
 
         this.getClientConfig();
         this.getHudConfig();
-        if(ClickGUIScreen.INSTANCE == null) {
+        if (ClickGUIScreen.INSTANCE == null) {
             ClickGUIScreen.INSTANCE = new ClickGUIScreen();
-        }else{
+        } else {
             ClickGUIScreen.INSTANCE.reset();
         }
     }

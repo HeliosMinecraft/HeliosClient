@@ -12,11 +12,12 @@ public class KeybindManager implements Listener {
     public static KeybindManager INSTANCE = new KeybindManager();
     protected static MinecraftClient mc = MinecraftClient.getInstance();
 
-    public KeybindManager(){
+    public KeybindManager() {
         EventManager.register(this);
     }
+
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
-    public void keyPressedEvent(KeyPressedEvent event){
+    public void keyPressedEvent(KeyPressedEvent event) {
         if (mc.currentScreen != null) return;
 
         for (Module_ module : ModuleManager.INSTANCE.modules) {
@@ -31,7 +32,7 @@ public class KeybindManager implements Listener {
     }
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
-    public void keyReleasedEvent(KeyReleasedEvent event){
+    public void keyReleasedEvent(KeyReleasedEvent event) {
         if (mc.currentScreen != null) return;
 
         for (Module_ module : ModuleManager.INSTANCE.modules) {
@@ -42,8 +43,9 @@ public class KeybindManager implements Listener {
             }
         }
     }
+
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
-    public void mouseClicked(MouseClickEvent event){
+    public void mouseClicked(MouseClickEvent event) {
         if (mc.currentScreen != null) return;
 
         for (Module_ module : ModuleManager.INSTANCE.modules) {

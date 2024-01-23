@@ -40,6 +40,7 @@ public class MathUtils {
 
     /**
      * Not a math utility
+     *
      * @param list
      * @return
      */

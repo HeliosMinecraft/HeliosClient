@@ -3,7 +3,6 @@ package dev.heliosclient.util;
 import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
 /**
  * Utils for working with GLFW keycodes.
@@ -385,6 +384,7 @@ public class KeycodeToString {
         }
         return keyName;
     }
+
     public static int charToGLFWKeycode(char c) {
         // Convert the char to uppercase
         c = Character.toUpperCase(c);

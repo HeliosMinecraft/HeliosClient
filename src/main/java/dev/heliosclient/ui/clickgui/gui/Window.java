@@ -15,7 +15,6 @@ import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -28,12 +27,12 @@ public class Window implements Listener {
     private final IWindowContentRenderer contentRenderer;
     public TextButton backButton = new TextButton("< Back");
     public TextButton collapseButton = new TextButton("+/-");
+    public Screen screen;
     int offsetY;
     private int x, y, windowHeight, windowWidth;
     private boolean isCollapsible;
     private boolean isCollapsed = false;
     private Runnable backButtonTask;
-    public Screen screen;
 
     public Window(int windowHeight, int windowWidth, boolean collapsible, IWindowContentRenderer contentRenderer) {
         this.windowHeight = windowHeight;
@@ -47,8 +46,8 @@ public class Window implements Listener {
         this.contentRenderer = contentRenderer;
         backButtonTask = () -> {
             HeliosClient.MC.setScreen(ClickGUIScreen.INSTANCE);
-            for(NavBarItem item:  NavBarManager.INSTANCE.navBarItems){
-                if(item.name.equalsIgnoreCase("ClickGUI")){
+            for (NavBarItem item : NavBarManager.INSTANCE.navBarItems) {
+                if (item.name.equalsIgnoreCase("ClickGUI")) {
                     item.target = ClickGUIScreen.INSTANCE;
                 }
             }
@@ -77,14 +76,6 @@ public class Window implements Listener {
             this.x = (HeliosClient.MC.getWindow().getScaledWidth() / 2) - windowWidth / 2;
             this.y = 5;
         }
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
     }
 
     public void render(DrawContext drawContext, int mouseX, int mouseY, String name, String description, TextRenderer textRenderer) {
@@ -134,7 +125,7 @@ public class Window implements Listener {
 
     @SubscribeEvent
     public void mouseClicked(MouseClickEvent event) {
-        if(screen != null && event.getScreen()  == screen) {
+        if (screen != null && event.getScreen() == screen) {
             double mouseX = event.getMouseX();
             double mouseY = event.getMouseY();
             backButton.mouseClicked((int) mouseX, (int) mouseY, backButtonTask);
@@ -172,8 +163,16 @@ public class Window implements Listener {
         return y;
     }
 
+    public void setY(int y) {
+        this.y = y;
+    }
+
     public int getX() {
         return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
     }
 
     public TextButton getBackButton() {

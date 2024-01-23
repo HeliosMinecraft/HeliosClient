@@ -1,7 +1,5 @@
 package dev.heliosclient.module.modules;
 
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 

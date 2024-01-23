@@ -2,10 +2,9 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.module.modules.NotificationModule;
 import dev.heliosclient.ui.notification.Notification;
 import dev.heliosclient.util.fontutils.FontRenderers;
 

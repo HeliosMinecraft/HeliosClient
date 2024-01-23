@@ -2,8 +2,8 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.util.fontutils.FontLoader;
@@ -21,11 +21,12 @@ public class FontManager implements Listener {
     public static ArrayList<String> fontNames = new ArrayList<>();
 
     public static FontManager INSTANCE = new FontManager();
-    public FontManager(){
+
+    public FontManager() {
         refresh();
     }
 
-    public void refresh(){
+    public void refresh() {
         fontNames.clear();
         fonts = FontLoader.loadFonts();
         iconFonts = FontLoader.loadIconFonts();
@@ -43,24 +44,25 @@ public class FontManager implements Listener {
             EventManager.unregister(this);
         }
     }
-    public void registerFonts(){
-            FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
-            FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
-            FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 10f);
 
-            FontRenderers.Super_Small_fxfontRenderer = new fxFontRenderer(fonts, 4f);
-            FontRenderers.Super_Small_iconRenderer = new fxFontRenderer(iconFonts, 4f);
+    public void registerFonts() {
+        FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
+        FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
+        FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 10f);
 
-            FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
-            FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
+        FontRenderers.Super_Small_fxfontRenderer = new fxFontRenderer(fonts, 4f);
+        FontRenderers.Super_Small_iconRenderer = new fxFontRenderer(iconFonts, 4f);
 
-            FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
-            FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
+        FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
+        FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
 
-            FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
-            FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
+        FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
+        FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
 
-            EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
-            HeliosClient.quadTree = new Quadtree(0);
+        FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
+        FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
+
+        EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
+        HeliosClient.quadTree = new Quadtree(0);
     }
 }

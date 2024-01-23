@@ -43,6 +43,7 @@ public class ListSetting extends Setting<ArrayList<String>> {
             MinecraftClient.getInstance().setScreen(new ListSettingScreen(this, parentScreen));
         }
     }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
         return value;
@@ -50,8 +51,9 @@ public class ListSetting extends Setting<ArrayList<String>> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value =(ArrayList<String>) MAP.get(name.replace(" ",""));
+        value = (ArrayList<String>) MAP.get(name.replace(" ", ""));
     }
+
     public boolean isOptionEnabled(String option) {
         return value.contains(option);
     }

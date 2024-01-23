@@ -3,33 +3,14 @@ package dev.heliosclient.managers;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 
-import java.lang.reflect.Method;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import java.lang.invoke.*;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import java.lang.invoke.*;
+import java.util.concurrent.TimeUnit;
 
 public class EventManager {
     private static final Map<Listener, Map<Class<?>, List<MethodHandle>>> INSTANCE = new ConcurrentHashMap<>();
@@ -38,6 +19,8 @@ public class EventManager {
         return (annotation != null) ? annotation.priority().ordinal() : Integer.MAX_VALUE;
     });
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+    private static final Map<Class<?>, Long> LAST_POSTED = new ConcurrentHashMap<>();
+    private static final long TIME_FRAME = TimeUnit.MINUTES.toMillis(1); // 1 minute timeframe
 
     public static void register(Listener listener) {
         Map<Class<?>, List<MethodHandle>> listenerMethods = new HashMap<>();
@@ -52,7 +35,6 @@ public class EventManager {
         }
         INSTANCE.put(listener, listenerMethods);
     }
-
 
     private static MethodHandle getMethodHandle(Method method) {
         try {
@@ -81,14 +63,12 @@ public class EventManager {
             }
         }
     }
-    private static final Map<Class<?>, Long> LAST_POSTED = new ConcurrentHashMap<>();
-    private static final long TIME_FRAME = TimeUnit.MINUTES.toMillis(1); // 1 minute timeframe
 
     /**
      * Posts an event but make sure that the event hasn't been posted before within the given timeframe.
      * If it has been posted within the said timeframe before, it won't post another one.
      *
-     * @param event Event to be posted
+     * @param event      Event to be posted
      * @param TIME_FRAME Time frame to check
      */
     public static void postEvent(Event event, long TIME_FRAME) {

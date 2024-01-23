@@ -29,6 +29,7 @@ public class CategoryManager {
     public static Map<String, Category> getCategories() {
         return categories;
     }
+
     public static CategoryPane findCategoryPane(Category category) {
         for (CategoryPane pane : ClickGUIScreen.INSTANCE.categoryPanes) {
             if (pane.category.equals(category)) {

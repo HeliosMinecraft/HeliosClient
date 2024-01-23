@@ -4,16 +4,14 @@ import dev.heliosclient.addon.AddonManager;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Categories;
-import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.system.Config;
-import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
-import dev.heliosclient.util.*;
-import dev.heliosclient.managers.CapeManager;
+import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.DamageUtils;
+import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.util.TimerUtils;
 import dev.heliosclient.util.cape.CapeSynchronizer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -23,9 +21,6 @@ import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class HeliosClient implements ModInitializer {
     public static final HeliosClient INSTANCE = new HeliosClient();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
@@ -33,6 +28,7 @@ public class HeliosClient implements ModInitializer {
     public static final String clientTag = ColorUtils.yellow + "Helios" + ColorUtils.white + "Client";
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
+    private static final TimerUtils configTimer = new TimerUtils();
     public static Quadtree quadTree;
     public static Config CONFIG = new Config();
     public static int uiColorA = 0xFF55FFFF;
@@ -41,8 +37,27 @@ public class HeliosClient implements ModInitializer {
     public static NotificationManager notificationManager = new NotificationManager();
     public static AddonManager addonManager = new AddonManager();
     public static ClickGUI CLICKGUI = new ClickGUI();
-    private static final TimerUtils configTimer = new TimerUtils();
 
+    public static void loadConfig() {
+        configTimer.startTimer();
+        CONFIG.loadConfig();
+        CommandManager.prefix = (String) CONFIG.getClientConfigMap().get("prefix");
+        CONFIG.loadClientConfigModules();
+        CONFIG.loadHudElements();
+        CONFIG.loadModules();
+        LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
+        configTimer.resetTimer();
+    }
+
+    public static void saveConfig() {
+        LOGGER.info("Saving config... \t Module Config being saved: " + Config.MODULES);
+        configTimer.startTimer();
+        CONFIG.getModuleConfig();
+        CONFIG.getClientConfig();
+        CONFIG.save();
+        LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
+        configTimer.resetTimer();
+    }
 
     @Override
     public void onInitialize() {
@@ -56,9 +71,8 @@ public class HeliosClient implements ModInitializer {
         HudElementList.INSTANCE = new HudElementList();
 
 
-
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            if(MC.player !=null) {
+            if (MC.player != null) {
                 for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                     Identifier capeTexture = CapeManager.cape;
                     CapeSynchronizer.sendCapeSyncPacket(player, capeTexture, CapeManager.getElytraTexture(MC.player));
@@ -85,26 +99,5 @@ public class HeliosClient implements ModInitializer {
         }
         // Save on shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(HeliosClient::saveConfig));
-    }
-
-    public static void loadConfig() {
-        configTimer.startTimer();
-        CONFIG.loadConfig();
-        CommandManager.prefix = (String) CONFIG.getClientConfigMap().get("prefix");
-        CONFIG.loadClientConfigModules();
-        CONFIG.loadHudElements();
-        CONFIG.loadModules();
-        LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
-        configTimer.resetTimer();
-    }
-
-    public static void saveConfig() {
-        LOGGER.info("Saving config... \t Module Config being saved: "+ Config.MODULES);
-        configTimer.startTimer();
-        CONFIG.getModuleConfig();
-        CONFIG.getClientConfig();
-        CONFIG.save();
-        LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
-        configTimer.resetTimer();
     }
 }

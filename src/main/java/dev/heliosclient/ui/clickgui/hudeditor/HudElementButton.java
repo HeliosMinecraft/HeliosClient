@@ -5,7 +5,6 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class HudElementButton {
@@ -19,21 +18,21 @@ public class HudElementButton {
     }
 
     public void render(DrawContext drawContext, boolean collapsed, int x, int y, float delta) {
-        if(collapsed)return;
+        if (collapsed) return;
         this.drawContext = drawContext;
         this.x = x;
         this.y = y;
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width, 12, 0xFF222222);
-        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer,drawContext.getMatrices(), hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), hudElement.name + " [" + count + "]", x + 3, y + 3, ColorManager.INSTANCE.defaultTextColor());
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button, boolean collapsed) {
-        if(collapsed)return;
+        if (collapsed) return;
         if (hovered(mouseX, mouseY) && button == 0) {
             addInstanceToList(hudElement.getClass());
             count = 0;
             HudManager.INSTANCE.hudElements.forEach(hudElement1 -> {
-                if(hudElement1 == hudElement){
+                if (hudElement1 == hudElement) {
                     count++;
                 }
             });

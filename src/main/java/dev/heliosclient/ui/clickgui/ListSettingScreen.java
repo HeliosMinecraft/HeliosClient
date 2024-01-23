@@ -2,12 +2,9 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.settings.ListSetting;
-import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
-import dev.heliosclient.ui.clickgui.gui.TextButton;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,7 +21,7 @@ public class ListSettingScreen extends AbstractSettingScreen {
     int windowWidth = 180, windowHeight;
 
     public ListSettingScreen(ListSetting listSetting, Screen parentScreen) {
-        super(Text.literal(listSetting.name), listSetting,0,180);
+        super(Text.literal(listSetting.name), listSetting, 0, 180);
         this.listSetting = listSetting;
         this.parentScreen = parentScreen;
         offsetY = 0;

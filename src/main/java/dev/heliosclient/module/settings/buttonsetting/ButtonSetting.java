@@ -3,6 +3,7 @@ package dev.heliosclient.module.settings.buttonsetting;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.ui.clickgui.gui.Table;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
@@ -14,6 +15,7 @@ import java.util.function.BooleanSupplier;
 public class ButtonSetting extends Setting<Boolean> {
     private final String ButtonCategoryText;
     private final Table table = new Table();
+    private int hovertimer = 0;
 
 
     public ButtonSetting(String ButtonCategoryText, BooleanSupplier shouldRender, boolean defaultValue) {
@@ -40,6 +42,15 @@ public class ButtonSetting extends Setting<Boolean> {
                 if (button != null)
                     button.render(drawContext, mouseX, mouseY, textRenderer);
             }
+        }
+        if (hovered(mouseX, mouseY)) {
+            hovertimer++;
+        } else {
+            hovertimer = 0;
+        }
+
+        if (hovertimer >= 150) {
+            Tooltip.tooltip.changeText(description);
         }
     }
 

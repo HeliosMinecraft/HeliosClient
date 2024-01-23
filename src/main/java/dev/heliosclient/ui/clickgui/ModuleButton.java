@@ -10,25 +10,20 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.Hitbox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.TimerUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
-import java.util.AbstractMap;
-import java.util.Set;
 
 public class ModuleButton implements Listener {
     public final Screen parentScreen;
@@ -41,14 +36,14 @@ public class ModuleButton implements Listener {
     public boolean settingsOpen = false;
     public int boxHeight = 0;
     public boolean animationDone = false;
+    public Screen screen;
+    public boolean collapsed = false;
     float animationSpeed = 0.13f;
     float delay = 0;
     int settingHeight = 0;
     private boolean faded = true;
     private float targetY;
     private float animationProgress = 0;
-    public Screen screen;
-    public boolean collapsed = false;
 
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
@@ -118,18 +113,17 @@ public class ModuleButton implements Listener {
         hitBox.set(x, y, width, height);
 
         Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
-        Color fillColorEnd = module.isActive() ?ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
-        Color blendedColor = ColorUtils.blend(fillColorStart,fillColorEnd,1/2f);
+        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
+        Color blendedColor = ColorUtils.blend(fillColorStart, fillColorEnd, 1 / 2f);
 
-        if(hitBox.contains(mouseX,mouseY)) {
-            Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y, width, height,fillColorStart,fillColorEnd,fillColorEnd,fillColorStart, 2,5,blendedColor);
-        }
-        else{
-            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart,fillColorEnd,fillColorEnd,fillColorStart,x + 1, y, width, height, 2);
+        if (hitBox.contains(mouseX, mouseY)) {
+            Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y, width, height, fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, 2, 5, blendedColor);
+        } else {
+            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y, width, height, 2);
         }
         if (settingsOpen && boxHeight >= 4) {
-            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100),  ColorUtils.changeAlpha(fillColorStart, 100),x + 1, y + height, width, boxHeight + 2, 2);
-           // Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 1, y + height, width, boxHeight + 2,2,ColorUtils.changeAlpha(blendedColor, 100).getRGB()); ;
+            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorStart, 100), x + 1, y + height, width, boxHeight + 2, 2);
+            // Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 1, y + height, width, boxHeight + 2,2,ColorUtils.changeAlpha(blendedColor, 100).getRGB()); ;
         }
 
         int textY = y + (height - moduleNameHeight) / 2;
@@ -166,7 +160,7 @@ public class ModuleButton implements Listener {
                 }
 
                 // If offset is more than Y level, render the setting.
-                if(buttonYOffset >= y + 3) {
+                if (buttonYOffset >= y + 3) {
                     setting.quickSettings = settingsOpen;
 
                     int animatedY = getAnimatedY(setting, buttonYOffset);
@@ -180,16 +174,15 @@ public class ModuleButton implements Listener {
                 buttonYOffset += 2;
             }
             setBoxHeight(buttonYOffset - y - this.height - 2);
-        }
-        else{
+        } else {
             module.quickSettings.forEach(this::resetAnimation);
         }
         // Return the total height of the quick settings
         return buttonYOffset > 2 ? buttonYOffset - y - this.height - 2 : 0;
     }
 
-    public int getAnimatedY(Setting setting, int offset){
-        return  Math.round(setting.getY() + (offset - setting.getY()) * setting.getAnimationProgress());
+    public int getAnimatedY(Setting setting, int offset) {
+        return Math.round(setting.getY() + (offset - setting.getY()) * setting.getAnimationProgress());
     }
 
     private void resetAnimation(Setting setting) {
@@ -198,9 +191,9 @@ public class ModuleButton implements Listener {
         setting.setAnimationProgress(0.5f);
     }
 
-   @SubscribeEvent
+    @SubscribeEvent
     public boolean mouseClicked(MouseClickEvent event) {
-        if (screen != null && event.getScreen() == screen){
+        if (screen != null && event.getScreen() == screen) {
             double mouseX = event.getMouseX();
             double mouseY = event.getMouseY();
             int button = event.getButton();
@@ -227,15 +220,15 @@ public class ModuleButton implements Listener {
                 }
             }
 
-        if (collapsed) {
-            for (Setting setting : module.quickSettings) {
-               resetAnimation(setting);
+            if (collapsed) {
+                for (Setting setting : module.quickSettings) {
+                    resetAnimation(setting);
+                }
+                setFaded(true);
+                animationDone = false;
+                setAnimationProgress(0.0f);
             }
-            setFaded(true);
-            animationDone = false;
-            setAnimationProgress(0.0f);
         }
-    }
         return false;
     }
 

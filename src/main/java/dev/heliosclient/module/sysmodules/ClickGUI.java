@@ -1,9 +1,7 @@
 package dev.heliosclient.module.sysmodules;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
-import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
@@ -20,7 +18,6 @@ import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.MinecraftClient;
 
@@ -28,7 +25,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.heliosclient.managers.FontManager.*;
+import static dev.heliosclient.managers.FontManager.fontSize;
+import static dev.heliosclient.managers.FontManager.fonts;
 
 /**
  * Setting for ClickGUI.
@@ -143,17 +141,6 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> TooltipMode.value == 1)
             .build()
     );
-    ButtonSetting loadFonts = sgGeneral.add(new ButtonSetting.Builder()
-            .name("Font")
-            .build()
-    );
-    BooleanSetting Pause = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Pause game")
-            .description("Pause the game when Click GUI is on.")
-            .onSettingChange(this)
-            .value(false)
-            .build()
-    );
     public BooleanSetting ScreenHelp = sgGeneral.add(new BooleanSetting.Builder()
             .name("Show keybind Help")
             .description("Show keybind Help for client screens.")
@@ -161,15 +148,7 @@ public class ClickGUI extends Module_ {
             .value(true)
             .build()
     );
-    BooleanSetting Keybinds = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Show Keybinds")
-            .description("Show keybinds in the Module Button.")
-            .onSettingChange(this)
-            .value(true)
-            .build()
-    );
     public SettingGroup sgRender = new SettingGroup("Render");
-
     public CycleSetting ColorMode = sgRender.add(new CycleSetting.Builder()
             .name("Color Mode")
             .description("Color mode for parts of the client")
@@ -184,16 +163,16 @@ public class ClickGUI extends Module_ {
             .onSettingChange(this)
             .value(new Color(ColorManager.INSTANCE.clickGuiSecondary))
             .defaultValue(new Color(ColorManager.INSTANCE.clickGuiSecondary))
-            .shouldRender(()-> ColorMode.value == 0)
+            .shouldRender(() -> ColorMode.value == 0)
             .build()
     );
     public CycleSetting GradientType = sgRender.add(new CycleSetting.Builder()
             .name("Gradient Type")
             .description("Gradient type for the gradient color mode")
             .onSettingChange(this)
-            .value(new ArrayList<>(List.of("Rainbow", "DaySky", "EveningSky", "NightSky","Linear2D")))
+            .value(new ArrayList<>(List.of("Rainbow", "DaySky", "EveningSky", "NightSky", "Linear2D")))
             .defaultListIndex(0)
-            .shouldRender(()-> ColorMode.value == 1)
+            .shouldRender(() -> ColorMode.value == 1)
             .build()
     );
     public RGBASetting linear2Start = sgRender.add(new RGBASetting.Builder()
@@ -202,7 +181,7 @@ public class ClickGUI extends Module_ {
             .onSettingChange(this)
             .value(Color.GREEN)
             .defaultValue(Color.GREEN)
-            .shouldRender(()-> GradientType.value == 4 && ColorMode.value == 1)
+            .shouldRender(() -> GradientType.value == 4 && ColorMode.value == 1)
             .build()
     );
     public RGBASetting linear2end = sgRender.add(new RGBASetting.Builder()
@@ -210,11 +189,10 @@ public class ClickGUI extends Module_ {
             .description("Linear Color End of Linear mode")
             .onSettingChange(this)
             .value(Color.YELLOW)
-            .shouldRender(()-> GradientType.value == 4 && ColorMode.value == 1)
+            .shouldRender(() -> GradientType.value == 4 && ColorMode.value == 1)
             .defaultValue(Color.YELLOW)
             .build()
     );
-
     public RGBASetting AccentColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Accent color")
             .description("Accent color of Click GUI.")
@@ -239,7 +217,26 @@ public class ClickGUI extends Module_ {
             .defaultValue(new Color(ColorManager.INSTANCE.defaultTextColor))
             .build()
     );
-   public ClickGUI() {
+    ButtonSetting loadFonts = sgGeneral.add(new ButtonSetting.Builder()
+            .name("Font")
+            .build()
+    );
+    BooleanSetting Pause = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Pause game")
+            .description("Pause the game when Click GUI is on.")
+            .onSettingChange(this)
+            .value(false)
+            .build()
+    );
+    BooleanSetting Keybinds = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Show Keybinds")
+            .description("Show keybinds in the Module Button.")
+            .onSettingChange(this)
+            .value(true)
+            .build()
+    );
+
+    public ClickGUI() {
         super("ClickGUI", "ClickGui related stuff.", Categories.RENDER);
 
         addSettingGroup(sgUI);
@@ -248,57 +245,57 @@ public class ClickGUI extends Module_ {
         addSettingGroup(sgTooltip);
         addSettingGroup(sgConfig);
 
-         active.value = true;
+        active.value = true;
         loadFonts.addButton("Load Fonts", 0, 0, () -> {
-            FontManager.INSTANCE .refresh();
+            FontManager.INSTANCE.refresh();
             Font.setOptions(FontManager.fontNames);
 
             HeliosClient.LOGGER.info("Reloaded fonts successfully!");
         });
 
-       reloadAllConfigs.addButton("Reload All Configs",0,0,()->{
-           HeliosClient.CONFIG.init();
-           switchConfigs.options = HeliosClient.CONFIG.MODULE_CONFIGS;
-           int var = switchConfigs.value;
-           HeliosClient.loadConfig();
-           switchConfigs.value = var;
-       });
+        reloadAllConfigs.addButton("Reload All Configs", 0, 0, () -> {
+            HeliosClient.CONFIG.init();
+            switchConfigs.options = HeliosClient.CONFIG.MODULE_CONFIGS;
+            int var = switchConfigs.value;
+            HeliosClient.loadConfig();
+            switchConfigs.value = var;
+        });
         EventManager.register(this);
-   }
-   @Override
-   public void onSettingChange(Setting setting) {
-       super.onSettingChange(setting);
+    }
 
-       Tooltip.tooltip.mode = TooltipMode.value;
-       Tooltip.tooltip.fixedPos = TooltipPos.value;
+    @Override
+    public void onSettingChange(Setting setting) {
+        super.onSettingChange(setting);
+
+        Tooltip.tooltip.mode = TooltipMode.value;
+        Tooltip.tooltip.fixedPos = TooltipPos.value;
 
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
         pause = Pause.value;
         keybinds = Keybinds.value;
 
-        if(setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font){
+        if (setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font) {
             fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
             FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
             EventManager.postEvent(new FontChangeEvent(fonts));
         }
 
-       if(setting == FontRenderer || setting == Font) {
-           FontManager.INSTANCE.registerFonts();
-       }
+        if (setting == FontRenderer || setting == Font) {
+            FontManager.INSTANCE.registerFonts();
+        }
 
-       if(setting == switchConfigs) {
-           HeliosClient.saveConfig();
-           Config.MODULES = HeliosClient.CONFIG.MODULE_CONFIGS.get(switchConfigs.value).replace(".toml", "");;
-           HeliosClient.loadConfig();
-           for(NavBarItem item:  NavBarManager.INSTANCE.navBarItems){
-               if(item.name.equalsIgnoreCase("ClickGUI")){
-                   item.target = ClickGUIScreen.INSTANCE;
-               }
-           }
-           EventManager.postEvent(new FontChangeEvent(fonts));
-       }
-   }
-
+        if (setting == switchConfigs) {
+            HeliosClient.saveConfig();
+            Config.MODULES = HeliosClient.CONFIG.MODULE_CONFIGS.get(switchConfigs.value).replace(".toml", "");
+            HeliosClient.loadConfig();
+            for (NavBarItem item : NavBarManager.INSTANCE.navBarItems) {
+                if (item.name.equalsIgnoreCase("ClickGUI")) {
+                    item.target = ClickGUIScreen.INSTANCE;
+                }
+            }
+            EventManager.postEvent(new FontChangeEvent(fonts));
+        }
+    }
 
 
     @Override
@@ -326,24 +323,24 @@ public class ClickGUI extends Module_ {
 
         fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
 
-        if(MinecraftClient.getInstance().getWindow() != null)
-        FontManager.INSTANCE.registerFonts();
+        if (MinecraftClient.getInstance().getWindow() != null)
+            FontManager.INSTANCE.registerFonts();
 
-        if(ColorMode.value == 0) {
+        if (ColorMode.value == 0) {
             ColorManager.INSTANCE.primaryGradientStart = staticColor.getColor();
             ColorManager.INSTANCE.primaryGradientEnd = staticColor.getColor();
         }
-        if(ColorMode.value == 1) {
-            switch(GradientType.value){
-                case 0->{
+        if (ColorMode.value == 1) {
+            switch (GradientType.value) {
+                case 0 -> {
                     ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
                     ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor2();
                 }
-                case 1, 2, 3 ->{
+                case 1, 2, 3 -> {
                     ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
                     ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor();
                 }
-                case 4->{
+                case 4 -> {
                     ColorManager.INSTANCE.primaryGradientStart = linear2Start.getColor();
                     ColorManager.INSTANCE.primaryGradientEnd = linear2end.getColor();
                 }
@@ -354,6 +351,7 @@ public class ClickGUI extends Module_ {
     @Override
     public void toggle() {
     }
+
     public enum ScrollTypes {
         OLD,
         NEW

@@ -2,8 +2,6 @@ package dev.heliosclient.hud;
 
 import dev.heliosclient.hud.hudelements.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -23,12 +21,12 @@ public class HudElementList {
     }
 
     public void registerElement(HudElementData hudElementData) {
-        elementDataMap.put(hudElementData.name(),hudElementData);
+        elementDataMap.put(hudElementData.name(), hudElementData);
     }
 
     public void registerElements(HudElementData... datas) {
-        for (HudElementData module : datas){
-            elementDataMap.put(module.name(),module);
+        for (HudElementData module : datas) {
+            elementDataMap.put(module.name(), module);
         }
     }
 }

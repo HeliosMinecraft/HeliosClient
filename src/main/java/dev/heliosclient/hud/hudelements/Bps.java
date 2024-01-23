@@ -6,7 +6,6 @@ import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.Vec3d;
@@ -14,17 +13,15 @@ import net.minecraft.util.math.Vec3d;
 
 public class Bps extends HudElement {
 
-    public static HudElementData<Bps> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second", Bps::new);
-
     public Bps() {
         super(DATA);
         this.width = 40;
         this.height = 10;
-    }
+    }    public static HudElementData<Bps> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second", Bps::new);
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
-        super.renderElement(drawContext,textRenderer);
+        super.renderElement(drawContext, textRenderer);
         String text = "Speed: ";
         String value = ColorUtils.gray + MathUtils.round(moveSpeed(), 2);
         this.width = Math.round(Renderer2D.getStringWidth(text + value));
@@ -39,4 +36,6 @@ public class Bps extends HudElement {
 
         return Math.abs(MathUtils.length2D(move));
     }
+
+
 }

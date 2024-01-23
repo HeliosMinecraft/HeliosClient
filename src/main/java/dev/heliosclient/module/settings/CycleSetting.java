@@ -2,7 +2,6 @@ package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.module.Module_;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.Renderer2D;
@@ -24,7 +23,7 @@ public class CycleSetting extends Setting<Integer> {
     public List options;
     public int value;
     ISettingChange iSettingChange;
-    Color color  = new Color(4, 3, 3, 157);
+    Color color = new Color(4, 3, 3, 157);
 
     public <T> CycleSetting(String name, String description, ISettingChange iSettingChange, List<T> options, int value, BooleanSupplier shouldRender, int defaultValue) {
         super(shouldRender, defaultValue);
@@ -59,9 +58,8 @@ public class CycleSetting extends Setting<Integer> {
 
         if (options.isEmpty() || options.size() - 1 < value) {
             Renderer2D.drawFixedString(drawContext.getMatrices(), "No option found!", x + 2, y + 4, 0xFFFF0000);
-        }
-        else {
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + Renderer2D.getFxStringWidth(name + ": ") , y + 2, Renderer2D.getFxStringWidth(options.get(value).toString()) + 4,Renderer2D.getFxStringHeight(options.get(value).toString()) + 3,3, color.getRGB());
+        } else {
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + Renderer2D.getFxStringWidth(name + ": "), y + 2, Renderer2D.getFxStringWidth(options.get(value).toString()) + 4, Renderer2D.getFxStringHeight(options.get(value).toString()) + 3, 3, color.getRGB());
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + options.get(value), x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
         }
 
@@ -82,8 +80,7 @@ public class CycleSetting extends Setting<Integer> {
 
         if (options.isEmpty() || options.size() - 1 < value) {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "No option found!", x + 2, y + 2, 0xFFFF0000);
-        }
-        else {
+        } else {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + options.get(value).toString().substring(0, Math.min(12, options.get(value).toString().length())) + "...", x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
         }
 
@@ -124,9 +121,10 @@ public class CycleSetting extends Setting<Integer> {
             iSettingChange.onSettingChange(this);
         }
     }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
-        if(options.isEmpty() || options.size() - 1 < value) {
+        if (options.isEmpty() || options.size() - 1 < value) {
             return null;
         }
         return options.get(value);
@@ -134,11 +132,11 @@ public class CycleSetting extends Setting<Integer> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        int optionIndex = options.indexOf(MAP.get(name.replace(" ","")));
-        if(optionIndex != -1) {
+        int optionIndex = options.indexOf(MAP.get(name.replace(" ", "")));
+        if (optionIndex != -1) {
             value = optionIndex;
-        } else{
-            LOGGER.error("Option not found for: " + MAP.get(name.replace(" ","")) +", " + name + " Setting during loading config: "+ Config.MODULES);
+        } else {
+            LOGGER.error("Option not found for: " + MAP.get(name.replace(" ", "")) + ", " + name + " Setting during loading config: " + Config.MODULES);
         }
     }
 

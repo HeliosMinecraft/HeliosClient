@@ -22,13 +22,11 @@ import java.util.Comparator;
 public class ModuleList extends HudElement implements Listener {
 
     private ArrayList<Module_> enabledModules = ModuleManager.INSTANCE.getEnabledModules();
-    public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
-
     public ModuleList() {
         super(DATA);
         this.width = 50;
         EventManager.register(this);
-    }
+    }    public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
@@ -48,7 +46,7 @@ public class ModuleList extends HudElement implements Listener {
         this.width = maxWidth + 5;
         this.height = totalY + 2;
 
-        super.renderElement(drawContext,textRenderer);
+        super.renderElement(drawContext, textRenderer);
 
         for (Module_ m : enabledModules) {
             if (!m.showInModulesList.value) continue;
@@ -66,5 +64,7 @@ public class ModuleList extends HudElement implements Listener {
     public void update(TickEvent.CLIENT event) {
         enabledModules = ModuleManager.INSTANCE.getEnabledModules();
     }
+
+
 
 }

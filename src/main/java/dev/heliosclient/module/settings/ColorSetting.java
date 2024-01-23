@@ -2,7 +2,6 @@ package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
@@ -234,6 +233,7 @@ public class ColorSetting extends Setting<Integer> {
         slidingGreen = false;
         slidingBlue = false;
     }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
         return value;
@@ -241,7 +241,7 @@ public class ColorSetting extends Setting<Integer> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value = (int) MAP.get(name.replace(" ",""));
+        value = (int) MAP.get(name.replace(" ", ""));
     }
 
     public static class Builder extends SettingBuilder<Builder, Integer, ColorSetting> {

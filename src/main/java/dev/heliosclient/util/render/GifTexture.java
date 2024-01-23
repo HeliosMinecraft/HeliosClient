@@ -2,7 +2,6 @@ package dev.heliosclient.util.render;
 
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;

@@ -4,10 +4,8 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CategoryManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
-import dev.heliosclient.module.Category;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
-import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
@@ -47,7 +45,8 @@ public class ClickGUIScreen extends Screen {
 
         searchBar = new SearchBar();
     }
-    public void reset(){
+
+    public void reset() {
         scrollX = 0;
         scrollY = 0;
         categoryPanes = new ArrayList<CategoryPane>();
@@ -70,7 +69,6 @@ public class ClickGUIScreen extends Screen {
     }
 
 
-
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         for (CategoryPane category : categoryPanes) {
@@ -89,7 +87,7 @@ public class ClickGUIScreen extends Screen {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
 
-        if(HeliosClient.CLICKGUI.ScreenHelp.value) {
+        if (HeliosClient.CLICKGUI.ScreenHelp.value) {
             float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Toggle Module", 2, drawContext.getScaledWindowHeight() - (3 * fontHeight) - 3 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Middle Click - Open QuickSettings", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
@@ -101,7 +99,6 @@ public class ClickGUIScreen extends Screen {
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
             if (category.category == Categories.SEARCH && !category.collapsed) {
                 category.addModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()));
-
                 if (ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()).size() == 1) {
                     category.keepOnlyModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()).get(0));
                 }

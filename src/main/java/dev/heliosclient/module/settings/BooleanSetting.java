@@ -1,9 +1,7 @@
 package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
-import com.moandjiezana.toml.TomlWriter;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.module.Module_;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
@@ -96,7 +94,7 @@ public class BooleanSetting extends Setting<Boolean> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        value = (boolean) MAP.get(name.replace(" ",""));
+        value = (boolean) MAP.get(name.replace(" ", ""));
     }
 
     public static class Builder extends SettingBuilder<Builder, Boolean, BooleanSetting> {

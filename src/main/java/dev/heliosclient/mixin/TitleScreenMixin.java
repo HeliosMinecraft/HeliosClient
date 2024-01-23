@@ -20,6 +20,7 @@ import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -32,7 +33,6 @@ public abstract class TitleScreenMixin extends Screen {
     private boolean doBackgroundFade;
 
     @Shadow
-    @Final
     private long backgroundFadeStart;
 
     public TitleScreenMixin() {
@@ -50,8 +50,6 @@ public abstract class TitleScreenMixin extends Screen {
         float g = this.doBackgroundFade ? MathHelper.clamp(f - 1.0F, 0.0F, 1.0F) : 1.0F;
         int l = MathHelper.ceil(g * 255.0F) << 24;
 
-        //drawContext.drawTextWithShadow(this.textRenderer, HeliosClient.clientTag + " " + HeliosClient.versionTag, 2, 2, 16777215 | l);
-
         this.addDrawableChild(new PressableTextWidget(2, 2, 150, 10, Text.literal(HeliosClient.clientTag + " " + HeliosClient.versionTag), (button) -> {
             if (this.client != null) {
                 this.client.setScreen(HeliosClientInfoScreen.INSTANCE);
@@ -59,7 +57,7 @@ public abstract class TitleScreenMixin extends Screen {
         }, this.textRenderer));
     }
 
-    @Inject(at = @At("TAIL"), method = "render")
+    @Inject(at = @At("RETURN"), method = "render")
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         Renderer2D.setDrawContext(context);
 
@@ -70,13 +68,13 @@ public abstract class TitleScreenMixin extends Screen {
 
         // Calculate the position for the subtitle
         int subtitleX = (this.width - textRenderer.getWidth(subtitleText)) / 2;
-        int subtitleY = this.height / 4 + 48 + 72 + 12 + 50;
+        int subtitleY = this.height / 4 + 182 - 10;
 
         // Draw the subtitle
         context.drawText(textRenderer, subtitleText, subtitleX, subtitleY, 0xFFFFFF, true);
     }
 
-    @Inject(at = @At("TAIL"), method = "init")
+    @Inject(at = @At("RETURN"), method = "init")
     private void altManagerButton(CallbackInfo callbackInfo) {
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Alt Manager"), this::gotoAltManagerScreen)
                 .position(this.width - 102, 0)
@@ -84,6 +82,7 @@ public abstract class TitleScreenMixin extends Screen {
                 .build());
     }
 
+    @Unique
     private void gotoAltManagerScreen(ButtonWidget button) {
         HeliosClient.MC.setScreen(AltManagerScreen.INSTANCE);
     }

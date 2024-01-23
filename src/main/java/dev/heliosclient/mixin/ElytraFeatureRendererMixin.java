@@ -1,7 +1,7 @@
 package dev.heliosclient.mixin;
 
-import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.managers.CapeManager;
+import dev.heliosclient.managers.ModuleManager;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -32,10 +32,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ElytraFeatureRendererMixin<T extends LivingEntity, M extends EntityModel<T>> extends FeatureRenderer<T, M> {
     @Shadow
     @Final
-    private ElytraEntityModel<T> elytra;
+    private static final Identifier SKIN = new Identifier("textures/entity/elytra.png");
     @Shadow
     @Final
-    private static final Identifier SKIN = new Identifier("textures/entity/elytra.png");
+    private ElytraEntityModel<T> elytra;
 
 
     public ElytraFeatureRendererMixin(FeatureRendererContext<T, M> context) {

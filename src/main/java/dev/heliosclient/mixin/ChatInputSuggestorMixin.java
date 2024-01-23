@@ -24,19 +24,15 @@ import java.util.concurrent.CompletableFuture;
 public abstract class ChatInputSuggestorMixin {
 
     @Shadow
-    private ParseResults<CommandSource> parse;
-
-    @Shadow
     @Final
     TextFieldWidget textField;
-
     @Shadow
     @Final
     MinecraftClient client;
-
     @Shadow
     boolean completingSuggestions;
-
+    @Shadow
+    private ParseResults<CommandSource> parse;
     @Shadow
     private CompletableFuture<Suggestions> pendingSuggestions;
 

@@ -25,7 +25,7 @@ public abstract class GameRendererMixin {
 
     @Shadow
     @Final
-    private MinecraftClient client;
+    MinecraftClient client;
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = {"ldc=hand"}), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private void render(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {

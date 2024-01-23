@@ -2,13 +2,12 @@ package dev.heliosclient.module;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.*;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
-import dev.heliosclient.module.modules.NotificationModule;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
@@ -106,6 +105,7 @@ public abstract class Module_ implements Listener, ISettingChange {
     public void addQuickSetting(Setting setting) {
         this.quickSettings.add(setting);
     }
+
     public void addQuickSettings(List<Setting> setting) {
         this.quickSettings.addAll(setting);
     }

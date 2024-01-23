@@ -2,7 +2,7 @@ package dev.heliosclient.module.modules;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.*;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.block.BlockBreakEvent;
 import dev.heliosclient.event.events.block.BlockInteractEvent;
 import dev.heliosclient.event.events.player.*;
@@ -14,19 +14,13 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.Renderer3D;
 import dev.heliosclient.util.render.GradientUtils;
-import dev.heliosclient.util.render.WorldRenderer;
-import dev.heliosclient.util.render.color.LineColor;
 import me.x150.renderer.render.Renderer3d;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 
 public class Test extends Module_ {

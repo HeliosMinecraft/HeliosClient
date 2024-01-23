@@ -2,8 +2,8 @@ package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
-import dev.heliosclient.event.events.player.PlayerJoinEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.player.PlayerJoinEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -40,7 +40,7 @@ public abstract class MinecraftClientMixin {
     @Inject(at = @At("TAIL"), method = "scheduleStop")
     public void onShutdown(CallbackInfo ci) {
         // FUCK LAG
-        HeliosClient.INSTANCE.saveConfig();
+        HeliosClient.saveConfig();
     }
 
     @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V", at = @At("HEAD"), cancellable = true)
