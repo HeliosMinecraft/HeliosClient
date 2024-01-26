@@ -17,6 +17,14 @@ public class NotificationModule extends Module_ {
             .defaultValue(true)
             .build()
     );
+    public BooleanSetting clientNotification = sgNotifications.add(new BooleanSetting.Builder()
+            .name("Client Info")
+            .description("Whether to show any messages or info of the client as a notification.")
+            .onSettingChange(this)
+            .value(true)
+            .defaultValue(true)
+            .build()
+    );
     public BooleanSetting playSound = sgConfig.add(new BooleanSetting.Builder()
             .name("Play Sound")
             .description("Whether to play a sound when a notification is made")

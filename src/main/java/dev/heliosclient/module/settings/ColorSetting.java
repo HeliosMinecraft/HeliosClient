@@ -241,6 +241,11 @@ public class ColorSetting extends Setting<Integer> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
+        if( MAP.get(name.replace(" ", "")) == null){
+            value = defaultValue;
+            return;
+        }
         value = (int) MAP.get(name.replace(" ", ""));
     }
 

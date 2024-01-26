@@ -97,6 +97,11 @@ public class StringListSetting extends Setting<String[]> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
+        if(toml.getList(name.replace(" ", "")) == null){
+            value = defaultValue;
+            return;
+        }
         int a;
         inputBoxes.clear();
         List<String> list = toml.getList(name.replace(" ", ""));

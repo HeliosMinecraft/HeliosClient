@@ -15,13 +15,17 @@ import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.FileUtils;
+import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.MinecraftClient;
 
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,6 +111,15 @@ public class ClickGUI extends Module_ {
             .build()
     );
     private final SettingGroup sgConfig = new SettingGroup("Config");
+    public StringSetting configPath = sgConfig.add(new StringSetting.Builder()
+            .name("Save Config Path")
+            .description("Saves current config to that path. It only saves there for temporary purposes, otherwise it selects the default HeliosClient directory")
+            .value(HeliosClient.CONFIG.configManager.getConfigDir().getAbsolutePath())
+            .inputMode(InputBox.InputMode.ALL)
+            .characterLimit(300)
+            .defaultValue(HeliosClient.CONFIG.configManager.getConfigDir().getAbsolutePath())
+            .build()
+    );
     public DropDownSetting switchConfigs = sgConfig.add(new DropDownSetting.Builder()
             .name("Switch Module Config")
             .defaultListIndex(0)
@@ -116,9 +129,9 @@ public class ClickGUI extends Module_ {
             .build()
 
     );
-    public ButtonSetting reloadAllConfigs = sgConfig.add(new ButtonSetting.Builder()
-            .name("Reload configs")
-            .description("Reload Configs")
+    public ButtonSetting config = sgConfig.add(new ButtonSetting.Builder()
+            .name("Configs")
+            .description("Reload or save Configs")
             .build()
     );
     public SettingGroup sgTooltip = new SettingGroup("ToolTip");
@@ -246,6 +259,8 @@ public class ClickGUI extends Module_ {
         addSettingGroup(sgConfig);
 
         active.value = true;
+        configPath.setShouldSaveOrLoad(false);
+
         loadFonts.addButton("Load Fonts", 0, 0, () -> {
             FontManager.INSTANCE.refresh();
             Font.setOptions(FontManager.fontNames);
@@ -253,13 +268,24 @@ public class ClickGUI extends Module_ {
             HeliosClient.LOGGER.info("Reloaded fonts successfully!");
         });
 
-        reloadAllConfigs.addButton("Reload All Configs", 0, 0, () -> {
+        config.addButton("Reload All Configs", 0, 0, () -> {
             HeliosClient.CONFIG.init();
             switchConfigs.options = HeliosClient.CONFIG.MODULE_CONFIGS;
             int var = switchConfigs.value;
             HeliosClient.loadConfig();
             switchConfigs.value = var;
         });
+        config.addButton("Save Config", 1, 0,()-> {
+            File pathFile = new File(configPath.value);
+            if(!pathFile.exists() || !pathFile.isDirectory() || !FileUtils.doesFileInPathExist(configPath.value)){
+                AnimationUtils.addErrorToast(ColorUtils.red + "Invalid Save Path. Path should be a valid directory", true, 2000);
+                return;
+            }
+            HeliosClient.CONFIG.configManager.setConfigDir(pathFile);
+            HeliosClient.saveConfig();
+        });
+        config.addButton("Load Config", 1, 1, HeliosClient::loadConfig);
+
         EventManager.register(this);
     }
 

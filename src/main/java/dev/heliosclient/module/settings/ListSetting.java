@@ -51,6 +51,11 @@ public class ListSetting extends Setting<ArrayList<String>> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
+        if( MAP.get(name.replace(" ", "")) == null){
+            value = defaultValue;
+            return;
+        }
         value = (ArrayList<String>) MAP.get(name.replace(" ", ""));
     }
 

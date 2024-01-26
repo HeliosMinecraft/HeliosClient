@@ -359,6 +359,12 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
+        if(toml.getList(this.name.replace(" ", "")) == null){
+            value = defaultValue;
+            rainbow = defaultRainbow;
+            return;
+        }
         value = ColorUtils.intToColor(Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(0).toString()));
         rainbow = Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(1).toString()) == 1;
         updateHandles();

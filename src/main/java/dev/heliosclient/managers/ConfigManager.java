@@ -23,7 +23,7 @@ public class ConfigManager {
             .indentTablesBy(2)
             .build();
     // Directory where the configuration files are stored.
-    private final File configDir;
+    private File configDir;
 
     // Constructor initializes the configuration directory.
     public ConfigManager(MinecraftClient mc) {
@@ -67,6 +67,10 @@ public class ConfigManager {
 
     public File getConfigDir() {
         return configDir;
+    }
+
+    public void setConfigDir(File configDir) {
+        this.configDir = configDir;
     }
 
     /**

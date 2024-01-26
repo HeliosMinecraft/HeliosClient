@@ -132,6 +132,11 @@ public class CycleSetting extends Setting<Integer> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
+        if(MAP.get(name.replace(" ", "")) == null){
+            value = defaultValue;
+            return;
+        }
         int optionIndex = options.indexOf(MAP.get(name.replace(" ", "")));
         if (optionIndex != -1) {
             value = optionIndex;

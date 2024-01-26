@@ -63,11 +63,18 @@ public class StringSetting extends Setting<String> {
 
     @Override
     public Object saveToToml(List<Object> objectList) {
-        return value;
+        return shouldSaveOrLoad? value : "";
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        if(!shouldSaveOrLoad){
+            return;
+        }
+        if(toml.getString(name.replace(" ", "")) == null){
+            value = defaultValue;
+            return;
+        }
         value = toml.getString(name.replace(" ", ""));
         inputBox.setValue(value);
     }

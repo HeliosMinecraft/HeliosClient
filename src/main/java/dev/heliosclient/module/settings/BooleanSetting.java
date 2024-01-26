@@ -94,6 +94,11 @@ public class BooleanSetting extends Setting<Boolean> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
+        if( MAP.get(name.replace(" ", "")) == null){
+            value = defaultValue;
+            return;
+        }
         value = (boolean) MAP.get(name.replace(" ", ""));
     }
 

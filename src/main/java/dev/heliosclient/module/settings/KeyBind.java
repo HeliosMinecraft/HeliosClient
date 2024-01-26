@@ -123,6 +123,11 @@ public class KeyBind extends Setting<Integer> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
+        if(toml.getString(name.replace(" ", "")) == null){
+            value = defaultValue;
+            return;
+        }
         if (Objects.equals(toml.getString(name.replace(" ", "")), "None")) {
             value = -1;
         } else {

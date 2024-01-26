@@ -1,13 +1,16 @@
 package dev.heliosclient;
 
 import dev.heliosclient.addon.AddonManager;
+import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Categories;
+import dev.heliosclient.module.modules.NotificationModule;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
+import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.DamageUtils;
 import dev.heliosclient.util.SoundUtils;
@@ -16,6 +19,7 @@ import dev.heliosclient.util.cape.CapeSynchronizer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.sound.SoundManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -46,7 +50,14 @@ public class HeliosClient implements ModInitializer {
         CONFIG.loadHudElements();
         CONFIG.loadModules();
         LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
+        if(shouldSendNotification()){
+            notificationManager.addNotification(new InfoNotification("Loading Completed", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+        }
         configTimer.resetTimer();
+
+        // Font event is posted to allow the GUI to reset its calculation for the new font by the config.
+        if(FontManager.fonts != null)
+        EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
     }
 
     public static void saveConfig() {
@@ -56,6 +67,9 @@ public class HeliosClient implements ModInitializer {
         CONFIG.getClientConfig();
         CONFIG.save();
         LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
+        if(shouldSendNotification()){
+            notificationManager.addNotification(new InfoNotification("Saving Completed", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+        }
         configTimer.resetTimer();
     }
 
@@ -99,5 +113,8 @@ public class HeliosClient implements ModInitializer {
         }
         // Save on shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(HeliosClient::saveConfig));
+    }
+    private static boolean shouldSendNotification(){
+        return (notificationManager != null && ModuleManager.notificationModule != null && ModuleManager.notificationModule.clientNotification.value && MC.getWindow() != null);
     }
 }

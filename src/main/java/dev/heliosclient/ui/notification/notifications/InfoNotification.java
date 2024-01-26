@@ -23,6 +23,15 @@ public class InfoNotification extends Notification {
             SoundUtils.playSound(soundEvent, (float) (ModuleManager.notificationModule.volume.value / 100f), pitch);
         }
     }
+    public InfoNotification(String title, String description, long endDelay, SoundEvent soundEvent) {
+        this.title = title;
+        this.description = description;
+        this.endDelay = endDelay;
+        this.WIDTH = 50;
+        if (ModuleManager.notificationModule.playSound.value && ModuleManager.notificationModule.isActive()) {
+            SoundUtils.playSound(soundEvent, (float) (ModuleManager.notificationModule.volume.value / 100f), 0.5f);
+        }
+    }
 
     @Override
     public void render(MatrixStack matrices, int y, fxFontRenderer fontRenderer) {

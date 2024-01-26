@@ -16,7 +16,9 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 public abstract class Setting<T> implements Listener, ISaveAndLoad {
     public final T defaultValue;
@@ -38,6 +40,9 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     int hovertimer = 0;
     private int hoverAnimationTimer = 0;
     private float targetY;
+    protected boolean shouldSaveOrLoad = true;
+    private Consumer<RenderContext> alsoRenderLogic = (renderContext) -> {};
+
 
     public Setting(BooleanSupplier shouldRender, T defaultValue) {
         this.shouldRender = shouldRender;
@@ -108,12 +113,31 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
 
             FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uEA1D", (x + 203.5f - FontRenderers.Small_iconRenderer.getStringWidth("\uEA1D")), (y + (float) height / 2 - 3.4f), -1);
         }
+        alsoRender(new RenderContext(drawContext, x, y, mouseX, mouseY, textRenderer));
+    }
+
+    /**
+     * Rendering call along with the main render method.
+     * Added so that you can render other stuff along with only specific settings.
+     *
+     * @param renderContext Object to get all the necessary arguments.
+     */
+    private void alsoRender(RenderContext renderContext) {
+        alsoRenderLogic.accept(renderContext);
+    }
+    /**
+     * Rendering call along with the main render method.
+     * Added so that you can render other stuff along with only specific settings.
+     *
+     * @param alsoRenderLogic Consumer object to receive the arguments and render.
+     */
+    public void alsoRender(Consumer<RenderContext> alsoRenderLogic) {
+        this.alsoRenderLogic = alsoRenderLogic;
     }
 
     public boolean hoveredOverReset(double mouseX, double mouseY) {
         return mouseX >= x + 195 && mouseX <= x + 206 && mouseY >= y + (double) this.height / 2 - 5.5f && mouseY <= y + (double) this.height / 2 + 5.5f;
     }
-
     /**
      * Compact rendering for clickGUI.
      */
@@ -147,6 +171,11 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         if (getAnimationProgress() <= 1) {
             return;
         }
+    }
+
+    public Setting setShouldSaveOrLoad(boolean shouldSaveOrLoad) {
+        this.shouldSaveOrLoad = shouldSaveOrLoad;
+        return this;
     }
 
     /**
@@ -259,7 +288,9 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-
+        if(!shouldSaveOrLoad){
+            return;
+        }
     }
 
     // Credits: Meteor client
@@ -268,6 +299,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         protected V value;
         protected BooleanSupplier shouldRender = () -> true; // Default to true
         protected V defaultValue;
+        protected boolean shouldSaveAndLoad = true;
 
         protected SettingBuilder(V value) {
             this.value = value;
@@ -293,6 +325,10 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
             this.shouldRender = shouldRender;
             return (B) this;
         }
+        public B shouldSaveAndLoad(boolean shouldSaveAndLoad) {
+            this.shouldSaveAndLoad = shouldSaveAndLoad;
+            return (B) this;
+        }
 
         public B defaultValue(V defaultValue) {
             this.defaultValue = defaultValue;
@@ -300,5 +336,22 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         }
 
         public abstract S build();
+    }
+    public static class RenderContext {
+        public final DrawContext drawContext;
+        public final int x;
+        public final int y;
+        public final int mouseX;
+        public final int mouseY;
+        public final TextRenderer textRenderer;
+
+        public RenderContext(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+            this.drawContext = drawContext;
+            this.x = x;
+            this.y = y;
+            this.mouseX = mouseX;
+            this.mouseY = mouseY;
+            this.textRenderer = textRenderer;
+        }
     }
 }

@@ -163,12 +163,6 @@ public class DropDownSetting extends Setting<Integer> {
         }
 
         if (selecting) {
-            // If the user clicks on the value textbox, then do an early escape and stop the selection. (Final selection  = value box option)
-            if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + maxOptionWidth && mouseY >= y + 2.0f && mouseY <= y + Renderer2D.getFxStringHeight() + 2.0f) {
-                selecting = false;
-                iSettingChange.onSettingChange(this);
-                return;
-            }
             // Clicked on the options other than the value textbox
             float offset = y + 4.0f + Renderer2D.getFxStringHeight() + 2.0f;
             for (Object option : options) {
@@ -183,6 +177,12 @@ public class DropDownSetting extends Setting<Integer> {
                 }
                 offset += Renderer2D.getFxStringHeight() + 2.0f;
             }
+            // If the user clicks on the value textbox, then do an early escape and stop the selection. (Final selection  = value box option)
+            if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + maxOptionWidth && mouseY >= y + 2.0f && mouseY <= y + Renderer2D.getFxStringHeight() + 2.0f) {
+                selecting = false;
+                iSettingChange.onSettingChange(this);
+                return;
+            }
         }
     }
 
@@ -196,6 +196,11 @@ public class DropDownSetting extends Setting<Integer> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
+        if( MAP.get(name.replace(" ", "")) == null){
+            value = defaultValue;
+            return;
+        }
         int optionIndex = options.indexOf(MAP.get(name.replace(" ", "")));
         if (optionIndex != -1) {
             value = optionIndex;

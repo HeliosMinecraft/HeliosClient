@@ -149,8 +149,11 @@ public class DoubleSetting extends Setting<Double> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
         if (toml.getDouble(name.replace(" ", "")) != null) {
             value = toml.getDouble(name.replace(" ", ""));
+        }else{
+            value = defaultValue;
         }
     }
 
