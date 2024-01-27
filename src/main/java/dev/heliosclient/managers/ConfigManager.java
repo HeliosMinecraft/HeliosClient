@@ -144,9 +144,9 @@ public class ConfigManager {
                 .filter(name -> name.endsWith(".toml"))
                 .sorted((name1, name2) -> {
                     if (name1.equals("modules")) {
-                        return 0;
+                        return -69;
                     } else if (name2.equals("modules")) {
-                        return 1;
+                        return 0;
                     } else {
                         return name1.compareTo(name2);
                     }

@@ -69,21 +69,23 @@ public class DropDownSetting extends Setting<Integer> {
         for (Object option : options) {
             maxOptionWidth = Math.max(maxOptionWidth, Math.round(Renderer2D.getFxStringWidth(option.toString())));
         }
-        float nameX = x + Renderer2D.getFxStringWidth(name + ": ");
 
         if (options.isEmpty() || options.size() - 1 < value) {
             Renderer2D.drawFixedString(drawContext.getMatrices(), "No option found!", x + 2, y + 4, 0xFFFF0000);
         } else {
+            float optionCenter = ((maxOptionWidth + 4.0f) / 2.0f) - (Renderer2D.getFxStringWidth(options.get(value).toString()) / 2.0f); // Center the text horizontally
+            float startX = x + Renderer2D.getFxStringWidth(name + ": ") + 2;
+
             if (!selecting) {
                 // Render box of value text
                 this.height = 24;
-                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), nameX, y + 2f, Renderer2D.getFxStringWidth(options.get(value).toString()) + 4, Renderer2D.getFxStringHeight() + 2, 3, color.darker().darker().getRGB());
+                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, y + 2f, maxOptionWidth + 4, Renderer2D.getFxStringHeight() + 2, 3, color.darker().darker().getRGB());
             }
             //Render arrow
-            FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), selecting ? "\uF123" : "\uF120", x + Renderer2D.getFxStringWidth(name + ": ") + maxOptionWidth + 5, y + 4, ColorManager.INSTANCE.defaultTextColor());
+            FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), selecting ? "\uF123" : "\uF120", x + Renderer2D.getFxStringWidth(name + ": ") + 2 + maxOptionWidth + 5, y + 4, ColorManager.INSTANCE.defaultTextColor());
             if (selecting) {
                 // Render full size box including the options
-                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), nameX, y + 2f, maxOptionWidth + 4, this.height - 2.0f, 3, color.brighter().getRGB());
+                Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), startX, y + 2f, maxOptionWidth + 4, this.height - 2.0f, 3,4, color.brighter().getRGB());
 
 
                 //Render the settings and center them horizontally
@@ -93,11 +95,11 @@ public class DropDownSetting extends Setting<Integer> {
                     if (option == options.get(value)) {
                         continue;
                     }
-                    float x2 = Renderer2D.getFxStringWidth(name + ": ") + x;
+                    float x2 = Renderer2D.getFxStringWidth(name + ": ") + x + 2;
                     int center = Math.round(((maxOptionWidth + 4.0f) / 2.0f) - (Renderer2D.getFxStringWidth(option.toString()) / 2.0f)); // Center the text horizontally
 
                     // Draw a horizontal line above the option text to separate the buttons
-                    Renderer2D.drawHorizontalLine(drawContext.getMatrices().peek().getPositionMatrix(), x2, maxOptionWidth + 4.0f, offset - 0.1f, 0.5f, Color.white.getRGB());
+                    //Renderer2D.drawHorizontalLine(drawContext.getMatrices().peek().getPositionMatrix(), x2, maxOptionWidth + 4.0f, offset - 0.1f, 0.5f, Color.white.getRGB());
 
                     // Draw the text
                     Renderer2D.drawFixedString(drawContext.getMatrices(), String.valueOf(option), x2 + center, offset, Color.white.getRGB());
@@ -106,7 +108,12 @@ public class DropDownSetting extends Setting<Integer> {
                 this.height = Math.round(offset - y);
             }
             // Draw the name of the option
-            Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + options.get(value), x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
+            Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": ", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
+            Renderer2D.drawFixedString(drawContext.getMatrices(), options.get(value).toString(), startX + optionCenter, y + 4, ColorManager.INSTANCE.defaultTextColor());
+
+            //Render the outline of the selected option
+            Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), startX, y + 2f, maxOptionWidth + 4, Renderer2D.getFxStringHeight() + 2, 3,0.35f,selecting? Color.WHITE.getRGB(): Color.DARK_GRAY.getRGB());
+
         }
 
 
@@ -117,7 +124,7 @@ public class DropDownSetting extends Setting<Integer> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 350) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -155,6 +162,14 @@ public class DropDownSetting extends Setting<Integer> {
         if (options.isEmpty() || options.size() - 1 < value) {
             return;
         }
+        if(selecting){
+            // If the user clicks on the value textbox, then do an early escape and stop the selection. (Final selection  = value box option)
+            if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + maxOptionWidth && mouseY >= y + 2.0f && mouseY <= y + Renderer2D.getFxStringHeight() + 2.0f) {
+                selecting = false;
+                iSettingChange.onSettingChange(this);
+                return;
+            }
+        }
         if (!selecting) {
             // Clicked on the value textbox.
             if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + Renderer2D.getFxStringWidth(options.get(value).toString()) && mouseY >= y + 2 && mouseY <= y + Renderer2D.getFxStringHeight() + 2) {
@@ -177,12 +192,15 @@ public class DropDownSetting extends Setting<Integer> {
                 }
                 offset += Renderer2D.getFxStringHeight() + 2.0f;
             }
+            /*
             // If the user clicks on the value textbox, then do an early escape and stop the selection. (Final selection  = value box option)
             if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + maxOptionWidth && mouseY >= y + 2.0f && mouseY <= y + Renderer2D.getFxStringHeight() + 2.0f) {
                 selecting = false;
                 iSettingChange.onSettingChange(this);
                 return;
             }
+
+             */
         }
     }
 

@@ -3,7 +3,9 @@ package dev.heliosclient.module.settings;
 
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.Renderer2D;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;

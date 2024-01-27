@@ -1089,6 +1089,9 @@ public class Renderer2D implements Listener {
     }
 
     public static float getCustomStringWidth(String text, FontRenderer fontRenderer) {
+        if(fontRenderer == null)
+            return 0;
+
         if (isVanillaRenderer()) {
             return HeliosClient.MC.textRenderer.getWidth(text);
         }
@@ -1100,6 +1103,9 @@ public class Renderer2D implements Listener {
     }
 
     public static float getCustomStringWidth(FontRenderer fontRenderer) {
+        if(fontRenderer == null)
+            return 0;
+
         return fontRenderer.getStringWidth(TEXT);
     }
 
@@ -1122,6 +1128,9 @@ public class Renderer2D implements Listener {
     }
 
     public static float getCustomStringHeight(String text, FontRenderer fontRenderer) {
+        if(fontRenderer == null)
+            return 0;
+
         if (isVanillaRenderer()) {
             return HeliosClient.MC.textRenderer.fontHeight;
         }
@@ -1134,6 +1143,9 @@ public class Renderer2D implements Listener {
     }
 
     public static float getCustomStringHeight(FontRenderer fontRenderer) {
+        if(fontRenderer == null)
+            return 0;
+
         return fontRenderer.getStringHeight(TEXT);
     }
 

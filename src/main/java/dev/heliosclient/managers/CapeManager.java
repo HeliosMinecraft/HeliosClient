@@ -65,9 +65,9 @@ public class CapeManager {
                 String capeName = fileName.substring(0, fileName.lastIndexOf('.'));
                 capeNames.add(capeName);
 
-                MinecraftClient.getInstance().execute(() -> {
+                HeliosClient.MC.execute(() -> {
                     try {
-                        TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+                        TextureManager textureManager =  HeliosClient.MC.getTextureManager();
                         Identifier capeIdentifier;
                         Identifier elytraIdentifier;
                         if (fileName.endsWith(".gif")) {

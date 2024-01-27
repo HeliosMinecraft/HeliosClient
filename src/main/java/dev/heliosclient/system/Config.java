@@ -14,6 +14,7 @@ import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
+import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,6 +158,7 @@ public class Config {
      */
     public void getHudConfig() {
         try {
+            Map<String, Object> pane = new HashMap<>();
             Map<String, Object> hudElements = new HashMap<>();
 
             int a = 0;
@@ -164,8 +166,12 @@ public class Config {
                 hudElements.put("element_" + a, hudElement.saveToToml(new ArrayList<>()));
                 a++;
             }
+            pane.put("x", HudCategoryPane.INSTANCE == null? 0: HudCategoryPane.INSTANCE.x);
+            pane.put("y", HudCategoryPane.INSTANCE == null? 0: HudCategoryPane.INSTANCE.y);
 
-            getHudElementMap().put("hudElements", hudElements);
+            pane.put("elements", hudElements.isEmpty()? new HashMap<>() :hudElements);
+
+            getHudElementMap().put("hudElements", pane);
         } catch (Exception e) {
             LOGGER.error("Error occurred while getting Hud config.", e);
         }
@@ -177,26 +183,34 @@ public class Config {
     public void loadHudElements() {
         HudManager.INSTANCE.hudElements.clear();
         // Get the hudElements table from the config
-        Toml toml = configManager.getTomls().get(HUD).getTable("hudElements");
-        if (toml != null) {
-            // Maps the toml.
-            toml.toMap().forEach((string, object) -> {
-                // Get the table of the hudElement
-                Toml hudElementTable = toml.getTable(string);
-                // Get the name of the hudElement and check if it exists
-                if (hudElementTable.contains("name")) {
-                    // Creates the hudElement provided by the hudElementData Supplier.
-                    HudElementData hudElementData = HudElementList.INSTANCE.elementDataMap.get(hudElementTable.getString("name"));
-                    HudElement hudElement = hudElementData.create();
+        Toml tomlElementMap = configManager.getTomls().get(HUD).getTable("hudElements");
+        if (tomlElementMap != null) {
+            Toml toml = tomlElementMap.getTable("elements");
+            if(toml != null) {
+                // Maps the toml.
+                toml.toMap().forEach((string, object) -> {
+                    // Get the table of the hudElement
+                    Toml hudElementTable = toml.getTable(string);
+                    // Get the name of the hudElement and check if it exists
+                    if (hudElementTable.contains("name")) {
+                        // Creates the hudElement provided by the hudElementData Supplier.
+                        HudElementData hudElementData = HudElementList.INSTANCE.elementDataMap.get(hudElementTable.getString("name"));
+                        HudElement hudElement = hudElementData.create();
 
-                    // Load the hudElement from the toml and add it to the hudElements list.
-                    if (hudElement != null) {
-                        hudElement.loadFromToml(hudElementTable.toMap(), hudElementTable);
-                        HudManager.INSTANCE.addHudElement(hudElement);
+                        // Load the hudElement from the toml and add it to the hudElements list.
+                        if (hudElement != null) {
+                            hudElement.loadFromToml(hudElementTable.toMap(), hudElementTable);
+                            HudManager.INSTANCE.addHudElement(hudElement);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
+        if(HudCategoryPane.INSTANCE != null) {
+            HudCategoryPane.INSTANCE.x = Math.toIntExact(configManager.getTomls().get(HUD).getTable("hudElements").getLong("x"));
+            HudCategoryPane.INSTANCE.y = Math.toIntExact(configManager.getTomls().get(HUD).getTable("hudElements").getLong("y"));
+        }
+
     }
 
     /**

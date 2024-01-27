@@ -216,8 +216,12 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         renderElement(drawContext, textRenderer);
 
         // Set the hitbox values after the render element incase any change of width/height occurs
-        hitbox.set((float) (x - padding.value / 2 - 1), (float) (y - padding.value / 2 - 1), (float) (width + padding.value + 4f), (float) (height + padding.value + 1));
+        setHitbox();
     }
+    public void setHitbox(){
+        hitbox.set((float) (x - padding.value / 2 - 1), (float) (y - padding.value / 2 - 1), (float) (width + padding.value + 4f), (float) (height +  1));
+    }
+
 
     /**
      * Rendering outside of editor.
@@ -248,6 +252,8 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
 
         //Render element
         renderElement(drawContext, textRenderer);
+
+        setHitbox();
     }
 
     /**
@@ -259,8 +265,8 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      * @param textRenderer
      */
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
+        setHitbox();
         if (renderBg.value) {
-            float width = hitbox.getWidth();
             drawContext.getMatrices().push();
             drawContext.getMatrices().translate(0, 0, 0D);
             Color bgStart, bgEnd;

@@ -1,7 +1,10 @@
 package dev.heliosclient;
 
 import dev.heliosclient.addon.AddonManager;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
+import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Categories;
@@ -25,7 +28,7 @@ import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HeliosClient implements ModInitializer {
+public class HeliosClient implements ModInitializer, Listener {
     public static final HeliosClient INSTANCE = new HeliosClient();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
     public static final Logger LOGGER = LoggerFactory.getLogger("Helios Client");
@@ -51,7 +54,7 @@ public class HeliosClient implements ModInitializer {
         CONFIG.loadModules();
         LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
         if(shouldSendNotification()){
-            notificationManager.addNotification(new InfoNotification("Loading Completed", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+            notificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
         configTimer.resetTimer();
 
@@ -68,13 +71,15 @@ public class HeliosClient implements ModInitializer {
         CONFIG.save();
         LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
         if(shouldSendNotification()){
-            notificationManager.addNotification(new InfoNotification("Saving Completed", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+            notificationManager.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
         configTimer.resetTimer();
     }
 
     @Override
     public void onInitialize() {
+        EventManager.register(this);
+
         LOGGER.info("Helios Client loading...");
         fontManager.refresh();
         addonManager.loadAddons();
@@ -94,7 +99,6 @@ public class HeliosClient implements ModInitializer {
             }
         });
 
-
         EventManager.register(fontManager);
         EventManager.register(notificationManager);
         EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
@@ -108,11 +112,15 @@ public class HeliosClient implements ModInitializer {
         loadConfig();
         ClickGUIScreen.INSTANCE.onLoad();
         HeliosClient.CLICKGUI.onLoad();
-        if (MC.getWindow() != null) {
-            quadTree = new Quadtree(0);
-        }
         // Save on shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(HeliosClient::saveConfig));
+    }
+    @SubscribeEvent
+    public void tick(TickEvent.CLIENT client){
+        if (MC.getWindow() != null) {
+            quadTree = new Quadtree(0);
+            EventManager.unregister(this);
+        }
     }
     private static boolean shouldSendNotification(){
         return (notificationManager != null && ModuleManager.notificationModule != null && ModuleManager.notificationModule.clientNotification.value && MC.getWindow() != null);

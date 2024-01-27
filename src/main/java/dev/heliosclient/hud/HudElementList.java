@@ -18,6 +18,8 @@ public class HudElementList {
         registerElement(Ping.DATA);
         registerElement(ModuleList.DATA);
         registerElement(TestHud.DATA);
+        registerElement(CompactData.DATA);
+
     }
 
     public void registerElement(HudElementData hudElementData) {
