@@ -24,6 +24,7 @@
     "KeyboardMixin",
     "MinecraftClientMixin",
     "MixinClientPlayNetworkHandler",
+    "MixinSplashScreen",
     "MouseMixin",
     "MultiplayerScreenMixin",
     "SimpleOptionMixin",
