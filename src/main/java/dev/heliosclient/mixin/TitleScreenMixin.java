@@ -60,18 +60,6 @@ public abstract class TitleScreenMixin extends Screen {
     @Inject(at = @At("RETURN"), method = "render")
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         Renderer2D.setDrawContext(context);
-
-        TextRenderer textRenderer = HeliosClient.MC.textRenderer;
-
-        // Create the text for the subtitle
-        MutableText subtitleText = Text.literal("Made with " + ColorUtils.red + "♥" + ColorUtils.white + " by HeliosDevelopment").setStyle(Style.EMPTY.withColor(Formatting.WHITE));
-
-        // Calculate the position for the subtitle
-        int subtitleX = (this.width - textRenderer.getWidth(subtitleText)) / 2;
-        int subtitleY = this.height / 4 + 182 - 10;
-
-        // Draw the subtitle
-        context.drawText(textRenderer, subtitleText, subtitleX, subtitleY, 0xFFFFFF, true);
     }
 
     @Inject(at = @At("RETURN"), method = "init")
