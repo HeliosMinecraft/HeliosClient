@@ -142,9 +142,8 @@ public abstract class MixinSplashScreen {
             GlStateManager._clear(16384, MinecraftClient.IS_SYSTEM_MAC);
         }
 
-        double d = Math.min((double)this.client.getWindow().getScaledWidth() * 0.75D, this.client.getWindow().getScaledHeight()) * 0.25D;
-        double e = d * 4.0;
-        int r = (int)(e * 0.5);
+            double d = Math.min((double)this.client.getWindow().getScaledWidth() * 0.75D, this.client.getWindow().getScaledHeight()) * 0.25D;
+            float verticalPosition = 0.0F;
 
             float s = 1.0f;
 
@@ -152,15 +151,23 @@ public abstract class MixinSplashScreen {
             else if (this.reloading) s = MathHelper.clamp((this.reloadStartTime > -1L ? (float)(Util.getMeasuringTimeMs() - this.reloadStartTime) / 500.0F : -1.0F), 0.0F, 1.0F);
 
             int w = (int)(d * 4);
+        if (this.reloading) {
+            float elapsedTime = (float)(Util.getMeasuringTimeMs() - this.reloadStartTime) / 1000.0F;
+
+            verticalPosition = (float) MathHelper.lerp(elapsedTime / 4.0F, d + 35, 0);
+        }
 
             RenderSystem.enableBlend();
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, s);
-            context.drawTexture(CLIENT_LOGO_TEXTURE,(int)(this.client.getWindow().getScaledWidth() * 0.5D) - (w / 2) - 12, (int)(d), w + 5, w/2, 0, 0, 1024, 512, 1024, 512);
-            if(HeliosClient.MC.textRenderer != null)
-            context.drawText(HeliosClient.MC.textRenderer, subtitleText, (int)(this.client.getWindow().getScaledWidth() * 0.5D) - HeliosClient.MC.textRenderer.getWidth(subtitleText)/2, w / 2 + HeliosClient.MC.textRenderer.fontHeight + 17, 0xFFFFFF, true);
+
+            context.drawTexture(CLIENT_LOGO_TEXTURE,(int)(this.client.getWindow().getScaledWidth() * 0.5D) - (w / 2) - 12, (int)(d - verticalPosition), w + 5, w/2, 0, 0, 1024, 512, 1024, 512);
+
+          if(HeliosClient.MC.textRenderer != null) {
+              context.drawText(HeliosClient.MC.textRenderer, subtitleText, (int) (this.client.getWindow().getScaledWidth() * 0.5D) - HeliosClient.MC.textRenderer.getWidth(subtitleText) / 2, w / 2 + HeliosClient.MC.textRenderer.fontHeight + 17, 0xFFFFFF, true);
+          }
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableBlend();
 
@@ -204,9 +211,14 @@ public abstract class MixinSplashScreen {
         int filledWidth = MathHelper.ceil((float)width * this.progress);
 
         int j = Math.round(opacity * 255.0F);
-        int color = ColorHelper.Argb.getArgb(j, 255, 255, 255);
 
-        drawContext.fill(minX, minY, minX + filledWidth, height, color);
+        if(filledWidth <= 0 || height <= 0 || minY <= 0){
+            return;
+        }
+
+        Renderer2D.setDrawContext(drawContext);
+        Renderer2D.drawRectangleWithShadow(drawContext.getMatrices(),minX, minY,filledWidth, height,withAlpha(ColorUtils.getRainbowColor().getRGB(),j),3);
+
         if(HeliosClient.MC.textRenderer == null)
             return;
 
