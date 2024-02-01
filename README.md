@@ -9,6 +9,7 @@
 </div>
 
 ## Images
+
 <details>
     <summary>Click to show</summary>
     <p>Keep in mind that these images might be outdated as Helios is currently updating frequently!</p>
@@ -19,7 +20,7 @@
 
 1. Clone this repository
 2. Run:
-   - Windows (CMD): `call gradlew build`
+   - Windows (CMD): `gradlew build`
    - Linux/MacOS/Windows (Powershell): `./gradlew build`
   
 ## Installation
