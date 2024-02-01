@@ -154,7 +154,7 @@ public abstract class MixinSplashScreen {
         if (this.reloading) {
             float elapsedTime = (float)(Util.getMeasuringTimeMs() - this.reloadStartTime) / 1000.0F;
 
-            verticalPosition = (float) MathHelper.lerp(elapsedTime / 4.0F, d + 35, 0);
+            verticalPosition = (float) MathHelper.lerp(elapsedTime / 4.0F, d, 0);
         }
 
             RenderSystem.enableBlend();

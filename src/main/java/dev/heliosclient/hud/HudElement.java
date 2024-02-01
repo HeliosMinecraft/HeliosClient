@@ -219,7 +219,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         setHitbox();
     }
     public void setHitbox(){
-        hitbox.set((float) (x - padding.value / 2 - 1), (float) (y - padding.value / 2 - 1), (float) (width + padding.value + 4f), (float) (height +  1));
+        hitbox.set((float) (x - 1 - (padding.value / 2f)), (float) (y - 1 - (padding.value / 2f)), (float) (width + padding.value + 4f), (float) (height + padding.value +  1));
     }
 
 
@@ -280,16 +280,16 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             Color blended = ColorUtils.blend(bgStart, bgEnd, 1 / 2f);
 
             if (rounded.value && !shadow.value) {
-                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, hitbox.getHeight(), 2);
+                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, hitbox.getX(), hitbox.getY(), hitbox.getWidth() - 1.9f, hitbox.getHeight(), 2);
             } else if (!shadow.value) {
-                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, hitbox.getHeight(), bgStart.getRGB(), bgEnd.getRGB());
+                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), hitbox.getX(), hitbox.getY(), hitbox.getWidth() - 1.9f, hitbox.getHeight(), bgStart.getRGB(), bgEnd.getRGB());
             }
 
             if (rounded.value && shadow.value) {
-                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, hitbox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, 4, blended);
+                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), hitbox.getX(), hitbox.getY(), hitbox.getWidth() - 1.9f, hitbox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, 4, blended);
             }
             if (!rounded.value && shadow.value) {
-                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), (float) (x - 1 - padding.value / 2), (float) (y - 1 - padding.value / 2), hitbox.getWidth() - 1.9f, hitbox.getHeight(), 4, bgStart.getRGB(), bgEnd.getRGB());
+                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), hitbox.getX(), hitbox.getY(), hitbox.getWidth() - 1.9f, hitbox.getHeight(), 4, bgStart.getRGB(), bgEnd.getRGB());
             }
 
             drawContext.getMatrices().pop();
