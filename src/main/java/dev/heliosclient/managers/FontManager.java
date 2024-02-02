@@ -62,6 +62,8 @@ public class FontManager implements Listener {
         FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
         FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
 
+
+        //Post the font change event to the EventManager
         EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
         HeliosClient.quadTree = new Quadtree(0);
     }

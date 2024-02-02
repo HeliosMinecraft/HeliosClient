@@ -23,7 +23,6 @@ public class DropDownSetting extends Setting<Integer> {
     public List options;
     public int value;
     public boolean selecting = false;
-    ISettingChange iSettingChange;
     Color color = new Color(4, 3, 3, 157);
     int maxOptionWidth = 0;
 

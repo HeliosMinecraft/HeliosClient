@@ -153,6 +153,20 @@ public class ConfigManager {
                 })
                 .collect(Collectors.toList());
     }
+    /**
+     * Checks if any of the TOML files is empty.
+     *
+     * @return The empty file if found, else null.
+     */
+    public File checkEmptyFiles() {
+        for (File file : configFiles.values()) {
+            if (file.length() == 0) {
+                return file;
+            }
+        }
+        return null;
+    }
+
 
     public void clear() {
         configFiles.clear();

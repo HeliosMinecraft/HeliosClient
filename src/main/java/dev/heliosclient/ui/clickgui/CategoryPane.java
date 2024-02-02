@@ -12,7 +12,7 @@ import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.ui.clickgui.gui.Hitbox;
+import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
@@ -30,12 +30,12 @@ import java.util.concurrent.Executors;
 public class CategoryPane implements Listener {
     public static int width = 83;
     public static int MAX_HEIGHT = 150;
-    public static List<Hitbox> hitboxes = new CopyOnWriteArrayList<>();
+    public static List<HudBox> hitboxes = new CopyOnWriteArrayList<>();
     public final char icon;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Screen parentScreen;
     private final float delayBetweenButtons = 0.0f;
-    private final Hitbox hitBox;
+    private final HudBox hitBox;
     public Category category;
     public int x;
     public int y;
@@ -63,7 +63,7 @@ public class CategoryPane implements Listener {
 
         icon = category.icon;
 
-        hitBox = new Hitbox(x, y, width, height);
+        hitBox = new HudBox(x, y, width, height);
         hitboxes.add(hitBox);
 
         EventManager.register(this);

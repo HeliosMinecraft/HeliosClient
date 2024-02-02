@@ -65,6 +65,8 @@ public class CapeManager {
                 String capeName = fileName.substring(0, fileName.lastIndexOf('.'));
                 capeNames.add(capeName);
 
+                NativeImage image = NativeImage.read(inputStream);
+
                 HeliosClient.MC.execute(() -> {
                     try {
                         TextureManager textureManager =  HeliosClient.MC.getTextureManager();
@@ -74,7 +76,6 @@ public class CapeManager {
                             capeIdentifier = textureManager.registerDynamicTexture("cape_" + fileName, new GifTexture(file));
                             elytraIdentifier = capeIdentifier;
                         } else {
-                            NativeImage image = NativeImage.read(inputStream);
                             capeIdentifier = textureManager.registerDynamicTexture("cape_" + fileName, new NativeImageBackedTexture(parseCape(image)));
                             elytraIdentifier = textureManager.registerDynamicTexture("elytra_" + fileName, new NativeImageBackedTexture(image));
                         }
@@ -83,6 +84,8 @@ public class CapeManager {
                         HeliosClient.LOGGER.info("Loaded cape: " + fileName);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        // loadCapes();
+                        return;
                     }
                 });
             } catch (IOException e) {

@@ -20,6 +20,7 @@ import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.TimerUtils;
 import dev.heliosclient.util.cape.CapeSynchronizer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.SoundManager;
@@ -106,14 +107,19 @@ public class HeliosClient implements ModInitializer, Listener {
         EventManager.register(ColorManager.INSTANCE);
         EventManager.register(new DamageUtils());
 
-        CapeManager.capes = CapeManager.loadCapes();
-        CapeSynchronizer.registerCapeSyncPacket();
 
         loadConfig();
         ClickGUIScreen.INSTANCE.onLoad();
         HeliosClient.CLICKGUI.onLoad();
-        // Save on shutdown
+
+        // Save
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> HeliosClient.saveConfig());
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((a,b,c) -> HeliosClient.saveConfig());
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> HeliosClient.saveConfig());
         Runtime.getRuntime().addShutdownHook(new Thread(HeliosClient::saveConfig));
+
+        CapeManager.capes = CapeManager.loadCapes();
+        CapeSynchronizer.registerCapeSyncPacket();
     }
     @SubscribeEvent
     public void tick(TickEvent.CLIENT client){

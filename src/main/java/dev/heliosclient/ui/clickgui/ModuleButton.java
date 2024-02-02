@@ -11,7 +11,7 @@ import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.ui.clickgui.gui.Hitbox;
+import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.Renderer2D;
@@ -27,7 +27,7 @@ import java.awt.*;
 
 public class ModuleButton implements Listener {
     public final Screen parentScreen;
-    private final Hitbox hitBox;
+    private final HudBox hitBox;
     private final float delayBetweenSettings = 0.1f;
     public int hoverAnimationTimer;
     public Module_ module;
@@ -50,7 +50,7 @@ public class ModuleButton implements Listener {
         this.width = CategoryPane.getWidth() - 2;
         this.height = 16;
         this.parentScreen = parentScreen;
-        hitBox = new Hitbox(x, y, width, height);
+        hitBox = new HudBox(x, y, width, height);
         EventManager.register(this);
     }
 

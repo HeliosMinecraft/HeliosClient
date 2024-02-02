@@ -23,7 +23,6 @@ public class DoubleSetting extends Setting<Double> {
     private final int roundingPlace;
     private final InputBox inputBox;
     public double value;
-    ISettingChange ISettingChange;
     boolean sliding = false;
 
     public DoubleSetting(String name, String description, ISettingChange ISettingChange, double value, double min, double max, int roundingPlace, BooleanSupplier shouldRender, double defaultValue) {
@@ -34,7 +33,7 @@ public class DoubleSetting extends Setting<Double> {
         this.min = min;
         this.max = max;
         this.heightCompact = 20;
-        this.ISettingChange = ISettingChange;
+        this.iSettingChange = ISettingChange;
         this.roundingPlace = roundingPlace;
         inputBox = new InputBox(String.valueOf(max).length() * 6, 11, String.valueOf(value), 10, InputBox.InputMode.DIGITS);
     }
@@ -53,7 +52,7 @@ public class DoubleSetting extends Setting<Double> {
             } else {
                 value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
             }
-            ISettingChange.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
 
         float valueWidth = Renderer2D.getFxStringWidth(value + ".00") + 3;
@@ -97,7 +96,7 @@ public class DoubleSetting extends Setting<Double> {
             } else {
                 value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
             }
-            ISettingChange.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
 
         String valueString = "" + MathUtils.round(value, roundingPlace);
@@ -126,7 +125,7 @@ public class DoubleSetting extends Setting<Double> {
         super.mouseClicked(mouseX, mouseY, button);
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             value = defaultValue;
-            ISettingChange.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
         if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.isFocused() && !inputBox.isFocusedHover(mouseX, mouseY)) {
             this.sliding = true;
@@ -139,7 +138,7 @@ public class DoubleSetting extends Setting<Double> {
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
         sliding = false;
-        ISettingChange.onSettingChange(this);
+        iSettingChange.onSettingChange(this);
     }
 
     @Override
@@ -192,7 +191,7 @@ public class DoubleSetting extends Setting<Double> {
                 }
                 value = newVal;
                 inputBox.setValue(String.valueOf(value));
-                ISettingChange.onSettingChange(this);
+                iSettingChange.onSettingChange(this);
             } catch (NumberFormatException ignored) {
             }
         }

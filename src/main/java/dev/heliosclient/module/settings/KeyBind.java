@@ -22,11 +22,10 @@ public class KeyBind extends Setting<Integer> {
     public static boolean listeningMouse = false;
     public int value;
     public boolean listening = false;
-    ISettingChange ISettingChange;
 
-    public KeyBind(String name, String description, ISettingChange ISettingChange, Integer value, BooleanSupplier shouldRender, int defaultValue) {
+    public KeyBind(String name, String description, ISettingChange iSettingChange, Integer value, BooleanSupplier shouldRender, int defaultValue) {
         super(shouldRender, defaultValue);
-        this.ISettingChange = ISettingChange;
+        this.iSettingChange = iSettingChange;
         this.name = name;
         this.description = description;
         this.value = value;
@@ -95,7 +94,7 @@ public class KeyBind extends Setting<Integer> {
             listening = false;
             listeningKey = false;
             listeningMouse = false;
-            ISettingChange.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
         }
     }
 
@@ -104,7 +103,7 @@ public class KeyBind extends Setting<Integer> {
         super.mouseClicked(mouseX, mouseY, button);
         if (listeningMouse && listening) {
             value = button;
-            ISettingChange.onSettingChange(this);
+            iSettingChange.onSettingChange(this);
             listening = !listening;
             listeningKey = false;
             listeningMouse = false;
@@ -142,20 +141,20 @@ public class KeyBind extends Setting<Integer> {
     }
 
     public static class Builder extends SettingBuilder<Builder, Integer, KeyBind> {
-        ISettingChange ISettingChange;
+        ISettingChange iSettingChange;
 
         public Builder() {
             super(-1);
         }
 
-        public Builder onSettingChange(ISettingChange ISettingChange) {
-            this.ISettingChange = ISettingChange;
+        public Builder onSettingChange(ISettingChange iSettingChange) {
+            this.iSettingChange = iSettingChange;
             return this;
         }
 
         @Override
         public KeyBind build() {
-            return new KeyBind(name, description, ISettingChange, value, shouldRender, defaultValue);
+            return new KeyBind(name, description, iSettingChange, value, shouldRender, defaultValue);
         }
     }
 }

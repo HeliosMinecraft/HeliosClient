@@ -15,6 +15,8 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
+import dev.heliosclient.util.FileUtils;
+import oshi.util.FileUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -181,6 +183,12 @@ public class Config {
      * Loads the HudElements from the config.
      */
     public void loadHudElements() {
+        if(FileUtils.isFileEmpty(configManager.getConfigFiles().get(HUD))){
+            LOGGER.warn(HUD + " config is empty! Creating new default hud config");
+            getHudConfig();
+            configManager.save();
+        }
+        LOGGER.info("Loading Hud Elements... ");
         HudManager.INSTANCE.hudElements.clear();
         // Get the hudElements table from the config
         Toml tomlElementMap = configManager.getTomls().get(HUD).getTable("hudElements");
@@ -207,8 +215,10 @@ public class Config {
             }
         }
         if(HudCategoryPane.INSTANCE != null) {
-            HudCategoryPane.INSTANCE.x = Math.toIntExact(configManager.getTomls().get(HUD).getTable("hudElements").getLong("x"));
-            HudCategoryPane.INSTANCE.y = Math.toIntExact(configManager.getTomls().get(HUD).getTable("hudElements").getLong("y"));
+            if(tomlElementMap != null) {
+                HudCategoryPane.INSTANCE.x = Math.toIntExact(tomlElementMap.getLong("x"));
+                HudCategoryPane.INSTANCE.y = Math.toIntExact(tomlElementMap.getLong("y"));
+            }
         }
 
     }
@@ -218,7 +228,7 @@ public class Config {
      */
     public void loadConfig() {
         ModuleManager.INSTANCE = new ModuleManager();
-        if (!configManager.load()) {
+         if (!configManager.load()) {
             LOGGER.info("Loading default config...");
             this.getDefaultModuleConfig();
             this.save();
@@ -243,6 +253,12 @@ public class Config {
     }
 
     public void loadModules() {
+        if(FileUtils.isFileEmpty(modulesManager.getConfigFiles().get(MODULES))){
+            LOGGER.warn(MODULES + " module config is empty! Creating new default Modules config");
+            getDefaultModuleConfig();
+            this.save();
+        }
+
         CategoryManager.getCategories().forEach((s, category) -> {
             for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
                 for (SettingGroup settingGroup : m.settingGroups) {
@@ -258,15 +274,27 @@ public class Config {
     }
 
     public void loadClientConfigModules() {
+        if(FileUtils.isFileEmpty(configManager.getConfigFiles().get(CLIENT))){
+            LOGGER.warn(CLIENT + " client config is empty! Creating new default Modules config");
+            getDefaultModuleConfig();
+            this.save();
+        }
+
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
                     Toml settingsToml = configManager.getTomls().get(CLIENT).getTable("settings");
                     if (settingsToml != null)
                         setting.loadFromToml(settingsToml.toMap(), settingsToml);
+
+                    if(setting.iSettingChange != null && setting != HeliosClient.CLICKGUI.switchConfigs){
+                        setting.iSettingChange.onSettingChange(setting);
+                    }
                 }
             }
         }
+
+        HeliosClient.CLICKGUI.onLoad();
     }
 
     public void getClientConfig() {

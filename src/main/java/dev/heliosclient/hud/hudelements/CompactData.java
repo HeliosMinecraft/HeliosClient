@@ -9,7 +9,14 @@ import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.biome.Biome;
+
+import java.util.Optional;
+
+import static net.fabricmc.loader.impl.util.StringUtil.capitalize;
 
 public class CompactData extends HudElement {
     public static HudElementData DATA = new HudElementData<>("CompactData","Displays data in compact manner", CompactData::new);
@@ -35,7 +42,7 @@ public class CompactData extends HudElement {
         String fps = "FPS: " + ColorUtils.gray + mc.getCurrentFps();
         String speed = "Speed: " + ColorUtils.gray + MathUtils.round(moveSpeed(), 1);
         String ping = "Ping: " + ColorUtils.gray + getPing();
-        String biome = "Biome: " + ColorUtils.gray + "None";
+        String biome = "Biome: " + ColorUtils.gray + getBiome();
 
         super.renderElement(drawContext, textRenderer);
 
@@ -75,4 +82,22 @@ public class CompactData extends HudElement {
         }
         return 0;
     }
+    public static String getBiome() {
+        String biomes = "None";
+        if (mc.world != null) {
+            Optional<RegistryKey<Biome>> biome = mc.world.getBiome(mc.player.getBlockPos()).getKey();
+
+            if (biome.isPresent()) {
+                String biomeName = Text.translatable( biome.get().getValue().getNamespace() + "." + biome.get().getValue().getPath()).getString();
+                biomes = capitalize(biomeName);
+            }
+        }
+        return formatBiomeString(biomes.trim());
+    }
+    public static String formatBiomeString(String str) {
+        str = str.replace("Minecraft.", "").replace("_", " ");
+        return str.isEmpty() ? str : Character.toUpperCase(str.charAt(0)) + str.substring(1);
+    }
+
+
 }

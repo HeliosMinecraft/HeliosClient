@@ -36,7 +36,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
     private final int offsetX = 10; // Offset from the left
     private final int offsetY = 20; // Offset from the top
     private final boolean defaultRainbow;
-    private final ISettingChange ISettingChange;
     public Color value;
     public InputBox hexInput;
     public boolean isPicking = false;
@@ -58,7 +57,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.defaultRainbow = rainbow;
         this.height = 25;
         this.heightCompact = 17;
-        this.ISettingChange = ISettingChange;
+        this.iSettingChange = ISettingChange;
         EventManager.register(this);
 
         // Calculate values once and store them
@@ -78,6 +77,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.brightnessSaturationBoxHeight = boxHeight;
 
         updateHandles();
+        alpha = value.getAlpha() / 255f;
 
         hexInput = new InputBox(50, 11, ColorUtils.colorToHex(value), 7, InputBox.InputMode.ALL);
     }
@@ -206,7 +206,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
         hue = hsbvals[0];
         saturation = hsbvals[1];
         brightness = hsbvals[2];
-        alpha = value.getAlpha() / 255f;
         handleX = Math.min((int) (hue * boxWidth), boxWidth);
         handleY = Math.min((int) ((1 - saturation) * gradientBoxHeight), gradientBoxHeight);
         shadeHandleX = Math.min((int) (brightness * boxWidth), boxWidth);
@@ -259,6 +258,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
             value = new Color(red, green, blue, (int) (alpha * 255));
             isPicking = !isPicking;
             updateHandles();
+            alpha = value.getAlpha() / 255f;
         }
 
         if (hoveredOverGradientBox(mouseX, mouseY)) {
@@ -281,6 +281,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         }
         if (rainbow) {
             updateHandles();
+            alpha = value.getAlpha() / 255f;
         } else {
             value = Color.getHSBColor(hue, saturation, brightness);
         }
@@ -308,6 +309,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
             rainbow = defaultRainbow;
             updateHandles();
             alphaHandleY = Math.round((1.0f - alpha) * (float) boxHeight);
+            alpha = value.getAlpha() / 255f;
         }
         super.mouseClicked(mouseX, mouseY, button);
         if (hovered((int) mouseX, (int) mouseY)) {

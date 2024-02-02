@@ -10,13 +10,13 @@ import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
+import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
@@ -42,6 +42,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     private float targetY;
     protected boolean shouldSaveOrLoad = true;
     private Consumer<RenderContext> alsoRenderLogic = (renderContext) -> {};
+    public ISettingChange iSettingChange;
 
 
     public Setting(BooleanSupplier shouldRender, T defaultValue) {
@@ -337,21 +338,8 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
 
         public abstract S build();
     }
-    public static class RenderContext {
-        public final DrawContext drawContext;
-        public final int x;
-        public final int y;
-        public final int mouseX;
-        public final int mouseY;
-        public final TextRenderer textRenderer;
 
-        public RenderContext(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-            this.drawContext = drawContext;
-            this.x = x;
-            this.y = y;
-            this.mouseX = mouseX;
-            this.mouseY = mouseY;
-            this.textRenderer = textRenderer;
-        }
+    public record RenderContext(DrawContext drawContext, int x, int y, int mouseX, int mouseY,
+                                TextRenderer textRenderer) {
     }
 }

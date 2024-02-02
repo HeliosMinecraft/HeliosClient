@@ -3,7 +3,7 @@ package dev.heliosclient.ui.clickgui.gui;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 
-public class Hitbox implements Listener {
+public class HudBox implements Listener {
     private float x, y, width, height;
     private float left;
     private float top;
@@ -11,7 +11,7 @@ public class Hitbox implements Listener {
     private float bottom;
     private float prevX, prevY;
 
-    public Hitbox(float x, float y, float width, float height) {
+    public HudBox(float x, float y, float width, float height) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -23,7 +23,7 @@ public class Hitbox implements Listener {
         this.bottom = y + height;
     }
 
-    public boolean intersects(Hitbox other) {
+    public boolean intersects(HudBox other) {
         float thisLeft = Math.min(this.x, this.x + this.width);
         float thisRight = Math.max(this.x, this.x + this.width);
         float thisTop = Math.min(this.y, this.y + this.height);
