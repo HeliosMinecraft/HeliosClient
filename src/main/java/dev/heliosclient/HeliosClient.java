@@ -14,10 +14,7 @@ import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
-import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.DamageUtils;
-import dev.heliosclient.util.SoundUtils;
-import dev.heliosclient.util.TimerUtils;
+import dev.heliosclient.util.*;
 import dev.heliosclient.util.cape.CapeSynchronizer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -77,9 +74,22 @@ public class HeliosClient implements ModInitializer, Listener {
         configTimer.resetTimer();
     }
 
+    public static boolean shouldSendNotification() {
+        return (notificationManager != null && ModuleManager.notificationModule != null && ModuleManager.notificationModule.clientNotification.value && MC.getWindow() != null);
+    }
+    @SubscribeEvent
+    public void tick(TickEvent.CLIENT client){
+        if (MC.getWindow() != null) {
+            quadTree = new Quadtree(0);
+            EventManager.unregister(this);
+        }
+    }
+
     @Override
     public void onInitialize() {
         EventManager.register(this);
+        registerEvents();
+
 
         LOGGER.info("Helios Client loading...");
         fontManager.refresh();
@@ -100,12 +110,6 @@ public class HeliosClient implements ModInitializer, Listener {
             }
         });
 
-        EventManager.register(fontManager);
-        EventManager.register(notificationManager);
-        EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
-        EventManager.register(KeybindManager.INSTANCE);
-        EventManager.register(ColorManager.INSTANCE);
-        EventManager.register(new DamageUtils());
 
 
         loadConfig();
@@ -121,14 +125,14 @@ public class HeliosClient implements ModInitializer, Listener {
         CapeManager.capes = CapeManager.loadCapes();
         CapeSynchronizer.registerCapeSyncPacket();
     }
-    @SubscribeEvent
-    public void tick(TickEvent.CLIENT client){
-        if (MC.getWindow() != null) {
-            quadTree = new Quadtree(0);
-            EventManager.unregister(this);
-        }
-    }
-    private static boolean shouldSendNotification(){
-        return (notificationManager != null && ModuleManager.notificationModule != null && ModuleManager.notificationModule.clientNotification.value && MC.getWindow() != null);
+
+    public void registerEvents() {
+        EventManager.register(fontManager);
+        EventManager.register(notificationManager);
+        EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
+        EventManager.register(KeybindManager.INSTANCE);
+        EventManager.register(ColorManager.INSTANCE);
+        EventManager.register(TickRate.INSTANCE);
+        EventManager.register(new DamageUtils());
     }
 }

@@ -48,7 +48,7 @@ public class EventManager {
         INSTANCE.remove(listener);
     }
 
-    public static void postEvent(Event event) {
+    public static Event postEvent(Event event) {
         Class<?> eventType = event.getClass();
         for (Map.Entry<Listener, Map<Class<?>, List<MethodHandle>>> entry : INSTANCE.entrySet()) {
             List<MethodHandle> methodHandles = entry.getValue().get(eventType);
@@ -62,6 +62,7 @@ public class EventManager {
                 }
             }
         }
+        return event;
     }
 
     /**

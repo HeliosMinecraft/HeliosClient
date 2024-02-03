@@ -100,7 +100,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.y = y;
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 3, y + 2, -1);
-        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x + 170, y + 2, 15, 15, 2, 4, value.getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, value.getRGB());
 
         int value1 = hoveredOverGradientBox(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
         int value2 = hoveredOverAlphaSlider(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
@@ -266,9 +266,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
             handleY = (int) (mouseY - y - offsetY);
             hue = handleX / (float) boxWidth;
             saturation = 1.0f - (float) handleY / gradientBoxHeight;
-        } else if (hoveredOverAlphaSlider(mouseX, mouseY)) {
-            alphaHandleY = (int) (mouseY - y - offsetY);
-            alpha = 1.0f - alphaHandleY / (float) boxHeight;
         } else if (hoveredOverBrightnessSaturationBox(mouseX, mouseY)) {
             shadeHandleX = (int) (mouseX - x - offsetX - boxWidth - sliderWidth * 3);
             shadeHandleY = (int) (mouseY - y - offsetY);
@@ -279,9 +276,13 @@ public class RGBASetting extends Setting<Color> implements Listener {
         } else if (hoveredOverPickBool(mouseX, mouseY)) {
             isPicking = !isPicking;
         }
+
+        if (hoveredOverAlphaSlider(mouseX, mouseY)) {
+            alphaHandleY = (int) (mouseY - y - offsetY);
+            alpha = 1.0f - alphaHandleY / (float) boxHeight;
+        }
         if (rainbow) {
             updateHandles();
-            alpha = value.getAlpha() / 255f;
         } else {
             value = Color.getHSBColor(hue, saturation, brightness);
         }

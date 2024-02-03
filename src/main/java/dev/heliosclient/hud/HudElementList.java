@@ -19,7 +19,7 @@ public class HudElementList {
         registerElement(ModuleList.DATA);
         registerElement(TestHud.DATA);
         registerElement(CompactData.DATA);
-
+        registerElement(Tps.DATA);
     }
 
     public void registerElement(HudElementData hudElementData) {

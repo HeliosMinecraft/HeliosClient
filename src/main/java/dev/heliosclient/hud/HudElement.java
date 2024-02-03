@@ -3,6 +3,7 @@ package dev.heliosclient.hud;
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
@@ -10,6 +11,7 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
+import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
@@ -54,6 +56,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public boolean shiftDown = false;
     public List<SettingGroup> settingGroups = new ArrayList<>();
     public SettingGroup sgUI = new SettingGroup("UI");
+    public boolean isInHudEditor = false;
     // Default settings
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
@@ -302,6 +305,11 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      */
     public void onLoad() {
         //addSettingGroup(sgUI);
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.CLIENT e) {
+        isInHudEditor = mc.currentScreen instanceof HudEditorScreen;
     }
 
     /**

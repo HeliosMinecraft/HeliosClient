@@ -6,6 +6,7 @@ import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.TickRate;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.PlayerListEntry;
@@ -43,6 +44,7 @@ public class CompactData extends HudElement {
         String speed = "Speed: " + ColorUtils.gray + MathUtils.round(moveSpeed(), 1);
         String ping = "Ping: " + ColorUtils.gray + getPing();
         String biome = "Biome: " + ColorUtils.gray + getBiome();
+        String tps = "TPS: " + ColorUtils.gray + MathUtils.round(TickRate.INSTANCE.getTPS(), 1);
 
         super.renderElement(drawContext, textRenderer);
 
@@ -55,6 +57,7 @@ public class CompactData extends HudElement {
         this.height = Math.round(Renderer2D.getStringHeight() * 5 + 11);
 
         Renderer2D.drawString(drawContext.getMatrices(), "X: " + ColorUtils.gray + coordX, this.x + 1, this.y + 1, HeliosClient.uiColor);
+        Renderer2D.drawString(drawContext.getMatrices(), tps, this.x + 4 + Renderer2D.getStringWidth("X: " + ColorUtils.gray + coordX), this.y + 1, HeliosClient.uiColor);
         Renderer2D.drawString(drawContext.getMatrices(), "Y: " + ColorUtils.gray + coordY, this.x + 1, this.y + Renderer2D.getStringHeight() + 3, HeliosClient.uiColor);
         Renderer2D.drawString(drawContext.getMatrices(), "Z: " + ColorUtils.gray + coordZ, this.x + 1, this.y + Renderer2D.getStringHeight() * 2 + 5, HeliosClient.uiColor);
 
@@ -62,6 +65,7 @@ public class CompactData extends HudElement {
         Renderer2D.drawString(drawContext.getMatrices(), speed, this.x + 1 + Renderer2D.getStringWidth(fps) + 3, this.y + Renderer2D.getStringHeight() * 3 + 7, HeliosClient.uiColor);
         Renderer2D.drawString(drawContext.getMatrices(), ping, this.x + 1, this.y + Renderer2D.getStringHeight() * 4 + 9, HeliosClient.uiColor);
         Renderer2D.drawString(drawContext.getMatrices(), biome, this.x + 1 + Renderer2D.getStringWidth(ping) + 3, this.y + Renderer2D.getStringHeight() * 4 + 9, HeliosClient.uiColor);
+
     }
 
     private double moveSpeed() {
