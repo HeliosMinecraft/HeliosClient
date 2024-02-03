@@ -37,7 +37,6 @@ public class HudEditorScreen extends Screen implements Listener {
         dragBox = new HudBox(0, 0, 0, 0);
     }
 
-
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         this.renderBackground(drawContext, mouseX, mouseY, delta);
@@ -200,7 +199,9 @@ public class HudEditorScreen extends Screen implements Listener {
         if (keyPressedEvent.getKey() == GLFW.GLFW_KEY_DELETE || keyPressedEvent.getKey() == GLFW.GLFW_KEY_BACKSPACE) {
             for (int i = 0; i < HudManager.INSTANCE.hudElements.size(); i++) {
                 if (HudManager.INSTANCE.hudElements.get(i).selected) {
-                    HudManager.INSTANCE.removeHudElement(HudManager.INSTANCE.hudElements.get(i));
+                    HudElement hudElement = HudManager.INSTANCE.hudElements.get(i);
+                    HudManager.INSTANCE.removeHudElement(hudElement);
+                    HudCategoryPane.INSTANCE.getHudElementButton(hudElement).updateCount();
                     i--;
                 }
             }

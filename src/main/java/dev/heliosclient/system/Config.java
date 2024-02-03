@@ -15,6 +15,7 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
+import dev.heliosclient.ui.clickgui.hudeditor.HudElementButton;
 import dev.heliosclient.util.FileUtils;
 import oshi.util.FileUtil;
 
@@ -219,6 +220,7 @@ public class Config {
                 HudCategoryPane.INSTANCE.x = Math.toIntExact(tomlElementMap.getLong("x"));
                 HudCategoryPane.INSTANCE.y = Math.toIntExact(tomlElementMap.getLong("y"));
             }
+            HudCategoryPane.INSTANCE.hudElementButtons.forEach(HudElementButton::updateCount);
         }
 
     }

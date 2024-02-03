@@ -15,6 +15,11 @@ public class HudElementButton {
 
     public HudElementButton(HudElement hudElement) {
         this.hudElement = hudElement;
+        HudManager.INSTANCE.hudElements.forEach(hudElement1 -> {
+            if (hudElement1.getClass().equals(hudElement.getClass())) {
+                count++;
+            }
+        });
     }
 
     public void render(DrawContext drawContext, boolean collapsed, int x, int y, float delta) {
@@ -30,13 +35,17 @@ public class HudElementButton {
         if (collapsed) return;
         if (hovered(mouseX, mouseY) && button == 0) {
             addInstanceToList(hudElement.getClass());
-            count = 0;
-            HudManager.INSTANCE.hudElements.forEach(hudElement1 -> {
-                if (hudElement1 == hudElement) {
-                    count++;
-                }
-            });
+            updateCount();
         }
+    }
+
+    public void updateCount() {
+        count = 0;
+        HudManager.INSTANCE.hudElements.forEach(hudElement1 -> {
+            if (hudElement1.getClass().equals(hudElement.getClass())) {
+                ++count;
+            }
+        });
     }
 
     public boolean hovered(double mouseX, double mouseY) {

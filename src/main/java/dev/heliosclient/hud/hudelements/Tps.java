@@ -16,7 +16,7 @@ public class Tps extends HudElement {
         super(DATA);
 
         this.width = 20;
-        this.height = 12;
+        this.height = 10;
     }
 
     @Override
