@@ -41,8 +41,9 @@ public class CapeManager {
         File defaultCapeFile = new File(CAPE_DIRECTORY, DEFAULT_CAPE);
         try (InputStream inputStream = CapeManager.class.getResourceAsStream("/assets/heliosclient/capes/" + DEFAULT_CAPE)) {
             assert inputStream != null;
-            Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             HeliosClient.LOGGER.info("Copying default cape in directory");
+            Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            HeliosClient.LOGGER.info("Copying completed");
         } catch (IOException e) {
             e.printStackTrace();
         }

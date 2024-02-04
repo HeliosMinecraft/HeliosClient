@@ -17,6 +17,7 @@ import net.minecraft.world.biome.Biome;
 
 import java.util.Optional;
 
+import static java.lang.Float.NaN;
 import static net.fabricmc.loader.impl.util.StringUtil.capitalize;
 
 public class CompactData extends HudElement {
@@ -44,7 +45,7 @@ public class CompactData extends HudElement {
         String speed = "Speed: " + ColorUtils.gray + MathUtils.round(moveSpeed(), 1);
         String ping = "Ping: " + ColorUtils.gray + getPing();
         String biome = "Biome: " + ColorUtils.gray + getBiome();
-        String tps = "TPS: " + ColorUtils.gray + MathUtils.round(TickRate.INSTANCE.getTPS(), 1);
+        String tps = "TPS: " + ColorUtils.gray + ((!Float.isNaN(TickRate.INSTANCE.getTPS())) ? MathUtils.round(TickRate.INSTANCE.getTPS(), 1) : "0.0");
 
         super.renderElement(drawContext, textRenderer);
 

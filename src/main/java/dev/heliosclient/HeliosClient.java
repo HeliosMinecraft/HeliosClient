@@ -90,8 +90,10 @@ public class HeliosClient implements ModInitializer, Listener {
         EventManager.register(this);
         registerEvents();
 
-
         LOGGER.info("Helios Client loading...");
+
+        DiscordRPC.INSTANCE.getLibrary();
+
         fontManager.refresh();
         addonManager.loadAddons();
         AddonManager.initializeAddons();
@@ -120,7 +122,12 @@ public class HeliosClient implements ModInitializer, Listener {
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> HeliosClient.saveConfig());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((a,b,c) -> HeliosClient.saveConfig());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> HeliosClient.saveConfig());
-        Runtime.getRuntime().addShutdownHook(new Thread(HeliosClient::saveConfig));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            saveConfig();
+            if (DiscordRPC.INSTANCE.isRunning) {
+                DiscordRPC.INSTANCE.stopPresence();
+            }
+        }));
 
         CapeManager.capes = CapeManager.loadCapes();
         CapeSynchronizer.registerCapeSyncPacket();

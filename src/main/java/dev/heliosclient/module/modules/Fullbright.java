@@ -31,10 +31,10 @@ public class Fullbright extends Module_ {
             .name("Gamma")
             .description("Desired gamma value")
             .onSettingChange(this)
-            .value(15.0)
-            .defaultValue(15.0)
+            .value(5.0)
+            .defaultValue(5.0)
             .min(0)
-            .max(15)
+            .max(7.0)
             .shouldRender(() -> mode.value == 0)
             .roundingPlace(0)
             .build());
