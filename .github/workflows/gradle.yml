@@ -5,7 +5,6 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
 
-
 name: Java Gradle
 
 on: push
@@ -22,12 +21,6 @@ jobs:
         with:
           java-version: '17'
 
-      - name: Extract mod version
-        id: extract_version
-        run: |
-          VERSION=$(./gradlew printModVersion --quiet)
-          echo "::set-output name=version::$VERSION"
-
       - name: Build File
         run: |
           chmod +x gradlew 
@@ -37,4 +30,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: HeliosClient
-          path: build/libs/heliosclient-${{ steps.extract_version.outputs.version }}.jar
+          path: build/libs
