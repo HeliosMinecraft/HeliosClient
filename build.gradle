@@ -33,9 +33,6 @@ repositories {
 	maven { url 'https://jitpack.io' }
 
 }
-build {
-//	dependsOn shadowJar
-}
 
 shadowJar {
 	configurations = [project.configurations.shadow]
@@ -112,7 +109,6 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
 	}
-	enabled = false
 }
 
 

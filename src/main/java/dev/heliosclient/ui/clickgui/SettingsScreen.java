@@ -73,7 +73,6 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
         y = window.getY();
 
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-        HeliosClient.LOGGER.info(module.settingGroups.toString());
     }
 
     @Override
