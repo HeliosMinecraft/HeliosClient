@@ -1,4 +1,5 @@
 plugins {
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
 }
@@ -28,12 +29,20 @@ repositories {
 	maven { url "https://maven.terraformersmc.com/releases/" }
 
 	mavenCentral()
+	jcenter()
 	maven { url 'https://jitpack.io' }
 
 }
+build {
+	dependsOn shadowJar
+}
+
+shadowJar {
+	configurations = [project.configurations.shadow]
+}
+
 
 configurations {
-	// include mods
 	modImplementation.extendsFrom(modInclude)
 	include.extendsFrom(modInclude)
 
@@ -55,17 +64,18 @@ dependencies {
 	include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
 
 	// Baritone API
-	implementation "com.github.wagyourtail:baritone:${project.baritone_version}"
+	modCompileOnly "com.github.wagyourtail:baritone:${project.baritone_version}"
 
 	// TOML parser
-	implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+	modInclude('com.moandjiezana.toml:toml4j:0.7.2')
 
 	// ModMenu
 	modApi "com.terraformersmc:modmenu:${project.modmenu_version}"
 
 	// Discord GameSDK
-	implementation 'com.github.JnCrMx:discord-game-sdk4j:v0.5.5'
+	modInclude('com.github.JnCrMx:discord-game-sdk4j:v0.5.5')
 
+//	shadow project(":launch")
 //	library "de.florianmichael:WaybackAuthLib:1.0.0"
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
