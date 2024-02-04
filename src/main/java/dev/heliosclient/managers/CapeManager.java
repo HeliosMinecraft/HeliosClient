@@ -45,7 +45,7 @@ public class CapeManager {
                 Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 HeliosClient.LOGGER.info("Copying completed");
             } else {
-                HeliosClient.LOGGER.error("Failed to load default cape resource");
+                HeliosClient.LOGGER.error("Failed to load open inputStream to default cape resource");
             }
         } catch (IOException e) {
             e.printStackTrace();

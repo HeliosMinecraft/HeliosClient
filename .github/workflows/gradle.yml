@@ -24,7 +24,7 @@ jobs:
       - name: Build File
         run: |
           chmod +x gradlew 
-          ./gradlew shadowJar
+          ./gradlew build
 
       - name: Upload File
         uses: actions/upload-artifact@v3

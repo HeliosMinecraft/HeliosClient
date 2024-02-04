@@ -24,7 +24,7 @@ public class DiscordRPC {
     public GameState currentGameState = GameState.MAINMENU;
     public boolean isRunning = false;
     File discordLibrary = null;
-    private Thread callbackThread;
+    private Thread callbackThread, downloadSDK;
     private Core discordCore;
     private Activity activity;
 
@@ -89,6 +89,7 @@ public class DiscordRPC {
     }
 
     public void getLibrary() {
+        downloadSDK = new Thread(() -> {
         try {
             discordLibrary = downloadDiscordGameSDK();
         } catch (IOException e) {
@@ -97,6 +98,9 @@ public class DiscordRPC {
         if (discordLibrary == null) {
             LOGGER.error("Error downloading Discord SDK.");
         }
+        });
+        downloadSDK.start();
+        downloadSDK.setName("Download SDK");
     }
 
     public void runPresence() {
@@ -105,7 +109,7 @@ public class DiscordRPC {
         Core.init(discordLibrary);
         try (CreateParams params = new CreateParams()) {
             params.setClientID(1203402546626957373L);
-            params.setFlags(CreateParams.getDefaultFlags());
+            params.setFlags(1);
             // Create the Core
             discordCore = new Core(params);
             activity = new Activity();
