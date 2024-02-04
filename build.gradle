@@ -50,6 +50,12 @@ configurations {
 	implementation.extendsFrom(library)
 	shadow.extendsFrom(library)
 }
+tasks.register('printModVersion') {
+	doLast {
+		println project.version
+	}
+}
+
 
 dependencies {
 	// To change the versions see the gradle.properties file
