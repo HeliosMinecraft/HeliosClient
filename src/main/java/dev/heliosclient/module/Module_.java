@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Template for modules.
@@ -31,8 +32,8 @@ public abstract class Module_ implements Listener, ISettingChange {
     public String name;
     public String description;
     public Category category;
-    public Set<SettingGroup> settingGroups;
-    public Set<Setting> quickSettings;
+    public List<SettingGroup> settingGroups;
+    public List<Setting> quickSettings;
     public boolean settingsOpen = false;
     public SettingGroup sgbind = new SettingGroup("Bind");
 
@@ -96,8 +97,8 @@ public abstract class Module_ implements Listener, ISettingChange {
         this.name = name;
         this.description = description;
         this.category = category;
-        settingGroups = new HashSet<>();
-        quickSettings = new HashSet<>();
+        settingGroups = new ArrayList<>(1);
+        quickSettings = new ArrayList<>(1);
     }
 
     public void addSettingGroup(SettingGroup settingGroup) {

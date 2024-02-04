@@ -1,5 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
@@ -24,6 +25,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
 
     public SettingsScreen(Module_ module, Screen parentScreen) {
         super(Text.literal(module.name + " Settings"), module, 0, 224);
+        module.addSettingGroup(module.sgbind);
         updateSetting();
     }
 
@@ -71,6 +73,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
         y = window.getY();
 
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
+        HeliosClient.LOGGER.info(module.settingGroups.toString());
     }
 
     @Override

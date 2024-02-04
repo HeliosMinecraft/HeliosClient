@@ -269,7 +269,7 @@ public class Config {
                         if (newToml != null) {
                             setting.loadFromToml(newToml.toMap(), newToml);
                         }
-                        if (setting == m.active && m.active.value) {
+                        if (setting == m.active && m.isActive()) {
                             m.onEnable();
                         }
                     }

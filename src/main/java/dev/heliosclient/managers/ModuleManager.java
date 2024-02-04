@@ -38,7 +38,7 @@ public class ModuleManager {
     public void registerModules(Module_... modules) {
         for (Module_ module : modules) {
             this.modules.add(module);
-            module.onLoad();
+            //   module.onLoad();
         }
     }
 

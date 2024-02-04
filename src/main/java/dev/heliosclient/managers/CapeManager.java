@@ -1,6 +1,7 @@
 package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.util.fontutils.FontLoader;
 import dev.heliosclient.util.render.GifTexture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
@@ -33,13 +34,12 @@ public class CapeManager {
      */
     public static String[] loadCapes() {
         if (!CAPE_DIRECTORY.exists()) {
-
             HeliosClient.LOGGER.info("Cape directory does not exist");
             CAPE_DIRECTORY.mkdirs();
         }
 
         File defaultCapeFile = new File(CAPE_DIRECTORY, DEFAULT_CAPE);
-        try (InputStream inputStream = CapeManager.class.getResourceAsStream("/assets/heliosclient/capes/" + DEFAULT_CAPE)) {
+        try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/capes/" + DEFAULT_CAPE)) {
             if (inputStream != null) {
                 HeliosClient.LOGGER.info("Copying default cape in directory");
                 Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
