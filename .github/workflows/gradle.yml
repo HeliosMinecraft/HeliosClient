@@ -4,7 +4,6 @@
 # documentation.
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
 name: Java Gradle
 
 on: push
@@ -30,4 +29,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: HeliosClient
-          path: build/libs
+          path: build/libs/heliosclient-${{ steps.build.outputs.mod_version }}.jar

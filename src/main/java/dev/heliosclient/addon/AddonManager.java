@@ -38,7 +38,10 @@ public class AddonManager {
                 try {
                     URLClassLoader classLoader = new URLClassLoader(new URL[]{file.toURI().toURL()});
 
+                    File jsonFile = new File(file, "fabric.mod.json");
                     // Parse fabric.mod.json
+                    if (!jsonFile.exists()) continue;
+
                     JsonObject jsonObject = gson.fromJson(new FileReader(new File(file, "fabric.mod.json")), JsonObject.class);
                     String mainClassPath = jsonObject.getAsJsonObject("entrypoints").getAsJsonArray("main").get(0).getAsString();
 
