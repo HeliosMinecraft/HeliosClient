@@ -40,10 +40,13 @@ public class CapeManager {
 
         File defaultCapeFile = new File(CAPE_DIRECTORY, DEFAULT_CAPE);
         try (InputStream inputStream = CapeManager.class.getResourceAsStream("/assets/heliosclient/capes/" + DEFAULT_CAPE)) {
-            assert inputStream != null;
-            HeliosClient.LOGGER.info("Copying default cape in directory");
-            Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            HeliosClient.LOGGER.info("Copying completed");
+            if (inputStream != null) {
+                HeliosClient.LOGGER.info("Copying default cape in directory");
+                Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                HeliosClient.LOGGER.info("Copying completed");
+            } else {
+                HeliosClient.LOGGER.error("Failed to load default cape resource");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -124,12 +127,6 @@ public class CapeManager {
         return imgNew;
     }
 
-    private static byte[] toByteArray(BufferedImage bufferedImage, String format) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, format, baos);
-        return baos.toByteArray();
-    }
-
     public static void loadCape(PlayerEntity player, Identifier capeTexture) {
         if (HeliosClient.MC.getResourceManager() != null) {
             try (InputStream stream = MinecraftClient.getInstance().getResourceManager().getResource(capeTexture).orElseThrow().getInputStream()) {
@@ -187,6 +184,6 @@ public class CapeManager {
     }
 
     public static void setElytra(PlayerEntity player, Identifier texture) {
-        ELYTRAS.put(player.getUuid(), texture); // New method for elytra textures
+        ELYTRAS.put(player.getUuid(), texture);
     }
 }

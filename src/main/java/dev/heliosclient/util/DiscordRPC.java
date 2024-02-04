@@ -28,6 +28,12 @@ public class DiscordRPC {
     private Core discordCore;
     private Activity activity;
 
+    /**
+     * File should be around 25mb. Any more and there is some error while downloading. Please report to devs.
+     *
+     * @return
+     * @throws IOException
+     */
     public static File downloadDiscordGameSDK() throws IOException {
         // Find out which name Discord's library has (.dll for Windows, .so for Linux)
         String name = "discord_game_sdk";
@@ -94,6 +100,7 @@ public class DiscordRPC {
     }
 
     public void runPresence() {
+        callbackThread = new Thread(() -> {
         LOGGER.info("Discord Rich Presence is running!");
         Core.init(discordLibrary);
         try (CreateParams params = new CreateParams()) {
@@ -107,7 +114,6 @@ public class DiscordRPC {
             activity.timestamps().setStart(Instant.now());
 
 
-            callbackThread = new Thread(() -> {
                 // Run callbacks forever
                 isRunning = true;
                 while (true) {
@@ -118,10 +124,10 @@ public class DiscordRPC {
                         e.printStackTrace();
                     }
                 }
-            });
-            callbackThread.setName("Discord-Callback");
-            callbackThread.start();
         }
+        });
+        callbackThread.setName("Discord-Callback");
+        callbackThread.start();
     }
 
     public void stopPresence() {
@@ -160,8 +166,9 @@ public class DiscordRPC {
 
     public enum GameState {
         MAINMENU("Main Menu"),
-        SINGLEPLAYER("SinglePlayer"),
-        MULTIPLAYER("Multi-Player"),
+        REALMS("Realms Screen"),
+        SINGLEPLAYER("SinglePlayer world"),
+        MULTIPLAYER("Multi-Player server"),
         SINGLEPLAYER_SCREEN("SinglePlayer Screen"),
         MULTIPLAYER_SCREEN("Multi-Player Screen");
 

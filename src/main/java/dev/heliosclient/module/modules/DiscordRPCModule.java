@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screen.multiplayer.DirectConnectScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.minecraft.client.realms.gui.screen.RealmsScreen;
 
 public class DiscordRPCModule extends Module_ {
     public DiscordRPCModule() {
@@ -52,6 +53,8 @@ public class DiscordRPCModule extends Module_ {
             if (!HeliosClient.MC.isInSingleplayer() || HeliosClient.MC.player.getServer() != null) {
                 DiscordRPC.INSTANCE.currentGameState = DiscordRPC.GameState.MULTIPLAYER;
             }
+        } else if (HeliosClient.MC.currentScreen instanceof RealmsScreen) {
+            DiscordRPC.INSTANCE.currentGameState = DiscordRPC.GameState.REALMS;
         } else {
             DiscordRPC.INSTANCE.currentGameState = DiscordRPC.GameState.MAINMENU;
         }
