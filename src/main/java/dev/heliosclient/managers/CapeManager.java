@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
@@ -39,7 +40,7 @@ public class CapeManager {
         }
 
         File defaultCapeFile = new File(CAPE_DIRECTORY, DEFAULT_CAPE);
-        try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/capes/" + DEFAULT_CAPE)) {
+        try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/capes/helioscape.png")) {
             if (inputStream != null) {
                 HeliosClient.LOGGER.info("Copying default cape in directory");
                 Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
