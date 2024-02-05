@@ -13,6 +13,7 @@ import java.util.Deque;
 import java.util.Iterator;
 
 public class NotificationManager implements Listener {
+    public static NotificationManager INSTANCE = new NotificationManager();
     private static final int HEIGHT = 25;
     private final Deque<Notification> notifications = new ArrayDeque<>();
 

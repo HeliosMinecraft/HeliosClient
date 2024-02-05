@@ -38,8 +38,6 @@ public class HeliosClient implements ModInitializer, Listener {
     public static Config CONFIG = new Config();
     public static int uiColorA = 0xFF55FFFF;
     public static int uiColor = 0x55FFFF;
-    public static FontManager fontManager = new FontManager();
-    public static NotificationManager notificationManager = new NotificationManager();
     public static AddonManager addonManager = new AddonManager();
     public static ClickGUI CLICKGUI = new ClickGUI();
 
@@ -52,7 +50,7 @@ public class HeliosClient implements ModInitializer, Listener {
         CONFIG.loadModules();
         LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
         if(shouldSendNotification()){
-            notificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+            NotificationManager.INSTANCE.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
         configTimer.resetTimer();
 
@@ -69,13 +67,13 @@ public class HeliosClient implements ModInitializer, Listener {
         CONFIG.save();
         LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
         if(shouldSendNotification()){
-            notificationManager.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+            NotificationManager.INSTANCE.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
         configTimer.resetTimer();
     }
 
     public static boolean shouldSendNotification() {
-        return (notificationManager != null && ModuleManager.notificationModule != null && ModuleManager.notificationModule.clientNotification.value && MC.getWindow() != null);
+        return (NotificationManager.INSTANCE != null && ModuleManager.notificationModule != null && ModuleManager.notificationModule.clientNotification.value && MC.getWindow() != null);
     }
     @SubscribeEvent
     public void tick(TickEvent.CLIENT client){
@@ -94,7 +92,7 @@ public class HeliosClient implements ModInitializer, Listener {
 
         LOGGER.info("Helios Client loading...");
 
-        fontManager.refresh();
+        FontManager.INSTANCE.refresh();
         addonManager.loadAddons();
         AddonManager.initializeAddons();
 
@@ -128,18 +126,16 @@ public class HeliosClient implements ModInitializer, Listener {
                 DiscordRPC.INSTANCE.stopPresence();
             }
         }));
-
-        CapeManager.capes = CapeManager.loadCapes();
-        CapeSynchronizer.registerCapeSyncPacket();
     }
 
     public void registerEvents() {
-        EventManager.register(fontManager);
-        EventManager.register(notificationManager);
-        EventManager.register(dev.heliosclient.util.Renderer2D.INSTANCE);
+        EventManager.register(FontManager.INSTANCE);
+        EventManager.register(NotificationManager.INSTANCE);
+        EventManager.register(Renderer2D.INSTANCE);
         EventManager.register(KeybindManager.INSTANCE);
         EventManager.register(ColorManager.INSTANCE);
         EventManager.register(TickRate.INSTANCE);
+        EventManager.register(CapeManager.INSTANCE);
         EventManager.register(new DamageUtils());
     }
 }

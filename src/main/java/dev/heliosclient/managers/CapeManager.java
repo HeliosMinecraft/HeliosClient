@@ -1,6 +1,10 @@
 package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.util.cape.CapeSynchronizer;
 import dev.heliosclient.util.fontutils.FontLoader;
 import dev.heliosclient.util.render.GifTexture;
 import net.minecraft.client.MinecraftClient;
@@ -18,7 +22,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-public class CapeManager {
+public class CapeManager implements Listener {
+    public static CapeManager INSTANCE = new CapeManager();
     private static final File CAPE_DIRECTORY = new File(HeliosClient.MC.runDirectory, "heliosclient/capes");
     private static final String DEFAULT_CAPE = "helioscape.png";
     public static final Identifier CAPE_TEXTURE = new Identifier("heliosclient", "capes/" + DEFAULT_CAPE);
@@ -30,6 +35,14 @@ public class CapeManager {
     public static List<Identifier> capeIdentifiers = new ArrayList<>();
     public static List<Identifier> elytraIdentifiers = new ArrayList<>();
 
+    @SubscribeEvent
+    public void onTick(TickEvent e) {
+        if (HeliosClient.MC.getWindow() != null) {
+            CapeManager.capes = CapeManager.loadCapes();
+            CapeSynchronizer.registerCapeSyncPacket();
+            EventManager.unregister(this);
+        }
+    }
     /**
      * Works similar to FontLoader#loadFonts
      */

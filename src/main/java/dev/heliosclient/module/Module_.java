@@ -8,6 +8,7 @@ import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
@@ -122,7 +123,7 @@ public abstract class Module_ implements Listener, ISettingChange {
             ChatUtils.sendHeliosMsg(this.name + " was enabled.");
         }
         if (ModuleManager.notificationModule.moduleNotification.value && HeliosClient.shouldSendNotification()) {
-            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
+            NotificationManager.INSTANCE.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
         }
         EventManager.register(this);
     }
@@ -143,7 +144,7 @@ public abstract class Module_ implements Listener, ISettingChange {
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
         }
         if (ModuleManager.notificationModule.moduleNotification.value && HeliosClient.shouldSendNotification()) {
-            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
+            NotificationManager.INSTANCE.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
         }
         EventManager.unregister(this);
     }
