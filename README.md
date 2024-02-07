@@ -12,7 +12,10 @@
 <details>
     <summary>Click to show</summary>
     <p>Keep in mind that these images might be outdated as Helios is currently updating frequently!</p>
-    <img src="https://github.com/HeliosClient/HeliosClient/blob/main/.github/images/ClickGUI.png?raw=true" alt="Click GUI">
+    <p>New clickgui as of commit #199 (0758e8c)</p>
+    <img src="https://github.com/HeliosClient/HeliosClient/assets/120117618/9fc78cc1-6a93-4ef7-83ef-3cff64b3c3f4" alt="New Click GUI">
+    <p>Old clickgui</p>
+    <img src="https://github.com/HeliosClient/HeliosClient/blob/main/.github/images/ClickGUI.png?raw=true" alt="Old Click GUI">
 </details>  
 
 ## Building
