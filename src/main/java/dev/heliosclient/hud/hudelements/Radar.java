@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Radar extends HudElement {
-    private static int RADAR_SIZE = 100; // Size of the radar in pixels    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
+    private static int RADAR_SIZE = 100; // Size of the radar in pixels
+    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
 
     private static int MAX_DISTANCE = 25; // Maximum entity distance
     public SettingGroup sgRadarSettings = new SettingGroup("General");
