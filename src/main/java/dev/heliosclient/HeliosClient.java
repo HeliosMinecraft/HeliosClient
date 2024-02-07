@@ -95,7 +95,7 @@ public class HeliosClient implements ModInitializer, Listener {
         DiscordRPC.INSTANCE.getLibrary();
 
 
-        LOGGER.info("Helios Client loading...");
+        LOGGER.info("Initialising Helios Client...");
 
         FontManager.INSTANCE.refresh();
         addonManager.loadAddons();

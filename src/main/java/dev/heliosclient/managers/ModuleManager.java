@@ -33,12 +33,13 @@ public class ModuleManager {
 
     public void registerModule(Module_ module) {
         modules.add(module);
+        module.onLoad();
     }
 
     public void registerModules(Module_... modules) {
         for (Module_ module : modules) {
             this.modules.add(module);
-            //   module.onLoad();
+            module.onLoad();
         }
     }
 

@@ -177,6 +177,7 @@ public class Radar extends HudElement {
         int centerY = y + RADAR_SIZE / 2;
 
         renderBg.value = true;
+        rounded.value = true;
 
         Vec3d playerPos = mc.player.getPos();
 
@@ -208,7 +209,6 @@ public class Radar extends HudElement {
                 }
             }
         }
-
     }
 
     @Override
