@@ -12,7 +12,6 @@ public class Fps extends HudElement {
 
     public Fps() {
         super(DATA);
-
         this.width = 20;
         this.height = 10;
     }    public static HudElementData<Fps> DATA = new HudElementData<>("FPS", "Shows current Fps", Fps::new);

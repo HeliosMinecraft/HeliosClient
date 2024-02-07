@@ -19,6 +19,7 @@
     "ClientConnectionMixin",
     "ClientPlayerEntityMixin",
     "ElytraFeatureRendererMixin",
+    "EntityRendererMixin",
     "GameRendererMixin",
     "InGameHudMixin",
     "KeyboardMixin",

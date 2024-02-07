@@ -21,10 +21,8 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class for creating HudElements for HUD
@@ -114,8 +112,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         this.description = hudElementInfo.description();
         hudBox = new HudBox(x, y, width, height);
         EventManager.register(this);
-
-        addSettingGroup(sgUI);
     }
 
     /**
@@ -304,7 +300,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      * Called on load.
      */
     public void onLoad() {
-        //addSettingGroup(sgUI);
+        addSettingGroup(sgUI);
     }
 
     @SubscribeEvent

@@ -20,6 +20,8 @@ public class HudElementList {
         registerElement(TestHud.DATA);
         registerElement(CompactData.DATA);
         registerElement(Tps.DATA);
+        registerElement(Radar.DATA);
+
     }
 
     public void registerElement(HudElementData hudElementData) {

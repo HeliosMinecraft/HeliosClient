@@ -40,6 +40,7 @@ public class HeliosClient implements ModInitializer, Listener {
     public static int uiColor = 0x55FFFF;
     public static AddonManager addonManager = new AddonManager();
     public static ClickGUI CLICKGUI = new ClickGUI();
+    public static boolean isSaving = false;
 
     public static void loadConfig() {
         configTimer.startTimer();
@@ -60,6 +61,9 @@ public class HeliosClient implements ModInitializer, Listener {
     }
 
     public static void saveConfig() {
+        if (isSaving) return;
+
+        isSaving = true;
         LOGGER.info("Saving config... \t Module Config being saved: " + Config.MODULES);
         configTimer.startTimer();
         CONFIG.getModuleConfig();
@@ -70,6 +74,7 @@ public class HeliosClient implements ModInitializer, Listener {
             NotificationManager.INSTANCE.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
         configTimer.resetTimer();
+        isSaving = false;
     }
 
     public static boolean shouldSendNotification() {
@@ -126,6 +131,10 @@ public class HeliosClient implements ModInitializer, Listener {
                 DiscordRPC.INSTANCE.stopPresence();
             }
         }));
+    }
+
+    public static boolean shouldUpdate() {
+        return MC.getWindow() == null && MC.player == null;
     }
 
     public void registerEvents() {
