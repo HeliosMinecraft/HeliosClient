@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 
 public class Radar extends HudElement {
     private static int RADAR_SIZE = 100; // Size of the radar in pixels
-    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
 
+    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
     private static int MAX_DISTANCE = 25; // Maximum entity distance
     public SettingGroup sgRadarSettings = new SettingGroup("General");
     public SettingGroup sgRadarColors = new SettingGroup("Colors");
@@ -201,13 +201,14 @@ public class Radar extends HudElement {
                     radius = 1f;
                 }
                 if (entity == mc.player) {
-                    FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF123", x2 - 1f, y2 - 1f, color);
+                    FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF123", x2 - 1.5f, y2 - 1.2f, color);
                 } else {
                     // Draw a dot for the entity
                     Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), x2, y2, radius, color);
                 }
             }
         }
+
     }
 
     @Override
