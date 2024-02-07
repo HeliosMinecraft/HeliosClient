@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 public class Radar extends HudElement {
     private static int RADAR_SIZE = 100; // Size of the radar in pixels    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
+
     private static int MAX_DISTANCE = 25; // Maximum entity distance
     public SettingGroup sgRadarSettings = new SettingGroup("General");
     public SettingGroup sgRadarColors = new SettingGroup("Colors");
@@ -99,6 +100,7 @@ public class Radar extends HudElement {
             .onSettingChange(this)
             .build()
     );
+
     public RGBASetting playerColor = sgRadarColors.add(new RGBASetting.Builder()
             .name("Player")
             .description("Color of players in radar")
@@ -147,6 +149,8 @@ public class Radar extends HudElement {
             .onSettingChange(this)
             .build()
     );
+
+
     public Radar() {
         super(DATA);
         addSettingGroup(sgRadarSettings);
@@ -222,6 +226,7 @@ public class Radar extends HudElement {
                 !includeOthers.value;
     }
 
+
     private int getColor(Entity entity) {
         int color;
         if (entity instanceof TameableEntity e && includeTamed.value) {
@@ -241,7 +246,4 @@ public class Radar extends HudElement {
         }
         return color;
     }
-
-
-
 }
