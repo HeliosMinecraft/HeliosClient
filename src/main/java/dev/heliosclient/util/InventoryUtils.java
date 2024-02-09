@@ -1,11 +1,18 @@
 package dev.heliosclient.util;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.module.settings.Option;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
+import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class InventoryUtils {
     private static final PlayerEntity player = HeliosClient.MC.player;
@@ -157,5 +164,14 @@ public class InventoryUtils {
         }
 
         return fastestTool; // Return the fastest tool, or an empty ItemStack if no tools were found
+    }
+
+    public static ArrayList<Option<Item>> getItemNames() {
+        ArrayList<Option<Item>> options = new ArrayList<>();
+        for (Item item : Registries.ITEM) {
+            String itemName = Text.translatable(item.getTranslationKey()).getLiteralString();
+            options.add(new Option<>(itemName, item, false));
+        }
+        return options;
     }
 }

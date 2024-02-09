@@ -3,6 +3,7 @@ package dev.heliosclient.managers;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.*;
+import dev.heliosclient.util.MathUtils;
 
 import java.util.ArrayList;
 
@@ -59,30 +60,16 @@ public class ModuleManager {
                 moduleS.add(module);
                 return moduleS;
             }
-            if (!moduleName.isEmpty() && module.name.trim().toLowerCase().startsWith(moduleName.trim().toLowerCase())) {
+            if (!moduleName.isEmpty() && MathUtils.jaroWinklerSimilarity(module.name.trim().toLowerCase(), moduleName.trim().toLowerCase()) >= 0.66) {
                 moduleS.add(module);
             }
         }
         moduleS.sort((m1, m2) -> {
-            int m1Score = getRelevanceScore(m1.name, moduleName);
-            int m2Score = getRelevanceScore(m2.name, moduleName);
-            return Integer.compare(m2Score, m1Score);
+            double m1Score = MathUtils.jaroWinklerSimilarity(m1.name, moduleName);
+            double m2Score = MathUtils.jaroWinklerSimilarity(m2.name, moduleName);
+            return Double.compare(m2Score, m1Score);
         });
         return moduleS;
-    }
-
-    private int getRelevanceScore(String name, String query) {
-        String lowerCaseName = name.toLowerCase();
-        String lowerCaseQuery = query.toLowerCase();
-        if (lowerCaseName.equals(lowerCaseQuery)) {
-            return 3;
-        } else if (lowerCaseName.startsWith(lowerCaseQuery)) {
-            return 2;
-        } else if (lowerCaseName.contains(lowerCaseQuery)) {
-            return 1;
-        } else {
-            return 0;
-        }
     }
 
 

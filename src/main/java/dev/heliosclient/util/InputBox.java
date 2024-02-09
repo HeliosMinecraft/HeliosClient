@@ -168,6 +168,11 @@ public class InputBox implements Listener {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y, width, height, 2, Color.BLACK.getRGB());
     }
 
+    public void setSize(int width, int height) {
+        setWidth(width);
+        setHeight(height);
+    }
+
     @SubscribeEvent
     public void keyPressed(KeyPressedEvent event) {
         int keyCode = event.getKey();
