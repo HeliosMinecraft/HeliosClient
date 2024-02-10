@@ -7,6 +7,7 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.cape.CapeSynchronizer;
 import dev.heliosclient.util.fontutils.FontLoader;
 import dev.heliosclient.util.render.GifTexture;
+import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;

@@ -188,7 +188,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         // Draw the alpha slider
         Color value1 = new Color(value.getRed(), value.getGreen(), value.getBlue(), 0);
         Color value2 = new Color(value.getRed(), value.getGreen(), value.getBlue(), 255);
-        Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), x, y, sliderWidth, boxHeight, value1.getRGB(), value2.getRGB());
+        Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), x, y, sliderWidth, boxHeight, value1.getRGB(), value2.getRGB(), Renderer2D.Direction.TOP_BOTTOM);
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, sliderWidth + 2, boxHeight + 2, 1, 1, value3);
 

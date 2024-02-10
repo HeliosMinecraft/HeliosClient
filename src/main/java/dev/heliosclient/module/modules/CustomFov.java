@@ -33,7 +33,7 @@ public class CustomFov extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
-        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).setValueUnrestricted((int) (FOV.value));
+        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).heliosClient$setValueUnrestricted((int) (FOV.value));
     }
 
     @Override
@@ -45,6 +45,6 @@ public class CustomFov extends Module_ {
     @Override
     public void onDisable() {
         super.onDisable();
-        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).setValueUnrestricted(previousFov);
+        ((ISimpleOption<Integer>) (Object) mc.options.getFov()).heliosClient$setValueUnrestricted(previousFov);
     }
 }

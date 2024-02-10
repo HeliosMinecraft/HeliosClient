@@ -11,16 +11,17 @@ import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.render.GradientUtils;
 import me.x150.renderer.render.Renderer3d;
+import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
+
+import static dev.heliosclient.util.Renderer2D.drawContext;
 
 
 public class Test extends Module_ {
@@ -43,21 +44,12 @@ public class Test extends Module_ {
     BooleanSetting TracerLine = sgGeneral.add(new BooleanSetting("TracerLine", "", this, false, () -> true, false));
     BooleanSetting blockOutlineAndFIll = sgGeneral.add(new BooleanSetting("blockOutlineAndFIll", "", this, false, () -> true, false));
     RGBASetting color = sgGeneral.add(new RGBASetting("Color", "color", Color.WHITE, false, this, () -> true));
-    GradientUtils rainbowGradient = new GradientUtils();
-
 
     public Test() {
         super("Test", "Render Test", Categories.RENDER);
 
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
-        rainbowGradient.addColor(Color.RED);
-        rainbowGradient.addColor(Color.ORANGE);
-        rainbowGradient.addColor(Color.YELLOW);
-        rainbowGradient.addColor(Color.GREEN);
-        rainbowGradient.addColor(Color.BLUE);
-        rainbowGradient.addColor(new Color(75, 0, 130)); // Indigo
-        rainbowGradient.addColor(new Color(238, 130, 238)); // Violet
     }
 
     @Override
@@ -100,8 +92,14 @@ public class Test extends Module_ {
         if (GradientRounded.value)
             Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), 22, 20, 40, 40, Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 2, 20, Color.WHITE);
 
-        if (Gradient.value)
-            Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), 20, 20, 40, 40, 10, ColorUtils.getRainbowColor().getRGB(), Color.WHITE.getRGB());
+        if (Gradient.value) {
+        }
+
+
+    }
+
+    @SubscribeEvent
+    public void renderer3d(Render3DEvent event) {
         PlayerEntity player = HeliosClient.MC.player;
 
         if (player != null && player.getWorld() != null) {
@@ -120,15 +118,10 @@ public class Test extends Module_ {
             Vec3d dimensions = new Vec3d(1, 1, 1);
 
             Renderer3d.renderOutline(drawContext.getMatrices(), Color.WHITE, start, dimensions);
-            Renderer3d.renderLine(drawContext.getMatrices(), Color.yellow, player.getEyePos(), end);
+            Renderer3d.renderLine(drawContext.getMatrices(), Color.yellow, RendererUtils.getCrosshairVector(), end);
             Renderer3d.renderFilled(drawContext.getMatrices(), Color.GREEN, start2, dimensions);
             Renderer3d.renderEdged(drawContext.getMatrices(), Color.CYAN, Color.BLACK, start3, dimensions);
         }
-
-    }
-
-    @SubscribeEvent
-    public void renderer3d(Render3DEvent event) {
     }
 
 

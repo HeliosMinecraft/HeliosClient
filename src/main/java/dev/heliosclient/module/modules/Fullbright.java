@@ -52,7 +52,7 @@ public class Fullbright extends Module_ {
     public void onEnable() {
         super.onEnable();
         if (mode.value == 0 && mc.player != null) {
-            ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(gamma.value);
+            ((ISimpleOption<Double>) (Object) mc.options.getGamma()).heliosClient$setValueUnrestricted(gamma.value);
             mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
         } else if (mc.player != null && mode.value == 1) {
             mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 254, true, false, false));
@@ -64,7 +64,7 @@ public class Fullbright extends Module_ {
         super.onSettingChange(setting);
         if (active.value) {
             if (mode.value == 0 && mc.player != null) {
-                ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(gamma.value);
+                ((ISimpleOption<Double>) (Object) mc.options.getGamma()).heliosClient$setValueUnrestricted(gamma.value);
                 mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
             } else if (mc.player != null && mode.value == 1) {
                 mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 254, true, false, false));

@@ -36,22 +36,13 @@ public abstract class MinecraftClientMixin {
         }
     }
 
-
-    @Inject(at = @At("TAIL"), method = "scheduleStop")
-    public void onShutdown(CallbackInfo ci) {
-        // FUCK LAG
-        HeliosClient.saveConfig();
-    }
-
     @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V", at = @At("HEAD"), cancellable = true)
     private void onDisconnect(Screen screen, CallbackInfo info) {
         if (world != null) {
             PlayerEntity player = HeliosClient.MC.player;
             Event event = new PlayerJoinEvent(player);
-            EventManager.postEvent(event);
-            if (event.isCanceled()) {
+            if (EventManager.postEvent(event).isCanceled())
                 info.cancel();
-            }
         }
     }
 }

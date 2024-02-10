@@ -24,13 +24,16 @@ public class EventManager {
 
     public static void register(Listener listener) {
         Map<Class<?>, List<MethodHandle>> listenerMethods = new HashMap<>();
+
         for (Method method : listener.getClass().getMethods()) {
             if (method.isAnnotationPresent(SubscribeEvent.class) && method.getParameterCount() == 1) {
                 Class<?> eventType = method.getParameterTypes()[0];
                 MethodHandle methodHandle = getMethodHandle(method);
                 List<MethodHandle> methodHandles = listenerMethods.computeIfAbsent(eventType, k -> new ArrayList<>());
                 methodHandles.add(methodHandle);
-                methodHandles.sort(METHOD_COMPARATOR);
+                if (methodHandles.size() > 1) {
+                    methodHandles.sort(METHOD_COMPARATOR);
+                }
             }
         }
         INSTANCE.put(listener, listenerMethods);
