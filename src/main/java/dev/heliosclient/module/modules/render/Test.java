@@ -20,6 +20,7 @@ import me.x150.renderer.render.Renderer3d;
 import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -108,11 +109,14 @@ public class Test extends Module_ {
 
         if (player != null && player.getWorld() != null) {
             Vec3d end = new Vec3d(200, 200, 200);
+            Vec3d end2 = new Vec3d(200, player.getY(), 200);
 
             QuadColor gradient = QuadColor.gradient(Color.WHITE.getRGB(), Color.GREEN.getRGB(), QuadColor.CardinalDirection.SOUTH);
 
             Renderer3D.drawBoxBoth(new BlockPos(player.getBlockPos().getX() - 5, player.getBlockPos().getY() + 2, player.getBlockPos().getZ() + 6), gradient, 3);
             Renderer3D.drawLine(Renderer3D.getEyeTracer(), end, LineColor.gradient(Color.WHITE.getRGB(), Color.GREEN.getRGB()), 1f);
+            Renderer3D.renderItem(Items.DIAMOND_BLOCK.getDefaultStack(), end);
+            Renderer3D.drawItemWithPhysics(Items.DIAMOND_BLOCK.getDefaultStack(), end2, mc.getTickDelta());
         }
     }
 

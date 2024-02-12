@@ -11,10 +11,13 @@ import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.random.Random;
 
 /*
 Credits: BleachHack 1.19.4
@@ -277,6 +280,56 @@ public class Renderer3D {
         RenderSystem.disableBlend();
     }
 
+    public static void renderItem(ItemStack itemStack, Vec3d position) {
+        if (HeliosClient.MC.world == null) return;
+
+
+        MatrixStack matrices = matrixFrom(position.x, position.y, position.z);
+
+        matrices.translate(position.x, position.y, position.z);
+        matrices.scale(0.5F, 0.5F, 0.5F);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        DiffuseLighting.disableGuiDepthLighting();
+
+
+        MinecraftClient.getInstance().getItemRenderer().renderItem(itemStack, ModelTransformationMode.GROUND, 0xF000F0, OverlayTexture.DEFAULT_UV, matrices, mc.getBufferBuilders().getEntityVertexConsumers(), HeliosClient.MC.world, 0);
+
+        DiffuseLighting.enableGuiDepthLighting();
+        mc.getBufferBuilders().getEntityVertexConsumers().draw();
+
+        RenderSystem.disableBlend();
+    }
+
+    public static void drawItemWithPhysics(ItemStack itemStack, Vec3d position, float deltaTime) {
+        MatrixStack matrices = matrixFrom(position.x, position.y, position.z);
+
+        double xDist = position.x - MinecraftClient.getInstance().player.getX();
+        double zDist = position.z - MinecraftClient.getInstance().player.getZ();
+        double dist = MathHelper.sqrt((float) (xDist * xDist + zDist * zDist));
+
+        float rotation = (float) Math.atan2(xDist, zDist);
+        matrices.translate(position.x, position.y, position.z);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) (-Math.toDegrees(rotation))));
+        matrices.scale(0.5F, 0.5F, 0.5F);
+
+        if (dist > 5.0D) {
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(30.0F));
+        }
+
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(deltaTime, Random.create().nextFloat() * 360.0F, Random.create().nextFloat() * 360.0F)));
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        DiffuseLighting.disableGuiDepthLighting();
+
+        MinecraftClient.getInstance().getItemRenderer().renderItem(itemStack, ModelTransformationMode.GROUND, 0xF000F0, OverlayTexture.DEFAULT_UV, matrices, mc.getBufferBuilders().getEntityVertexConsumers(), HeliosClient.MC.world, 0);
+
+        DiffuseLighting.enableGuiDepthLighting();
+        mc.getBufferBuilders().getEntityVertexConsumers().draw();
+
+        RenderSystem.disableBlend();
+    }
     // -------------------- Utils --------------------
 
     public static MatrixStack matrixFrom(double x, double y, double z) {
