@@ -55,7 +55,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.value = defaultColor;
         this.rainbow = rainbow;
         this.defaultRainbow = rainbow;
-        this.height = 25;
+        this.height = 24;
         this.heightCompact = 17;
         this.iSettingChange = ISettingChange;
         EventManager.register(this);

@@ -27,7 +27,7 @@ public class PlayerModel extends HudElement {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null && !renderBg.value) {
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, this.y, width - 1, height - 1, Color.BLACK.getRGB());
-        } else {
+        } else if (!renderBg.value) {
             Renderer2D.drawEntity(drawContext, x + width / 2, y + height - 6, 25, player, MinecraftClient.getInstance().getTickDelta());
         }
 

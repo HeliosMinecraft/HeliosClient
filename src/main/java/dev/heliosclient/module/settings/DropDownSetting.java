@@ -104,7 +104,8 @@ public class DropDownSetting extends Setting<Integer> {
                     Renderer2D.drawFixedString(drawContext.getMatrices(), String.valueOf(option), x2 + center, offset, Color.white.getRGB());
                     offset += Renderer2D.getFxStringHeight() + 2.0f;
                 }
-                this.height = Math.round(offset - y);
+                // 24 is the height of setting
+                this.height = Math.max(24, Math.round(offset - y));
             }
             // Draw the name of the option
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": ", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());

@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
@@ -13,10 +13,14 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.Renderer3D;
+import dev.heliosclient.util.render.color.LineColor;
+import dev.heliosclient.util.render.color.QuadColor;
 import me.x150.renderer.render.Renderer3d;
 import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
@@ -103,24 +107,12 @@ public class Test extends Module_ {
         PlayerEntity player = HeliosClient.MC.player;
 
         if (player != null && player.getWorld() != null) {
-            Renderer3d.renderThroughWalls();
-            float pitch = player.getPitch();
-            float yaw = player.getYaw();
-            Vec3d direction = new Vec3d(0, 0, -1).rotateY(yaw).rotateX(pitch);
-            Vec3d end = player.getEyePos().add(direction.multiply(20));
+            Vec3d end = new Vec3d(200, 200, 200);
 
+            QuadColor gradient = QuadColor.gradient(Color.WHITE.getRGB(), Color.GREEN.getRGB(), QuadColor.CardinalDirection.SOUTH);
 
-            Vec3d start = new Vec3d(player.getX() + 2, player.getY() + 1, player.getZ() - 3);
-            Vec3d start2 = new Vec3d(50, player.getY() - 1, player.getZ() + 2);
-            Vec3d start3 = new Vec3d(player.getX() - 5, player.getY() + 2, player.getZ() + 6);
-
-
-            Vec3d dimensions = new Vec3d(1, 1, 1);
-
-            Renderer3d.renderOutline(drawContext.getMatrices(), Color.WHITE, start, dimensions);
-            Renderer3d.renderLine(drawContext.getMatrices(), Color.yellow, RendererUtils.getCrosshairVector(), end);
-            Renderer3d.renderFilled(drawContext.getMatrices(), Color.GREEN, start2, dimensions);
-            Renderer3d.renderEdged(drawContext.getMatrices(), Color.CYAN, Color.BLACK, start3, dimensions);
+            Renderer3D.drawBoxBoth(new BlockPos(player.getBlockPos().getX() - 5, player.getBlockPos().getY() + 2, player.getBlockPos().getZ() + 6), gradient, 3);
+            Renderer3D.drawLine(Renderer3D.getEyeTracer(), end, LineColor.gradient(Color.WHITE.getRGB(), Color.GREEN.getRGB()), 1f);
         }
     }
 

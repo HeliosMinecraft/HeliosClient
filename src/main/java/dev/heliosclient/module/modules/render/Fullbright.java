@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.Categories;

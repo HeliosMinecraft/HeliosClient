@@ -24,6 +24,7 @@
     "InGameHudMixin",
     "KeyboardMixin",
     "MinecraftClientMixin",
+    "MixinClientPlayerInteractionManager",
     "MixinClientPlayNetworkHandler",
     "MixinSplashScreen",
     "MouseMixin",

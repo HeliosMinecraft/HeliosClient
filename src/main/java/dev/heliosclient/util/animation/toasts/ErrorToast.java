@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ErrorToast implements net.minecraft.client.toast.Toast {
 
-    private static final Identifier TEXTURE = new Identifier("toast/advancement");
+    private static final Identifier TEXTURE = new Identifier("textures/gui/sprites/toast/advancement.png");
     private final String message;
     private final boolean hasProgressBar;
     private final long endDelay;
@@ -31,7 +31,7 @@ public class ErrorToast implements net.minecraft.client.toast.Toast {
 
     public Toast.Visibility draw(DrawContext context, ToastManager manager, long startTime) {
         context.drawTexture(TEXTURE, 0, 0, 0, 96, this.getWidth(), this.getHeight());
-        List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth() - 30);
+        List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth() - 36);
 
         int yOffset = 2;
         for (String s : messageWarp) {

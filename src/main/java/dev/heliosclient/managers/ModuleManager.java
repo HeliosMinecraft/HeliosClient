@@ -2,7 +2,18 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.modules.*;
+import dev.heliosclient.module.modules.chat.ChatHighlight;
+import dev.heliosclient.module.modules.misc.CapeModule;
+import dev.heliosclient.module.modules.misc.DiscordRPCModule;
+import dev.heliosclient.module.modules.misc.NotificationModule;
+import dev.heliosclient.module.modules.movement.Fly;
+import dev.heliosclient.module.modules.movement.Speed;
+import dev.heliosclient.module.modules.movement.Step;
+import dev.heliosclient.module.modules.player.NoFall;
+import dev.heliosclient.module.modules.render.CustomFov;
+import dev.heliosclient.module.modules.render.Fullbright;
+import dev.heliosclient.module.modules.render.HUDModule;
+import dev.heliosclient.module.modules.render.Test;
 import dev.heliosclient.util.MathUtils;
 
 import java.util.ArrayList;

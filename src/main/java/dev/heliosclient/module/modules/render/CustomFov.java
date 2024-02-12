@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
@@ -33,18 +33,24 @@ public class CustomFov extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
+        if (mc.options == null) return;
+
         ((ISimpleOption<Integer>) (Object) mc.options.getFov()).heliosClient$setValueUnrestricted((int) (FOV.value));
     }
 
     @Override
     public void onEnable() {
         super.onEnable();
+        if (mc.options == null) return;
+
         previousFov = mc.options.getFov().getValue();
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
+        if (mc.options == null) return;
+
         ((ISimpleOption<Integer>) (Object) mc.options.getFov()).heliosClient$setValueUnrestricted(previousFov);
     }
 }

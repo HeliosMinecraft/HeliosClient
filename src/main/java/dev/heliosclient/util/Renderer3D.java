@@ -1,14 +1,19 @@
 package dev.heliosclient.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.render.FrustumUtils;
 import dev.heliosclient.util.render.Vertexer;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
+import me.x150.renderer.util.RendererUtils;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 
 /*
@@ -17,6 +22,7 @@ Credits: BleachHack 1.19.4
 Todo: Replace this later with orignal code
  */
 public class Renderer3D {
+    static MinecraftClient mc = MinecraftClient.getInstance();
     /**
      * Offsets this box so that minX, minY and minZ are all zero.
      **/
@@ -202,6 +208,75 @@ public class Renderer3D {
         cleanup();
     }
 
+    public static void drawLine(Vec3d start, Vec3d end, LineColor color, float width) {
+        if (!FrustumUtils.isPointVisible(start.x, start.y, start.z) && !FrustumUtils.isPointVisible(end.x, end.y, end.z)) {
+            return;
+        }
+
+        setup();
+
+        MatrixStack matrices = matrixFrom(start.x, start.y, start.z);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        // Line
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.lineWidth(width);
+
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+        Vertexer.vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (end.x - start.x), (float) (end.y - start.y), (float) (end.z - start.z), color);
+        tessellator.draw();
+
+        RenderSystem.enableCull();
+        RenderSystem.enableDepthTest();
+        cleanup();
+    }
+
+    public static void drawText(Text text, double x, double y, double z, double scale, boolean shadow) {
+        drawText(text, x, y, z, 0, 0, scale, shadow);
+    }
+
+    /**
+     * Draws text in the world.
+     **/
+    public static void drawText(Text text, double x, double y, double z, double offX, double offY, double scale, boolean fill) {
+        MatrixStack matrices = matrixFrom(x, y, z);
+
+        Camera camera = mc.gameRenderer.getCamera();
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+
+        matrices.translate(offX, offY, 0);
+        matrices.scale(-0.025f * (float) scale, -0.025f * (float) scale, 1);
+
+        int halfWidth = mc.textRenderer.getWidth(text) / 2;
+
+        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+
+        if (fill) {
+            int opacity = (int) (MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25F) * 255.0F) << 24;
+            mc.textRenderer.draw(text, -halfWidth, 0f, 553648127, false, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, opacity, 0xf000f0);
+            immediate.draw();
+        } else {
+            matrices.push();
+            matrices.translate(1, 1, 0);
+            mc.textRenderer.draw(text.copy(), -halfWidth, 0f, 0x202020, false, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, 0, 0xf000f0);
+            immediate.draw();
+            matrices.pop();
+        }
+
+        mc.textRenderer.draw(text, -halfWidth, 0f, -1, false, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, 0, 0xf000f0);
+        immediate.draw();
+
+        RenderSystem.disableBlend();
+    }
+
     // -------------------- Utils --------------------
 
     public static MatrixStack matrixFrom(double x, double y, double z) {
@@ -235,6 +310,13 @@ public class Renderer3D {
 
     public static void cleanup() {
         RenderSystem.disableBlend();
+    }
+
+    public static Vec3d getEyeTracer() {
+        return new Vec3d(0, 0, 75)
+                .rotateX(-(float) Math.toRadians(HeliosClient.MC.gameRenderer.getCamera().getPitch()))
+                .rotateY(-(float) Math.toRadians(HeliosClient.MC.gameRenderer.getCamera().getYaw()))
+                .add(HeliosClient.MC.cameraEntity.getEyePos());
     }
 
     /**

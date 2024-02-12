@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.movement;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;

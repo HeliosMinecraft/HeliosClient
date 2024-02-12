@@ -18,6 +18,7 @@ import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -135,7 +136,7 @@ public class ModuleButton implements Listener {
 
         if (module.keyBind.value != -1 && ClickGUI.keybinds) {
             String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
-            Renderer2D.drawFixedString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor);
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getCustomStringWidth(keyName, FontRenderers.Small_fxfontRenderer)), textY, ColorManager.INSTANCE.defaultTextColor);
         }
     }
 

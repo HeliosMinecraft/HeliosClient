@@ -123,7 +123,7 @@ public abstract class Module_ implements Listener, ISettingChange {
             ChatUtils.sendHeliosMsg(this.name + " was enabled.");
         }
         if (ModuleManager.notificationModule.moduleNotification.value && HeliosClient.shouldSendNotification()) {
-            NotificationManager.INSTANCE.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
+            NotificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
         }
         EventManager.register(this);
     }
@@ -144,7 +144,7 @@ public abstract class Module_ implements Listener, ISettingChange {
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
         }
         if (ModuleManager.notificationModule.moduleNotification.value && HeliosClient.shouldSendNotification()) {
-            NotificationManager.INSTANCE.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
+            NotificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
         }
         EventManager.unregister(this);
     }

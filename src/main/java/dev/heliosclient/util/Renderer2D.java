@@ -12,7 +12,10 @@ import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.GaussianBlur;
 import dev.heliosclient.util.render.GradientUtils;
 import dev.heliosclient.util.render.Texture;
+import ladysnake.satin.api.util.RenderLayerHelper;
+import me.x150.renderer.Renderer;
 import me.x150.renderer.font.FontRenderer;
+import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -463,7 +466,7 @@ public class Renderer2D implements Listener {
      * @param radius   radius of the circle outline
      * @param color    color of the circle outline
      */
-    public static void drawCircle(Matrix4f matrix4f, float xCenter, float yCenter, float radius, int color) {
+    public static void drawCircle(Matrix4f matrix4f, float xCenter, float yCenter, float radius, float lineWidth, int color) {
         float red = (float) (color >> 16 & 255) / 255.0F;
         float green = (float) (color >> 8 & 255) / 255.0F;
         float blue = (float) (color & 255) / 255.0F;
@@ -477,8 +480,12 @@ public class Renderer2D implements Listener {
         for (int i = 0; i <= 360; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
             double y = yCenter + Math.cos(Math.toRadians(i)) * radius;
+            double x2 = xCenter + Math.sin(Math.toRadians(i)) * (radius + lineWidth);
+            double y2 = yCenter + Math.cos(Math.toRadians(i)) * (radius + lineWidth);
             bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, 0).color(red, green, blue, alpha).next();
         }
+
 
         tessellator.draw();
     }
@@ -879,56 +886,15 @@ public class Renderer2D implements Listener {
         // Draw the rectangles for the outline with gradient
         drawGradient(matrix4f, x + radius, y, width - radius * 2, thickness, color1.getRGB(), color2.getRGB(), Direction.LEFT_RIGHT); // Top rectangle
         drawGradient(matrix4f, x + radius, y + height - thickness, width - radius * 2, thickness, color3.getRGB(), color4.getRGB(), Direction.RIGHT_LEFT); // Bottom rectangle
-        drawGradient(matrix4f, x, y + radius, thickness, height - radius * 2, color1.getRGB(), color1.getRGB(), Direction.TOP_BOTTOM); // Left rectangle
-        drawGradient(matrix4f, x + width - thickness, y + radius, thickness, height - radius * 2, color2.getRGB(), color2.getRGB(), Direction.BOTTOM_TOP); // Right rectangle
+
+        drawRectangle(matrix4f, x, y + radius, thickness, height - radius * 2, color1.getRGB()); // Left rectangle
+        drawRectangle(matrix4f, x + width - thickness, y + radius, thickness, height - radius * 2, color2.getRGB()); // Right rectangle
 
         // Draw the arcs at the corners for the outline with gradient
         drawArc(matrix4f, x + radius, y + radius, radius, thickness, color1.getRGB(), 180, 270); // Top-left arc
         drawArc(matrix4f, x + width - radius, y + radius, radius, thickness, color2.getRGB(), 90, 180); // Top-right arc
         drawArc(matrix4f, x + width - radius, y + height - radius, radius, thickness, color3.getRGB(), 0, 90); // Bottom-right arc
         drawArc(matrix4f, x + radius, y + height - radius, radius, thickness, color4.getRGB(), 270, 360); // Bottom-left arc
-    }
-
-    // Minecraft InventoryScreen source code but 360 degree support
-    public static void drawEntity(DrawContext context, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
-        float f = (float) Math.atan(mouseX / 40.0F);
-        float g = (float) Math.atan(mouseY / 40.0F);
-        Quaternionf quaternionf = (new Quaternionf()).rotateZ(3.1415927F);
-        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(g * 20.0F * 0.017453292F);
-        quaternionf.mul(quaternionf2);
-        float h = entity.bodyYaw;
-        float i = entity.getYaw();
-        float j = entity.getPitch();
-        float k = entity.prevHeadYaw;
-        float l = entity.headYaw;
-        entity.bodyYaw = 360.0F + f * 20.0F;
-        entity.setYaw(360.0F + f * 40.0F);
-        entity.headYaw = entity.getYaw();
-        entity.prevHeadYaw = entity.getYaw();
-        context.getMatrices().push();
-        context.getMatrices().translate(x, y, 50.0);
-        context.getMatrices().multiplyPositionMatrix((new Matrix4f()).scaling((float) size, (float) size, (float) (-size)));
-        context.getMatrices().multiply(quaternionf);
-        DiffuseLighting.method_34742();
-        EntityRenderDispatcher entityRenderDispatcher = HeliosClient.MC.getEntityRenderDispatcher();
-        if (quaternionf2 != null) {
-            quaternionf2.conjugate();
-            entityRenderDispatcher.setRotation(quaternionf2);
-        }
-
-        entityRenderDispatcher.setRenderShadows(false);
-        RenderSystem.runAsFancy(() -> {
-            entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, HeliosClient.MC.getTickDelta(), context.getMatrices(), context.getVertexConsumers(), 15728880);
-        });
-        context.draw();
-        entityRenderDispatcher.setRenderShadows(true);
-        context.getMatrices().pop();
-        DiffuseLighting.enableGuiDepthLighting();
-        entity.bodyYaw = h;
-        entity.setYaw(i);
-        entity.setPitch(j);
-        entity.prevHeadYaw = k;
-        entity.headYaw = l;
     }
 
     /**
@@ -1088,6 +1054,48 @@ public class Renderer2D implements Listener {
     public enum Direction {
         // Left_Right means from left to right. Same for others //
         LEFT_RIGHT, TOP_BOTTOM, RIGHT_LEFT, BOTTOM_TOP
+    }
+
+    // Minecraft InventoryScreen source code but 360 degree support and smoother tickdelta
+    public static void drawEntity(DrawContext context, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
+        float f = (float) Math.atan(mouseX / 40.0F);
+        float g = (float) Math.atan(mouseY / 40.0F);
+        Quaternionf quaternionf = (new Quaternionf()).rotateZ(3.1415927F);
+        Quaternionf quaternionf2 = (new Quaternionf()).rotateX(g * 20.0F * 0.017453292F);
+        quaternionf.mul(quaternionf2);
+        float h = entity.bodyYaw;
+        float i = entity.getYaw();
+        float j = entity.getPitch();
+        float k = entity.prevHeadYaw;
+        float l = entity.headYaw;
+        entity.bodyYaw = 360.0F + f * 20.0F;
+        entity.setYaw(360.0F + f * 40.0F);
+        entity.headYaw = entity.getYaw();
+        entity.prevHeadYaw = entity.getYaw();
+        context.getMatrices().push();
+        context.getMatrices().translate(x, y, 50.0);
+        context.getMatrices().multiplyPositionMatrix((new Matrix4f()).scaling((float) size, (float) size, (float) (-size)));
+        context.getMatrices().multiply(quaternionf);
+        DiffuseLighting.method_34742();
+        EntityRenderDispatcher entityRenderDispatcher = HeliosClient.MC.getEntityRenderDispatcher();
+        if (quaternionf2 != null) {
+            quaternionf2.conjugate();
+            entityRenderDispatcher.setRotation(quaternionf2);
+        }
+
+        entityRenderDispatcher.setRenderShadows(false);
+        RenderSystem.runAsFancy(() -> {
+            entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, HeliosClient.MC.getTickDelta(), context.getMatrices(), context.getVertexConsumers(), 15728880);
+        });
+        context.draw();
+        entityRenderDispatcher.setRenderShadows(true);
+        context.getMatrices().pop();
+        DiffuseLighting.enableGuiDepthLighting();
+        entity.bodyYaw = h;
+        entity.setYaw(i);
+        entity.setPitch(j);
+        entity.prevHeadYaw = k;
+        entity.headYaw = l;
     }
 
 

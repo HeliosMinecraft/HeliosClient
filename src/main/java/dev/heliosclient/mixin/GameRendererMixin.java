@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -34,5 +35,15 @@ public abstract class GameRendererMixin {
         camera = client.gameRenderer.getCamera();
         Render3DEvent event = new Render3DEvent(matrices, tickDelta, camera.getPos().x, camera.getPos().y, camera.getPos().z);
         EventManager.postEvent(event);
+    }
+
+    @Inject(method = "bobView", at = @At(value = "HEAD"), cancellable = true)
+    private void cancelBobView(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+        ci.cancel();
+    }
+
+    @ModifyArg(at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/RotationAxis;rotationDegrees(F)Lorg/joml/Quaternionf;"), method = "bobView", require = 1)
+    public float changeBobIntensity(float value) {
+        return 0.0F;
     }
 }

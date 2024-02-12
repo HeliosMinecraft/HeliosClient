@@ -2,9 +2,12 @@ package dev.heliosclient.util;
 
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.CreateParams;
+import de.jcm.discordgamesdk.GameSDKException;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityType;
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.util.animation.AnimationUtils;
+import net.minecraft.client.MinecraftClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +21,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static dev.heliosclient.HeliosClient.LOGGER;
+import static dev.heliosclient.HeliosClient.MC;
 
 public class DiscordRPC {
     public static DiscordRPC INSTANCE = new DiscordRPC();
@@ -110,7 +114,14 @@ public class DiscordRPC {
             params.setClientID(1203402546626957373L);
             params.setFlags(CreateParams.Flags.NO_REQUIRE_DISCORD);
             // Create the Core
-            discordCore = new Core(params);
+            try {
+                discordCore = new Core(params);
+            } catch (GameSDKException e) {
+                if (MC.getToastManager() != null)
+                    AnimationUtils.addErrorToast("Discord Application is not running. Code 055", false, 1500);
+                return;
+            }
+
             activity = new Activity();
 
             updateActivity();

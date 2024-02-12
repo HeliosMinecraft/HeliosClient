@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.chat;
 
 import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.module.Categories;
