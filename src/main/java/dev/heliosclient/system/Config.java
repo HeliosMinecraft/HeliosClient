@@ -166,7 +166,7 @@ public class Config {
 
             int a = 0;
             for (HudElement hudElement : HudManager.INSTANCE.hudElements) {
-                hudElements.put("element_" + a, hudElement.saveToToml(new ArrayList<>()));
+                hudElements.put(hudElement.id.uniqueID, hudElement.saveToToml(new ArrayList<>()));
                 a++;
             }
             pane.put("x", HudCategoryPane.INSTANCE == null? 0: HudCategoryPane.INSTANCE.x);
@@ -203,12 +203,13 @@ public class Config {
                     // Get the name of the hudElement and check if it exists
                     if (hudElementTable.contains("name")) {
                         // Creates the hudElement provided by the hudElementData Supplier.
-                        HudElementData hudElementData = HudElementList.INSTANCE.elementDataMap.get(hudElementTable.getString("name"));
+                        HudElementData<?> hudElementData = HudElementList.INSTANCE.elementDataMap.get(hudElementTable.getString("name"));
                         HudElement hudElement = hudElementData.create();
 
                         // Load the hudElement from the toml and add it to the hudElements list.
                         if (hudElement != null) {
                             hudElement.loadFromToml(hudElementTable.toMap(), hudElementTable);
+                            hudElement.id.setUniqueID(string);
                             HudManager.INSTANCE.addHudElement(hudElement);
                         }
                     }
@@ -222,7 +223,27 @@ public class Config {
             }
             HudCategoryPane.INSTANCE.hudElementButtons.forEach(HudElementButton::updateCount);
         }
+        loadHudElementSettings();
+    }
 
+    public void loadHudElementSettings() {
+        Toml tomlElementMap = configManager.getTomls().get(HUD).getTable("hudElements").getTable("elements");
+        tomlElementMap.toMap().forEach((string, object) -> {
+            // Get the table of the hudElement
+            Toml hudElementTable = tomlElementMap.getTable(string);
+
+
+            for (HudElement element : HudManager.INSTANCE.hudElements) {
+                if (string.equals(element.id.uniqueID)) {
+                    System.out.println(string + " Equals " + element.id.uniqueID);
+                    for (SettingGroup settingGroup : element.settingGroups) {
+                        for (Setting<?> setting : settingGroup.getSettings()) {
+                            setting.loadFromToml(hudElementTable.toMap(), hudElementTable);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -261,10 +282,12 @@ public class Config {
             this.save();
         }
 
+        //Worlds most ineffcient code with complexity of O(4)
+
         CategoryManager.getCategories().forEach((s, category) -> {
             for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
                 for (SettingGroup settingGroup : m.settingGroups) {
-                    for (Setting setting : settingGroup.getSettings()) {
+                    for (Setting<?> setting : settingGroup.getSettings()) {
                         Toml newToml = modulesManager.getTomls().get(MODULES).getTable("panes").getTable(category.name).getTable(m.name.replace(" ", ""));
                         if (newToml != null) {
                             setting.loadFromToml(newToml.toMap(), newToml);

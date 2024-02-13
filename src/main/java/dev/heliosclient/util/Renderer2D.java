@@ -1099,7 +1099,7 @@ public class Renderer2D implements Listener {
     }
 
 
-    public static void drawEntity(DrawContext context, int x, int y, int size, Entity entity, float delta) {
+    public static void drawEntity(DrawContext context, int x, int y, int size, double z, Entity entity, float delta) {
         float yaw = MathHelper.wrapDegrees(entity.prevYaw + (entity.getYaw() - entity.prevYaw) * HeliosClient.MC.getTickDelta());
         float pitch = entity.getPitch();
 
@@ -1128,7 +1128,7 @@ public class Renderer2D implements Listener {
         }
 
         entityRenderDispatcher.setRenderShadows(false);
-        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, delta, context.getMatrices(), context.getVertexConsumers(), 15728880));
+        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, z, 0.0F, delta, context.getMatrices(), context.getVertexConsumers(), 15728880));
         context.draw();
         entityRenderDispatcher.setRenderShadows(true);
         context.getMatrices().pop();

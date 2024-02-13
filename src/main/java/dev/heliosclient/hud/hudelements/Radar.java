@@ -1,5 +1,6 @@
 package dev.heliosclient.hud.hudelements;
 
+import com.moandjiezana.toml.Toml;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.module.settings.*;
@@ -247,5 +248,10 @@ public class Radar extends HudElement {
             color = otherColor.value.getRGB();
         }
         return color;
+    }
+
+    @Override
+    public void loadFromToml(Map<String, Object> map, Toml toml) {
+        super.loadFromToml(map, toml);
     }
 }

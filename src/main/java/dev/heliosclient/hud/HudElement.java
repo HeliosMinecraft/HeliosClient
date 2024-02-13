@@ -14,6 +14,7 @@ import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.UniqueID;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.MinecraftClient;
@@ -55,6 +56,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public List<SettingGroup> settingGroups = new ArrayList<>();
     public SettingGroup sgUI = new SettingGroup("UI");
     public boolean isInHudEditor = false;
+    public UniqueID id;
     // Default settings
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
@@ -107,9 +109,11 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .build());
     int startX, startY, snapSize = 120;
 
+
     public HudElement(HudElementData hudElementInfo) {
         this.name = hudElementInfo.name();
         this.description = hudElementInfo.description();
+        this.id = UniqueID.generate();
         hudBox = new HudBox(x, y, width, height);
         EventManager.register(this);
     }
@@ -268,7 +272,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         
         if (renderBg.value) {
             drawContext.getMatrices().push();
-            drawContext.getMatrices().translate(0, 0, 0D);
+            drawContext.getMatrices().translate(0D, 0D, 0D);
             Color bgStart, bgEnd;
             if (clientColorCycle.value) {
                 bgStart = ColorManager.INSTANCE.getPrimaryGradientStart();
@@ -434,14 +438,5 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         this.height = Integer.parseInt(obj.get(3).toString());
         this.distanceX = x;
         this.distanceY = y;
-
-        for (SettingGroup settingGroup : settingGroups) {
-            for (Setting setting : settingGroup.getSettings()) {
-                if (setting.name != null) {
-                    setting.loadFromToml(map, toml);
-                }
-            }
-        }
-
     }
 }
