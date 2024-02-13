@@ -1,11 +1,11 @@
 package dev.heliosclient.managers;
 
 import com.google.gson.*;
-import com.mojang.util.UUIDTypeAdapter;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.cape.CapeSynchronizer;
 import dev.heliosclient.util.cape.ProfileUtils;
@@ -22,9 +22,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -58,20 +56,22 @@ public class CapeManager implements Listener {
     public static String[] loadCapes() {
         if (!CAPE_DIRECTORY.exists()) {
             HeliosClient.LOGGER.info("Cape directory does not exist");
-            CAPE_DIRECTORY.mkdirs();
+            if (CAPE_DIRECTORY.mkdirs()) {
+                HeliosClient.LOGGER.info("Cape directory created successfully");
+            }
         }
 
         File defaultCapeFile = new File(CAPE_DIRECTORY, DEFAULT_CAPE);
         try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/capes/helioscape.png")) {
-            if (inputStream != null) {
+            if (inputStream == null) {
+                HeliosClient.LOGGER.error("Failed to load open inputStream to default cape resource");
+            } else {
                 HeliosClient.LOGGER.info("Copying default cape in directory");
                 Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 HeliosClient.LOGGER.info("Copying completed");
-            } else {
-                HeliosClient.LOGGER.error("Failed to load open inputStream to default cape resource");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            HeliosClient.LOGGER.error("An error has occured while reading default resource asset cape", e);
         }
 
         File[] capeFiles = CAPE_DIRECTORY.listFiles((dir, name) -> name.toLowerCase().endsWith(".png") || name.toLowerCase().endsWith(".gif"));
@@ -94,7 +94,7 @@ public class CapeManager implements Listener {
 
                 load(inputStream, fileName, file);
             } catch (IOException e) {
-                e.printStackTrace();
+                HeliosClient.LOGGER.error("An error has occured while reading cape file: " + ColorUtils.darkGreen + file.getName(), e);
             }
         }
         String[] capeNamesArray = capeNames.toArray(new String[0]);
@@ -121,7 +121,7 @@ public class CapeManager implements Listener {
                 capeIdentifiers.add(capeIdentifier);
                 HeliosClient.LOGGER.info("Loaded cape: " + fileName);
             } catch (IOException e) {
-                e.printStackTrace();
+                HeliosClient.LOGGER.error("An error has occured while parsing and registering cape file: " + ColorUtils.darkGreen + file.getName(), e);
             }
         });
     }
