@@ -11,6 +11,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
+import dev.heliosclient.ui.clickgui.ConsoleScreen;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.*;
@@ -21,6 +22,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +43,7 @@ public class HeliosClient implements ModInitializer, Listener {
     public static AddonManager addonManager = new AddonManager();
     public static ClickGUI CLICKGUI = new ClickGUI();
     public static boolean isSaving = false;
+    public static ConsoleScreen CONSOLE = new ConsoleScreen();
 
     public static void loadConfig() {
         configTimer.startTimer();
@@ -54,7 +59,7 @@ public class HeliosClient implements ModInitializer, Listener {
         CONFIG.loadModules();
         LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
         if(shouldSendNotification()){
-            NotificationManager.INSTANCE.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+            NotificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
         configTimer.resetTimer();
     }
@@ -70,7 +75,7 @@ public class HeliosClient implements ModInitializer, Listener {
         CONFIG.save();
         LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
         if(shouldSendNotification()){
-            NotificationManager.INSTANCE.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+            NotificationManager.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
         configTimer.resetTimer();
         isSaving = false;
@@ -130,6 +135,16 @@ public class HeliosClient implements ModInitializer, Listener {
                 DiscordRPC.INSTANCE.stopPresence();
             }
         }));
+
+       /* ConsoleAppender consoleAppender = new ConsoleAppender(CONSOLE);
+
+        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        Configuration config = ctx.getConfiguration();
+        config.addAppender(consoleAppender);
+        config.getRootLogger().addAppender(consoleAppender, null, null);
+        ctx.updateLoggers(config);
+
+        */
     }
 
     public static boolean shouldUpdate() {
@@ -144,6 +159,6 @@ public class HeliosClient implements ModInitializer, Listener {
         EventManager.register(ColorManager.INSTANCE);
         EventManager.register(TickRate.INSTANCE);
         EventManager.register(CapeManager.INSTANCE);
-        EventManager.register(new DamageUtils());
+        EventManager.register(DamageUtils.INSTANCE);
     }
 }
