@@ -1,7 +1,10 @@
 package dev.heliosclient.hud.hudelements;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
+import dev.heliosclient.module.settings.DoubleSetting;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -12,26 +15,42 @@ import java.awt.*;
 import java.util.List;
 
 public class PlayerModel extends HudElement {
+    public SettingGroup group = new SettingGroup("Size");
+    public DoubleSetting size = group.add(new DoubleSetting.Builder()
+            .name("Size")
+            .description("Change the size of the model")
+            .min(0.1D)
+            .max(2.0D)
+            .value(1D)
+            .defaultValue(1D)
+            .onSettingChange(this)
+            .roundingPlace(1)
+            .build()
+    );
 
     public PlayerModel() {
         super(DATA);
         this.width = 30;
         this.height = 55;
-    }    public static HudElementData<PlayerModel> DATA = new HudElementData<>("Player Model", "Shows player model in a small cute way", PlayerModel::new);
+        addSettingGroup(group);
+
+    }
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         this.width = 30;
         this.height = 55;
         super.renderElement(drawContext, textRenderer);
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (player == null) {
+        ClientPlayerEntity player = HeliosClient.MC.player;
+        if (player == null && !renderBg.value) {
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, this.y, width - 1, height - 1, Color.BLACK.getRGB());
-        } else {
-            Renderer2D.drawEntity(drawContext, x + width / 2 + 1, y + height - 6, 25, player);
         }
+        if (player != null && !renderBg.value) {
+            Renderer2D.drawEntity(drawContext, x + width / 2, y + height - 6, ((int) (25 * size.value)), 0.5D, player, MinecraftClient.getInstance().getTickDelta());
+        }
+    }    public static HudElementData<PlayerModel> DATA = new HudElementData<>("Player Model", "Shows player model in a small cute way", PlayerModel::new);
 
-    }
+
 
     @Override
     public Object saveToToml(List<Object> objects) {

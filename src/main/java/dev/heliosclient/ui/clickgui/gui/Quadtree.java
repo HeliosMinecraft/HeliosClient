@@ -11,20 +11,20 @@ public class Quadtree {
     private final int MAX_LEVELS = 5;
 
     private final int level;
-    private final List<Hitbox> objects;
+    private final List<HudBox> objects;
     private final Rectangle bounds;
     private final Quadtree[] nodes;
 
     public Quadtree(int level) {
         this.level = level;
-        this.objects = new ArrayList<Hitbox>();
+        this.objects = new ArrayList<HudBox>();
         this.bounds = new Rectangle(0, 0, MC.getWindow().getWidth(), MC.getWindow().getHeight());
         this.nodes = new Quadtree[4];
     }
 
     public Quadtree(int level, Rectangle bounds) {
         this.level = level;
-        this.objects = new ArrayList<Hitbox>();
+        this.objects = new ArrayList<HudBox>();
         this.bounds = bounds;
         this.nodes = new Quadtree[4];
     }
@@ -52,21 +52,21 @@ public class Quadtree {
         nodes[3] = new Quadtree(level + 1, new Rectangle(x + subWidth, y + subHeight, subWidth, subHeight));
     }
 
-    private int getIndex(Hitbox hitbox) {
+    private int getIndex(HudBox hudBox) {
         int index = -1;
         double verticalMidpoint = bounds.getX() + (bounds.getWidth() / 2);
         double horizontalMidpoint = bounds.getY() + (bounds.getHeight() / 2);
 
-        boolean topQuadrant = (hitbox.getY() < horizontalMidpoint && hitbox.getY() + hitbox.getHeight() < horizontalMidpoint);
-        boolean bottomQuadrant = (hitbox.getY() > horizontalMidpoint);
+        boolean topQuadrant = (hudBox.getY() < horizontalMidpoint && hudBox.getY() + hudBox.getHeight() < horizontalMidpoint);
+        boolean bottomQuadrant = (hudBox.getY() > horizontalMidpoint);
 
-        if (hitbox.getX() < verticalMidpoint && hitbox.getX() + hitbox.getWidth() < verticalMidpoint) {
+        if (hudBox.getX() < verticalMidpoint && hudBox.getX() + hudBox.getWidth() < verticalMidpoint) {
             if (topQuadrant) {
                 index = 1;
             } else if (bottomQuadrant) {
                 index = 2;
             }
-        } else if (hitbox.getX() > verticalMidpoint) {
+        } else if (hudBox.getX() > verticalMidpoint) {
             if (topQuadrant) {
                 index = 0;
             } else if (bottomQuadrant) {
@@ -77,18 +77,18 @@ public class Quadtree {
         return index;
     }
 
-    public void insert(Hitbox hitbox) {
+    public void insert(HudBox hudBox) {
         if (nodes[0] != null) {
-            int index = getIndex(hitbox);
+            int index = getIndex(hudBox);
 
             if (index != -1) {
-                nodes[index].insert(hitbox);
+                nodes[index].insert(hudBox);
 
                 return;
             }
         }
 
-        objects.add(hitbox);
+        objects.add(hudBox);
 
         if (objects.size() > MAX_OBJECTS && level < MAX_LEVELS) {
             if (nodes[0] == null) {
@@ -107,10 +107,10 @@ public class Quadtree {
         }
     }
 
-    public List<Hitbox> retrieve(List<Hitbox> returnObjects, Hitbox hitbox) {
-        int index = getIndex(hitbox);
+    public List<HudBox> retrieve(List<HudBox> returnObjects, HudBox hudBox) {
+        int index = getIndex(hudBox);
         if (index != -1 && nodes[0] != null) {
-            nodes[index].retrieve(returnObjects, hitbox);
+            nodes[index].retrieve(returnObjects, hudBox);
         }
 
         returnObjects.addAll(objects);
@@ -118,14 +118,14 @@ public class Quadtree {
         return returnObjects;
     }
 
-    public void remove(Hitbox hitbox) {
-        int index = getIndex(hitbox);
+    public void remove(HudBox hudBox) {
+        int index = getIndex(hudBox);
         if (index != -1 && nodes[0] != null) {
-            nodes[index].remove(hitbox);
+            nodes[index].remove(hudBox);
             return;
         }
 
-        objects.remove(hitbox);
+        objects.remove(hudBox);
 
         // If this node has no objects left and no subnodes, clear it
         if (objects.isEmpty() && nodes[0] == null) {

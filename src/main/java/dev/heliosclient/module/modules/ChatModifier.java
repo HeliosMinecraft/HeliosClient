@@ -1,6 +1,7 @@
 package dev.heliosclient.module.modules;
 
 import com.mojang.authlib.GameProfile;
+import dev.heliosclient.module.modules.chat.ChatHighlight;
 import dev.heliosclient.util.ChatUtils;
 import net.minecraft.network.message.MessageType.Parameters;
 import net.minecraft.network.message.SignedMessage;

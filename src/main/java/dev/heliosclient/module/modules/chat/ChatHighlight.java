@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.chat;
 
 import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.module.Categories;
@@ -39,7 +39,6 @@ public class ChatHighlight extends Module_ {
         super("Chat Highlighter", "Highlights specified words in chat messages.", Categories.CHAT);
 
         addSettingGroup(sgGeneral);
-
         addQuickSettings(sgGeneral.getSettings());
 
         this.highlightList.add("ElBe_Gaming");

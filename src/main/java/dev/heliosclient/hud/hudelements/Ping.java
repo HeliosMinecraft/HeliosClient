@@ -13,6 +13,7 @@ public class Ping extends HudElement {
 
     public Ping() {
         super(DATA);
+
         this.width = 20;
         this.height = 10;
     }    public static HudElementData<Ping> DATA = new HudElementData<>("Ping", "Shows current player ping", Ping::new);

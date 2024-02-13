@@ -17,7 +17,6 @@ import java.util.function.BooleanSupplier;
 
 public class BooleanSetting extends Setting<Boolean> {
     public boolean value;
-    ISettingChange iSettingChange;
     String description;
     AnimationUtils CheckBoxAnimation = new AnimationUtils();
 

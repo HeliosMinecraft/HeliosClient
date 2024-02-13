@@ -81,7 +81,8 @@ public class ConfigManager {
     public boolean load() {
         for (String name : configMaps.keySet()) {
             try {
-                tomls.put(name, new Toml().read(configFiles.get(name)));
+                Toml toml = new Toml().read(configFiles.get(name));
+                tomls.put(name, toml);
                 if (tomls.get(name) == null) {
                     throw new FileNotFoundException();
                 } else {
@@ -89,6 +90,9 @@ public class ConfigManager {
                 }
             } catch (Exception e) {
                 HeliosClient.LOGGER.error("Error occurred while loading config. Load default config.", e);
+
+                //Save the config,i.e load a new empty config.
+                save(name);
                 return false;
             }
         }
@@ -153,6 +157,20 @@ public class ConfigManager {
                 })
                 .collect(Collectors.toList());
     }
+    /**
+     * Checks if any of the TOML files is empty.
+     *
+     * @return The empty file if found, else null.
+     */
+    public File checkEmptyFiles() {
+        for (File file : configFiles.values()) {
+            if (file.length() == 0) {
+                return file;
+            }
+        }
+        return null;
+    }
+
 
     public void clear() {
         configFiles.clear();

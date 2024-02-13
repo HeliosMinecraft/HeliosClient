@@ -8,6 +8,7 @@ import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
@@ -19,7 +20,10 @@ import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Template for modules.
@@ -29,8 +33,8 @@ public abstract class Module_ implements Listener, ISettingChange {
     public String name;
     public String description;
     public Category category;
-    public ArrayList<SettingGroup> settingGroups;
-    public ArrayList<Setting> quickSettings;
+    public List<SettingGroup> settingGroups;
+    public List<Setting> quickSettings;
     public boolean settingsOpen = false;
     public SettingGroup sgbind = new SettingGroup("Bind");
 
@@ -94,8 +98,8 @@ public abstract class Module_ implements Listener, ISettingChange {
         this.name = name;
         this.description = description;
         this.category = category;
-        settingGroups = new ArrayList<>();
-        quickSettings = new ArrayList<>();
+        settingGroups = new ArrayList<>(1);
+        quickSettings = new ArrayList<>(1);
     }
 
     public void addSettingGroup(SettingGroup settingGroup) {
@@ -118,8 +122,8 @@ public abstract class Module_ implements Listener, ISettingChange {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was enabled.");
         }
-        if (ModuleManager.notificationModule.moduleNotification.value) {
-            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
+        if (ModuleManager.notificationModule.moduleNotification.value && HeliosClient.shouldSendNotification()) {
+            NotificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
         }
         EventManager.register(this);
     }
@@ -139,8 +143,8 @@ public abstract class Module_ implements Listener, ISettingChange {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
         }
-        if (ModuleManager.notificationModule.moduleNotification.value) {
-            HeliosClient.notificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
+        if (ModuleManager.notificationModule.moduleNotification.value && HeliosClient.shouldSendNotification()) {
+            NotificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
         }
         EventManager.unregister(this);
     }

@@ -22,7 +22,6 @@ import static com.mojang.text2speech.Narrator.LOGGER;
 public class CycleSetting extends Setting<Integer> {
     public List options;
     public int value;
-    ISettingChange iSettingChange;
     Color color = new Color(4, 3, 3, 157);
 
     public <T> CycleSetting(String name, String description, ISettingChange iSettingChange, List<T> options, int value, BooleanSupplier shouldRender, int defaultValue) {

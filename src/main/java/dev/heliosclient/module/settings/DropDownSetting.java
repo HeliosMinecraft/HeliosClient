@@ -23,7 +23,6 @@ public class DropDownSetting extends Setting<Integer> {
     public List options;
     public int value;
     public boolean selecting = false;
-    ISettingChange iSettingChange;
     Color color = new Color(4, 3, 3, 157);
     int maxOptionWidth = 0;
 
@@ -89,7 +88,7 @@ public class DropDownSetting extends Setting<Integer> {
 
 
                 //Render the settings and center them horizontally
-                float offset = y + 5.0f + Renderer2D.getFxStringHeight();
+                float offset = y + 6.0f + Renderer2D.getFxStringHeight();
                 for (Object option : options) {
                     //Skip the chosen option
                     if (option == options.get(value)) {
@@ -103,9 +102,10 @@ public class DropDownSetting extends Setting<Integer> {
 
                     // Draw the text
                     Renderer2D.drawFixedString(drawContext.getMatrices(), String.valueOf(option), x2 + center, offset, Color.white.getRGB());
-                    offset += Renderer2D.getFxStringHeight() + 2.0f;
+                    offset += Renderer2D.getFxStringHeight() + 5.0f;
                 }
-                this.height = Math.round(offset - y);
+                // 24 is the height of setting
+                this.height = Math.max(24, Math.round(offset - y));
             }
             // Draw the name of the option
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": ", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
@@ -172,7 +172,7 @@ public class DropDownSetting extends Setting<Integer> {
         }
         if (!selecting) {
             // Clicked on the value textbox.
-            if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + Renderer2D.getFxStringWidth(options.get(value).toString()) && mouseY >= y + 2 && mouseY <= y + Renderer2D.getFxStringHeight() + 2) {
+            if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + maxOptionWidth && mouseY >= y + 2 && mouseY <= y + Renderer2D.getFxStringHeight() + 2) {
                 selecting = true;
             }
         }

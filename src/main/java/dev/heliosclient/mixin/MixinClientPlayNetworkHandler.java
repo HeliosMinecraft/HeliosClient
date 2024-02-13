@@ -2,6 +2,7 @@ package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
+import dev.heliosclient.event.events.player.PlayerDeathEvent;
 import dev.heliosclient.event.events.player.PlayerJoinEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -42,9 +43,8 @@ public abstract class MixinClientPlayNetworkHandler {
     @Inject(method = "onDeathMessage", at = @At("HEAD"), cancellable = true)
     private void onDeathMessage(DeathMessageS2CPacket packet, CallbackInfo ci) {
         if (HeliosClient.MC.player != null) {
-            Event event = new PlayerJoinEvent(HeliosClient.MC.player);
-            EventManager.postEvent(event);
-            if (event.isCanceled()) {
+            Event event = new PlayerDeathEvent(HeliosClient.MC.player);
+            if (EventManager.postEvent(event).isCanceled()) {
                 ci.cancel();
             }
         }

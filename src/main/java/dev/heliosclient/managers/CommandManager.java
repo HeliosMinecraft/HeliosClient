@@ -28,6 +28,7 @@ public class CommandManager {
         add(new Reset());
         add(new Friend());
         add(new Prefix());
+        add(new OpenConsole());
         commands.sort(Comparator.comparing(Command::getName));
     }
 

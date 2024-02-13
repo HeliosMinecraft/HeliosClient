@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.movement;
 
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;

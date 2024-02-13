@@ -19,6 +19,8 @@ public class HudElementList {
         registerElement(ModuleList.DATA);
         registerElement(TestHud.DATA);
         registerElement(CompactData.DATA);
+        registerElement(Tps.DATA);
+        registerElement(Radar.DATA);
 
     }
 

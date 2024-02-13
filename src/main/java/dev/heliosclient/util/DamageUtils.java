@@ -25,6 +25,7 @@ import net.minecraft.world.explosion.Explosion;
 import java.util.Objects;
 
 public class DamageUtils implements Listener {
+    public static DamageUtils INSTANCE = new DamageUtils();
     private static final float MAX_DAMAGE = 100.0F; // Maximum damage value
     private static Explosion explosion;
 

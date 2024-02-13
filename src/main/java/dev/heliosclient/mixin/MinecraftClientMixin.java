@@ -4,6 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.player.PlayerJoinEvent;
+import dev.heliosclient.event.events.player.PlayerLeaveEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -36,22 +37,13 @@ public abstract class MinecraftClientMixin {
         }
     }
 
-
-    @Inject(at = @At("TAIL"), method = "scheduleStop")
-    public void onShutdown(CallbackInfo ci) {
-        // FUCK LAG
-        HeliosClient.saveConfig();
-    }
-
-    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V", at = @At("TAIL"), cancellable = true)
     private void onDisconnect(Screen screen, CallbackInfo info) {
         if (world != null) {
             PlayerEntity player = HeliosClient.MC.player;
-            Event event = new PlayerJoinEvent(player);
-            EventManager.postEvent(event);
-            if (event.isCanceled()) {
+            Event event = new PlayerLeaveEvent(player);
+            if (EventManager.postEvent(event).isCanceled())
                 info.cancel();
-            }
         }
     }
 }

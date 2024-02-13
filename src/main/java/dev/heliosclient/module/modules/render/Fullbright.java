@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.Categories;
@@ -31,10 +31,10 @@ public class Fullbright extends Module_ {
             .name("Gamma")
             .description("Desired gamma value")
             .onSettingChange(this)
-            .value(15.0)
-            .defaultValue(15.0)
+            .value(5.0)
+            .defaultValue(5.0)
             .min(0)
-            .max(15)
+            .max(7.0)
             .shouldRender(() -> mode.value == 0)
             .roundingPlace(0)
             .build());
@@ -52,7 +52,7 @@ public class Fullbright extends Module_ {
     public void onEnable() {
         super.onEnable();
         if (mode.value == 0 && mc.player != null) {
-            ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(gamma.value);
+            ((ISimpleOption<Double>) (Object) mc.options.getGamma()).heliosClient$setValueUnrestricted(gamma.value);
             mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
         } else if (mc.player != null && mode.value == 1) {
             mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 254, true, false, false));
@@ -64,7 +64,7 @@ public class Fullbright extends Module_ {
         super.onSettingChange(setting);
         if (active.value) {
             if (mode.value == 0 && mc.player != null) {
-                ((ISimpleOption<Double>) (Object) mc.options.getGamma()).setValueUnrestricted(gamma.value);
+                ((ISimpleOption<Double>) (Object) mc.options.getGamma()).heliosClient$setValueUnrestricted(gamma.value);
                 mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
             } else if (mc.player != null && mode.value == 1) {
                 mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 254, true, false, false));

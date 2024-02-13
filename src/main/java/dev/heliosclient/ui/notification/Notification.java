@@ -8,7 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 
 public abstract class Notification {
     public final int HEIGHT = 25;
-    protected final long creationTime;
+    protected long creationTime;
     public int WIDTH = 60;
     public int targetY;
     public int y;
@@ -18,6 +18,10 @@ public abstract class Notification {
     protected int x;
 
     public Notification() {
+        initialise();
+    }
+
+    protected void initialise() {
         int screenWidth = HeliosClient.MC.getWindow().getScaledWidth();
         this.y = targetY + HEIGHT;
         this.x = screenWidth - WIDTH - 5;

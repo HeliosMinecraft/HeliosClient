@@ -23,7 +23,6 @@ public class ColorSetting extends Setting<Integer> {
     boolean slidingGreen = false;
     boolean slidingBlue = false;
     boolean slidingAlpha = false;
-    ISettingChange iSettingChange;
     int boxSize = 20;
 
     public ColorSetting(String name, String description, ISettingChange iSettingChange, int value, BooleanSupplier shouldRender, int defaultValue) {

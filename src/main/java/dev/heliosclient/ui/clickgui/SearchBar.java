@@ -1,5 +1,7 @@
 package dev.heliosclient.ui.clickgui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
@@ -12,7 +14,7 @@ import java.awt.*;
 
 public class SearchBar extends InputBox {
     public SearchBar() {
-        super(145, 16, "", 25, InputMode.ALL);
+        super(146, 16, "", 25, InputMode.ALL);
     }
 
     @Override

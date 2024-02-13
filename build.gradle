@@ -1,6 +1,7 @@
 plugins {
-	id 'fabric-loom' version '1.4-SNAPSHOT'
+	id 'fabric-loom' version '1.5-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -27,11 +28,18 @@ repositories {
 	}
 	maven { url "https://maven.terraformersmc.com/releases/" }
 
+	mavenCentral()
+	jcenter()
 	maven { url 'https://jitpack.io' }
 
 }
+
+shadowJar {
+	configurations = [project.configurations.shadow]
+}
+
+
 configurations {
-	// include mods
 	modImplementation.extendsFrom(modInclude)
 	include.extendsFrom(modInclude)
 
@@ -39,6 +47,7 @@ configurations {
 	implementation.extendsFrom(library)
 	shadow.extendsFrom(library)
 }
+
 
 dependencies {
 	// To change the versions see the gradle.properties file
@@ -53,14 +62,20 @@ dependencies {
 	include modImplementation("com.github.0x3C50:Renderer:master-SNAPSHOT")
 
 	// Baritone API
-	implementation 'com.github.wagyourtail:baritone:v1.5.3'
+	modCompileOnly "com.github.wagyourtail:baritone:${project.baritone_version}"
 
 	// TOML parser
-	implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+	modInclude('com.moandjiezana.toml:toml4j:0.7.2')
 
-	modApi "com.terraformersmc:modmenu:9.0.0"
+	// ModMenu
+	modApi "com.terraformersmc:modmenu:${project.modmenu_version}"
+
+	// Discord GameSDK
+	modInclude('com.github.JnCrMx:discord-game-sdk4j:v0.5.5')
+
+//	shadow project(":launch")
 //	library "de.florianmichael:WaybackAuthLib:1.0.0"
-	// Uncomment the following line to enable the deprecated Fabric API modules. 
+	// Uncomment the following line to enable the deprecated Fabric API modules.
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
@@ -86,8 +101,6 @@ tasks.withType(JavaCompile).configureEach {
 java {
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
 }
@@ -97,6 +110,7 @@ jar {
 		rename { "${it}_${project.archivesBaseName}"}
 	}
 }
+
 
 // configure the maven publication
 publishing {

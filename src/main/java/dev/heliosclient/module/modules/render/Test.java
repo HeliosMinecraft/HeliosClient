@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
@@ -11,16 +11,22 @@ import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.render.GradientUtils;
+import dev.heliosclient.util.Renderer3D;
+import dev.heliosclient.util.render.color.LineColor;
+import dev.heliosclient.util.render.color.QuadColor;
 import me.x150.renderer.render.Renderer3d;
+import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
+
+import static dev.heliosclient.util.Renderer2D.drawContext;
 
 
 public class Test extends Module_ {
@@ -31,7 +37,7 @@ public class Test extends Module_ {
     BooleanSetting rounded = sgGeneral.add(new BooleanSetting("Rounded", "", this, false, () -> true, false));
     BooleanSetting Circle = sgGeneral.add(new BooleanSetting("Circle", "", this, false, () -> true, false));
     BooleanSetting Triangle = sgGeneral.add(new BooleanSetting("Triangle", "", this, false, () -> true, false));
-    StringSetting num = sgGeneral.add(new StringSetting("Enter a number 2", "DESCRIPTION", "E", 100, InputBox.InputMode.ALL, () -> true, "E"));
+    StringSetting num = sgGeneral.add(new StringSetting("Enter a number 2", "DESCRIPTION", "E", 100, this, InputBox.InputMode.ALL, () -> true, "E"));
     String[] list = new String[]{"1ST", "2ND", "3RD", "LMAO"};
     StringListSetting stringListSetting = sgGeneral.add(new StringListSetting("Enter a number", "DESCRIPTION", list, 4, 100, InputBox.InputMode.DIGITS_AND_CHARACTERS, () -> true));
 
@@ -43,21 +49,12 @@ public class Test extends Module_ {
     BooleanSetting TracerLine = sgGeneral.add(new BooleanSetting("TracerLine", "", this, false, () -> true, false));
     BooleanSetting blockOutlineAndFIll = sgGeneral.add(new BooleanSetting("blockOutlineAndFIll", "", this, false, () -> true, false));
     RGBASetting color = sgGeneral.add(new RGBASetting("Color", "color", Color.WHITE, false, this, () -> true));
-    GradientUtils rainbowGradient = new GradientUtils();
-
 
     public Test() {
         super("Test", "Render Test", Categories.RENDER);
 
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
-        rainbowGradient.addColor(Color.RED);
-        rainbowGradient.addColor(Color.ORANGE);
-        rainbowGradient.addColor(Color.YELLOW);
-        rainbowGradient.addColor(Color.GREEN);
-        rainbowGradient.addColor(Color.BLUE);
-        rainbowGradient.addColor(new Color(75, 0, 130)); // Indigo
-        rainbowGradient.addColor(new Color(238, 130, 238)); // Violet
     }
 
     @Override
@@ -100,35 +97,27 @@ public class Test extends Module_ {
         if (GradientRounded.value)
             Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), 22, 20, 40, 40, Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 2, 20, Color.WHITE);
 
-        if (Gradient.value)
-            Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), 20, 20, 40, 40, 10, ColorUtils.getRainbowColor().getRGB(), Color.WHITE.getRGB());
-        PlayerEntity player = HeliosClient.MC.player;
-
-        if (player != null && player.getWorld() != null) {
-            Renderer3d.renderThroughWalls();
-            float pitch = player.getPitch();
-            float yaw = player.getYaw();
-            Vec3d direction = new Vec3d(0, 0, -1).rotateY(yaw).rotateX(pitch);
-            Vec3d end = player.getEyePos().add(direction.multiply(20));
-
-
-            Vec3d start = new Vec3d(player.getX() + 2, player.getY() + 1, player.getZ() - 3);
-            Vec3d start2 = new Vec3d(50, player.getY() - 1, player.getZ() + 2);
-            Vec3d start3 = new Vec3d(player.getX() - 5, player.getY() + 2, player.getZ() + 6);
-
-
-            Vec3d dimensions = new Vec3d(1, 1, 1);
-
-            Renderer3d.renderOutline(drawContext.getMatrices(), Color.WHITE, start, dimensions);
-            Renderer3d.renderLine(drawContext.getMatrices(), Color.yellow, player.getEyePos(), end);
-            Renderer3d.renderFilled(drawContext.getMatrices(), Color.GREEN, start2, dimensions);
-            Renderer3d.renderEdged(drawContext.getMatrices(), Color.CYAN, Color.BLACK, start3, dimensions);
+        if (Gradient.value) {
         }
+
 
     }
 
     @SubscribeEvent
     public void renderer3d(Render3DEvent event) {
+        PlayerEntity player = HeliosClient.MC.player;
+
+        if (player != null && player.getWorld() != null) {
+            Vec3d end = new Vec3d(200, 200, 200);
+            Vec3d end2 = new Vec3d(200, player.getY(), 200);
+
+            QuadColor gradient = QuadColor.gradient(Color.WHITE.getRGB(), Color.GREEN.getRGB(), QuadColor.CardinalDirection.SOUTH);
+
+            Renderer3D.drawBoxBoth(new BlockPos(player.getBlockPos().getX() - 5, player.getBlockPos().getY() + 2, player.getBlockPos().getZ() + 6), gradient, 3);
+            Renderer3D.drawLine(Renderer3D.getEyeTracer(), end, LineColor.gradient(Color.WHITE.getRGB(), Color.GREEN.getRGB()), 1f);
+            Renderer3D.renderItem(Items.DIAMOND_BLOCK.getDefaultStack(), end);
+            Renderer3D.drawItemWithPhysics(Items.DIAMOND_BLOCK.getDefaultStack(), end2, mc.getTickDelta());
+        }
     }
 
 

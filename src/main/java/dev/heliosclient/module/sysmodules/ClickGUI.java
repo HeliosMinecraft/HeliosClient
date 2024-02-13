@@ -300,13 +300,13 @@ public class ClickGUI extends Module_ {
         pause = Pause.value;
         keybinds = Keybinds.value;
 
-        if (setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font) {
+        if ((setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font) && HeliosClient.MC.getWindow() != null) {
             fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
             FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
             EventManager.postEvent(new FontChangeEvent(fonts));
         }
 
-        if (setting == FontRenderer || setting == Font) {
+        if ((setting == FontRenderer || setting == Font) && HeliosClient.MC.getWindow() != null) {
             FontManager.INSTANCE.registerFonts();
         }
 
@@ -349,8 +349,12 @@ public class ClickGUI extends Module_ {
 
         fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
 
-        if (MinecraftClient.getInstance().getWindow() != null)
+        if (MinecraftClient.getInstance().getWindow() != null) {
             FontManager.INSTANCE.registerFonts();
+            FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
+            EventManager.postEvent(new FontChangeEvent(fonts));
+        }
+
 
         if (ColorMode.value == 0) {
             ColorManager.INSTANCE.primaryGradientStart = staticColor.getColor();

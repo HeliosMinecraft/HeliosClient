@@ -11,13 +11,14 @@ import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.ui.clickgui.gui.Hitbox;
+import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -27,7 +28,7 @@ import java.awt.*;
 
 public class ModuleButton implements Listener {
     public final Screen parentScreen;
-    private final Hitbox hitBox;
+    private final HudBox hitBox;
     private final float delayBetweenSettings = 0.1f;
     public int hoverAnimationTimer;
     public Module_ module;
@@ -50,7 +51,7 @@ public class ModuleButton implements Listener {
         this.width = CategoryPane.getWidth() - 2;
         this.height = 16;
         this.parentScreen = parentScreen;
-        hitBox = new Hitbox(x, y, width, height);
+        hitBox = new HudBox(x, y, width, height);
         EventManager.register(this);
     }
 
@@ -135,7 +136,7 @@ public class ModuleButton implements Listener {
 
         if (module.keyBind.value != -1 && ClickGUI.keybinds) {
             String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
-            Renderer2D.drawFixedString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getFxStringWidth(keyName)), textY, ColorManager.INSTANCE.defaultTextColor);
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getCustomStringWidth(keyName, FontRenderers.Small_fxfontRenderer)), textY, ColorManager.INSTANCE.defaultTextColor);
         }
     }
 

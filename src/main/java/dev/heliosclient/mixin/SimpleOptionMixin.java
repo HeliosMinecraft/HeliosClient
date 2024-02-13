@@ -6,6 +6,7 @@ import net.minecraft.client.option.SimpleOption;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -19,7 +20,7 @@ public class SimpleOptionMixin<T> implements ISimpleOption<T> {
     private Consumer<T> changeCallback;
 
     @Override
-    public void setValueUnrestricted(T object) {
+    public void heliosClient$setValueUnrestricted(T object) {
         if (!MinecraftClient.getInstance().isRunning()) {
             this.value = object;
             return;

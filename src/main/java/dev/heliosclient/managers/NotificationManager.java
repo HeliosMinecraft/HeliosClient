@@ -13,17 +13,18 @@ import java.util.Deque;
 import java.util.Iterator;
 
 public class NotificationManager implements Listener {
+    public static NotificationManager INSTANCE = new NotificationManager();
     private static final int HEIGHT = 25;
-    private final Deque<Notification> notifications = new ArrayDeque<>();
+    private static final Deque<Notification> notifications = new ArrayDeque<>();
 
-    public void addNotification(Notification notification) {
+    public static void addNotification(Notification notification) {
         if (ModuleManager.notificationModule.isActive()) {
             notifications.addFirst(notification);
             updatePositions();
         }
     }
 
-    private void updatePositions() {
+    private static void updatePositions() {
         int screenHeight = HeliosClient.MC.getWindow().getScaledHeight();
         int y = screenHeight - HEIGHT - 5;
 

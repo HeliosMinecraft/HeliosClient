@@ -15,6 +15,9 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
+import dev.heliosclient.ui.clickgui.hudeditor.HudElementButton;
+import dev.heliosclient.util.FileUtils;
+import oshi.util.FileUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -163,7 +166,7 @@ public class Config {
 
             int a = 0;
             for (HudElement hudElement : HudManager.INSTANCE.hudElements) {
-                hudElements.put("element_" + a, hudElement.saveToToml(new ArrayList<>()));
+                hudElements.put(hudElement.id.uniqueID, hudElement.saveToToml(new ArrayList<>()));
                 a++;
             }
             pane.put("x", HudCategoryPane.INSTANCE == null? 0: HudCategoryPane.INSTANCE.x);
@@ -181,6 +184,12 @@ public class Config {
      * Loads the HudElements from the config.
      */
     public void loadHudElements() {
+        if(FileUtils.isFileEmpty(configManager.getConfigFiles().get(HUD))){
+            LOGGER.warn(HUD + " config is empty! Creating new default hud config");
+            getHudConfig();
+            configManager.save();
+        }
+        LOGGER.info("Loading Hud Elements... ");
         HudManager.INSTANCE.hudElements.clear();
         // Get the hudElements table from the config
         Toml tomlElementMap = configManager.getTomls().get(HUD).getTable("hudElements");
@@ -194,12 +203,13 @@ public class Config {
                     // Get the name of the hudElement and check if it exists
                     if (hudElementTable.contains("name")) {
                         // Creates the hudElement provided by the hudElementData Supplier.
-                        HudElementData hudElementData = HudElementList.INSTANCE.elementDataMap.get(hudElementTable.getString("name"));
+                        HudElementData<?> hudElementData = HudElementList.INSTANCE.elementDataMap.get(hudElementTable.getString("name"));
                         HudElement hudElement = hudElementData.create();
 
                         // Load the hudElement from the toml and add it to the hudElements list.
                         if (hudElement != null) {
                             hudElement.loadFromToml(hudElementTable.toMap(), hudElementTable);
+                            hudElement.id.setUniqueID(string);
                             HudManager.INSTANCE.addHudElement(hudElement);
                         }
                     }
@@ -207,10 +217,33 @@ public class Config {
             }
         }
         if(HudCategoryPane.INSTANCE != null) {
-            HudCategoryPane.INSTANCE.x = Math.toIntExact(configManager.getTomls().get(HUD).getTable("hudElements").getLong("x"));
-            HudCategoryPane.INSTANCE.y = Math.toIntExact(configManager.getTomls().get(HUD).getTable("hudElements").getLong("y"));
+            if(tomlElementMap != null) {
+                HudCategoryPane.INSTANCE.x = Math.toIntExact(tomlElementMap.getLong("x"));
+                HudCategoryPane.INSTANCE.y = Math.toIntExact(tomlElementMap.getLong("y"));
+            }
+            HudCategoryPane.INSTANCE.hudElementButtons.forEach(HudElementButton::updateCount);
         }
+        loadHudElementSettings();
+    }
 
+    public void loadHudElementSettings() {
+        Toml tomlElementMap = configManager.getTomls().get(HUD).getTable("hudElements").getTable("elements");
+        tomlElementMap.toMap().forEach((string, object) -> {
+            // Get the table of the hudElement
+            Toml hudElementTable = tomlElementMap.getTable(string);
+
+
+            for (HudElement element : HudManager.INSTANCE.hudElements) {
+                if (string.equals(element.id.uniqueID)) {
+                    System.out.println(string + " Equals " + element.id.uniqueID);
+                    for (SettingGroup settingGroup : element.settingGroups) {
+                        for (Setting<?> setting : settingGroup.getSettings()) {
+                            setting.loadFromToml(hudElementTable.toMap(), hudElementTable);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -218,7 +251,7 @@ public class Config {
      */
     public void loadConfig() {
         ModuleManager.INSTANCE = new ModuleManager();
-        if (!configManager.load()) {
+         if (!configManager.load()) {
             LOGGER.info("Loading default config...");
             this.getDefaultModuleConfig();
             this.save();
@@ -243,13 +276,24 @@ public class Config {
     }
 
     public void loadModules() {
+        if(FileUtils.isFileEmpty(modulesManager.getConfigFiles().get(MODULES))){
+            LOGGER.warn(MODULES + " module config is empty! Creating new default Modules config");
+            getDefaultModuleConfig();
+            this.save();
+        }
+
+        //Worlds most ineffcient code with complexity of O(4)
+
         CategoryManager.getCategories().forEach((s, category) -> {
             for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
                 for (SettingGroup settingGroup : m.settingGroups) {
-                    for (Setting setting : settingGroup.getSettings()) {
+                    for (Setting<?> setting : settingGroup.getSettings()) {
                         Toml newToml = modulesManager.getTomls().get(MODULES).getTable("panes").getTable(category.name).getTable(m.name.replace(" ", ""));
                         if (newToml != null) {
                             setting.loadFromToml(newToml.toMap(), newToml);
+                        }
+                        if (setting == m.active && m.isActive()) {
+                            m.onEnable();
                         }
                     }
                 }
@@ -258,15 +302,27 @@ public class Config {
     }
 
     public void loadClientConfigModules() {
+        if(FileUtils.isFileEmpty(configManager.getConfigFiles().get(CLIENT))){
+            LOGGER.warn(CLIENT + " client config is empty! Creating new default Modules config");
+            getDefaultModuleConfig();
+            this.save();
+        }
+
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
                     Toml settingsToml = configManager.getTomls().get(CLIENT).getTable("settings");
                     if (settingsToml != null)
                         setting.loadFromToml(settingsToml.toMap(), settingsToml);
+
+                    if(setting.iSettingChange != null && setting != HeliosClient.CLICKGUI.switchConfigs){
+                        setting.iSettingChange.onSettingChange(setting);
+                    }
                 }
             }
         }
+
+        HeliosClient.CLICKGUI.onLoad();
     }
 
     public void getClientConfig() {

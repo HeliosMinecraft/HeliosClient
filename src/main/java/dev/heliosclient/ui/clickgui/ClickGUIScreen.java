@@ -13,6 +13,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -28,10 +29,15 @@ public class ClickGUIScreen extends Screen {
         reset();
     }
 
+    @Override
+    protected void init() {
+        super.init();
+    }
+
     public void reset() {
         scrollX = 0;
         scrollY = 0;
-        categoryPanes = new ArrayList<CategoryPane>();
+        categoryPanes = new ArrayList<>();
 
         Object panesObject = HeliosClient.CONFIG.modulesManager.getConfigMaps().get("modules").get("panes");
         if (panesObject instanceof Map panePos) {
@@ -90,6 +96,7 @@ public class ClickGUIScreen extends Screen {
                 }
             }
         }
+
         searchBar.render(drawContext, drawContext.getScaledWindowWidth() / 2 - searchBar.width / 2 + 7, drawContext.getScaledWindowHeight() - searchBar.height - 11, mouseX, mouseY, textRenderer);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);

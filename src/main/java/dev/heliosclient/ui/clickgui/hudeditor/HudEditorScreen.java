@@ -8,7 +8,7 @@ import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.ui.clickgui.gui.Hitbox;
+import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
@@ -28,15 +28,14 @@ public class HudEditorScreen extends Screen implements Listener {
     float threshold = 1;
     // Variables to track the drag state and initial position
     private boolean isDragging = false;
-    private Hitbox dragBox = null;
+    private HudBox dragBox = null;
 
 
     private HudEditorScreen() {
         super(Text.of("Hud editor"));
         EventManager.register(this);
-        dragBox = new Hitbox(0, 0, 0, 0);
+        dragBox = new HudBox(0, 0, 0, 0);
     }
-
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
@@ -76,13 +75,13 @@ public class HudEditorScreen extends Screen implements Listener {
                     continue; // Skip comparison with itself
                 }
                 HudElement element2 = hudElements.get(j);
-                checkAndDrawVerticalLine(drawContext, element1.hitbox.getLeft(), element2.hitbox.getLeft(), element2.hitbox.getX());
+                checkAndDrawVerticalLine(drawContext, element1.hudBox.getLeft(), element2.hudBox.getLeft(), element2.hudBox.getX());
 
-                checkAndDrawVerticalLine(drawContext, element1.hitbox.getRight(), element2.hitbox.getRight(), element2.hitbox.getX() + element2.hitbox.getWidth());
+                checkAndDrawVerticalLine(drawContext, element1.hudBox.getRight(), element2.hudBox.getRight(), element2.hudBox.getX() + element2.hudBox.getWidth());
 
-                checkAndDrawHorizontalLine(drawContext, element1.hitbox.getTop(), element2.hitbox.getTop(), element2.hitbox.getY() - 1);
+                checkAndDrawHorizontalLine(drawContext, element1.hudBox.getTop(), element2.hudBox.getTop(), element2.hudBox.getY() - 1);
 
-                checkAndDrawHorizontalLine(drawContext, element1.hitbox.getBottom(), element2.hitbox.getBottom(), element2.hitbox.getY() + element2.hitbox.getHeight());
+                checkAndDrawHorizontalLine(drawContext, element1.hudBox.getBottom(), element2.hudBox.getBottom(), element2.hudBox.getY() + element2.hudBox.getHeight());
             }
         }
     }
@@ -147,15 +146,15 @@ public class HudEditorScreen extends Screen implements Listener {
                 isDragging = true;
                 int dragStartX = (int) mouseX;
                 int dragStartY = (int) mouseY;
-                dragBox = new Hitbox(dragStartX, dragStartY, 0, 0);
+                dragBox = new HudBox(dragStartX, dragStartY, 0, 0);
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    private void selectElementsInRectangle(Hitbox dragBox) {
+    private void selectElementsInRectangle(HudBox dragBox) {
         for (HudElement element : HudManager.INSTANCE.hudElements) {
-            if (element.hitbox.intersects(dragBox)) {
+            if (element.hudBox.intersects(dragBox)) {
                 element.selected = true;
                 selectedElements.add(element);
             } else {
@@ -200,7 +199,9 @@ public class HudEditorScreen extends Screen implements Listener {
         if (keyPressedEvent.getKey() == GLFW.GLFW_KEY_DELETE || keyPressedEvent.getKey() == GLFW.GLFW_KEY_BACKSPACE) {
             for (int i = 0; i < HudManager.INSTANCE.hudElements.size(); i++) {
                 if (HudManager.INSTANCE.hudElements.get(i).selected) {
-                    HudManager.INSTANCE.removeHudElement(HudManager.INSTANCE.hudElements.get(i));
+                    HudElement hudElement = HudManager.INSTANCE.hudElements.get(i);
+                    HudManager.INSTANCE.removeHudElement(hudElement);
+                    HudCategoryPane.INSTANCE.getHudElementButton(hudElement).updateCount();
                     i--;
                 }
             }

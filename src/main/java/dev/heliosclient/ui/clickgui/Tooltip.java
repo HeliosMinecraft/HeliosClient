@@ -1,10 +1,12 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
+import org.apache.xmlgraphics.java2d.color.ColorUtil;
 
 import java.awt.*;
 
@@ -13,7 +15,6 @@ public class Tooltip {
     public String tooltipText = "";
     public Integer mode = 0;
     public Integer fixedPos = 3;
-
     private Tooltip() {
     }
 
@@ -53,10 +54,10 @@ public class Tooltip {
     private void renderTooltip(DrawContext drawContext, String text, int x, int y) {
         int textWidth = Math.round(Renderer2D.getFxStringWidth(text));
         float textHeight = Renderer2D.getFxStringHeight();
-        float textY = y - textHeight; // Center the text vertically
-        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y - 13, (textWidth + 4), 13, 0xAA000000);
-        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 13, (textWidth + 5), 14, 1, Color.GRAY.getRGB());
+        float textY = y - (13f / 2f) - textHeight / 2; // Center the text vertically
 
+        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 2, y - 15, textWidth + 8, 16f, 3, 3, Color.BLACK.brighter().brighter().getRGB());
+        Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y - 15, textWidth + 8, 16f, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientStart().darker());
         Renderer2D.drawFixedString(drawContext.getMatrices(), text, x + 2, textY, ColorManager.INSTANCE.defaultTextColor());
     }
 

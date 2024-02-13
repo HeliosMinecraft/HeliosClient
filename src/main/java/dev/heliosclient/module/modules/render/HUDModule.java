@@ -1,4 +1,4 @@
-package dev.heliosclient.module.modules;
+package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
@@ -27,7 +27,9 @@ public class HUDModule extends Module_ implements Listener {
         super("HUD", "The HeliosClient HUD. Toggle to update.", Categories.RENDER);
         this.active.value = true;
         this.showInModulesList.value = false;
+
         addSettingGroup(sgGeneral);
+
         HeliosClient.uiColorA = colorSetting.getColor().getAlpha();
         HeliosClient.uiColor = colorSetting.getColor().getRGB();
         EventManager.register(this);

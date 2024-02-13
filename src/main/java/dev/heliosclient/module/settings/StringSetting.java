@@ -5,6 +5,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -19,8 +20,9 @@ public class StringSetting extends Setting<String> {
     public String value;
     String description;
     private final InputBox inputBox;
+    public ISettingChange settingChange;
 
-    public StringSetting(String name, String description, String value, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender, String defaultValue) {
+    public StringSetting(String name, String description, String value, int characterLimit, ISettingChange settingChange, InputBox.InputMode inputMode, BooleanSupplier shouldRender, String defaultValue) {
         super(shouldRender, defaultValue);
         this.name = name;
         this.value = value;
@@ -29,6 +31,7 @@ public class StringSetting extends Setting<String> {
         this.heightCompact = 25;
         this.characterLimit = characterLimit;
         this.inputMode = inputMode;
+        this.settingChange = settingChange;
         inputBox = new InputBox(180, 13, value, characterLimit, inputMode);
         inputBoxCompact = new InputBox(widthCompact - 4, 11, value, characterLimit, inputMode);
     }
@@ -98,6 +101,7 @@ public class StringSetting extends Setting<String> {
     public static class Builder extends SettingBuilder<Builder, String, StringSetting> {
         int characterLimit;
         InputBox.InputMode inputMode;
+        ISettingChange settingChange;
 
         public Builder() {
             super("");
@@ -113,9 +117,14 @@ public class StringSetting extends Setting<String> {
             return this;
         }
 
+        public Builder onSettingChange(ISettingChange settingChange) {
+            this.settingChange = settingChange;
+            return this;
+        }
+
         @Override
         public StringSetting build() {
-            return new StringSetting(name, description, value, characterLimit, inputMode, shouldRender, defaultValue);
+            return new StringSetting(name, description, value, characterLimit, settingChange, inputMode, shouldRender, defaultValue);
         }
     }
 }

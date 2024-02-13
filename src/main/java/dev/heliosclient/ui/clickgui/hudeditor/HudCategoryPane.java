@@ -39,6 +39,15 @@ public class HudCategoryPane {
         }
     }
 
+    public HudElementButton getHudElementButton(HudElement hudElement) {
+        for (HudElementButton hudElementButton : hudElementButtons) {
+            if (hudElementButton.getHudElement().getClass().equals(hudElement.getClass())) {
+                return hudElementButton;
+            }
+        }
+        return null;
+    }
+
     private float calculateMaxWidth() {
         float maxWidth = 0;
         for (HudElementButton elementButton : hudElementButtons) {

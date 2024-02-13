@@ -38,6 +38,7 @@ public class HudManager implements Listener {
 
     public void addHudElement(HudElement element) {
         this.hudElements.add(element);
+        element.onLoad();
     }
 
     public void removeHudElement(HudElement element) {

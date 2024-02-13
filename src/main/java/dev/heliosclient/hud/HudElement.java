@@ -3,15 +3,18 @@ package dev.heliosclient.hud;
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.ui.clickgui.gui.Hitbox;
+import dev.heliosclient.ui.clickgui.gui.HudBox;
+import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.UniqueID;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.MinecraftClient;
@@ -19,10 +22,8 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class for creating HudElements for HUD
@@ -50,10 +51,12 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public boolean selected = false;
     public boolean draggable = true;
     public boolean renderOutLineBox = true;
-    public Hitbox hitbox;
+    public HudBox hudBox;
     public boolean shiftDown = false;
     public List<SettingGroup> settingGroups = new ArrayList<>();
     public SettingGroup sgUI = new SettingGroup("UI");
+    public boolean isInHudEditor = false;
+    public UniqueID id;
     // Default settings
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
@@ -106,13 +109,13 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .build());
     int startX, startY, snapSize = 120;
 
+
     public HudElement(HudElementData hudElementInfo) {
         this.name = hudElementInfo.name();
         this.description = hudElementInfo.description();
-        hitbox = new Hitbox(x, y, width, height);
+        this.id = UniqueID.generate();
+        hudBox = new HudBox(x, y, width, height);
         EventManager.register(this);
-
-        addSettingGroup(sgUI);
     }
 
     /**
@@ -210,16 +213,16 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
                     Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 0, (float) drawContext.getScaledWindowHeight() / 2 - 1, drawContext.getScaledWindowWidth(), 2, 0xFF00FF00);
                 }
             }
-            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), (float) (x - 1 - padding.value / 2 - 1), (float) (y - 1 - padding.value / 2 - 1), hitbox.getWidth(), hitbox.getHeight() + 2f, 0.4f, 0xFFFFFFFF);
+            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), (float) (x - 1 - padding.value / 2 - 1), (float) (y - 1 - padding.value / 2 - 1), hudBox.getWidth(), hudBox.getHeight() + 2f, 0.4f, 0xFFFFFFFF);
         }
         //Renders element
         renderElement(drawContext, textRenderer);
 
-        // Set the hitbox values after the render element incase any change of width/height occurs
-        setHitbox();
+        // Set the hudBox values after the render element incase any change of width/height occurs
+        setHudBox();
     }
-    public void setHitbox(){
-        hitbox.set((float) (x - 1 - (padding.value / 2f)), (float) (y - 1 - (padding.value / 2f)), (float) (width + padding.value + 4f), (float) (height + padding.value +  1));
+    public void setHudBox(){
+        hudBox.set((float) (x - 1 - (padding.value / 2f)), (float) (y - 1 - (padding.value / 2f)), (float) (width + padding.value + 4f), (float) (height + padding.value +  1));
     }
 
 
@@ -253,7 +256,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         //Render element
         renderElement(drawContext, textRenderer);
 
-        setHitbox();
+        setHudBox();
     }
 
     /**
@@ -265,10 +268,11 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      * @param textRenderer
      */
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
-        setHitbox();
+        setHudBox();
+        
         if (renderBg.value) {
             drawContext.getMatrices().push();
-            drawContext.getMatrices().translate(0, 0, 0D);
+            drawContext.getMatrices().translate(0D, 0D, 0D);
             Color bgStart, bgEnd;
             if (clientColorCycle.value) {
                 bgStart = ColorManager.INSTANCE.getPrimaryGradientStart();
@@ -280,16 +284,16 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             Color blended = ColorUtils.blend(bgStart, bgEnd, 1 / 2f);
 
             if (rounded.value && !shadow.value) {
-                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, hitbox.getX(), hitbox.getY(), hitbox.getWidth() - 1.9f, hitbox.getHeight(), 2);
+                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), 2);
             } else if (!shadow.value) {
-                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), hitbox.getX(), hitbox.getY(), hitbox.getWidth() - 1.9f, hitbox.getHeight(), bgStart.getRGB(), bgEnd.getRGB());
+                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart.getRGB(), bgEnd.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
             }
 
             if (rounded.value && shadow.value) {
-                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), hitbox.getX(), hitbox.getY(), hitbox.getWidth() - 1.9f, hitbox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, 4, blended);
+                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, 4, blended);
             }
             if (!rounded.value && shadow.value) {
-                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), hitbox.getX(), hitbox.getY(), hitbox.getWidth() - 1.9f, hitbox.getHeight(), 4, bgStart.getRGB(), bgEnd.getRGB());
+                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), 4, bgStart.getRGB(), bgEnd.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
             }
 
             drawContext.getMatrices().pop();
@@ -300,7 +304,12 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      * Called on load.
      */
     public void onLoad() {
-        //addSettingGroup(sgUI);
+        addSettingGroup(sgUI);
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.CLIENT e) {
+        isInHudEditor = mc.currentScreen instanceof HudEditorScreen;
     }
 
     /**
@@ -348,7 +357,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      * @return if mouse is hovered over this element
      */
     public boolean hovered(double mouseX, double mouseY) {
-        return hitbox.contains(mouseX, mouseY);
+        return hudBox.contains(mouseX, mouseY);
     }
 
     /**
@@ -429,14 +438,5 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         this.height = Integer.parseInt(obj.get(3).toString());
         this.distanceX = x;
         this.distanceY = y;
-
-        for (SettingGroup settingGroup : settingGroups) {
-            for (Setting setting : settingGroup.getSettings()) {
-                if (setting.name != null) {
-                    setting.loadFromToml(map, toml);
-                }
-            }
-        }
-
     }
 }
