@@ -45,6 +45,44 @@ public class InputBox implements Listener {
         EventManager.register(this);
     }
 
+    @SubscribeEvent
+    public void keyHeld(KeyHeldEvent event) {
+        int keyCode = event.getKey();
+        if (focused && canWrite()) {
+            switch (keyCode) {
+                case GLFW.GLFW_KEY_BACKSPACE -> {
+                    if (!value.isEmpty() && cursorPosition > 0) {
+                        if (selecting) {
+                            value = value.substring(0, selectionStart) + value.substring(selectionEnd);
+                            cursorPosition = selectionStart;
+                            selecting = false;
+                            selectionStart = 0;
+                            selectionEnd = 0;
+                        } else {
+                            value = value.substring(0, cursorPosition - 1) + value.substring(cursorPosition);
+                            cursorPosition--;
+                        }
+                    }
+                }
+                case GLFW.GLFW_KEY_DELETE -> {
+                    if (selecting) {
+                        value = value.substring(0, selectionStart) + value.substring(selectionEnd);
+                        cursorPosition = selectionStart;
+                        selecting = false;
+                        selectionStart = 0;
+                        selectionEnd = 0;
+                    } else if (cursorPosition != value.length()) {
+                        value = value.substring(0, cursorPosition) + value.substring(cursorPosition + 1);
+                    }
+                }
+                case GLFW.GLFW_KEY_ENTER,
+                        GLFW.GLFW_KEY_KP_ENTER -> {
+                    focused = false;
+                }
+            }
+        }
+    }
+
     public void setText(String text) {
         this.value = text;
         this.textSegments.clear();
@@ -267,71 +305,6 @@ public class InputBox implements Listener {
     }
 
     @SubscribeEvent
-    public void keyHeld(KeyHeldEvent event) {
-        int keyCode = event.getKey();
-        if (focused && canWrite()) {
-            switch (keyCode) {
-                case GLFW.GLFW_KEY_BACKSPACE -> {
-                    if (!value.isEmpty() && cursorPosition > 0) {
-                        if (selecting) {
-                            value = value.substring(0, selectionStart) + value.substring(selectionEnd);
-                            cursorPosition = selectionStart;
-                            selecting = false;
-                            selectionStart = 0;
-                            selectionEnd = 0;
-                        } else {
-                            value = value.substring(0, cursorPosition - 1) + value.substring(cursorPosition);
-                            cursorPosition--;
-                        }
-                    }
-                }
-                case GLFW.GLFW_KEY_DELETE -> {
-                    if (selecting) {
-                        value = value.substring(0, selectionStart) + value.substring(selectionEnd);
-                        cursorPosition = selectionStart;
-                        selecting = false;
-                        selectionStart = 0;
-                        selectionEnd = 0;
-                    } else if (cursorPosition != value.length()) {
-                        value = value.substring(0, cursorPosition) + value.substring(cursorPosition + 1);
-                    }
-                }
-                case GLFW.GLFW_KEY_ENTER,
-                        GLFW.GLFW_KEY_KP_ENTER -> focused = false;
-            }
-        }
-    }
-
-
-    private void insertCharacter(char chr) {
-        if (value.length() <= characterLimit) {
-            // Check if text is selected
-            if (selecting) {
-                // Replace the selected text with the new character
-                int start = Math.min(selectionStart, selectionEnd);
-                int end = Math.max(selectionStart, selectionEnd);
-                StringBuilder builder = new StringBuilder(value);
-                builder.replace(start, end, String.valueOf(chr));
-                value = builder.toString();
-                cursorPosition = start + 1;
-
-                // Clear the selection
-                selecting = false;
-                selectionStart = selectionEnd = cursorPosition;
-            } else {
-                // Insert the new character at the cursor position
-                value = value.substring(0, cursorPosition) + chr + value.substring(cursorPosition);
-                cursorPosition++;
-            }
-        }
-    }
-
-
-    public void moveCursor(int offset) {
-        this.setCursorPos(this.cursorPosition + offset);
-    }
-
-    @SubscribeEvent
     public void charTyped(CharTypedEvent event) {
         char chr = event.getI();
         if (focused) {
@@ -371,9 +344,54 @@ public class InputBox implements Listener {
                         AnimationUtils.addErrorToast(ColorUtils.red + "Enter only digits or letters" + ColorUtils.green + " a-z // A-Z // 0-9", true, 1000);
                     }
                 }
+                case DIGITS_AND_CHARACTERS_AND_UNDERSCORE -> {
+                    if (Character.isLetterOrDigit(chr) || chr == '_') {
+                        insertCharacter(chr);
+                    } else {
+                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only digits or letters or underscore" + ColorUtils.green + " a-z // A-Z // 0-9 // _", true, 1000);
+                    }
+                }
                 case ALL -> insertCharacter(chr);
             }
         }
+    }
+
+
+    private void insertCharacter(char chr) {
+        if (value.length() <= characterLimit) {
+            // Check if text is selected
+            if (selecting) {
+                // Replace the selected text with the new character
+                int start = Math.min(selectionStart, selectionEnd);
+                int end = Math.max(selectionStart, selectionEnd);
+                StringBuilder builder = new StringBuilder(value);
+                builder.replace(start, end, String.valueOf(chr));
+                value = builder.toString();
+                cursorPosition = start + 1;
+
+                // Clear the selection
+                selecting = false;
+                selectionStart = selectionEnd = cursorPosition;
+            } else {
+                // Insert the new character at the cursor position
+                value = value.substring(0, cursorPosition) + chr + value.substring(cursorPosition);
+                cursorPosition++;
+            }
+        }
+    }
+
+    public void moveCursor(int offset) {
+        this.setCursorPos(this.cursorPosition + offset);
+    }
+
+    public enum InputMode {
+        DIGITS,
+        CHARACTERS,
+        CHARACTERS_AND_WHITESPACE,
+        DIGITS_AND_CHARACTERS,
+        DIGITS_AND_CHARACTERS_AND_UNDERSCORE,
+        DIGITS_AND_CHARACTERS_AND_WHITESPACE,
+        ALL
     }
 
 
@@ -486,13 +504,5 @@ public class InputBox implements Listener {
         return inputMode;
     }
 
-    public enum InputMode {
-        DIGITS,
-        CHARACTERS,
-        CHARACTERS_AND_WHITESPACE,
-        DIGITS_AND_CHARACTERS,
-        DIGITS_AND_CHARACTERS_AND_WHITESPACE,
-        ALL
-    }
 }
 
