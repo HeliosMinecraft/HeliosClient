@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://github.com/HeliosMinecraft/HeliosClient/assets/120117618/f7fc786b-2dda-4467-9b26-884fcc5f7a96" height="150px">
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/text.png?raw=true" height="150px">
 </p>
 <div align="center">
     <h3>Fabric anarchy utility mod for the latest Minecraft version.</h3>
@@ -14,9 +14,9 @@
     <summary>Click to show</summary>
     <p>Keep in mind that these images might be outdated as Helios is currently updating frequently!</p>
     <p>New clickgui as of commit #199 (0758e8c)</p>
-    <img src="https://github.com/HeliosClient/HeliosClient/assets/120117618/9fc78cc1-6a93-4ef7-83ef-3cff64b3c3f4" alt="New Click GUI">
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/heliosclientgui.png?raw=true" alt="New Click GUI">
     <p>Old clickgui</p>
-    <img src="https://github.com/HeliosClient/HeliosClient/blob/main/.github/images/ClickGUI.png?raw=true" alt="Old Click GUI">
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/ClickGUI.png?raw=true" alt="Old Click GUI">
 </details>  
 
 ## Building
