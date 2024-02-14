@@ -4,26 +4,20 @@ import com.moandjiezana.toml.Toml;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Radar extends HudElement {
     private static int RADAR_SIZE = 100; // Size of the radar in pixels

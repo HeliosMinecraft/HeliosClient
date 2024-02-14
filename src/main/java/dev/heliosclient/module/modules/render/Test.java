@@ -12,12 +12,10 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.Renderer3D;
+import dev.heliosclient.util.render.Renderer2D;
+import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
-import me.x150.renderer.render.Renderer3d;
-import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
@@ -25,8 +23,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
-
-import static dev.heliosclient.util.Renderer2D.drawContext;
 
 
 public class Test extends Module_ {

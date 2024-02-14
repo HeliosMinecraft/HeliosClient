@@ -17,7 +17,7 @@ import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;

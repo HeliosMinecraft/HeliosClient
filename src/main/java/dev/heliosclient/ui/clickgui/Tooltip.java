@@ -1,12 +1,11 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import org.apache.xmlgraphics.java2d.color.ColorUtil;
 
 import java.awt.*;
 
@@ -52,13 +51,14 @@ public class Tooltip {
 
 
     private void renderTooltip(DrawContext drawContext, String text, int x, int y) {
-        int textWidth = Math.round(Renderer2D.getFxStringWidth(text));
-        float textHeight = Renderer2D.getFxStringHeight();
-        float textY = y - (13f / 2f) - textHeight / 2; // Center the text vertically
+        int textWidth = Math.round(Renderer2D.getCustomStringWidth(text, FontRenderers.Small_fxfontRenderer));
+        float textHeight = Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer);
+        float textY = y + textHeight / 2 + 4; // Center the text vertically
 
-        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 2, y - 15, textWidth + 8, 16f, 3, 3, Color.BLACK.brighter().brighter().getRGB());
-        Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y - 15, textWidth + 8, 16f, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientStart().darker());
-        Renderer2D.drawFixedString(drawContext.getMatrices(), text, x + 2, textY, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x + 5, textY - 2, textWidth + 8, textHeight + 3, 3, 3, Color.BLACK.brighter().brighter().getRGB());
+        Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 5, textY - 2, textWidth + 8, textHeight + 3, 3, 0.7f, ColorManager.INSTANCE.getPrimaryGradientStart().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientStart().darker());
+
+        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer,drawContext.getMatrices(), text, x + 8, textY, ColorManager.INSTANCE.defaultTextColor());
     }
 
     public void changeText(String str) {

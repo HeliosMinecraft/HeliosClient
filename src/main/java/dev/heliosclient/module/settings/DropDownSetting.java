@@ -4,7 +4,7 @@ import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;

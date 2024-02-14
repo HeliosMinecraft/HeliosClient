@@ -1,11 +1,10 @@
 package dev.heliosclient.ui.notification.notifications;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.ui.notification.Notification;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;

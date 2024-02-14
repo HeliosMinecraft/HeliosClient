@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -6,16 +6,11 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.KeyframeAnimation;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
-import dev.heliosclient.util.render.GaussianBlur;
-import dev.heliosclient.util.render.GradientUtils;
-import dev.heliosclient.util.render.Texture;
-import ladysnake.satin.api.util.RenderLayerHelper;
-import me.x150.renderer.Renderer;
 import me.x150.renderer.font.FontRenderer;
-import me.x150.renderer.util.RendererUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
@@ -881,14 +876,27 @@ public class Renderer2D implements Listener {
             drawRectangle(matrix4f, x + width - radius, y + height - radius, radius, radius, color);
         }
     }
-
+    /**
+     * Draws a outline rounded gradient rectangle
+     *
+     * @param matrix4f Matrix4f object to draw the rounded gradient rectangle
+     * @param color1 is applied to the bottom-left vertex (x, y + height).
+     * @param color2 is applied to the bottom-right vertex (x + width, y + height).
+     * @param color3 is applied to the top-right vertex (x + width, y).
+     * @param color4 is applied to the top-left vertex (x, y).
+     * @param x      X pos
+     * @param y      Y pos
+     * @param width  Width of rounded gradient rectangle
+     * @param height Height of rounded gradient rectangle
+     * @param radius Radius of the quadrants / the rounded gradient rectangle
+     */
     public static void drawOutlineGradientRoundedBox(Matrix4f matrix4f, float x, float y, float width, float height, float radius, float thickness, Color color1, Color color2, Color color3, Color color4) {
         // Draw the rectangles for the outline with gradient
         drawGradient(matrix4f, x + radius, y, width - radius * 2, thickness, color1.getRGB(), color2.getRGB(), Direction.LEFT_RIGHT); // Top rectangle
         drawGradient(matrix4f, x + radius, y + height - thickness, width - radius * 2, thickness, color3.getRGB(), color4.getRGB(), Direction.RIGHT_LEFT); // Bottom rectangle
 
-        drawRectangle(matrix4f, x, y + radius, thickness, height - radius * 2, color1.getRGB()); // Left rectangle
-        drawRectangle(matrix4f, x + width - thickness, y + radius, thickness, height - radius * 2, color2.getRGB()); // Right rectangle
+        drawGradient(matrix4f, x, y + radius, thickness, height - radius * 2, color4.getRGB(),color1.getRGB(), Direction.BOTTOM_TOP); // Left rectangle
+        drawGradient(matrix4f, x + width - thickness, y + radius, thickness, height - radius * 2, color2.getRGB(),color3.getRGB(),Direction.TOP_BOTTOM); // Right rectangle
 
         // Draw the arcs at the corners for the outline with gradient
         drawArc(matrix4f, x + radius, y + radius, radius, thickness, color1.getRGB(), 180, 270); // Top-left arc
@@ -896,6 +904,30 @@ public class Renderer2D implements Listener {
         drawArc(matrix4f, x + width - radius, y + height - radius, radius, thickness, color3.getRGB(), 0, 90); // Bottom-right arc
         drawArc(matrix4f, x + radius, y + height - radius, radius, thickness, color4.getRGB(), 270, 360); // Bottom-left arc
     }
+    public static void drawOutlineGradientRoundedBoxEffect(Matrix4f matrix4f, float x, float y, float width, float height, float radius,float ratio, float thickness, Color primaryColor, Color secondaryColor, int currentColorCorner) {
+        Color color1, color2, color3, color4;
+        switch (currentColorCorner) {
+            case 1:
+                color1 = ColorUtils.blend(primaryColor, secondaryColor, ratio);
+                color2 = color3 = color4 = primaryColor;
+                break;
+            case 2:
+                color2 = ColorUtils.blend(primaryColor, secondaryColor, ratio);
+                color1 = color3 = color4 = primaryColor;
+                break;
+            case 3:
+                color3 = ColorUtils.blend(primaryColor, secondaryColor, ratio);
+                color1 = color2 = color4 = primaryColor;
+                break;
+            default:
+                color4 = ColorUtils.blend(primaryColor, secondaryColor, ratio);
+                color1 = color2 = color3 = primaryColor;
+                break;
+        }
+
+        drawOutlineGradientRoundedBox(matrix4f,x,y,width,height,radius,thickness,color1,color2,color3,color4);
+    }
+
 
     /**
      * Draws a rounded rectangle with a shadow in a bad way

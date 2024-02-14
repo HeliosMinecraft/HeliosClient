@@ -1,4 +1,4 @@
-package dev.heliosclient.system;
+package dev.heliosclient.util.render.textures;
 
 import net.minecraft.client.resource.metadata.TextureResourceMetadata;
 import net.minecraft.client.texture.NativeImage;

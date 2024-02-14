@@ -3,7 +3,7 @@ package dev.heliosclient.module.settings;
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;

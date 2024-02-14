@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.system;
 
 import dev.heliosclient.ui.clickgui.ConsoleScreen;
 import org.apache.logging.log4j.core.Appender;

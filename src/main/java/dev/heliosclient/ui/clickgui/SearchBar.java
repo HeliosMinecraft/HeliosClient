@@ -1,12 +1,10 @@
 package dev.heliosclient.ui.clickgui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 

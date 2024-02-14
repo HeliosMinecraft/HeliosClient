@@ -1,4 +1,4 @@
-package dev.heliosclient.system;
+package dev.heliosclient.util.render.textures;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.mixin.MixinSplashScreen;

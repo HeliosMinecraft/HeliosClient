@@ -7,10 +7,13 @@ import java.util.concurrent.TimeUnit;
 public class TimerUtils {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private long startTime;
+    private boolean hasTimerStarted;
 
     // Starts the timer
     public void startTimer() {
+        if(hasTimerStarted) return;
         startTime = System.currentTimeMillis();
+        hasTimerStarted = true;
     }
 
     // Returns the elapsed time (in seconds) since the timer was started
@@ -22,6 +25,7 @@ public class TimerUtils {
     // Resets the timer
     public void resetTimer() {
         startTime = System.currentTimeMillis();
+        hasTimerStarted = false;
     }
 
     // Schedules a task to reset the timer every ms milliseconds

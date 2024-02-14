@@ -5,7 +5,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.ui.clickgui.gui.Table;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 

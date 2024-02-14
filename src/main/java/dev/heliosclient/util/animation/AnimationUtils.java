@@ -3,7 +3,7 @@ package dev.heliosclient.util.animation;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.toasts.ErrorToast;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;

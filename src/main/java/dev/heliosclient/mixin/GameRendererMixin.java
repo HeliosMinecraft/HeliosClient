@@ -2,7 +2,6 @@ package dev.heliosclient.mixin;
 
 import dev.heliosclient.event.events.render.Render3DEvent;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.util.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;

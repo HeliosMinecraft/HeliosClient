@@ -4,7 +4,7 @@ import com.moandjiezana.toml.Toml;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.CategoryPane;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;

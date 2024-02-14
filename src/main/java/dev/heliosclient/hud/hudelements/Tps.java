@@ -5,8 +5,8 @@ import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
-import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.TickRate;
+import dev.heliosclient.util.render.Renderer2D;
+import dev.heliosclient.system.TickRate;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 

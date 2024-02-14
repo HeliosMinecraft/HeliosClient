@@ -189,6 +189,7 @@ public class Config {
             getHudConfig();
             configManager.save();
         }
+
         LOGGER.info("Loading Hud Elements... ");
         HudManager.INSTANCE.hudElements.clear();
         // Get the hudElements table from the config
@@ -227,23 +228,27 @@ public class Config {
     }
 
     public void loadHudElementSettings() {
-        Toml tomlElementMap = configManager.getTomls().get(HUD).getTable("hudElements").getTable("elements");
-        tomlElementMap.toMap().forEach((string, object) -> {
-            // Get the table of the hudElement
-            Toml hudElementTable = tomlElementMap.getTable(string);
+        Toml tomlElementMap = configManager.getTomls().get(HUD).getTable("hudElements");
+        if (tomlElementMap != null) {
+            Toml toml = tomlElementMap.getTable("elements");
+            if(toml != null) {
+                tomlElementMap.toMap().forEach((string, object) -> {
+                    // Get the table of the hudElement
+                    Toml hudElementTable = toml.getTable(string);
 
 
-            for (HudElement element : HudManager.INSTANCE.hudElements) {
-                if (string.equals(element.id.uniqueID)) {
-                    System.out.println(string + " Equals " + element.id.uniqueID);
-                    for (SettingGroup settingGroup : element.settingGroups) {
-                        for (Setting<?> setting : settingGroup.getSettings()) {
-                            setting.loadFromToml(hudElementTable.toMap(), hudElementTable);
+                    for (HudElement element : HudManager.INSTANCE.hudElements) {
+                        if (string.equals(element.id.uniqueID)) {
+                            for (SettingGroup settingGroup : element.settingGroups) {
+                                for (Setting<?> setting : settingGroup.getSettings()) {
+                                    setting.loadFromToml(hudElementTable.toMap(), hudElementTable);
+                                }
+                            }
                         }
                     }
-                }
+                });
             }
-        });
+        }
     }
 
     /**

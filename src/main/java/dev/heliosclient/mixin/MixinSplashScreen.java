@@ -3,21 +3,16 @@ package dev.heliosclient.mixin;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.system.ClearTexture;
-import dev.heliosclient.system.ClientTexture;
+import dev.heliosclient.util.render.textures.ClearTexture;
+import dev.heliosclient.util.render.textures.ClientTexture;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.Renderer2D;
-import dev.heliosclient.util.fontutils.FontRenderers;
-import me.x150.renderer.font.FontRenderer;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Overlay;
 import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.texture.AbstractTexture;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReload;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -33,14 +28,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static dev.heliosclient.system.ClientTexture.CLIENT_LOGO_TEXTURE;
+import static dev.heliosclient.util.render.textures.ClientTexture.CLIENT_LOGO_TEXTURE;
 
 @Mixin(value = SplashOverlay.class, priority = 3000)
 public abstract class MixinSplashScreen {

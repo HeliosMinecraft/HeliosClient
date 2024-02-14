@@ -5,7 +5,7 @@ import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;

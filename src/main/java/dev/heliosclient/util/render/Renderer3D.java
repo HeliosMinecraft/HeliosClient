@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;

@@ -9,7 +9,7 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.MinecraftClient;

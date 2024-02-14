@@ -2,7 +2,7 @@ package dev.heliosclient.util.animation.toasts;
 
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;

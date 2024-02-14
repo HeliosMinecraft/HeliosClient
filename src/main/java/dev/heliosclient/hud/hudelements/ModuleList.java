@@ -10,7 +10,7 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 

@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.system;
 
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.CreateParams;
@@ -7,7 +7,6 @@ import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityType;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.animation.AnimationUtils;
-import net.minecraft.client.MinecraftClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +15,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 

@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.system;
 
 import java.util.Random;
 

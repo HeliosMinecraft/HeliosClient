@@ -10,7 +10,7 @@ import dev.heliosclient.managers.HudManager;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;

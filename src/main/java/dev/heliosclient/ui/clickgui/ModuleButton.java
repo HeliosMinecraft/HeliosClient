@@ -14,11 +14,11 @@ import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
-import dev.heliosclient.util.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -117,17 +117,17 @@ public class ModuleButton implements Listener {
         Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
         Color blendedColor = ColorUtils.blend(fillColorStart, fillColorEnd, 1 / 2f);
 
+        int textY = y + (height - moduleNameHeight) / 2;
+
         if (hitBox.contains(mouseX, mouseY)) {
-            Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y, width, height, fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, 2, 5, blendedColor);
+            textY = textY - 1;
+            Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y-1, width, height, fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, 2, 5, blendedColor);
         } else {
             Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y, width, height, 2);
         }
         if (settingsOpen && boxHeight >= 4) {
             Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorStart, 100), x + 1, y + height, width, boxHeight + 2, 2);
-            // Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 1, y + height, width, boxHeight + 2,2,ColorUtils.changeAlpha(blendedColor, 100).getRGB()); ;
         }
-
-        int textY = y + (height - moduleNameHeight) / 2;
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor());
         if (hitBox.contains(mouseX, mouseY)) {

@@ -11,7 +11,7 @@ import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;

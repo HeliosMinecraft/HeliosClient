@@ -3,7 +3,7 @@ package dev.heliosclient.module.settings;
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 

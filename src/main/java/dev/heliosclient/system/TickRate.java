@@ -1,18 +1,14 @@
-package dev.heliosclient.util;
+package dev.heliosclient.system;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.player.PacketEvent;
 import dev.heliosclient.event.events.player.PlayerJoinEvent;
 import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.managers.EventManager;
 import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class TickRate implements Listener {
     public static TickRate INSTANCE = new TickRate();

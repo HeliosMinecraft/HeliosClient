@@ -14,7 +14,7 @@ import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.Renderer2D;
+import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -148,7 +148,10 @@ public class CategoryPane implements Listener {
             y = mouseY - startY;
         }
         if (!collapsed && height >= 10) {
+            Renderer2D.enableScissor(x-2,y+categoryNameHeight+6,width+5,(int) hitBox.getHeight());
+            Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x-1,y+categoryNameHeight,width + 3.5f, hitBox.getHeight() + 6,3,1f,ColorManager.INSTANCE.getPrimaryGradientStart(),ColorManager.INSTANCE.getPrimaryGradientStart(),ColorManager.INSTANCE.getPrimaryGradientEnd(),ColorManager.INSTANCE.getPrimaryGradientEnd());
             Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, hitBox.getHeight(), 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+            Renderer2D.disableScissor();
         }
 
         if (collapsed) {
@@ -159,7 +162,7 @@ public class CategoryPane implements Listener {
             Renderer2D.enableScissor(x - 2, y + 10, width + 2, Math.round(hitBox.getHeight()) + 6);
             for (ModuleButton m : moduleButtons) {
                 int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
-                m.render(drawContext, mouseX, mouseY, x, animatedY, maxWidth);
+                m.render(drawContext, mouseX, mouseY, x + 1, animatedY, maxWidth);
 
                 int settingsHeight = m.renderSettings(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                 buttonYOffset += settingsHeight;

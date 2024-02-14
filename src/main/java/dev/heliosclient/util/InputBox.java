@@ -9,6 +9,7 @@ import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
