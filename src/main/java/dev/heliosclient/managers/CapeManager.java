@@ -5,6 +5,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.cape.CapeSynchronizer;
@@ -17,6 +18,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import org.apache.http.client.HttpResponseException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,6 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class CapeManager implements Listener {
     public static CapeManager INSTANCE = new CapeManager();
@@ -54,6 +58,7 @@ public class CapeManager implements Listener {
      * Works similar to FontLoader#loadFonts
      */
     public static String[] loadCapes() {
+        Future<String[]> future = HeliosExecutor.submit(() -> {
         if (!CAPE_DIRECTORY.exists()) {
             HeliosClient.LOGGER.info("Cape directory does not exist");
             if (CAPE_DIRECTORY.mkdirs()) {
@@ -100,6 +105,13 @@ public class CapeManager implements Listener {
         String[] capeNamesArray = capeNames.toArray(new String[0]);
         capes = capeNamesArray;
         return capeNamesArray;
+    });
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            HeliosClient.LOGGER.error("An error occurred while loading capes", e);
+            return new String[0];
+        }
     }
 
     public static void load(InputStream inputStream, String fileName, File file) throws IOException {
@@ -167,6 +179,7 @@ public class CapeManager implements Listener {
         }
     }
 
+    // No executors here because fuck I like lag sometimes
     public static void getCapes(CapeType type, String profileName, String UUID) throws IOException {
         switch (type) {
             case OPTIFINE:
@@ -226,7 +239,8 @@ public class CapeManager implements Listener {
             ImageIO.write(image, "png", outputfile);
             connection.disconnect();
         } else {
-            HeliosClient.LOGGER.error(connection.getResponseMessage() + connection.getResponseCode());
+            HeliosClient.LOGGER.error("Connection Message: " + connection.getResponseMessage() + ", Response Code: " + connection.getResponseCode());
+            throw new HttpResponseException(connection.getResponseCode(),connection.getResponseMessage());
         }
     }
 
@@ -266,7 +280,8 @@ public class CapeManager implements Listener {
             ImageIO.write(image, "png", outputfile);
             connection.disconnect();
         } else {
-            HeliosClient.LOGGER.error(connection.getResponseMessage() + connection.getResponseCode());
+            HeliosClient.LOGGER.error("Connection Message: " + connection.getResponseMessage() + ", Response Code: " + connection.getResponseCode());
+            throw new HttpResponseException(connection.getResponseCode(),connection.getResponseMessage());
         }
     }
 

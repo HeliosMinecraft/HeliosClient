@@ -6,6 +6,7 @@ import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.toasts.ErrorToast;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.toast.Toast;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class AnimationUtils implements Listener {
@@ -16,7 +17,10 @@ public class AnimationUtils implements Listener {
     private EasingType easingType = EasingType.LINEAR_IN;
 
     public static void addErrorToast(String message, boolean hasProgressBar, long endDelay) {
-        HeliosClient.MC.getToastManager().add(new ErrorToast(message, hasProgressBar, endDelay));
+        Toast toast = new ErrorToast(message, hasProgressBar, endDelay);
+        if(HeliosClient.MC.getToastManager() != null && toast != null) {
+            HeliosClient.MC.getToastManager().add(toast);
+        }
     }
 
     public static float lerp(float point1, float point2, float alpha) {

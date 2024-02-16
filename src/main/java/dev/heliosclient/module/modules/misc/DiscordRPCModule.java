@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules.misc;
 
+import de.jcm.discordgamesdk.GameSDKException;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
@@ -23,11 +24,16 @@ public class DiscordRPCModule extends Module_ {
     public void onEnable() {
         super.onEnable();
         if (DiscordRPC.INSTANCE.isRunning) {
-            AnimationUtils.addErrorToast("DiscordRPC is already running!", true, 1000);
+            AnimationUtils.addErrorToast("DiscordRPC is already running!", false, 1000);
             HeliosClient.LOGGER.error("DiscordRPC is already running!");
             return;
         }
-        DiscordRPC.INSTANCE.runPresence();
+        try {
+            DiscordRPC.INSTANCE.runPresence();
+        }
+        catch (GameSDKException e){
+            toggle();
+        }
     }
 
     @Override

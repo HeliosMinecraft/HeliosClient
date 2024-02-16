@@ -17,5 +17,7 @@ public abstract class HeliosAddon {
 
     public void registerCategories() {
     }
+    public void registerModules() {
+    }
 
 }

@@ -366,6 +366,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         if(toml.getList(this.name.replace(" ", "")) == null){
             value = defaultValue;
             rainbow = defaultRainbow;
+            HeliosClient.LOGGER.error(this.name.replace(" ","") + " is null, Setting loaded to default");
             return;
         }
         value = ColorUtils.intToColor(Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(0).toString()));

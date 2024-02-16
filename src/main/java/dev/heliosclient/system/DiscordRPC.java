@@ -101,7 +101,7 @@ public class DiscordRPC {
         }
     }
 
-    public void runPresence() {
+    public void runPresence() throws GameSDKException{
         callbackThread = new Thread(() -> {
             if (discordLibrary == null) {
                 getLibrary();
@@ -109,15 +109,16 @@ public class DiscordRPC {
         LOGGER.info("Discord Rich Presence is running!");
         Core.init(discordLibrary);
         try (CreateParams params = new CreateParams()) {
+            // Please dont hack me ಥ_ಥ
             params.setClientID(1203402546626957373L);
             params.setFlags(CreateParams.Flags.NO_REQUIRE_DISCORD);
+
             // Create the Core
             try {
                 discordCore = new Core(params);
             } catch (GameSDKException e) {
-                if (MC.getToastManager() != null)
-                    AnimationUtils.addErrorToast("Discord Application is not running. Code 055", false, 1500);
-                return;
+                AnimationUtils.addErrorToast("Discord Application is not running. Code 055", false, 1500);
+                throw e;
             }
 
             activity = new Activity();
@@ -131,7 +132,8 @@ public class DiscordRPC {
                 while (true) {
                     discordCore.runCallbacks();
                     try {
-                        Thread.sleep(30);
+                        //More delay == More CPU happy
+                        Thread.sleep(45);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

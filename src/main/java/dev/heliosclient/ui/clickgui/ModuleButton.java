@@ -7,6 +7,7 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
@@ -113,8 +114,8 @@ public class ModuleButton implements Listener {
 
         hitBox.set(x, y, width, height);
 
-        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
-        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100);
+        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(GUI.INSTANCE.buttonColor.getColor(), 100);
+        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(GUI.INSTANCE.buttonColor.getColor(), 100);
         Color blendedColor = ColorUtils.blend(fillColorStart, fillColorEnd, 1 / 2f);
 
         int textY = y + (height - moduleNameHeight) / 2;
@@ -146,7 +147,7 @@ public class ModuleButton implements Listener {
             updateSetting();
             buttonYOffset = y + this.height + 2;
 
-            for (Setting setting : module.quickSettings) {
+            for (Setting<?> setting : module.quickSettings) {
 
                 // Reset the animation if the setting is not visible.
                 if (!setting.shouldRender()) {

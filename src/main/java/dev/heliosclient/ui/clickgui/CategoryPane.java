@@ -10,6 +10,7 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
@@ -28,7 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class CategoryPane implements Listener {
-    public static int width = 83;
+    public static int width = 85;
     public static int MAX_HEIGHT = 150;
     public static List<HudBox> hitboxes = new CopyOnWriteArrayList<>();
     public final char icon;
@@ -149,8 +150,10 @@ public class CategoryPane implements Listener {
         }
         if (!collapsed && height >= 10) {
             Renderer2D.enableScissor(x-2,y+categoryNameHeight+6,width+5,(int) hitBox.getHeight());
-            Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x-1,y+categoryNameHeight,width + 3.5f, hitBox.getHeight() + 6,3,1f,ColorManager.INSTANCE.getPrimaryGradientStart(),ColorManager.INSTANCE.getPrimaryGradientStart(),ColorManager.INSTANCE.getPrimaryGradientEnd(),ColorManager.INSTANCE.getPrimaryGradientEnd());
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4.5f, hitBox.getHeight(), 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 100).getRGB());
+            if(GUI.INSTANCE.categoryBorder.value) {
+                Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight, width + 3f, hitBox.getHeight() + 6, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
+            }
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4f, hitBox.getHeight(), 3, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary(), 100).getRGB());
             Renderer2D.disableScissor();
         }
 
@@ -162,7 +165,7 @@ public class CategoryPane implements Listener {
             Renderer2D.enableScissor(x - 2, y + 10, width + 2, Math.round(hitBox.getHeight()) + 6);
             for (ModuleButton m : moduleButtons) {
                 int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
-                m.render(drawContext, mouseX, mouseY, x + 1, animatedY, maxWidth);
+                m.render(drawContext, mouseX, mouseY, x + 1 , animatedY, maxWidth);
 
                 int settingsHeight = m.renderSettings(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                 buttonYOffset += settingsHeight;
@@ -173,7 +176,7 @@ public class CategoryPane implements Listener {
             Renderer2D.disableScissor();
         }
 
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3, ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.ClickGuiPrimary()), 255).getRGB());
+        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3,2, ColorUtils.changeAlpha(GUI.INSTANCE.categoryPaneColors.getColor(), 255).getRGB());
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
         hitBox.set(x, y, width, MAX_HEIGHT);

@@ -1,5 +1,7 @@
 package dev.heliosclient.managers;
 
+import dev.heliosclient.addon.AddonManager;
+import dev.heliosclient.addon.HeliosAddon;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.chat.ChatHighlight;
@@ -10,10 +12,7 @@ import dev.heliosclient.module.modules.movement.Fly;
 import dev.heliosclient.module.modules.movement.Speed;
 import dev.heliosclient.module.modules.movement.Step;
 import dev.heliosclient.module.modules.player.NoFall;
-import dev.heliosclient.module.modules.render.CustomFov;
-import dev.heliosclient.module.modules.render.Fullbright;
-import dev.heliosclient.module.modules.render.HUDModule;
-import dev.heliosclient.module.modules.render.Test;
+import dev.heliosclient.module.modules.render.*;
 import dev.heliosclient.util.MathUtils;
 
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ public class ModuleManager {
         registerModules(
                 new Fly(),
                 new NoFall(),
+                GUI.INSTANCE,
                 new HUDModule(),
                 new Step(),
                 new Fullbright(),
@@ -41,6 +41,8 @@ public class ModuleManager {
                 notificationModule,
                 capeModule
         );
+
+        AddonManager.addons.forEach(HeliosAddon::registerModules);
     }
 
     public void registerModule(Module_ module) {

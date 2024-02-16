@@ -19,6 +19,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.lwjgl.opengl.GL40C;
@@ -44,6 +45,10 @@ public class Renderer2D implements Listener {
             animations[i].addKeyframe(0, 0);
             animations[i].addKeyframe(1, 1);
         }
+    }
+    public enum Direction {
+        // Left_Right means from left to right. Same for others //
+        LEFT_RIGHT, TOP_BOTTOM, RIGHT_LEFT, BOTTOM_TOP
     }
 
     /**
@@ -245,43 +250,6 @@ public class Renderer2D implements Listener {
         drawGradient(matrices.peek().getPositionMatrix(), x, y, width, height, startColor, endColor, direction);
     }
 
-
-    public static void drawGradient(Matrix4f matrix4f, GradientUtils gradient, float x, float y, float width, float height, int shiftSpeed) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-
-        bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-        float scrollOffset = (System.currentTimeMillis() % (shiftSpeed * 100)) / (shiftSpeed * 100.0f);
-
-        Color startColor = gradient.getColor(scrollOffset);
-        Color endColor = gradient.getColor((scrollOffset + 0.5f) % 1.0f);
-
-        float startRed = startColor.getRed() / 255.0F;
-        float startGreen = startColor.getGreen() / 255.0F;
-        float startBlue = startColor.getBlue() / 255.0F;
-        float startAlpha = startColor.getAlpha() / 255.0F;
-
-        float endRed = endColor.getRed() / 255.0F;
-        float endGreen = endColor.getGreen() / 255.0F;
-        float endBlue = endColor.getBlue() / 255.0F;
-        float endAlpha = endColor.getAlpha() / 255.0F;
-
-        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-
-        tessellator.draw();
-
-        RenderSystem.disableBlend();
-    }
-
     /**
      * Draws an outline rounded rectangle by drawing 4 side rectangles, and 4 arcs
      *
@@ -420,7 +388,7 @@ public class Renderer2D implements Listener {
      * @param color      color of the blurred shadow
      * @param blurRadius blur radius of the shadow for gaussian blur algorithm
      */
-    public static void drawCircleBlurredShadow(MatrixStack matrices, float xCenter, float yCenter, float radius, Color color, int blurRadius) {
+    public static void drawCircularBlurredShadow(MatrixStack matrices, float xCenter, float yCenter, float radius, Color color, int blurRadius) {
         // Calculate the size of the shadow image
         int diameter = (int) (radius * 2);
         int shadowWidth = diameter + blurRadius * 2;
@@ -553,10 +521,8 @@ public class Renderer2D implements Listener {
      * @param blurRadius blur radius of the shadow for gaussian blur algorithm
      */
     public static void drawCircleWithShadow(MatrixStack matrices, float xCenter, float yCenter, float radius, int blurRadius, int color) {
-        // First, render the shadow
-        drawCircleBlurredShadow(matrices, xCenter, yCenter, radius, new Color(color), blurRadius);
+        drawCircularBlurredShadow(matrices, xCenter, yCenter, radius, new Color(color), blurRadius);
 
-        // Then, render the circle
         drawFilledCircle(matrices.peek().getPositionMatrix(), xCenter, yCenter, radius, color);
     }
 
@@ -783,23 +749,6 @@ public class Renderer2D implements Listener {
         drawArc(matrix4f, xCenter, yCenter, radius, 1f, color, startAngle, endAngle);
     }
 
-    public static void drawFilledTriangle(Matrix4f matrix4f, int x1, int y1, int x2, int y2, int x3, int y3, int color) {
-        float red = (float) (color >> 16 & 255) / 255.0F;
-        float green = (float) (color >> 8 & 255) / 255.0F;
-        float blue = (float) (color & 255) / 255.0F;
-        float alpha = (float) (color >> 24 & 255) / 255.0F;
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
-
-        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x3, y3, 0).color(red, green, blue, alpha).next();
-
-        tessellator.draw();
-    }
-
     /* ====  Drawing Rounded Rectangles  ==== */
 
     /**
@@ -950,7 +899,6 @@ public class Renderer2D implements Listener {
         // Then, render the rounded rectangle
         drawRoundedRectangle(matrix4f, x, y, width, height, radius, color);
     }
-
     /**
      * Draws a rounded rectangle with a shadow
      *
@@ -964,8 +912,25 @@ public class Renderer2D implements Listener {
      * @param blurRadius blur radius of the shadow
      */
     public static void drawRoundedRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, float radius, int blurRadius, int color) {
+      drawRoundedRectangleWithShadow(matrices,x,y,width,height,radius,blurRadius,color,color);
+    }
+
+    /**
+     * Draws a rounded rectangle with a shadow of color given
+     *
+     * @param matrices   MatrixStack object to draw the rounded rectangle
+     * @param x          X pos
+     * @param y          Y pos
+     * @param width      Width of rounded rectangle
+     * @param height     Height of rounded rectangle
+     * @param radius     Radius of the quadrants / the rounded rectangle
+     * @param color      Color of the rounded rectangle
+     * @param blurRadius blur radius of the shadow
+     * @param shadowColor color of the shadow
+     */
+    public static void drawRoundedRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, float radius, int blurRadius, int color, int shadowColor) {
         // First, render the shadow
-        drawBlurredShadow(matrices, x, y, width, height, blurRadius, new Color(color));
+        drawBlurredShadow(matrices, x, y, width, height, blurRadius, new Color(shadowColor));
 
         // Then, render the rounded rectangle
         drawRoundedRectangle(matrices.peek().getPositionMatrix(), x, y, width, height, radius, color);
@@ -1012,45 +977,6 @@ public class Renderer2D implements Listener {
         RenderSystem.defaultBlendFunc();
     }
 
-    public static void drawRoundedGradientRectangle(Matrix4f matrix, GradientUtils gradient, float x, float y, float width, float height, float radius, int shiftSpeed) {
-        // Get the colors from the gradient
-        Color color1 = gradient.getColor(0.0f); // Start color
-        Color color2 = gradient.getColor(0.33f); // Middle color
-        Color color3 = gradient.getColor(0.67f); // Middle color
-        Color color4 = gradient.getColor(1.0f); // End color
-
-        RenderSystem.enableBlend();
-        RenderSystem.colorMask(false, false, false, true);
-        RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
-        RenderSystem.colorMask(true, true, true, true);
-
-        drawRoundedRectangle(matrix, x, y, width, height, (int) radius, color1.getRGB());
-
-        RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
-
-        RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
-
-        // Calculate the scroll offset
-        float scrollOffset = (System.currentTimeMillis() % (shiftSpeed * 100)) / (shiftSpeed * 100.0f);
-
-        // Apply the scroll offset to the texture coordinates
-        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB()).texture(0.0f + scrollOffset, 0.0f).next();
-        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB()).texture(1.0f + scrollOffset, 0.0f).next();
-        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB()).texture(1.0f + scrollOffset, 1.0f).next();
-        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB()).texture(0.0f + scrollOffset, 1.0f).next();
-
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        RenderSystem.disableBlend();
-
-        RenderSystem.defaultBlendFunc();
-    }
-
     /**
      * Draws a rounded gradient rectangle with a shadow
      *
@@ -1082,11 +1008,6 @@ public class Renderer2D implements Listener {
     }
 
     /* ==== Drawing Custom Stuff ==== */
-
-    public enum Direction {
-        // Left_Right means from left to right. Same for others //
-        LEFT_RIGHT, TOP_BOTTOM, RIGHT_LEFT, BOTTOM_TOP
-    }
 
     // Minecraft InventoryScreen source code but 360 degree support and smoother tickdelta
     public static void drawEntity(DrawContext context, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {

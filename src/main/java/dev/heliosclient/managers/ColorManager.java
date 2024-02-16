@@ -50,11 +50,11 @@ public class ColorManager implements Listener {
         }
     }
 
-    public int ClickGuiPrimary() {
+    public Color ClickGuiPrimary() {
         if (clickGuiPrimaryRainbow) {
-            return ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), clickGuiPrimaryAlpha).getRGB();
+            return ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), clickGuiPrimaryAlpha);
         } else {
-            return clickGuiPrimary;
+            return new Color(clickGuiPrimary);
         }
     }
 

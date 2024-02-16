@@ -23,8 +23,9 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext, mouseX, mouseY, delta);
-
+        if (this.client.world == null) {
+            super.renderBackgroundTexture(drawContext);
+        }
         if (textRenderer.getWidth(setting.description) > windowWidth) {
             windowWidth = textRenderer.getWidth(setting.description) + 5;
         } else if (textRenderer.getWidth(setting.name) > windowWidth) {
@@ -38,7 +39,6 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
 
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
     }
-
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         window.setBackButtonTask(() -> {

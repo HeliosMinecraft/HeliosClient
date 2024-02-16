@@ -97,9 +97,14 @@ public class CapeModule extends Module_ {
                     CapeManager.getCapes(CapeManager.CapeType.values()[getCapeFrom.value], null, UUID.value);
                 }
                 capes.options = List.of(CapeManager.capes);
+
+                //Todo: Change to info toast
                 AnimationUtils.addErrorToast("Fetched cape successfully", false, 1000);
             } catch (IOException e) {
                 HeliosClient.LOGGER.error("An error has occured while fetching cape. ", e);
+                AnimationUtils.addErrorToast("Failed to fetch cape. Check logs", false, 1000);
+                AnimationUtils.addErrorToast("Reason for fail: " + e.getMessage(), false, 1000);
+
             }
         });
         loadCapes.addButton("Reload Capes", 0, 1, () -> {

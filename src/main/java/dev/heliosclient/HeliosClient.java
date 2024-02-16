@@ -11,6 +11,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.system.DiscordRPC;
+import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.system.TickRate;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ConsoleScreen;
@@ -46,6 +47,7 @@ public class HeliosClient implements ModInitializer, Listener {
     public static ConsoleScreen CONSOLE = new ConsoleScreen();
 
     public static void loadConfig() {
+        HeliosExecutor.execute(()->{
         configTimer.startTimer();
         CONFIG.loadConfig();
         CommandManager.prefix = (String) CONFIG.getClientConfigMap().get("prefix");
@@ -62,11 +64,13 @@ public class HeliosClient implements ModInitializer, Listener {
             NotificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
         configTimer.resetTimer();
+        });
     }
 
     public static void saveConfig() {
         if (isSaving) return;
 
+        HeliosExecutor.execute(()->{
         isSaving = true;
         LOGGER.info("Saving config... \t Module Config being saved: " + Config.MODULES);
         configTimer.startTimer();
@@ -79,6 +83,7 @@ public class HeliosClient implements ModInitializer, Listener {
         }
         configTimer.resetTimer();
         isSaving = false;
+        });
     }
 
     public static boolean shouldSendNotification() {
@@ -134,6 +139,7 @@ public class HeliosClient implements ModInitializer, Listener {
             if (DiscordRPC.INSTANCE.isRunning) {
                 DiscordRPC.INSTANCE.stopPresence();
             }
+            HeliosExecutor.shutdown();
         }));
 
        /* ConsoleAppender consoleAppender = new ConsoleAppender(CONSOLE);
