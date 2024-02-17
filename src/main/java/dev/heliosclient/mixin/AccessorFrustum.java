@@ -22,21 +22,21 @@ public interface AccessorFrustum {
     @Accessor
     void setFrustumIntersection(FrustumIntersection vector4f);
 
-    @Accessor
+    @Accessor(value = "x")
     double getX();
 
-    @Accessor
+    @Accessor(value = "x")
     void setX(double x);
 
-    @Accessor
+    @Accessor(value = "y")
     double getY();
 
-    @Accessor
+    @Accessor(value = "y")
     void setY(double y);
 
-    @Accessor
+    @Accessor(value = "z")
     double getZ();
 
-    @Accessor
+    @Accessor(value = "z")
     void setZ(double z);
 }

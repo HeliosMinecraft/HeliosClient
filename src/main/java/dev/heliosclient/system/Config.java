@@ -18,7 +18,6 @@ import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
 import dev.heliosclient.ui.clickgui.hudeditor.HudElementButton;
 import dev.heliosclient.util.FileUtils;
-import oshi.util.FileUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;

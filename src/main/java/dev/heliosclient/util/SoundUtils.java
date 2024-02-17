@@ -19,14 +19,14 @@ public class SoundUtils {
 
     public static void playSound(SoundEvent sound, float volume, float pitch) {
         if (HeliosClient.MC.world == null || HeliosClient.MC.player == null) return;
-        HeliosClient.MC.world.playSound(HeliosClient.MC.player, HeliosClient.MC.player.getBlockPos(), sound, SoundCategory.BLOCKS, volume, pitch);
+        HeliosClient.MC.world.playSound(HeliosClient.MC.player, HeliosClient.MC.player.getBlockPos(), sound, SoundCategory.PLAYERS, volume, pitch);
     }
     public static void playInstanceSound(SoundEvent sound) {
-        SoundInstance soundInstance = new HeliosSoundInstance(sound,SoundCategory.MUSIC,SoundInstance.createRandom());
+        SoundInstance soundInstance = new HeliosSoundInstance(sound,SoundCategory.PLAYERS,SoundInstance.createRandom());
         HeliosClient.MC.getSoundManager().play(soundInstance);
     }
     public static void playInstanceSound(SoundEvent sound, float volume, float pitch) {
-        HeliosSoundInstance soundInstance = new HeliosSoundInstance(sound,SoundCategory.MUSIC,SoundInstance.createRandom());
+        HeliosSoundInstance soundInstance = new HeliosSoundInstance(sound,SoundCategory.PLAYERS,SoundInstance.createRandom());
         soundInstance.setPitch(pitch);
         soundInstance.setVolume(volume);
         HeliosClient.MC.getSoundManager().play(soundInstance);
