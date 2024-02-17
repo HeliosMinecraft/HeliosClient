@@ -43,7 +43,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
                     .filter(entry -> entry.getValue().shouldRender())
                     .forEach(entry -> {
                         SettingGroup settingGroup = entry.getKey();
-                        Setting setting = entry.getValue();
+                        Setting<?> setting = entry.getValue();
                         setting.update(settingGroup.getY());
                         if (!setting.isAnimationDone() && delay.get() <= 0.0f) {
                             delay.set(delayBetweenSettings);
@@ -56,14 +56,16 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext, mouseX, mouseY, delta);
+        if (this.client.world == null) {
+            super.renderBackgroundTexture(drawContext);
+        }
 
         windowHeight = 50;
         for (SettingGroup settingGroup : module.settingGroups) {
             float groupNameHeight = settingGroup.getGroupNameHeight();
             windowHeight += Math.round(groupNameHeight + 12);
             if (!settingGroup.shouldRender()) continue;
-            for (Setting setting : settingGroup.getSettings()) {
+            for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
                 windowHeight += setting.height + 1;
@@ -100,7 +102,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
             if (settingGroup.shouldRender()) {
                 List<Setting> settings = settingGroup.getSettings();
-                for (Setting setting : settings) {
+                for (Setting<?> setting : settings) {
                     if (setting.shouldRender()) {
                         if (setting instanceof RGBASetting rgbaSetting) {
                             rgbaSetting.setParentScreen(this);
@@ -132,7 +134,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    public void resetSettingAnimation(Setting setting, SettingGroup settingGroup) {
+    public void resetSettingAnimation(Setting<?> setting, SettingGroup settingGroup) {
         setting.animationDone = false;
         setting.setAnimationProgress(0);
         synchronized (executorReset) {

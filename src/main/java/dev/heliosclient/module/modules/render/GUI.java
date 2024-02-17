@@ -10,7 +10,6 @@ import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
 
 public class GUI extends Module_ {
-    public static GUI INSTANCE = new GUI();
     public SettingGroup sgColors = new SettingGroup("Colors");
     public RGBASetting categoryPaneColors = sgColors.add(new RGBASetting.Builder()
             .name("CategoryPane Color")

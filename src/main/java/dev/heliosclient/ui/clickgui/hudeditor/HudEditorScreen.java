@@ -39,7 +39,10 @@ public class HudEditorScreen extends Screen implements Listener {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext, mouseX, mouseY, delta);
+        if (this.client.world == null) {
+            super.renderBackgroundTexture(drawContext);
+        }
+
         if (HeliosClient.CLICKGUI.ScreenHelp.value) {
             float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Select Element", 2, drawContext.getScaledWindowHeight() - (4 * fontHeight) - 4 * 2, -1);
@@ -50,7 +53,7 @@ public class HudEditorScreen extends Screen implements Listener {
 
         checkAlignmentAndDrawLines(drawContext);
 
-        if (dragBox != null && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX, mouseY)) {
+        if (dragBox != null && !HudCategoryPane.INSTANCE.hoveredOverCategoryCompletely(mouseX, mouseY)) {
             drawContext.getMatrices().push();
             drawContext.getMatrices().translate(0, 0, -0.0D);
             drawContext.fill(Math.round(dragBox.getX()), Math.round(dragBox.getY()), Math.round(dragBox.getX() + dragBox.getWidth()), Math.round(dragBox.getY() + dragBox.getHeight()), new Color(255, 255, 255, 45).getRGB());
@@ -110,7 +113,7 @@ public class HudEditorScreen extends Screen implements Listener {
         HudCategoryPane.INSTANCE.mouseClicked(mouseX, mouseY, button);
 
         if (button == 0) {
-            if (!selectedElements.isEmpty() && !isDragging && dragBox == null && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX, mouseY)) {
+            if (!selectedElements.isEmpty() && !isDragging && dragBox == null && !HudCategoryPane.INSTANCE.hoveredOverCategoryCompletely(mouseX, mouseY)) {
                 for (HudElement element : selectedElements) {
                     if (dragBox == null && !isDragging) {
                         element.mouseClicked(mouseX, mouseY, button);
@@ -142,7 +145,7 @@ public class HudEditorScreen extends Screen implements Listener {
         }
 
         if (button == 0) {
-            if (lastHoveredIndex == -1 && selectedElements.isEmpty() && !HudCategoryPane.INSTANCE.hoveredComplete(mouseX, mouseY) && dragBox == null) {
+            if (lastHoveredIndex == -1 && selectedElements.isEmpty() && !HudCategoryPane.INSTANCE.hoveredOverCategoryCompletely(mouseX, mouseY) && dragBox == null) {
                 isDragging = true;
                 int dragStartX = (int) mouseX;
                 int dragStartY = (int) mouseY;

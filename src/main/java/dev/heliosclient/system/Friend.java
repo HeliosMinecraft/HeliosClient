@@ -19,4 +19,9 @@ public record Friend(String playerName) {
     public int hashCode() {
         return this.playerName.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return playerName;
+    }
 }

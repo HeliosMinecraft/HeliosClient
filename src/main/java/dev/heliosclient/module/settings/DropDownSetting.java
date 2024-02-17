@@ -4,6 +4,7 @@ import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
@@ -83,29 +84,33 @@ public class DropDownSetting extends Setting<Integer> {
             //Render arrow
             FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), selecting ? "\uF123" : "\uF120", x + Renderer2D.getFxStringWidth(name + ": ") + 2 + maxOptionWidth + 5, y + 4, ColorManager.INSTANCE.defaultTextColor());
             if (selecting) {
-                // Render full size box including the options
-                Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), startX, y + 2f, maxOptionWidth + 4, this.height - 2.0f, 3,4, color.brighter().getRGB());
-
-
                 //Render the settings and center them horizontally
-                float offset = y + 6.0f + Renderer2D.getFxStringHeight();
-                for (Object option : options) {
-                    //Skip the chosen option
-                    if (option == options.get(value)) {
-                        continue;
+                if(options.size() > 1) {
+                    // Render full size box including the options
+                    Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), startX, y + 2f, maxOptionWidth + 4, this.height - 2.0f, 3,4, color.brighter().getRGB());
+
+                    float offset = y + 6.0f + Renderer2D.getFxStringHeight();
+                    for (Object option : options) {
+                        //Skip the chosen option
+                        if (option == options.get(value)) {
+                            continue;
+                        }
+                        float x2 = Renderer2D.getFxStringWidth(name + ": ") + x + 2;
+                        int center = Math.round(((maxOptionWidth + 4.0f) / 2.0f) - (Renderer2D.getFxStringWidth(option.toString()) / 2.0f)); // Center the text horizontally
+
+                        // Draw a horizontal line above the option text to separate the buttons
+                        //Renderer2D.drawHorizontalLine(drawContext.getMatrices().peek().getPositionMatrix(), x2, maxOptionWidth + 4.0f, offset - 0.1f, 0.5f, Color.white.getRGB());
+
+                        // Draw the text
+                        Renderer2D.drawFixedString(drawContext.getMatrices(), String.valueOf(option), x2 + center, offset, Color.white.getRGB());
+                        offset += Renderer2D.getFxStringHeight() + 5.0f;
                     }
-                    float x2 = Renderer2D.getFxStringWidth(name + ": ") + x + 2;
-                    int center = Math.round(((maxOptionWidth + 4.0f) / 2.0f) - (Renderer2D.getFxStringWidth(option.toString()) / 2.0f)); // Center the text horizontally
-
-                    // Draw a horizontal line above the option text to separate the buttons
-                    //Renderer2D.drawHorizontalLine(drawContext.getMatrices().peek().getPositionMatrix(), x2, maxOptionWidth + 4.0f, offset - 0.1f, 0.5f, Color.white.getRGB());
-
-                    // Draw the text
-                    Renderer2D.drawFixedString(drawContext.getMatrices(), String.valueOf(option), x2 + center, offset, Color.white.getRGB());
-                    offset += Renderer2D.getFxStringHeight() + 5.0f;
+                    // 24 is the height of setting
+                    this.height = Math.max(24, Math.round(offset - y));
+                }else{
+                    this.height = 28;
+                    Renderer2D.drawFixedString(drawContext.getMatrices(), "Only one option found!", x + 2, y + Renderer2D.getFxStringHeight() + 6, 0xFFFF0000);
                 }
-                // 24 is the height of setting
-                this.height = Math.max(24, Math.round(offset - y));
             }
             // Draw the name of the option
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": ", x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());

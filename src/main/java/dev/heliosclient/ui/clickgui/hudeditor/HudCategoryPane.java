@@ -23,7 +23,7 @@ public class HudCategoryPane {
 
     public HudCategoryPane() {
         float maxWidth = 0;
-        for (HudElementData data : HudElementList.INSTANCE.elementDataMap.values()) {
+        for (HudElementData<?> data : HudElementList.INSTANCE.elementDataMap.values()) {
             HudElement element = data.create();
             HudElementButton button = new HudElementButton(element);
             float elementWidth = Renderer2D.getCustomStringWidth(button.hudElement.name + " [" + button.count + "]", FontRenderers.Small_fxfontRenderer) + 4;
@@ -31,7 +31,7 @@ public class HudCategoryPane {
         }
         width = Math.round(maxWidth);
 
-        for (HudElementData data : HudElementList.INSTANCE.elementDataMap.values()) {
+        for (HudElementData<?> data : HudElementList.INSTANCE.elementDataMap.values()) {
             HudElement element = data.create();
             HudElementButton button = new HudElementButton(element);
             button.width = width;
@@ -102,7 +102,8 @@ public class HudCategoryPane {
         return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + 13;
     }
 
-    public boolean hoveredComplete(double mouseX, double mouseY) {
+    // This is so that you cant create a new selection box when over the category pane
+    public boolean hoveredOverCategoryCompletely(double mouseX, double mouseY) {
         return mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + (hudElementButtons.size() * 12) + 13;
     }
 }

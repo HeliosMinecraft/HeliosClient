@@ -6,6 +6,10 @@ import java.util.List;
 
 import static dev.heliosclient.HeliosClient.MC;
 
+/**
+ * Scheduled for removal
+ */
+@Deprecated
 public class Quadtree {
     private final int MAX_OBJECTS = 10;
     private final int MAX_LEVELS = 5;

@@ -21,15 +21,18 @@ public class ModuleManager {
     public static ModuleManager INSTANCE = new ModuleManager();
     public static CapeModule capeModule;
     public static NotificationModule notificationModule;
+    public static GUI GUI;
     public ArrayList<Module_> modules = new ArrayList<>();
 
     public ModuleManager() {
         capeModule = new CapeModule();
         notificationModule = new NotificationModule();
+        GUI = new GUI();
+
         registerModules(
                 new Fly(),
                 new NoFall(),
-                GUI.INSTANCE,
+                GUI,
                 new HUDModule(),
                 new Step(),
                 new Fullbright(),

@@ -12,6 +12,7 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
@@ -81,7 +82,7 @@ public class Config {
             for (Module_ module : ModuleManager.INSTANCE.getModulesByCategory(category)) {
                 Map<String, Object> ModuleConfig = new HashMap<>();
                 for (SettingGroup settingGroup : module.settingGroups) {
-                    for (Setting setting : settingGroup.getSettings()) {
+                    for (Setting<?> setting : settingGroup.getSettings()) {
                         if (setting.name != null) {
                             ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
                         }
@@ -133,7 +134,7 @@ public class Config {
                         // Map for storing the values of each module
                         Map<String, Object> ModuleConfig = new HashMap<>();
                         for (SettingGroup settingGroup : module.settingGroups) {
-                            for (Setting setting : settingGroup.getSettings()) {
+                            for (Setting<?> setting : settingGroup.getSettings()) {
                                 if (setting.name != null) {
                                     // Put the value of each setting into the map. Call the setting saveToToml method to get the value of the setting.
                                     ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
@@ -164,10 +165,8 @@ public class Config {
             Map<String, Object> pane = new HashMap<>();
             Map<String, Object> hudElements = new HashMap<>();
 
-            int a = 0;
             for (HudElement hudElement : HudManager.INSTANCE.hudElements) {
                 hudElements.put(hudElement.id.uniqueID, hudElement.saveToToml(new ArrayList<>()));
-                a++;
             }
             pane.put("x", HudCategoryPane.INSTANCE == null? 0: HudCategoryPane.INSTANCE.x);
             pane.put("y", HudCategoryPane.INSTANCE == null? 0: HudCategoryPane.INSTANCE.y);
@@ -256,19 +255,19 @@ public class Config {
      */
     public void loadConfig() {
         ModuleManager.INSTANCE = new ModuleManager();
-         if (!configManager.load()) {
+        if (configManager.load()) {
+            this.getModuleConfig();
+        } else {
             LOGGER.info("Loading default config...");
             this.getDefaultModuleConfig();
             this.save();
-        } else {
-            this.getModuleConfig();
         }
-        if (!modulesManager.load()) {
+        if (modulesManager.load()) {
+            this.getModuleConfig();
+        } else {
             LOGGER.info("Loading default modules config...");
             this.getDefaultModuleConfig();
             this.save();
-        } else {
-            this.getModuleConfig();
         }
 
         this.getClientConfig();
@@ -288,12 +287,13 @@ public class Config {
         }
 
         //Worlds most ineffcient code with complexity of O(4)
+        Toml panesToml = modulesManager.getTomls().get(MODULES).getTable("panes");
 
         CategoryManager.getCategories().forEach((s, category) -> {
             for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
                 for (SettingGroup settingGroup : m.settingGroups) {
                     for (Setting<?> setting : settingGroup.getSettings()) {
-                        Toml newToml = modulesManager.getTomls().get(MODULES).getTable("panes").getTable(category.name).getTable(m.name.replace(" ", ""));
+                        Toml newToml = panesToml.getTable(category.name).getTable(m.name.replace(" ", ""));
                         if (newToml != null) {
                             setting.loadFromToml(newToml.toMap(), newToml);
                         }
@@ -314,13 +314,13 @@ public class Config {
         }
 
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
-            for (Setting setting : settingGroup.getSettings()) {
+            for (Setting<?> setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
                     Toml settingsToml = configManager.getTomls().get(CLIENT).getTable("settings");
                     if (settingsToml != null)
                         setting.loadFromToml(settingsToml.toMap(), settingsToml);
 
-                    if(setting.iSettingChange != null && setting != HeliosClient.CLICKGUI.switchConfigs){
+                    if(setting.iSettingChange != null && setting != HeliosClient.CLICKGUI.switchConfigs && setting != ClickGUI.FontRenderer){
                         setting.iSettingChange.onSettingChange(setting);
                     }
                 }
@@ -334,7 +334,7 @@ public class Config {
         getClientConfigMap().put("prefix", ".");
         Map<String, Object> ModuleConfig = new HashMap<>();
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
-            for (Setting setting : settingGroup.getSettings()) {
+            for (Setting<?> setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
                     ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
                 }

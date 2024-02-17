@@ -6,6 +6,7 @@ import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.ListSetting;
@@ -15,6 +16,7 @@ import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
+import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
@@ -46,7 +48,6 @@ public class ModuleButton implements Listener {
     private boolean faded = true;
     private float targetY;
     private float animationProgress = 0;
-
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
         this.width = CategoryPane.getWidth() - 2;
@@ -97,7 +98,7 @@ public class ModuleButton implements Listener {
         return faded;
     }
 
-    public void render(DrawContext drawContext, int mouseX, int mouseY, int x, int y, int maxWidth) {
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float  x, int y, int maxWidth) {
         this.screen = HeliosClient.MC.currentScreen;
         this.x = x;
         this.y = y;
@@ -114,8 +115,8 @@ public class ModuleButton implements Listener {
 
         hitBox.set(x, y, width, height);
 
-        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(GUI.INSTANCE.buttonColor.getColor(), 100);
-        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(GUI.INSTANCE.buttonColor.getColor(), 100);
+        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(ModuleManager.GUI.buttonColor.getColor(), 100);
+        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(ModuleManager.GUI.buttonColor.getColor(), 100);
         Color blendedColor = ColorUtils.blend(fillColorStart, fillColorEnd, 1 / 2f);
 
         int textY = y + (height - moduleNameHeight) / 2;
@@ -183,11 +184,11 @@ public class ModuleButton implements Listener {
         return buttonYOffset > 2 ? buttonYOffset - y - this.height - 2 : 0;
     }
 
-    public int getAnimatedY(Setting setting, int offset) {
+    public int getAnimatedY(Setting<?> setting, int offset) {
         return Math.round(setting.getY() + (offset - setting.getY()) * setting.getAnimationProgress());
     }
 
-    private void resetAnimation(Setting setting) {
+    private void resetAnimation(Setting<?> setting) {
         setting.animationDone = false;
         delay = 0;
         setting.setAnimationProgress(0.5f);
@@ -204,6 +205,9 @@ public class ModuleButton implements Listener {
                 if (hitBox.contains(mouseX, mouseY)) {
                     if (button == 0) {
                         module.toggle();
+                        if(HeliosClient.CLICKGUI.clickGUISound.value) {
+                            SoundUtils.playInstanceSound(SoundUtils.CLICK_SOUNDEVENT);
+                        }
                         return true;
                     } else if (button == 1) {
                         HeliosClient.MC.setScreen(new SettingsScreen(module, parentScreen));
@@ -215,7 +219,7 @@ public class ModuleButton implements Listener {
                     }
                 }
                 if (this.module.settingsOpen) {
-                    for (Setting setting : module.quickSettings) {
+                    for (Setting<?> setting : module.quickSettings) {
                         if (!setting.shouldRender()) continue;
                         setting.mouseClicked(mouseX, mouseY, button);
                     }
@@ -223,7 +227,7 @@ public class ModuleButton implements Listener {
             }
 
             if (collapsed) {
-                for (Setting setting : module.quickSettings) {
+                for (Setting<?> setting : module.quickSettings) {
                     resetAnimation(setting);
                 }
                 setFaded(true);

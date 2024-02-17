@@ -47,7 +47,6 @@ public class HeliosClient implements ModInitializer, Listener {
     public static ConsoleScreen CONSOLE = new ConsoleScreen();
 
     public static void loadConfig() {
-        HeliosExecutor.execute(()->{
         configTimer.startTimer();
         CONFIG.loadConfig();
         CommandManager.prefix = (String) CONFIG.getClientConfigMap().get("prefix");
@@ -56,7 +55,7 @@ public class HeliosClient implements ModInitializer, Listener {
         // Font event is posted to allow the GUI to reset its calculation for the new font by the config.
         if (FontManager.fonts != null)
             EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
-
+        
         CONFIG.loadHudElements();
         CONFIG.loadModules();
         LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
@@ -64,7 +63,6 @@ public class HeliosClient implements ModInitializer, Listener {
             NotificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
         configTimer.resetTimer();
-        });
     }
 
     public static void saveConfig() {

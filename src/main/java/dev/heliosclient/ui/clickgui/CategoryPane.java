@@ -21,7 +21,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -150,10 +149,10 @@ public class CategoryPane implements Listener {
         }
         if (!collapsed && height >= 10) {
             Renderer2D.enableScissor(x-2,y+categoryNameHeight+6,width+5,(int) hitBox.getHeight());
-            if(GUI.INSTANCE.categoryBorder.value) {
-                Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight, width + 3f, hitBox.getHeight() + 6, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
+            if(ModuleManager.GUI.categoryBorder.value) {
+                Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight, width + 2f, hitBox.getHeight() + 6, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
             }
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 2, y + categoryNameHeight + 6, false, false, true, true, width + 4f, hitBox.getHeight(), 3, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary(), 100).getRGB());
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hitBox.getHeight(), 3, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary(), 100).getRGB());
             Renderer2D.disableScissor();
         }
 
@@ -165,7 +164,7 @@ public class CategoryPane implements Listener {
             Renderer2D.enableScissor(x - 2, y + 10, width + 2, Math.round(hitBox.getHeight()) + 6);
             for (ModuleButton m : moduleButtons) {
                 int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
-                m.render(drawContext, mouseX, mouseY, x + 1 , animatedY, maxWidth);
+                m.render(drawContext, mouseX, mouseY, x , animatedY, maxWidth);
 
                 int settingsHeight = m.renderSettings(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                 buttonYOffset += settingsHeight;
@@ -176,7 +175,7 @@ public class CategoryPane implements Listener {
             Renderer2D.disableScissor();
         }
 
-        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3,2, ColorUtils.changeAlpha(GUI.INSTANCE.categoryPaneColors.getColor(), 255).getRGB());
+        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3,2, ColorUtils.changeAlpha(ModuleManager.GUI.categoryPaneColors.getColor(), 255).getRGB());
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
         hitBox.set(x, y, width, MAX_HEIGHT);
@@ -234,7 +233,7 @@ public class CategoryPane implements Listener {
     public void mouseReleased(int mouseX, int mouseY, int button) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.settingsOpen) {
-                for (Setting setting : moduleButton.module.quickSettings) {
+                for (Setting<?> setting : moduleButton.module.quickSettings) {
                     if (!setting.shouldRender()) continue;
                     setting.mouseReleased(mouseX, mouseY, button);
                 }
@@ -246,7 +245,7 @@ public class CategoryPane implements Listener {
     public void charTyped(char chr, int modifiers) {
         for (ModuleButton moduleButton : moduleButtons) {
             if (moduleButton.settingsOpen) {
-                for (Setting setting : moduleButton.module.quickSettings) {
+                for (Setting<?> setting : moduleButton.module.quickSettings) {
                     if (!setting.shouldRender()) continue;
                     setting.charTyped(chr, modifiers);
                 }

@@ -22,6 +22,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
     @Inject(method = "render", at = @At("TAIL"))
     public void onRenderPost(T entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         RenderSystem.enableDepthTest();
+
     }
 }
 

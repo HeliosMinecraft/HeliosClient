@@ -36,7 +36,9 @@ public class ListSettingScreen extends AbstractSettingScreen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext, mouseX, mouseY, delta);
+        if (this.client.world == null) {
+            super.renderBackgroundTexture(drawContext);
+        }
 
         windowHeight = 52;
         windowHeight += listSetting.options.size() * 25;

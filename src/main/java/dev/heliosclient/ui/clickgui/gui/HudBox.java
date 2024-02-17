@@ -16,11 +16,12 @@ public class HudBox implements Listener {
         this.y = y;
         this.width = width;
         this.height = height;
-        EventManager.register(this);
         this.left = x;
         this.top = y;
         this.right = x + width;
         this.bottom = y + height;
+
+        EventManager.register(this);
     }
 
     public boolean intersects(HudBox other) {

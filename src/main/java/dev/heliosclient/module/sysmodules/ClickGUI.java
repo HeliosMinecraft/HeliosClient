@@ -38,18 +38,18 @@ import static dev.heliosclient.managers.FontManager.fonts;
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
-    public static SettingGroup sgUI = new SettingGroup("UI");
+    public static SettingGroup sgMisc = new SettingGroup("Misc");
+
     public static ClickGUI INSTANCE = new ClickGUI();
-    public static CycleSetting ScrollType = sgUI.add(new CycleSetting.Builder()
+    public static CycleSetting ScrollType = sgMisc.add(new CycleSetting.Builder()
             .name("Scrolling System")
             .description("Scrolling for the ClickGui")
             .onSettingChange(INSTANCE)
             .value(new ArrayList<>(List.of(ScrollTypes.values())))
             .defaultListIndex(0)
-            .shouldRender(() -> true)
             .build()
     );
-    public static DoubleSetting CategoryHeight = sgUI.add(new DoubleSetting.Builder()
+    public static DoubleSetting CategoryHeight = sgMisc.add(new DoubleSetting.Builder()
             .name("CategoryPane Height")
             .description("CategoryPane Height for the ClickGUI")
             .onSettingChange(INSTANCE)
@@ -60,7 +60,7 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> ScrollType.value == 1)
             .build()
     );
-    public static DoubleSetting ScrollSpeed = sgUI.add(new DoubleSetting.Builder()
+    public static DoubleSetting ScrollSpeed = sgMisc.add(new DoubleSetting.Builder()
             .name("Scroll Speed")
             .description("Change your scroll speed for the ClickGUI")
             .onSettingChange(INSTANCE)
@@ -70,7 +70,7 @@ public class ClickGUI extends Module_ {
             .roundingPlace(1)
             .build()
     );
-    public static CycleSetting FontRenderer = sgUI.add(new CycleSetting.Builder()
+    public static CycleSetting FontRenderer = sgMisc.add(new CycleSetting.Builder()
             .name("Font Renderer")
             .description("Font Rendering for the client")
             .onSettingChange(INSTANCE)
@@ -79,7 +79,7 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> true)
             .build()
     );
-    public static CycleSetting Font = sgUI.add(new CycleSetting.Builder()
+    public static CycleSetting Font = sgMisc.add(new CycleSetting.Builder()
             .name("Font")
             .description("Font for the client")
             .onSettingChange(INSTANCE)
@@ -88,7 +88,7 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
-    public static DoubleSetting FontSize = sgUI.add(new DoubleSetting.Builder()
+    public static DoubleSetting FontSize = sgMisc.add(new DoubleSetting.Builder()
             .name("Font Size")
             .description("Change your FontSize")
             .onSettingChange(INSTANCE)
@@ -99,7 +99,7 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
-    public static DoubleSetting RainbowSpeed = sgUI.add(new DoubleSetting.Builder()
+    public static DoubleSetting RainbowSpeed = sgMisc.add(new DoubleSetting.Builder()
             .name("Rainbow/Gradient speed")
             .description("Speed of the rainbow and gradients throughout the client")
             .onSettingChange(ClickGUI.INSTANCE)
@@ -134,6 +134,16 @@ public class ClickGUI extends Module_ {
             .description("Reload or save Configs")
             .build()
     );
+    public SettingGroup sgSound = new SettingGroup("Sound");
+    public BooleanSetting clickGUISound = sgSound.add(new BooleanSetting.Builder()
+            .name("Play module toggle sound")
+            .description("Play ClickGUI button sound on toggling modules")
+            .onSettingChange(this)
+            .value(true)
+            .defaultValue(true)
+            .build()
+    );
+
     public SettingGroup sgTooltip = new SettingGroup("ToolTip");
     public SettingGroup sgGeneral = new SettingGroup("General");
     public CycleSetting TooltipMode = sgTooltip.add(new CycleSetting.Builder()
@@ -252,9 +262,10 @@ public class ClickGUI extends Module_ {
     public ClickGUI() {
         super("ClickGUI", "ClickGui related stuff.", Categories.RENDER);
 
-        addSettingGroup(sgUI);
+        addSettingGroup(sgMisc);
         addSettingGroup(sgRender);
         addSettingGroup(sgGeneral);
+        addSettingGroup(sgSound);
         addSettingGroup(sgTooltip);
         addSettingGroup(sgConfig);
 
@@ -300,14 +311,15 @@ public class ClickGUI extends Module_ {
         pause = Pause.value;
         keybinds = Keybinds.value;
 
-        if ((setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font) && HeliosClient.MC.getWindow() != null) {
-            fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
-            FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
-            EventManager.postEvent(new FontChangeEvent(fonts));
-        }
-
-        if ((setting == FontRenderer || setting == Font) && HeliosClient.MC.getWindow() != null) {
-            FontManager.INSTANCE.registerFonts();
+        if(HeliosClient.MC.getWindow() != null) {
+            if (setting == FontRenderer || setting == Font) {
+                FontManager.INSTANCE.registerFonts();
+            }
+            if (setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font) {
+                fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
+                FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
+                EventManager.postEvent(new FontChangeEvent(fonts));
+            }
         }
 
         if (setting == switchConfigs) {

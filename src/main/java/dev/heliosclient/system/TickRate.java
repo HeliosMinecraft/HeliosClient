@@ -10,6 +10,9 @@ import net.minecraft.util.math.MathHelper;
 
 import java.util.Arrays;
 
+/**
+ * Credits: <a href="https://github.com/S-B99/kamiblue/blob/feature/master/src/main/java/me/zeroeightsix/kami/util/LagCompensator.java">KAMI Blue</a>
+ */
 public class TickRate implements Listener {
     public static TickRate INSTANCE = new TickRate();
     private final float[] tickRates = new float[20];

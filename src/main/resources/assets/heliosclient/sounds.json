@@ -3,5 +3,10 @@
     "sounds": [
       "heliosclient:ting"
     ]
+  },
+  "click": {
+    "sounds": [
+      "heliosclient:click"
+    ]
   }
 }

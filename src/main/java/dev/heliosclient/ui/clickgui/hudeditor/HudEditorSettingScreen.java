@@ -38,7 +38,7 @@ public class HudEditorSettingScreen extends AbstractSettingScreen implements IWi
         for (SettingGroup settingGroup : hudElement.settingGroups) {
             windowHeight += Math.round(settingGroup.getGroupNameHeight() + 13);
             if (!settingGroup.shouldRender()) continue;
-            for (Setting setting : settingGroup.getSettings()) {
+            for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
                 windowHeight += setting.height + 1;
@@ -70,7 +70,7 @@ public class HudEditorSettingScreen extends AbstractSettingScreen implements IWi
 
             if (settingGroup.shouldRender()) {
                 List<Setting> settings = settingGroup.getSettings();
-                for (Setting setting : settings) {
+                for (Setting<?> setting : settings) {
                     if (setting.shouldRender()) {
                         if (setting instanceof RGBASetting rgbaSetting) {
                             rgbaSetting.setParentScreen(this);

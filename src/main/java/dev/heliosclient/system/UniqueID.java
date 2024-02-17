@@ -3,7 +3,7 @@ package dev.heliosclient.system;
 import java.util.Random;
 
 public class UniqueID {
-    private static final String ALPHANUMERIC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final String ALPHANUMERIC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
     private static final int LENGTH = 5;
     private static final Random RANDOM = new Random();
     public String uniqueID;

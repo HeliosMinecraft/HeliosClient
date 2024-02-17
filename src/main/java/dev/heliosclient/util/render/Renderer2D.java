@@ -1274,7 +1274,7 @@ public class Renderer2D implements Listener {
     }
 
     // https://github.com/Pan4ur/ThunderHack-Recode/blob/main/src/main/java/thunder/hack/utility/render/Render2DEngine.java
-    public static class BlurredShadow {
+    public static class BlurredShadow{
         Texture id;
 
         public BlurredShadow(BufferedImage bufferedImage) {

@@ -46,7 +46,7 @@ public class NavBarItem {
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (hovered(mouseX, mouseY) && button == 0) {
-            MinecraftClient.getInstance().setScreen(target);
+           HeliosClient.MC.setScreen(target);
         }
     }
 }

@@ -1,5 +1,6 @@
 package dev.heliosclient.ui.clickgui.hudeditor;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.HudManager;
@@ -61,7 +62,7 @@ public class HudElementButton {
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).distanceX = 0;
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).distanceY = 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            HeliosClient.LOGGER.error("Error adding hud element instance to list",e);
         }
     }
 

@@ -22,14 +22,14 @@ public class SettingGroup {
         groupNameHeight = Renderer2D.getStringHeight(name);
     }
 
-    public <T extends Setting> T add(T setting) {
+    public <T extends Setting<?>> T add(T setting) {
         settings.add(setting);
         height += setting.height + 1;
         return setting;
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        for (Setting setting : settings) {
+        for (Setting<?> setting : settings) {
             if (setting.shouldRender() && setting.getAnimationProgress() > 0.9f) {
                 setting.mouseClicked(mouseX, mouseY, button);
             }
@@ -37,7 +37,7 @@ public class SettingGroup {
     }
 
     public void mouseReleased(double mouseX, double mouseY, int button) {
-        for (Setting setting : settings) {
+        for (Setting<?> setting : settings) {
             if (setting.shouldRender()) {
                 setting.mouseReleased(mouseX, mouseY, button);
             }
@@ -45,7 +45,7 @@ public class SettingGroup {
     }
 
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (Setting setting : settings) {
+        for (Setting<?> setting : settings) {
             if (setting.shouldRender()) {
                 setting.keyPressed(keyCode, scanCode, modifiers);
             }
@@ -53,7 +53,7 @@ public class SettingGroup {
     }
 
     public void mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        for (Setting setting : settings) {
+        for (Setting<?> setting : settings) {
             if (setting.shouldRender()) {
                 setting.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
             }
@@ -61,7 +61,7 @@ public class SettingGroup {
     }
 
     public void keyReleased(int keyCode, int scanCode, int modifiers) {
-        for (Setting setting : settings) {
+        for (Setting<?> setting : settings) {
             if (setting.shouldRender()) {
                 setting.keyReleased(keyCode, scanCode, modifiers);
             }
@@ -69,7 +69,7 @@ public class SettingGroup {
     }
 
     public void charTyped(char chr, int modifiers) {
-        for (Setting setting : settings) {
+        for (Setting<?> setting : settings) {
             if (setting.shouldRender()) {
                 setting.charTyped(chr, modifiers);
             }

@@ -53,9 +53,9 @@ public class InfoNotification extends Notification {
         fontRenderer.drawString(matrices, description, x + 17, y + 9 + fontRenderer.getStringHeight(description) / 2, -1);
 
         Renderer2D.drawFilledCircle(matrices.peek().getPositionMatrix(), x + 9, y + 12, 6.0f, ColorUtils.changeAlpha(Color.YELLOW, 120).getRGB());
-        Renderer2D.drawCircle(matrices.peek().getPositionMatrix(), x + 9, y + 12, 6.0f, 0.6f, ColorUtils.changeAlpha(Color.WHITE, 120).getRGB());
+        Renderer2D.drawCircle(matrices.peek().getPositionMatrix(), x + 9, y + 12, 4.0f, 0.6f, ColorUtils.changeAlpha(Color.WHITE, 120).getRGB());
 
-        FontRenderers.Mid_iconRenderer.drawString(matrices, "\uEAC3", x + 5.2f, y + 7.5f, Color.WHITE.getRGB());
+        FontRenderers.Small_iconRenderer.drawString(matrices, "\uEAC3", x + 3.2f, y + 5.5f, Color.WHITE.getRGB());
 
 
         // Draw progress bar

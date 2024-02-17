@@ -40,7 +40,7 @@ public class ClickGUIScreen extends Screen {
         categoryPanes = new ArrayList<>();
 
         Object panesObject = HeliosClient.CONFIG.modulesManager.getConfigMaps().get("modules").get("panes");
-        if (panesObject instanceof Map panePos) {
+        if (panesObject instanceof Map<?,?> panePos) {
             CategoryManager.getCategories().forEach((s, category) -> {
                 Object categoryObject = panePos.get(category.name);
                 if (categoryObject instanceof Map) {
@@ -73,7 +73,9 @@ public class ClickGUIScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext, mouseX, mouseY, delta);
+        if (this.client.world == null) {
+            super.renderBackgroundTexture(drawContext);
+        }
 
         if (HeliosClient.CLICKGUI.ScreenHelp.value) {
             float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
@@ -81,6 +83,7 @@ public class ClickGUIScreen extends Screen {
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Middle Click - Open QuickSettings", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (fontHeight) - 2, -1);
         }
+
         for (CategoryPane category : categoryPanes) {
             category.y += scrollY * 10;
             category.x += scrollX * 10;
@@ -102,7 +105,6 @@ public class ClickGUIScreen extends Screen {
         NavBar.navBar.render(drawContext, textRenderer, mouseX, mouseY);
         scrollY = 0;
         scrollX = 0;
-
     }
 
     @Override

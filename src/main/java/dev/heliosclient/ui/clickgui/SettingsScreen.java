@@ -36,7 +36,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
                     .filter(entry -> entry.getValue().shouldRender())
                     .forEach(entry -> {
                         SettingGroup settingGroup = entry.getKey();
-                        Setting setting = entry.getValue();
+                        Setting<?> setting = entry.getValue();
                         setting.update(settingGroup.getY());
                         if (!setting.isAnimationDone() && delay.get() <= 0) {
                             delay.set(delayBetweenSettings);
@@ -49,13 +49,15 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext, mouseX, mouseY, delta);
+        if (this.client.world == null) {
+            super.renderBackgroundTexture(drawContext);
+        }
 
         windowHeight = 50;
         for (SettingGroup settingGroup : module.settingGroups) {
             windowHeight += Math.round(settingGroup.getGroupNameHeight() + 13);
             if (!settingGroup.shouldRender()) continue;
-            for (Setting setting : settingGroup.getSettings()) {
+            for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
                 windowHeight += setting.height + 1;
@@ -84,7 +86,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
 
             if (settingGroup.shouldRender()) {
                 List<Setting> settings = settingGroup.getSettings();
-                for (Setting setting : settings) {
+                for (Setting<?> setting : settings) {
                     if (setting.shouldRender()) {
                         if (setting instanceof RGBASetting rgbaSetting) {
                             rgbaSetting.setParentScreen(this);
@@ -108,7 +110,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
         }
     }
 
-    private void resetSettingAnimation(Setting setting) {
+    private void resetSettingAnimation(Setting<?> setting) {
         setting.animationDone = false;
         delay.set(0);
         setting.setAnimationProgress(0.5f);
