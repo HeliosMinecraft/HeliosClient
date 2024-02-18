@@ -36,6 +36,7 @@ public class CategoryManager {
                 return pane;
             }
         }
+
         return null;
     }
 }
