@@ -38,12 +38,10 @@ To submit a bug open an issue in this repository. Before doing so please assure 
 ## Known issues
 
 - Unfinished/placeholder modules.
-- When new features are added, a crash is caused by an incomplete config file.
-- Non functional config system.
 
 ## Contributing
 
-If you want to contribute to this project, look into the [`CONTRIBUTING.md`](https://github.com/HeliosClient/HeliosClient/blob/main/CONTRIBUTING.md) file for more detail.
+If you want to contribute to this project, look into the [`CONTRIBUTING.md`](https://github.com/HeliosMinecraft/HeliosClient/blob/main/CONTRIBUTING.md) file for more detail.
 
 ## Contributors
 
