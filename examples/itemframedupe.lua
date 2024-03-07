@@ -10,7 +10,7 @@ local function setFullBrightModuleOn()
     -- Get a list of entities within a certain distance from the player
     local entities = PlayerUtils:getEntitiesWithinDistance(mc.player, 150) -- Assuming a distance of 5
     if entities == nil then
-       -- ChatUtils:sendHeliosMsg("No entities found within distance.")
+        -- ChatUtils:sendHeliosMsg("No entities found within distance.")
         return false, "No entities nearby"
     end
     -- Iterate over the entities
@@ -19,15 +19,11 @@ local function setFullBrightModuleOn()
 
         -- Check if the entity is an ItemFrameEntity
         if itemFrame:getType() == EntityType.ITEM_FRAME or itemFrame:getType() == EntityType.GLOW_ITEM_FRAME then
-          --  ChatUtils.sendHeliosMsg(tostring( "Item is entity"));
+            --  ChatUtils.sendHeliosMsg(tostring( "Item is entity"));
             -- The entity is an ItemFrameEntity, you can interact with it here
 
-            -- Get the item frame pos, directly passing may cause LuaError
-           local x = itemFrame:getX()
-           local y = itemFrame:getY()
-           local z = itemFrame:getZ()
-
-           RotationUtils:lookAt(x,y,z)
+            -- Look at the itemframe
+            PlayerLib:lookAtCoords(itemFrame:getX(),itemFrame:getY(),itemFrame:getZ())
 
             -- Place the item in hand on the itemframe
             PlayerUtils:doRightClick();
@@ -57,7 +53,7 @@ end
 
 
 function onTick()
-   return setFullBrightModuleOn()
+    return setFullBrightModuleOn()
 end
 
 function onStop()

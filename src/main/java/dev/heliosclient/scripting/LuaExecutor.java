@@ -3,6 +3,8 @@ package dev.heliosclient.scripting;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.scripting.libraries.ChatLib;
+import dev.heliosclient.scripting.libraries.PacketLib;
 import dev.heliosclient.scripting.libraries.PlayerLib;
 import dev.heliosclient.util.*;
 import dev.heliosclient.util.render.Renderer2D;
@@ -41,7 +43,8 @@ public class LuaExecutor {
         globals = JsePlatform.standardGlobals();
         globals.load(new DebugLib());
         globals.load(new PlayerLib());
-
+        globals.load(new ChatLib());
+        globals.load(new PacketLib());
 
         globals.set("mc", CoerceJavaToLua.coerce(mc));
         globals.set("hc", CoerceJavaToLua.coerce(HeliosClient.INSTANCE));

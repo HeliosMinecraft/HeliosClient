@@ -5,11 +5,13 @@ import dev.heliosclient.module.settings.Option;
 import dev.heliosclient.util.InventoryUtils;
 import dev.heliosclient.util.RotationUtils;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.block.Blocks;
+import net.minecraft.util.math.Vec3d;
 import org.luaj.vm2.*;
 import org.luaj.vm2.lib.*;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -17,7 +19,7 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import java.util.ArrayList;
 
 public class PlayerLib extends TwoArgFunction {
-    private PlayerEntity player;
+    private final PlayerEntity player;
 
     public PlayerLib() {
         this.player = HeliosClient.MC.player;
@@ -44,7 +46,8 @@ public class PlayerLib extends TwoArgFunction {
         library.set("swapBackHotbar", new swapBackHotbar());
         library.set("swapBackInventory", new swapBackInventory());
         library.set("lookAtCoords", new lookAtCoords());
-
+        library.set("lookAtEntity", new lookAtEntity());
+        library.set("lookAtVec3d", new lookAtVec3d());
 
         env.set("PlayerLib", library);
         return library;
@@ -52,7 +55,7 @@ public class PlayerLib extends TwoArgFunction {
     static class getItemCount extends OneArgFunction {
         public LuaValue call(LuaValue itemStack) {
             // Convert the LuaValue to a Java ItemStack object
-            ItemStack stack = (ItemStack) itemStack.touserdata(ItemStack.class);
+            ItemStack stack = (ItemStack) itemStack.checkuserdata(ItemStack.class);
 
             return LuaValue.valueOf(InventoryUtils.getItemCount(stack));
         }
@@ -60,14 +63,17 @@ public class PlayerLib extends TwoArgFunction {
     static class canSwapItem extends OneArgFunction {
         public LuaValue call(LuaValue itemStack) {
             // Convert the LuaValue to a Java ItemStack object
-            ItemStack stack = (ItemStack) itemStack.touserdata(ItemStack.class);
+            ItemStack stack = (ItemStack) itemStack.checkuserdata(ItemStack.class);
 
             return LuaValue.valueOf(InventoryUtils.canSwapItem(stack));
         }
     }
     static class swapHotbarAndInventory extends TwoArgFunction {
         public LuaValue call(LuaValue hotbarSlot, LuaValue inventorySlot) {
-            InventoryUtils.swapHotbarAndInventory(hotbarSlot.toint(),inventorySlot.toint());
+            int hSlot = hotbarSlot.checkint();
+            int invSlot = inventorySlot.checkint();
+
+            InventoryUtils.swapHotbarAndInventory(hSlot,invSlot);
             return NIL;
         }
     }
@@ -87,7 +93,7 @@ public class PlayerLib extends TwoArgFunction {
     static class dropAllItems extends OneArgFunction {
         public LuaValue call(LuaValue luaItem) {
             // Convert the LuaValue to a Java Item object
-            Item item = (Item) luaItem.touserdata(Item.class);
+            Item item = (Item) luaItem.checkuserdata(Item.class);
             ItemStack itemStack = new ItemStack(item);
             InventoryUtils.dropAllItems(itemStack);
             return NIL;
@@ -97,7 +103,7 @@ public class PlayerLib extends TwoArgFunction {
     static class dropAllItemStack extends OneArgFunction {
         public LuaValue call(LuaValue luaItemStack) {
             // Convert the LuaValue to a Java ItemStack object
-            ItemStack itemStack = (ItemStack) luaItemStack.touserdata(ItemStack.class);
+            ItemStack itemStack = (ItemStack) luaItemStack.checkuserdata(ItemStack.class);
             InventoryUtils.dropAllItems(itemStack);
             return NIL;
         }
@@ -105,7 +111,7 @@ public class PlayerLib extends TwoArgFunction {
     static class moveItemToHotbar extends OneArgFunction {
         public LuaValue call(LuaValue luaItemStack) {
             // Convert the LuaValue to a Java ItemStack object
-            ItemStack itemStack = (ItemStack) luaItemStack.touserdata(ItemStack.class);
+            ItemStack itemStack = (ItemStack) luaItemStack.checkuserdata(ItemStack.class);
             InventoryUtils.moveItemToHotbar(itemStack);
             return NIL;
         }
@@ -113,7 +119,7 @@ public class PlayerLib extends TwoArgFunction {
     static class findItemInHotbar extends OneArgFunction {
         public LuaValue call(LuaValue luaItemStack) {
             // Convert the LuaValue to a Java ItemStack object
-            ItemStack itemStack = (ItemStack) luaItemStack.touserdata(ItemStack.class);
+            ItemStack itemStack = (ItemStack) luaItemStack.checkuserdata(ItemStack.class);
             InventoryUtils.findItemInHotbar(itemStack);
             return NIL;
         }
@@ -121,7 +127,7 @@ public class PlayerLib extends TwoArgFunction {
     static class findItemInInventory extends OneArgFunction {
         public LuaValue call(LuaValue luaItemStack) {
             // Convert the LuaValue to a Java ItemStack object
-            ItemStack itemStack = (ItemStack) luaItemStack.touserdata(ItemStack.class);
+            ItemStack itemStack = (ItemStack) luaItemStack.checkuserdata(ItemStack.class);
             InventoryUtils.findItemInInventory(itemStack);
             return NIL;
         }
@@ -134,7 +140,7 @@ public class PlayerLib extends TwoArgFunction {
     static class getFastestTool extends OneArgFunction {
         public LuaValue call(LuaValue blockState) {
             // Convert the LuaValue to a Java blockstate object
-            BlockState state = (BlockState) blockState.touserdata(BlockState.class);
+            BlockState state = (BlockState) blockState.checkuserdata(BlockState.class);
             LuaValue value = CoerceJavaToLua.coerce(InventoryUtils.getFastestTool(state));
 
             return value;
@@ -167,9 +173,23 @@ public class PlayerLib extends TwoArgFunction {
             return NIL;
         }
     }
-    class lookAtCoords extends ThreeArgFunction {
+    static class lookAtCoords extends ThreeArgFunction {
         public LuaValue call(LuaValue x, LuaValue y, LuaValue z) {
             RotationUtils.lookAt(x.todouble(),y.todouble(),z.todouble());
+            return NIL;
+        }
+    }
+    static class lookAtEntity extends OneArgFunction {
+        public LuaValue call(LuaValue entity) {
+            Entity entity1 = (Entity) entity.checkuserdata(Entity.class);
+            RotationUtils.lookAt(entity1);
+            return NIL;
+        }
+    }
+    static class lookAtVec3d extends OneArgFunction {
+        public LuaValue call(LuaValue vec3d) {
+            Vec3d vec = (Vec3d) vec3d.checkuserdata(Vec3d.class);
+            RotationUtils.lookAt(vec);
             return NIL;
         }
     }
