@@ -67,7 +67,7 @@ public class ScriptManagerScreen extends Screen {
         //Draw separating line between the scripts and buttons
         Renderer2D.drawRectangleWithShadow(context.getMatrices(), 175,50,1f,scaledHeight - 98,Color.BLACK.brighter().brighter().getRGB(),4);
 
-        //Draw buttons
+        //Draw Side buttons
         drawButton(context,102,55,"Local Scripts","\uF15D",mouseX,mouseY);
         drawButton(context,102,73,"Cloud Scripts","\uEA37",mouseX,mouseY);
 
@@ -138,6 +138,7 @@ public class ScriptManagerScreen extends Screen {
         }
 
         // Calculate the maximum scroll offset based on the number of scripts and the size of the entries
+        // Don't scroll if the luaFiles size is 1 or less
         maxScroll = LuaScriptManager.luaFiles.size() > 1? Math.max(0, (3*LuaScriptManager.luaFiles.size() * entryHeight)/4 - (scaledHeight - 200)) : 0;
     }
     public static boolean isMouseOver(double mouseX, double mouseY, float x, float y, float width, float height){
@@ -258,8 +259,7 @@ public class ScriptManagerScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-
-        // I don't want to add check for luaFiles is null so using old loop and not enhanced.
+        // I don't want to add check for luaFiles is null or empty so using old loop and not enhanced.
         for(int i = 0; i < LuaScriptManager.luaFiles.size(); i++){
             LuaFile file = LuaScriptManager.luaFiles.get(i);
             if(file.isListeningForBind && keyCode != GLFW.GLFW_KEY_ESCAPE){

@@ -26,7 +26,7 @@ public class ScriptModule extends Module_ {
             config.put(file.getScriptName(),file.bindKey);
         }
 
-        return super.saveToToml(list);
+        return config;
     }
 
     @Override

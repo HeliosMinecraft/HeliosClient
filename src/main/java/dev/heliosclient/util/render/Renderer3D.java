@@ -28,7 +28,7 @@ Todo: Replace this later with original code or not ig
  */
 public class Renderer3D {
     public static boolean renderThroughWalls = false;
-    static MinecraftClient mc = MinecraftClient.getInstance();
+    public static MinecraftClient mc = MinecraftClient.getInstance();
     /**
      * Offsets this box so that minX, minY and minZ are all zero.
      **/

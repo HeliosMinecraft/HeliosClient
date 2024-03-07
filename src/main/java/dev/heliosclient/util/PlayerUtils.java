@@ -1,7 +1,12 @@
 package dev.heliosclient.util;
 
+import dev.heliosclient.HeliosClient;
+import dev.heliosclient.mixin.AccessorMinecraftClient;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -60,5 +65,42 @@ public class PlayerUtils {
             }
         }
         return blocks;
+    }
+        /**
+         * Interacts with an entity.
+         *
+         * @param entity The entity to interact with.
+         * @param hand The hand to use.
+         */
+        public static void interactEntity(Entity entity, Hand hand) {
+            ClientPlayerInteractionManager interactionManager = HeliosClient.MC.interactionManager;
+            if (interactionManager != null) {
+                interactionManager.interactEntity(HeliosClient.MC.player, entity, hand);
+            }
+        }
+
+        /**
+         * Attacks an entity.
+         *
+         * @param entity The entity to attack.
+         */
+        public static void attackEntity(Entity entity) {
+            ClientPlayerInteractionManager interactionManager = HeliosClient.MC.interactionManager;
+            if (interactionManager != null) {
+                interactionManager.attackEntity(HeliosClient.MC.player, entity);
+            }
+        }
+        public static void doLeftClick(){
+            HeliosClient.MC.options.attackKey.setPressed(true);
+           ((AccessorMinecraftClient) HeliosClient.MC).leftClick();
+            HeliosClient.MC.options.attackKey.setPressed(false);
+        }
+        public static void doRightClick(){
+            HeliosClient.MC.options.useKey.setPressed(true);
+            ((AccessorMinecraftClient) HeliosClient.MC).rightClick();
+            HeliosClient.MC.options.useKey.setPressed(false);
+        }
+    public PlayerEntity getPlayer(){
+        return HeliosClient.MC.player;
     }
 }

@@ -119,7 +119,7 @@ public class InventoryUtils {
     }
 
     // Find an item in the inventory
-    public static int findItemInInventory(PlayerEntity player, ItemStack itemStack) {
+    public static int findItemInInventory(ItemStack itemStack) {
         for (int i = 0; i < player.getInventory().size(); i++) {
             if (player.getInventory().getStack(i) == itemStack) {
                 return i;
@@ -129,7 +129,7 @@ public class InventoryUtils {
     }
 
     // Find an item in the hotbar
-    public static int findItemInHotbar(PlayerEntity player, ItemStack itemStack) {
+    public static int findItemInHotbar(ItemStack itemStack) {
         for (int i = 0; i < 9; i++) {
             if (player.getInventory().getStack(i) == itemStack) {
                 return i;

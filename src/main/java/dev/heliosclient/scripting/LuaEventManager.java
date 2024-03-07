@@ -1,6 +1,9 @@
 package dev.heliosclient.scripting;
 
 import dev.heliosclient.HeliosClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ItemFrameEntity;
+import net.minecraft.item.Item;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -25,6 +28,19 @@ public class LuaEventManager {
     public void register(String eventType, LuaValue listener) {
         org.luaj.vm2.LuaFunction luaFunction = listener.checkfunction();
         listeners.computeIfAbsent(eventType, k -> new ArrayList<>()).add(luaFunction);
+    }
+    /**
+     * Unregisters a Lua event listener.
+     *
+     * @param eventType The type of the event.
+     * @param listener The Lua function to remove.
+     */
+    public void unregister(String eventType, LuaValue listener) {
+        org.luaj.vm2.LuaFunction luaFunction = listener.checkfunction();
+        List<LuaFunction> eventListeners = listeners.get(eventType);
+        if (eventListeners != null) {
+            eventListeners.remove(luaFunction);
+        }
     }
 
     /**
@@ -67,7 +83,6 @@ public class LuaEventManager {
                 } catch (Exception e) {
                     HeliosClient.LOGGER.error("Error while invoking Lua function", e);
                 }
-
                 // Check if an error occurred
                 if (!status.toboolean() && !status.isnil()) {
                     HeliosClient.LOGGER.error("Error in Lua script: " + result.tojstring());

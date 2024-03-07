@@ -1,5 +1,7 @@
 package dev.heliosclient.scripting;
 
+import org.luaj.vm2.LuaValue;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -48,6 +50,13 @@ public class LuaFriendlyWrapper {
      */
     public Object call(String methodName, Object... args) {
         try {
+            // Coerce Lua userdata to Java objects
+            for (int i = 0; i < args.length; i++) {
+                if (args[i] instanceof org.luaj.vm2.LuaUserdata) {
+                    args[i] = org.luaj.vm2.lib.jse.CoerceLuaToJava.coerce((LuaValue) args[i], Object.class);
+                }
+            }
+
             Method method;
             if (args.length > 0) {
                 method = javaObject.getClass().getMethod(methodName, args.getClass());

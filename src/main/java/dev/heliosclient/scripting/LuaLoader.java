@@ -7,10 +7,6 @@ import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.SoundUtils;
-import dev.heliosclient.util.animation.AnimationUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.ItemFrameEntity;
 import org.luaj.vm2.LuaValue;
 
 import java.io.File;
@@ -18,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class is responsible for loading Lua scripts from a specified directory.

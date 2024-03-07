@@ -41,6 +41,9 @@ public class LuaScriptManager {
     public static void reloadScript(LuaFile luaFile){
         if(luaFiles.contains(luaFile)) {
             int index = luaFiles.indexOf(luaFile);
+            if(luaFile.isLoaded){
+                INSTANCE.closeScript(luaFile);
+            }
             luaFiles.set(index, luaLoader.getScript(luaFile));
             ChatUtils.sendHeliosMsg(ColorUtils.gold + "Reloaded script "+ ColorUtils.blue + luaFile.getAbsolutePath() + ColorUtils.green +" successfully");
         }else{

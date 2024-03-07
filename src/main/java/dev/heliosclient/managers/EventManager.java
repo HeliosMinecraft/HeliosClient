@@ -16,6 +16,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class EventManager {
@@ -27,6 +29,7 @@ public class EventManager {
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     private static final Map<Class<?>, Long> LAST_POSTED = new ConcurrentHashMap<>();
     private static final long TIME_FRAME = TimeUnit.MINUTES.toMillis(1); // 1 minute timeframe
+    private static Executor executor = Executors.newFixedThreadPool(10);
 
     public static void register(Listener listener) {
         Map<Class<?>, List<MethodHandle>> listenerMethods = new HashMap<>();
@@ -72,7 +75,7 @@ public class EventManager {
             }
         }
         if (event.getClass().isAnnotationPresent(LuaEvent.class) && LuaEventManager.INSTANCE.hasListeners()) {
-            HeliosExecutor.execute(() -> LuaEventManager.INSTANCE.post(event.getClass().getAnnotation(LuaEvent.class).value(), CoerceJavaToLua.coerce(event)));
+            executor.execute(() -> LuaEventManager.INSTANCE.post(event.getClass().getAnnotation(LuaEvent.class).value(), CoerceJavaToLua.coerce(event)));
         }
         return event;
     }

@@ -27,6 +27,9 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
