@@ -177,7 +177,7 @@ public class InputBox implements Listener {
             if (endX > x + width) {
                 endX = x + width;
             }
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, Renderer2D.isVanillaRenderer() ? textY + 1 : textY, endX - startX + 1, textHeight, new Color(0, 166, 255, 64).getRGB());
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, Renderer2D.isVanillaRenderer() ? textY - 1 : textY, endX - startX + 1, textHeight - 1, new Color(0, 166, 255, 64).getRGB());
         }
     }
 
@@ -373,7 +373,7 @@ public class InputBox implements Listener {
                 // Clear the selection
                 selecting = false;
                 selectionStart = selectionEnd = cursorPosition;
-            } else {
+            } else if (cursorPosition >= 0 && cursorPosition <= value.length()) {
                 // Insert the new character at the cursor position
                 value = value.substring(0, cursorPosition) + chr + value.substring(cursorPosition);
                 cursorPosition++;
@@ -384,17 +384,6 @@ public class InputBox implements Listener {
     public void moveCursor(int offset) {
         this.setCursorPos(this.cursorPosition + offset);
     }
-
-    public enum InputMode {
-        DIGITS,
-        CHARACTERS,
-        CHARACTERS_AND_WHITESPACE,
-        DIGITS_AND_CHARACTERS,
-        DIGITS_AND_CHARACTERS_AND_UNDERSCORE,
-        DIGITS_AND_CHARACTERS_AND_WHITESPACE,
-        ALL
-    }
-
 
     public void setCursorPos(int pos) {
         this.cursorPosition = MathHelper.clamp(pos, 0, this.value.length());
@@ -503,6 +492,16 @@ public class InputBox implements Listener {
 
     public InputMode getInputMode() {
         return inputMode;
+    }
+
+    public enum InputMode {
+        DIGITS,
+        CHARACTERS,
+        CHARACTERS_AND_WHITESPACE,
+        DIGITS_AND_CHARACTERS,
+        DIGITS_AND_CHARACTERS_AND_UNDERSCORE,
+        DIGITS_AND_CHARACTERS_AND_WHITESPACE,
+        ALL
     }
 
 }

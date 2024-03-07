@@ -2,29 +2,32 @@ package dev.heliosclient.util.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.util.render.FrustumUtils;
-import dev.heliosclient.util.render.Vertexer;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
-import me.x150.renderer.util.RendererUtils;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
-import net.minecraft.util.math.random.Random;
+import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 Credits: BleachHack 1.19.4
 
-Todo: Replace this later with orignal code
+Todo: Replace this later with original code or not ig
  */
 public class Renderer3D {
+    public static boolean renderThroughWalls = false;
     static MinecraftClient mc = MinecraftClient.getInstance();
     /**
      * Offsets this box so that minX, minY and minZ are all zero.
@@ -300,36 +303,36 @@ public class Renderer3D {
 
         RenderSystem.disableBlend();
     }
+    public static void drawCircleAroundEntity(MatrixStack matrix, Entity entity, float radius, int color, int points) {
+        setup();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
 
-    public static void drawItemWithPhysics(ItemStack itemStack, Vec3d position, float deltaTime) {
-        MatrixStack matrices = matrixFrom(position.x, position.y, position.z);
+        double x = entity.prevX + (entity.getX() - entity.prevX) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getX();
+        double y = entity.prevY + (entity.getY() - entity.prevY) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getY();
+        double z = entity.prevZ + (entity.getZ() - entity.prevZ) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+        matrix.push();
+        matrix.translate(x, y, z);
 
-        double xDist = position.x - MinecraftClient.getInstance().player.getX();
-        double zDist = position.z - MinecraftClient.getInstance().player.getZ();
-        double dist = MathHelper.sqrt((float) (xDist * xDist + zDist * zDist));
+        Matrix4f matrix4 = matrix.peek().getPositionMatrix();
+        for (int i = 0; i <= points; i++) {
+            double angle = 2 * Math.PI * i / points;
+            float xCoord = (float) (radius * Math.cos(angle));
+            float zCoord = (float) (radius * Math.sin(angle));
 
-        float rotation = (float) Math.atan2(xDist, zDist);
-        matrices.translate(position.x, position.y, position.z);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) (-Math.toDegrees(rotation))));
-        matrices.scale(0.5F, 0.5F, 0.5F);
-
-        if (dist > 5.0D) {
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(30.0F));
+            bufferBuilder.vertex(matrix4, xCoord, 0.0f, zCoord)
+                    .color(color)
+                    .next();
         }
 
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(deltaTime, Random.create().nextFloat() * 360.0F, Random.create().nextFloat() * 360.0F)));
-
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        DiffuseLighting.disableGuiDepthLighting();
-
-        MinecraftClient.getInstance().getItemRenderer().renderItem(itemStack, ModelTransformationMode.GROUND, 0xF000F0, OverlayTexture.DEFAULT_UV, matrices, mc.getBufferBuilders().getEntityVertexConsumers(), HeliosClient.MC.world, 0);
-
-        DiffuseLighting.enableGuiDepthLighting();
-        mc.getBufferBuilders().getEntityVertexConsumers().draw();
-
-        RenderSystem.disableBlend();
+        tessellator.draw();
+        cleanup();
+        matrix.translate(-x, -y, -z);
+        matrix.pop();
     }
+
     // -------------------- Utils --------------------
 
     public static MatrixStack matrixFrom(double x, double y, double z) {
@@ -357,11 +360,20 @@ public class Renderer3D {
     }
 
     public static void setup() {
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+            RenderSystem.enableBlend();
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthFunc(renderThroughWalls ? GL11.GL_ALWAYS : GL11.GL_LEQUAL);
+    }
+    public static void renderThroughWalls(){
+        renderThroughWalls = true;
+    }
+    public static void stopRenderingThroughWalls(){
+        renderThroughWalls = false;
     }
 
     public static void cleanup() {
+        RenderSystem.enableCull();
         RenderSystem.disableBlend();
     }
 

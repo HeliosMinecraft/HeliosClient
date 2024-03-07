@@ -13,6 +13,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
@@ -24,18 +25,15 @@ import net.minecraft.client.gui.screen.Screen;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CategoryPane implements Listener {
     public static int width = 85;
     public static int MAX_HEIGHT = 150;
-    public static List<HudBox> hitboxes = new CopyOnWriteArrayList<>();
+    public static List<HudBox> hudBoxes = new CopyOnWriteArrayList<>();
     public final char icon;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Screen parentScreen;
     private final float delayBetweenButtons = 0.0f;
-    private final HudBox hitBox;
+    private final HudBox hudBox;
     public Category category;
     public int x;
     public int y;
@@ -63,8 +61,8 @@ public class CategoryPane implements Listener {
 
         icon = category.icon;
 
-        hitBox = new HudBox(x, y, width, height);
-        hitboxes.add(hitBox);
+        hudBox = new HudBox(x, y, width, height);
+        hudBoxes.add(hudBox);
 
         EventManager.register(this);
         update();
@@ -103,8 +101,8 @@ public class CategoryPane implements Listener {
     }
 
     public void update() {
-        executor.submit(() -> {
-            float prevbuttonY = hitBox.getY();
+        HeliosExecutor.execute(() -> {
+            float prevbuttonY = hudBox.getY();
             for (ModuleButton button : moduleButtons) {
                 button.update(prevbuttonY);
                 if (!button.isAnimationDone()) {
@@ -119,7 +117,7 @@ public class CategoryPane implements Listener {
     }
 
     @SubscribeEvent
-    public void onFontChange(FontChangeEvent event) {
+    public void onFontChange(FontChangeEvent e) {
         categoryNameHeight = Math.round(Renderer2D.getFxStringHeight(category.name));
     }
 
@@ -135,10 +133,10 @@ public class CategoryPane implements Listener {
             maxWidth = getWidth() - 3;
         }
 
-        if (ClickGUI.ScrollTypes.values()[ClickGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
+        if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
             MAX_HEIGHT = height;
         } else {
-            MAX_HEIGHT = (int) Math.round(ClickGUI.CategoryHeight.value);
+            MAX_HEIGHT = (int) Math.round(HeliosClient.CLICKGUI.CategoryHeight.value);
             if (MAX_HEIGHT > height) {
                 MAX_HEIGHT = height;
             }
@@ -148,11 +146,11 @@ public class CategoryPane implements Listener {
             y = mouseY - startY;
         }
         if (!collapsed && height >= 10) {
-            Renderer2D.enableScissor(x-2,y+categoryNameHeight+6,width+5,(int) hitBox.getHeight());
-            if(ModuleManager.GUI.categoryBorder.value) {
-                Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight, width + 2f, hitBox.getHeight() + 6, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
+            Renderer2D.enableScissor(x-2,y+categoryNameHeight+6,width+5,(int) hudBox.getHeight());
+            if(GUI.get().categoryBorder.value) {
+                Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight, width + 2f, hudBox.getHeight() + 6, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
             }
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hitBox.getHeight(), 3, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary(), 100).getRGB());
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary(), 100).getRGB());
             Renderer2D.disableScissor();
         }
 
@@ -161,7 +159,7 @@ public class CategoryPane implements Listener {
         } else {
             update();
             int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
-            Renderer2D.enableScissor(x - 2, y + 10, width + 2, Math.round(hitBox.getHeight()) + 6);
+            Renderer2D.enableScissor(x - 2, y + 10, width + 2, Math.round(hudBox.getHeight()) + 6);
             for (ModuleButton m : moduleButtons) {
                 int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
                 m.render(drawContext, mouseX, mouseY, x , animatedY, maxWidth);
@@ -175,10 +173,10 @@ public class CategoryPane implements Listener {
             Renderer2D.disableScissor();
         }
 
-        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3,2, ColorUtils.changeAlpha(ModuleManager.GUI.categoryPaneColors.getColor(), 255).getRGB());
+        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3,2, ColorUtils.changeAlpha(GUI.get().categoryPaneColors.getColor(), 255).getRGB());
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
-        hitBox.set(x, y, width, MAX_HEIGHT);
+        hudBox.set(x, y, width, MAX_HEIGHT);
 
         FontRenderers.iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), -1);
 
@@ -219,10 +217,10 @@ public class CategoryPane implements Listener {
     }
 
     public void mouseScrolled(int mouseX, int mouseY, double amount) {
-        if (hoveredOverModules(mouseX, mouseY) && ClickGUI.ScrollTypes.values()[ClickGUI.ScrollType.value] == ClickGUI.ScrollTypes.NEW) {
+        if (hoveredOverModules(mouseX, mouseY) && ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.NEW) {
             int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
             // Scroll this pane by changing the scroll offset
-            scrollOffset += (int) (amount * ClickGUI.ScrollSpeed.value);
+            scrollOffset += (int) (amount * HeliosClient.CLICKGUI.ScrollSpeed.value);
 
             // Clamp the scroll offset to prevent scrolling past the start or end of the modules
             int maxScroll = Math.max(0, moduleButtons.size() * (categoryNameHeight + 10));

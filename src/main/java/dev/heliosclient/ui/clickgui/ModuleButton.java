@@ -60,6 +60,7 @@ public class ModuleButton implements Listener {
 
     public void updateSetting() {
         settingHeight = 2;
+
         module.quickSettings.stream().filter(Setting::shouldRender)
                 .forEach(entry -> {
                     entry.update(entry.getY());
@@ -115,8 +116,8 @@ public class ModuleButton implements Listener {
 
         hitBox.set(x, y, width, height);
 
-        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(ModuleManager.GUI.buttonColor.getColor(), 100);
-        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(ModuleManager.GUI.buttonColor.getColor(), 100);
+        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(GUI.get().buttonColor.getColor(), 100);
+        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(GUI.get().buttonColor.getColor(), 100);
         Color blendedColor = ColorUtils.blend(fillColorStart, fillColorEnd, 1 / 2f);
 
         int textY = y + (height - moduleNameHeight) / 2;
@@ -204,10 +205,10 @@ public class ModuleButton implements Listener {
                 setFaded(false);
                 if (hitBox.contains(mouseX, mouseY)) {
                     if (button == 0) {
-                        module.toggle();
                         if(HeliosClient.CLICKGUI.clickGUISound.value) {
                             SoundUtils.playInstanceSound(SoundUtils.CLICK_SOUNDEVENT);
                         }
+                        module.toggle();
                         return true;
                     } else if (button == 1) {
                         HeliosClient.MC.setScreen(new SettingsScreen(module, parentScreen));

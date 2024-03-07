@@ -4,6 +4,7 @@ package dev.heliosclient.ui.clickgui.gui;
 import com.google.common.util.concurrent.AtomicDouble;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
@@ -12,6 +13,7 @@ import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.text.Text;
 
 public abstract class AbstractSettingScreen extends Screen implements IWindowContentRenderer {
@@ -141,6 +143,14 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
             }
         }
         return super.charTyped(chr, modifiers);
+    }
+    public static boolean isMouseOver(double mouseX, double mouseY, float x, float y, float width, float height){
+        return mouseX>= x && mouseX<=x + width && mouseY>= y && mouseY <= y + height;
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc() {
+        return false;
     }
 
     @Override

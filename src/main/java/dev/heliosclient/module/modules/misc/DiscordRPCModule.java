@@ -1,12 +1,12 @@
 package dev.heliosclient.module.modules.misc;
 
-import de.jcm.discordgamesdk.GameSDKException;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.system.DiscordRPC;
+import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
 import net.minecraft.client.gui.screen.multiplayer.AddServerScreen;
 import net.minecraft.client.gui.screen.multiplayer.DirectConnectScreen;
@@ -24,16 +24,16 @@ public class DiscordRPCModule extends Module_ {
     public void onEnable() {
         super.onEnable();
         if (DiscordRPC.INSTANCE.isRunning) {
-            AnimationUtils.addErrorToast("DiscordRPC is already running!", false, 1000);
+            if(mc.player == null) {
+                AnimationUtils.addErrorToast("DiscordRPC is already running!", false, 1000);
+            }else{
+                ChatUtils.sendHeliosMsg("DiscordRPC is already running");
+            }
             HeliosClient.LOGGER.error("DiscordRPC is already running!");
             return;
         }
-        try {
-            DiscordRPC.INSTANCE.runPresence();
-        }
-        catch (GameSDKException e){
-            toggle();
-        }
+
+        DiscordRPC.INSTANCE.runPresence(this);
     }
 
     @Override

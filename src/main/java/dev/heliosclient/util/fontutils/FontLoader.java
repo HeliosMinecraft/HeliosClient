@@ -1,5 +1,6 @@
 package dev.heliosclient.util.fontutils;
 
+import dev.heliosclient.HeliosClient;
 import net.minecraft.client.MinecraftClient;
 
 import java.awt.*;
@@ -16,55 +17,44 @@ import java.util.Objects;
 public class FontLoader {
     private static final String FONTS_FOLDER = "heliosclient/fonts";
     private static final String ICON_FONTS_FOLDER = "heliosclient/fonts/icons";
-    private static final String[] DEFAULT_FONT = {"Minecraft.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf",};
-    private static final String[] DEFAULT_ICON_FONT = {"icons2.ttf", "icons.ttf"};
+    private static final String[] DEFAULT_FONT = {"Minecraft.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf"};
+    private static final String[] DEFAULT_ICON_FONT = {"fontello.ttf","icons2.ttf", "icons.ttf"};
 
+    /**
+     * Loads all the font files (with {@code .ttf and .otf} extension) present in the {@link  #FONTS_FOLDER} directory
+     *
+     * @return An array of all the fonts created from the files
+     */
     public static Font[] loadFonts() {
-        // Get the Minecraft game directory
-        File gameDir = MinecraftClient.getInstance().runDirectory;
-
-        // Create the fonts directory if it doesn't exist
-        File fontsDir = new File(gameDir, FONTS_FOLDER);
-        if (!fontsDir.exists()) {
-            fontsDir.mkdirs();
-        }
-
-        // Copy the default font file from the assets folder to the fonts directory
-        for (String s : DEFAULT_FONT) {
-            File defaultFontFile = new File(fontsDir, s);
-            try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/fonts/" + s)) {
-                assert inputStream != null;
-                Files.copy(inputStream, defaultFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException ignored) {
-            }
-        }
-        // Load all font files from the fonts directory
-        List<Font> fonts = new ArrayList<>();
-        for (File file : Objects.requireNonNull(fontsDir.listFiles())) {
-            if (file.isFile() && (file.getName().toLowerCase().endsWith(".ttf") || file.getName().toLowerCase().endsWith(".otf"))) {
-                try {
-                    Font[] fontArray = Font.createFonts(file);
-                    Collections.addAll(fonts, fontArray);
-                } catch (FontFormatException | IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return fonts.toArray(new Font[0]);
+        return loadFonts(FONTS_FOLDER, DEFAULT_FONT);
     }
 
+    /**
+     * Loads all the icon font files (with {@code .ttf and .otf} extension) present in the {@link  #ICON_FONTS_FOLDER} directory
+     *
+     * @return An array of all the fonts created from the files
+     */
     public static Font[] loadIconFonts() {
-        File gameDir = MinecraftClient.getInstance().runDirectory;
+        return loadFonts(ICON_FONTS_FOLDER, DEFAULT_ICON_FONT);
+    }
 
-        File fontsDir = new File(gameDir, ICON_FONTS_FOLDER);
+    /**
+     * Loads all the font files (with {@code .ttf and .otf} present in the given folder
+     *
+     * @param folder Folder where the fonts are to be searched in
+     * @param defaultFonts Default font files in the assets folder to be copied.
+     * @return An array of all the fonts created from the files
+     */
+    private static Font[] loadFonts(String folder, String[] defaultFonts) {
+        File gameDir = MinecraftClient.getInstance().runDirectory;
+        File fontsDir = new File(gameDir, folder);
         if (!fontsDir.exists()) {
             fontsDir.mkdirs();
         }
 
-        for (String s : DEFAULT_ICON_FONT) {
+        for (String s : defaultFonts) {
             File defaultFontFile = new File(fontsDir, s);
-            try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/fonts/" + s)) {
+            try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/" + FONTS_FOLDER + "/" + s)) {
                 assert inputStream != null;
                 Files.copy(inputStream, defaultFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException ignored) {
@@ -78,11 +68,12 @@ public class FontLoader {
                     Font[] fontArray = Font.createFonts(file);
                     Collections.addAll(fonts, fontArray);
                 } catch (FontFormatException | IOException e) {
-                    e.printStackTrace();
+                    HeliosClient.LOGGER.error("An error has occured while converting file to font format",e);
                 }
             }
         }
 
         return fonts.toArray(new Font[0]);
     }
+
 }

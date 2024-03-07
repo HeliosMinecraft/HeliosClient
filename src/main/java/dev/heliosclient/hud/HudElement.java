@@ -396,7 +396,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     /**
      * Called when setting gets changed.
      */
-    public void onSettingChange(Setting setting) {
+    public void onSettingChange(Setting<?> setting) {
 
     }
 

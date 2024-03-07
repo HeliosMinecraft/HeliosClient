@@ -45,7 +45,7 @@ public class FriendManager {
         FriendManager.friends = friends;
     }
 
-    public HashSet<String> getFriendsName() {
+    public static HashSet<String> getFriendsName() {
         return friendsName;
     }
 }

@@ -1,8 +1,10 @@
 package dev.heliosclient.event.events.render;
 
 import dev.heliosclient.event.Event;
+import dev.heliosclient.event.LuaEvent;
 import net.minecraft.client.util.math.MatrixStack;
 
+@LuaEvent("Render3dEvent")
 public class Render3DEvent extends Event {
 
     private final MatrixStack matrices;

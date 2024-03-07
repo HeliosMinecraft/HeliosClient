@@ -2,6 +2,7 @@ package dev.heliosclient.ui.notification.notifications;
 
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.ui.notification.Notification;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
@@ -18,25 +19,24 @@ public class InfoNotification extends Notification {
     private final String description;
 
     public InfoNotification(String title, String description, long endDelay, SoundEvent soundEvent, float pitch) {
-        super();
+        this.soundEvent = soundEvent;
+        this.pitch = pitch;
         this.title = title;
         this.description = description;
         this.endDelay = endDelay;
+        this.endDelayInS = endDelay / 1000.0f;
         this.WIDTH = 63;
-        if (ModuleManager.notificationModule.playSound.value && ModuleManager.notificationModule.isActive()) {
-            SoundUtils.playSound(soundEvent, (float) (ModuleManager.notificationModule.volume.value / 100f), pitch);
-        }
         initialise();
     }
     public InfoNotification(String title, String description, long endDelay, SoundEvent soundEvent) {
-        this.title = title;
-        this.description = description;
-        this.endDelay = endDelay;
-        this.WIDTH = 63;
-        if (ModuleManager.notificationModule.playSound.value && ModuleManager.notificationModule.isActive()) {
-            SoundUtils.playSound(soundEvent, (float) (ModuleManager.notificationModule.volume.value / 100f), 0.5f);
+        this(title,description,endDelay,soundEvent,1.0f);
+    }
+
+    @Override
+    public void playSound(SoundEvent soundEvent, float volume, float pitch) {
+        if (NotificationModule.get().playSound.value && NotificationModule.get().isActive()) {
+            SoundUtils.playSound(soundEvent, (float) (NotificationModule.get().volume.value / 100f), pitch);
         }
-        initialise();
     }
 
     @Override
@@ -52,11 +52,10 @@ public class InfoNotification extends Notification {
         fontRenderer.drawString(matrices, titleText, x + 17, y + 1 + fontRenderer.getStringHeight(title) / 2, -1);
         fontRenderer.drawString(matrices, description, x + 17, y + 9 + fontRenderer.getStringHeight(description) / 2, -1);
 
-        Renderer2D.drawFilledCircle(matrices.peek().getPositionMatrix(), x + 9, y + 12, 6.0f, ColorUtils.changeAlpha(Color.YELLOW, 120).getRGB());
-        Renderer2D.drawCircle(matrices.peek().getPositionMatrix(), x + 9, y + 12, 4.0f, 0.6f, ColorUtils.changeAlpha(Color.WHITE, 120).getRGB());
+        Renderer2D.drawFilledCircle(matrices.peek().getPositionMatrix(), x + 9, y + 12, 4.0f, ColorUtils.changeAlpha(Color.YELLOW, 120).getRGB());
+        Renderer2D.drawCircle(matrices.peek().getPositionMatrix(), x + 9, y + 12, 4.0f, 0.33f, ColorUtils.changeAlpha(Color.WHITE, 120).getRGB());
 
-        FontRenderers.Small_iconRenderer.drawString(matrices, "\uEAC3", x + 3.2f, y + 5.5f, Color.WHITE.getRGB());
-
+        FontRenderers.Small_iconRenderer.drawString(matrices, "\uEAC3", x + 6f, y + 9f, Color.WHITE.getRGB());
 
         // Draw progress bar
         float progress = Math.min(timeElapsed / (float) endDelay, 1);

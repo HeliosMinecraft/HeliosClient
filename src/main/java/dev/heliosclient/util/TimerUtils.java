@@ -8,6 +8,7 @@ public class TimerUtils {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private long startTime;
     private boolean hasTimerStarted;
+    final Runnable resetter = this::resetTimer;
 
     // Starts the timer
     public void startTimer() {
@@ -30,13 +31,11 @@ public class TimerUtils {
 
     // Schedules a task to reset the timer every ms milliseconds
     public void scheduleReset(long ms) {
-        final Runnable resetter = this::resetTimer;
         scheduler.scheduleAtFixedRate(resetter, ms, ms, TimeUnit.MILLISECONDS);
     }
 
     // Schedules a task to reset the timer once after ms milliseconds
     public void scheduleSingleReset(long ms) {
-        final Runnable resetter = this::resetTimer;
         scheduler.schedule(resetter, ms, TimeUnit.MILLISECONDS);
     }
 

@@ -4,6 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.ColorUtils;
 
@@ -67,19 +68,19 @@ public class ColorManager implements Listener {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent e) {
         if (HeliosClient.CLICKGUI == null) return;
         Tooltip.tooltip.mode = HeliosClient.CLICKGUI.TooltipMode.value;
         Tooltip.tooltip.fixedPos = HeliosClient.CLICKGUI.TooltipPos.value;
 
         float hue = (System.currentTimeMillis() % 10000) / 10000f;
 
-        if (HeliosClient.CLICKGUI.ColorMode.value == 0) {
-            this.primaryGradientStart = HeliosClient.CLICKGUI.staticColor.getColor();
-            this.primaryGradientEnd = HeliosClient.CLICKGUI.staticColor.getColor();
+        if (GUI.get().ColorMode.value == 0) {
+            this.primaryGradientStart = GUI.get().staticColor.getColor();
+            this.primaryGradientEnd = GUI.get().staticColor.getColor();
         }
-        if (HeliosClient.CLICKGUI.ColorMode.value == 1) {
-            switch (HeliosClient.CLICKGUI.GradientType.value) {
+        if (GUI.get().ColorMode.value == 1) {
+            switch (GUI.get().GradientType.value) {
                 case 0 -> {
                     this.primaryGradientStart = ColorUtils.getRainbowColor();
                     this.primaryGradientEnd = ColorUtils.getRainbowColor2();
@@ -97,8 +98,8 @@ public class ColorManager implements Listener {
                     this.primaryGradientEnd = ColorUtils.getNightSkyColors(hue)[1];
                 }
                 case 4 -> {
-                    this.primaryGradientStart = HeliosClient.CLICKGUI.linear2Start.getColor();
-                    this.primaryGradientEnd = HeliosClient.CLICKGUI.linear2end.getColor();
+                    this.primaryGradientStart = GUI.get().linear2Start.getColor();
+                    this.primaryGradientEnd = GUI.get().linear2end.getColor();
                 }
             }
         }

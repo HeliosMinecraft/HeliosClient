@@ -13,6 +13,7 @@ import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
@@ -21,7 +22,7 @@ public class KeyBind extends Setting<Integer> {
     public static boolean listeningKey = false;
     public static boolean listeningMouse = false;
     public int value;
-    public boolean listening = false;
+    public static boolean listening = false;
 
     public KeyBind(String name, String description, ISettingChange iSettingChange, Integer value, BooleanSupplier shouldRender, int defaultValue) {
         super(shouldRender, defaultValue);
@@ -43,7 +44,7 @@ public class KeyBind extends Setting<Integer> {
         } else if (value == -1) {
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": None", x + 2, y + 8, defaultColor);
         } else {
-            String keyName = KeycodeToString.translate(value);
+            String keyName = KeycodeToString.translate(value).toUpperCase(Locale.ROOT);
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + keyName, x + 2, y + 8, defaultColor);
         }
 
@@ -68,7 +69,7 @@ public class KeyBind extends Setting<Integer> {
         } else if (value == -1) {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": None", x + 2, y + 6, defaultColor);
         } else {
-            String keyName = KeycodeToString.translate(value);
+            String keyName = KeycodeToString.translate(value).toUpperCase(Locale.ROOT);
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + keyName, x + 2, y + 6, defaultColor);
         }
 
@@ -100,7 +101,14 @@ public class KeyBind extends Setting<Integer> {
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
+        if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
+            value = defaultValue;
+            iSettingChange.onSettingChange(this);
+            listeningKey = false;
+            listeningMouse = false;
+            listening = false;
+        }
+
         if (listeningMouse && listening) {
             value = button;
             iSettingChange.onSettingChange(this);

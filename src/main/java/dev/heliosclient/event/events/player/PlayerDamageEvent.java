@@ -2,10 +2,12 @@ package dev.heliosclient.event.events.player;
 
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
+import dev.heliosclient.event.LuaEvent;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 
 @Cancelable
+@LuaEvent("PlayerDamageEvent")
 public class PlayerDamageEvent extends Event {
 
     private final PlayerEntity player;

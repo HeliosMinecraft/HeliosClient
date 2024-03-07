@@ -1,5 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.ListSetting;
@@ -7,6 +8,7 @@ import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
@@ -24,8 +26,6 @@ import java.util.concurrent.Executors;
 public class ClientSettingsScreen extends AbstractSettingScreen implements IWindowContentRenderer {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
     private final float delayBetweenSettings = 0.2f;
-    private final ExecutorService executorUpdate = Executors.newSingleThreadExecutor();
-    private final ExecutorService executorReset = Executors.newSingleThreadExecutor();
     public NavBar navBar = new NavBar();
     int x, y, windowWidth = 224, windowHeight;
 
@@ -35,8 +35,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     }
 
     public void updateSetting() {
-        synchronized (executorUpdate) {
-            executorUpdate.submit(() -> module.settingGroups.stream()
+        HeliosExecutor.execute(()-> module.settingGroups.stream()
                     .filter(SettingGroup::shouldRender)
                     .flatMap(settingGroup -> settingGroup.getSettings().stream()
                             .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
@@ -49,8 +48,8 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
                             delay.set(delayBetweenSettings);
                             delay.set(delay.get() - setting.animationSpeed);
                         }
-                    }));
-        }
+                    })
+        );
     }
 
 
@@ -84,12 +83,12 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
         navBar.render(drawContext, textRenderer, mouseX, mouseY);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-        FontManager.fontSize = (int) ClickGUI.FontSize.value;
+        FontManager.fontSize = (int) HeliosClient.CLICKGUI.FontSize.value;
     }
 
     @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        // This should not happen but just incase.
+        // This should not happen but just in case.
         if (module.settingGroups == null) return;
 
         updateSetting();
@@ -137,16 +136,14 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     public void resetSettingAnimation(Setting<?> setting, SettingGroup settingGroup) {
         setting.animationDone = false;
         setting.setAnimationProgress(0);
-        synchronized (executorReset) {
-            delay.set(0);
-            executorReset.submit(() -> {
+        HeliosExecutor.execute(()-> {
+        delay.set(0);
                 setting.reset(settingGroup.getY());
                 if (setting.isAnimationDone() && delay.get() <= 0) {
                     delay.set(delayBetweenSettings);
                     delay.set(delay.get() - setting.animationSpeed);
                 }
-            });
-        }
+        });
         setting.setAnimationProgress(0.5f);
     }
 }

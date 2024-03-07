@@ -22,7 +22,7 @@ public class Categories {
         CategoryManager.register(RENDER);
         CategoryManager.register(SEARCH);
 
-        AddonManager.addons.forEach(HeliosAddon::registerCategories);
+        AddonManager.HELIOS_ADDONS.forEach(HeliosAddon::registerCategories);
     }
 
 }

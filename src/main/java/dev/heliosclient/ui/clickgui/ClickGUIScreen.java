@@ -12,8 +12,8 @@ import dev.heliosclient.util.fontutils.FontRenderers;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -43,16 +43,14 @@ public class ClickGUIScreen extends Screen {
         if (panesObject instanceof Map<?,?> panePos) {
             CategoryManager.getCategories().forEach((s, category) -> {
                 Object categoryObject = panePos.get(category.name);
-                if (categoryObject instanceof Map) {
-                    Map<String, Object> categoryMap = (Map<String, Object>) panePos.get(category.name);
-                    int xOffset = MathUtils.d2iSafe(Integer.parseInt(categoryMap.get("x").toString()));
-                    int yOffset = MathUtils.d2iSafe(Integer.parseInt(categoryMap.get("y").toString()));
-                    boolean collapsed = (boolean) categoryMap.get("collapsed");
+                if (categoryObject instanceof Map<?, ?> map) {
+                    int xOffset = MathUtils.d2iSafe(map.get("x"));
+                    int yOffset = MathUtils.d2iSafe(map.get("y"));
+                    boolean collapsed = (boolean) map.get("collapsed");
                     categoryPanes.add(new CategoryPane(category, xOffset, yOffset, collapsed, this));
                 }
             });
         }
-
         searchBar = new SearchBar();
     }
 
@@ -63,7 +61,7 @@ public class ClickGUIScreen extends Screen {
             category.mouseScrolled((int) mouseX, (int) mouseY, verticalAmount);
         }
 
-        if (ClickGUI.ScrollTypes.values()[ClickGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
+        if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
             // Old mode: scroll the whole screen
             scrollY += (int) verticalAmount;
         }
@@ -111,6 +109,15 @@ public class ClickGUIScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         NavBar.navBar.mouseClicked((int) mouseX, (int) mouseY, button);
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if(keyCode == GLFW.GLFW_KEY_S && Screen.hasControlDown() && !searchBar.isFocused()){
+            searchBar.setFocused(true);
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

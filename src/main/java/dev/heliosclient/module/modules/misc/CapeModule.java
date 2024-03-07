@@ -1,24 +1,19 @@
 package dev.heliosclient.module.modules.misc;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
+import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.animation.AnimationUtils;
-import dev.heliosclient.util.cape.CapeSynchronizer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
-import java.io.IOException;
 import java.util.List;
 
 public class CapeModule extends Module_ {
-    public SettingGroup sgCape = new SettingGroup("Cape");
+    public SettingGroup sgCape = new SettingGroup("Cape Settings");
 
     public CycleSetting capes = sgCape.add(new CycleSetting.Builder()
             .name("Cape")
@@ -33,6 +28,10 @@ public class CapeModule extends Module_ {
             .description("Gets your favourite cape from the following places. Need valid UUID or player name")
             .value(List.of(CapeManager.CapeType.values()))
             .defaultListIndex(0)
+            .addOptionToolTip("None")
+            .addOptionToolTip("Fetch cape from optifine api")
+            .addOptionToolTip("Fetch cape from craftar, a UUID to player skin provider")
+            .addOptionToolTip("Fetch custom cape from minecraftcapes.com")
             .onSettingChange(this)
             .build()
     );
@@ -76,8 +75,9 @@ public class CapeModule extends Module_ {
             .name("Capes")
             .build()
     );
+    private static CapeModule INSTANCE = new CapeModule();
 
-    public CapeModule() {
+    protected CapeModule() {
         super("Capes", "Use Custom Capes from `heliosclient/capes` directory", Categories.MISC);
 
         capes.options = List.of(CapeManager.capes);
@@ -88,66 +88,66 @@ public class CapeModule extends Module_ {
         addQuickSetting(customPhysics);
         addQuickSetting(elytra);
 
+        playerName.setShouldSaveOrLoad(false);
+        UUID.setShouldSaveOrLoad(false);
 
         loadCapes.addButton("Get Cape", 0, 0, () -> {
             try {
-                if (!playerName.value.isEmpty() && playerName.value.length() > 3 && CapeManager.CapeType.values()[getCapeFrom.value] == CapeManager.CapeType.OPTIFINE) {
-                    CapeManager.getCapes(CapeManager.CapeType.OPTIFINE, playerName.value, null);
-                } else if (!UUID.value.isEmpty() && UUID.value.length() > 31) {
-                    CapeManager.getCapes(CapeManager.CapeType.values()[getCapeFrom.value], null, UUID.value);
+                CapeManager.CapeType capeType = CapeManager.CapeType.values()[getCapeFrom.value];
+                if (shouldUsePlayerName() && capeType == CapeManager.CapeType.OPTIFINE) {
+                    CapeManager.getCapes(capeType, playerName.value, null);
+                } else if (shouldUseUUID()) {
+                    CapeManager.getCapes(capeType, null, UUID.value);
                 }
-                capes.options = List.of(CapeManager.capes);
+                capes.iSettingChange.onSettingChange(capes);
 
-                //Todo: Change to info toast
-                AnimationUtils.addErrorToast("Fetched cape successfully", false, 1000);
-            } catch (IOException e) {
-                HeliosClient.LOGGER.error("An error has occured while fetching cape. ", e);
-                AnimationUtils.addErrorToast("Failed to fetch cape. Check logs", false, 1000);
-                AnimationUtils.addErrorToast("Reason for fail: " + e.getMessage(), false, 1000);
-
+                if(mc.player == null) {
+                    AnimationUtils.addInfoToast("Fetched cape successfully", false, 1000);
+                }else{
+                    ChatUtils.sendHeliosMsg("Fetched cape successfully");
+                }
+            } catch (Exception e) {
+                HeliosClient.LOGGER.error("An error occurred while fetching cape. ", e);
+                if(mc.player == null) {
+                    AnimationUtils.addErrorToast("Failed to fetch cape. Check logs", false, 1000);
+                    AnimationUtils.addErrorToast("Reason: " + e.getMessage().trim(), false, 1000);
+                }else{
+                    ChatUtils.sendHeliosMsg("Failed to fetch cape. Check logs");
+                    ChatUtils.sendHeliosMsg("Reason: " + e.getMessage().trim());
+                }
             }
         });
-        loadCapes.addButton("Reload Capes", 0, 1, () -> {
-            CapeManager.loadCapes();
-            capes.options = List.of(CapeManager.capes);
-        });
+
+
+        loadCapes.addButton("Reload Capes", 0, 1, CapeManager::loadCapes);
+    }
+
+    public boolean shouldUseUUID() {
+        return !UUID.value.isEmpty() && UUID.value.length() > 31;
+    }
+
+    public boolean shouldUsePlayerName() {
+        return !playerName.value.isEmpty() && playerName.value.length() > 2;
     }
 
     @Override
     public void onEnable() {
         super.onEnable();
-        if (CapeManager.capeIdentifiers.isEmpty()) return;
-        capes.options = List.of(CapeManager.capes);
-
-        CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
-
-        if (mc.player != null) {
-            CapeManager.setCapeAndElytra(mc.player, CapeManager.cape, CapeManager.elytraIdentifiers.get(capes.value));
-            if (mc.player.getServer() != null) {
-                for (ServerPlayerEntity player : mc.player.getServer().getPlayerManager().getPlayerList()) {
-                    Identifier capeTexture = CapeManager.cape;
-                    CapeSynchronizer.sendCapeSyncPacket(player, capeTexture, CapeManager.elytraIdentifiers.get(capes.value));
-                }
-            }
-        }
-
+        setCape();
     }
 
     @Override
-    public void onSettingChange(Setting setting) {
-        super.onSettingChange(setting);
+    public void onSettingChange(Setting<?> setting) {
+        setCape();
+    }
 
+    public void setCape() {
         if (CapeManager.capeIdentifiers.isEmpty()) return;
-        CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
 
-        if (mc.player != null) {
-            CapeManager.setCapeAndElytra(mc.player, CapeManager.cape, CapeManager.elytraIdentifiers.get(capes.value));
-            if (mc.player.getServer() != null) {
-                for (ServerPlayerEntity player : mc.player.getServer().getPlayerManager().getPlayerList()) {
-                    Identifier capeTexture = CapeManager.cape;
-                    CapeSynchronizer.sendCapeSyncPacket(player, capeTexture, CapeManager.elytraIdentifiers.get(capes.value));
-                }
-            }
+        capes.options = List.of(CapeManager.capes);
+
+        if (capes.value < CapeManager.capeIdentifiers.size()) {
+            CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
         }
     }
 
@@ -155,18 +155,12 @@ public class CapeModule extends Module_ {
     @Override
     public void onLoad() {
         super.onLoad();
-
-        if (CapeManager.capeIdentifiers.isEmpty()) return;
-        CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
-
-        if (mc.player != null) {
-            CapeManager.setCapeAndElytra(mc.player, CapeManager.cape, CapeManager.elytraIdentifiers.get(capes.value));
-            if (mc.player.getServer() != null) {
-                for (ServerPlayerEntity player : mc.player.getServer().getPlayerManager().getPlayerList()) {
-                    Identifier capeTexture = CapeManager.cape;
-                    CapeSynchronizer.sendCapeSyncPacket(player, capeTexture, CapeManager.elytraIdentifiers.get(capes.value));
-                }
-            }
+        if (capes.value < CapeManager.capeIdentifiers.size()) {
+            CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
         }
+    }
+
+    public static CapeModule get() {
+        return INSTANCE;
     }
 }

@@ -13,11 +13,8 @@ public abstract class HeliosAddon {
 
     public abstract void onInitialize();
 
-    public abstract String getMainClassPath();
-
-    public void registerCategories() {
-    }
-    public void registerModules() {
-    }
-
+    // Register stuff
+    public abstract void registerCategories();
+    public abstract void registerHudElementData();
+    public abstract void registerModules();
 }

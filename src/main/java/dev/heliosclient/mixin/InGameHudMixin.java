@@ -17,10 +17,10 @@ public class InGameHudMixin {
     public void onRender(DrawContext drawContext, float tickDelta, CallbackInfo info) {
         RenderEvent event = new RenderEvent(drawContext, tickDelta);
         EventManager.postEvent(event);
+        Renderer2D.setDrawContext(drawContext);
         if (event.isCanceled()) {
             info.cancel();
         }
-        Renderer2D.setDrawContext(drawContext);
     }
 
 }

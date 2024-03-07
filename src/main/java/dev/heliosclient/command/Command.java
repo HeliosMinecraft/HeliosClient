@@ -23,6 +23,7 @@ public abstract class Command {
     private final List<String> aliases = new ArrayList<>();
     public int SINGLE_SUCCESS = com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
+
     public Command(String name, String description, String... aliases) {
         this.name = name;
         this.description = description;

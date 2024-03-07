@@ -2,9 +2,11 @@ package dev.heliosclient.event.events.input;
 
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
+import dev.heliosclient.event.LuaEvent;
 import net.minecraft.client.gui.screen.Screen;
 
 @Cancelable
+@LuaEvent("MouseClickedEvent")
 public class MouseClickEvent extends Event {
     private final long window;
     private final int button;

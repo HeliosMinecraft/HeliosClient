@@ -21,26 +21,27 @@ public class Tooltip {
         if (this.tooltipText != null && !this.tooltipText.isEmpty()) {
             int windWidth = drawContext.getScaledWindowWidth();
             int winHeight = drawContext.getScaledWindowHeight();
-            int textWidth = Math.round(Renderer2D.getFxStringWidth(this.tooltipText));
+            int textWidth = Math.round(Renderer2D.getCustomStringWidth(this.tooltipText, FontRenderers.Small_fxfontRenderer));
+            int height    = Math.round(Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer) + 6);
             if (this.mode == 0) {
                 this.renderTooltip(drawContext, tooltipText, mouseX + 1, mouseY - 1);
             } else if (this.mode == 1) {
                 switch (fixedPos) {
                     case 0 ->
                         //Top-left
-                            this.renderTooltip(drawContext, tooltipText, 0, 13);
+                            this.renderTooltip(drawContext, tooltipText, 0, 0);
                     case 1 ->
                         //Top-right
-                            this.renderTooltip(drawContext, tooltipText, windWidth - textWidth - 4, 13);
+                            this.renderTooltip(drawContext, tooltipText, windWidth - textWidth - 16, 0);
                     case 2 ->
                         //Bottom-left
-                            this.renderTooltip(drawContext, tooltipText, 0, winHeight);
+                            this.renderTooltip(drawContext, tooltipText, 0, winHeight - height - 6);
                     case 3 ->
                         //Bottom-right
-                            this.renderTooltip(drawContext, tooltipText, windWidth - textWidth - 4, winHeight);
+                            this.renderTooltip(drawContext, tooltipText, windWidth - textWidth - 16, winHeight - height - 6);
                     case 4 ->
                         //Center
-                            this.renderTooltip(drawContext, tooltipText, windWidth / 2 - (textWidth - 4) / 2, winHeight);
+                            this.renderTooltip(drawContext, tooltipText, windWidth / 2 - (textWidth - 5) / 2, winHeight/2);
                 }
             } else if (this.mode == 2) {
                 drawContext.drawTooltip(textRenderer, Text.of(this.tooltipText), mouseX, mouseY);

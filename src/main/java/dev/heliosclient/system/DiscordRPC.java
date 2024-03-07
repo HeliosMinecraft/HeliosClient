@@ -6,15 +6,17 @@ import de.jcm.discordgamesdk.GameSDKException;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityType;
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.module.Module_;
 import dev.heliosclient.util.animation.AnimationUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -25,91 +27,99 @@ public class DiscordRPC {
     public static DiscordRPC INSTANCE = new DiscordRPC();
     public GameState currentGameState = GameState.MAINMENU;
     public boolean isRunning = false;
-    File discordLibrary = null;
     private Thread callbackThread;
     private Core discordCore;
     private Activity activity;
+    public void init() {
+        try {
+            File temp = this.getSDKLibrary();
+
+            // Initialize the Core with the existing or downloaded file
+            Core.init(temp);
+        } catch (IOException | RuntimeException e) {
+            AnimationUtils.addErrorToast("Discord Core init failed. Check logs for details.", false, 1500);
+            HeliosClient.LOGGER.error("Discord Core init failed.",e);
+        }
+    }
 
     /**
-     * File should be around 25mb. Any more and there is some error while downloading. Please report to devs.
+     * This is the modified version of {@link Core#downloadDiscordLibrary()}
+     * In this version, it checks if the required file already exists in the Temp folder,
+     * If not then it will proceed to download and extract a new one.
+     * <p>
+     * Modified because the original downloads the file everytime.
+     * </p>
      *
-     * @return
+     * @return Temp file needed
      * @throws IOException
      */
-    public static File downloadDiscordGameSDK() throws IOException {
-        // Find out which name Discord's library has (.dll for Windows, .so for Linux)
-        String name = "discord_game_sdk";
-        String suffix;
+    private File getSDKLibrary() throws IOException{
+            // Find out which name Discord's library has (.dll for Windows, .so for Linux)
+            String name = "discord_game_sdk";
+            String suffix;
 
-        String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-        String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+            String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+            String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
 
-        if (osName.contains("windows")) {
-            suffix = ".dll";
-        } else if (osName.contains("linux")) {
-            suffix = ".so";
-        } else if (osName.contains("mac os")) {
-            suffix = ".dylib";
-        } else {
-            throw new RuntimeException("Cannot determine OS type: " + osName);
-        }
+            if (osName.contains("windows")) {
+                suffix = ".dll";
+            } else if (osName.contains("linux")) {
+                suffix = ".so";
+            } else if (osName.contains("mac os")) {
+                suffix = ".dylib";
+            } else {
+                throw new RuntimeException("cannot determine OS type: " + osName);
+            }
 
-        if (arch.equals("amd64"))
-            arch = "x86_64";
+            if (arch.equals("amd64"))
+                arch = "x86_64";
 
-        String zipPath = "lib/" + arch + "/" + name + suffix;
+            // Path of Discord's library inside the ZIP
+            String zipPath = "lib/" + arch + "/" + name + suffix;
 
-        URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip");
+            // Create a new temporary directory
+            File tempDir = new File(System.getProperty("java.io.tmpdir"), "java");
+            File temp = new File(tempDir, name + suffix);
 
-        HttpURLConnection connection = (HttpURLConnection) downloadUrl.openConnection();
+            // Check if the file already exists
+            if (!temp.exists()) {
+                // If not, download discord sdk and extract it
+                URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip");
+                ZipInputStream zin = new ZipInputStream(downloadUrl.openStream());
 
-        connection.setRequestProperty("User-Agent", "discord-game-sdk4j (https://github.com/JnCrMx/discord-game-sdk4j)");
-        ZipInputStream zin = new ZipInputStream(connection.getInputStream());
+                // Search for the right file inside the ZIP
+                ZipEntry entry;
+                while ((entry = zin.getNextEntry()) != null) {
+                    if (entry.getName().equals(zipPath)) {
+                        if (!tempDir.mkdir())
+                            throw new IOException("Cannot create temporary directory");
+                        tempDir.deleteOnExit();
 
-        ZipEntry entry;
-        while ((entry = zin.getNextEntry()) != null) {
-            if (entry.getName().equals(zipPath)) {
-                File tempDir = new File(System.getProperty("java.io.tmpdir"), "java-" + name + System.nanoTime());
-                if (!tempDir.mkdir())
-                    throw new IOException("Cannot create temporary directory");
-                tempDir.deleteOnExit();
+                        // Copy the file in the ZIP to our temporary file
+                        Files.copy(zin, temp.toPath());
 
-                File temp = new File(tempDir, name + suffix);
-                temp.deleteOnExit();
+                        // We are done, so close the input stream
+                        zin.close();
 
-                Files.copy(zin, temp.toPath());
+                        return temp;
+                    }
 
+                    // Next entry
+                    zin.closeEntry();
+                }
+                // Close if not found and throw new error
                 zin.close();
-
-                return temp;
+                throw new FileNotFoundException("Required GameSDK file was not found");
             }
-            zin.closeEntry();
-        }
-        zin.close();
-
-        return null;
+            return temp;
     }
 
-    public void getLibrary() {
-        try {
-            discordLibrary = downloadDiscordGameSDK();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (discordLibrary == null) {
-            LOGGER.error("Error downloading Discord SDK.");
-        }
-    }
-
-    public void runPresence() throws GameSDKException{
+    public void runPresence(Module_ module) throws GameSDKException{
         callbackThread = new Thread(() -> {
-            if (discordLibrary == null) {
-                getLibrary();
-            }
         LOGGER.info("Discord Rich Presence is running!");
-        Core.init(discordLibrary);
+
         try (CreateParams params = new CreateParams()) {
-            // Please dont hack me ಥ_ಥ
+            // Please don't hack me ಥ_ಥ
             params.setClientID(1203402546626957373L);
             params.setFlags(CreateParams.Flags.NO_REQUIRE_DISCORD);
 
@@ -117,8 +127,9 @@ public class DiscordRPC {
             try {
                 discordCore = new Core(params);
             } catch (GameSDKException e) {
-                AnimationUtils.addErrorToast("Discord Application is not running. Code 055", false, 1500);
-                throw e;
+                AnimationUtils.addErrorToast("Discord Application is not running. Toggling off", false, 1500);
+                module.toggle();
+                return;
             }
 
             activity = new Activity();
@@ -158,13 +169,13 @@ public class DiscordRPC {
     }
 
     public void updateActivity() {
-        if (HeliosClient.MC.player != null) {
-            activity.setDetails("Playing as " + HeliosClient.MC.player.getName().getString() + " on: " + HeliosClient.MC.getCurrentServerEntry().address);
-        } else {
+        if (HeliosClient.MC.player == null) {
             activity.setDetails("Idle");
+        } else {
+            activity.setDetails("Playing as " + HeliosClient.MC.player.getName().getString() + " on: " + (Objects.requireNonNull(MC.getCurrentServerEntry()).address == null ? "----" : HeliosClient.MC.getCurrentServerEntry().address));
         }
 
-        activity.setState("Currently on: " + currentGameState.getName());
+        activity.setState("Currently on: " + currentGameState.getStateName());
         activity.setType(ActivityType.PLAYING);
 
 
@@ -192,7 +203,7 @@ public class DiscordRPC {
             this.name = name;
         }
 
-        public String getName() {
+        public String getStateName() {
             return this.name;
         }
     }

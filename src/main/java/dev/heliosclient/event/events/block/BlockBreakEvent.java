@@ -2,6 +2,7 @@ package dev.heliosclient.event.events.block;
 
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
+import dev.heliosclient.event.LuaEvent;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
@@ -9,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
  * Event fired every time block gets broken.
  */
 @Cancelable
+@LuaEvent("BlockBreakEvent")
 public class BlockBreakEvent extends Event {
     private final BlockPos pos;
     private final BlockState state;
@@ -19,6 +21,8 @@ public class BlockBreakEvent extends Event {
     }
 
     /**
+     * Lua code: "pos"
+     *
      * @return Position of BlockBreakEvent
      */
     public BlockPos getPos() {
@@ -26,6 +30,8 @@ public class BlockBreakEvent extends Event {
     }
 
     /**
+     *  Lua code: "state"
+     *
      * @return State of BlockBreakEvent
      */
     public BlockState getState() {

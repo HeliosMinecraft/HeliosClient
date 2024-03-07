@@ -1,6 +1,7 @@
 package dev.heliosclient.hud;
 
 import dev.heliosclient.hud.hudelements.*;
+import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -21,16 +22,16 @@ public class HudElementList {
         registerElement(CompactData.DATA);
         registerElement(Tps.DATA);
         registerElement(Radar.DATA);
-
     }
 
-    public void registerElement(HudElementData hudElementData) {
+    private void registerElement(HudElementData<?> hudElementData) {
         elementDataMap.put(hudElementData.name(), hudElementData);
     }
 
-    public void registerElements(HudElementData... datas) {
-        for (HudElementData module : datas) {
+    public void registerElements(HudElementData<?>... datas) {
+        for (HudElementData<?> module : datas) {
             elementDataMap.put(module.name(), module);
         }
+        HudCategoryPane.INSTANCE = new HudCategoryPane();
     }
 }

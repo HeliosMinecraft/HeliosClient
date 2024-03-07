@@ -12,11 +12,16 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.PlayerUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
+import me.x150.renderer.render.Renderer3d;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
@@ -93,26 +98,19 @@ public class Test extends Module_ {
         if (GradientRounded.value)
             Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), 22, 20, 40, 40, Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 2, 20, Color.WHITE);
 
-        if (Gradient.value) {
-        }
-
-
     }
 
     @SubscribeEvent
     public void renderer3d(Render3DEvent event) {
         PlayerEntity player = HeliosClient.MC.player;
+        Vec3d pos = new Vec3d(200,75,200);
 
         if (player != null && player.getWorld() != null) {
-            Vec3d end = new Vec3d(200, 200, 200);
-            Vec3d end2 = new Vec3d(200, player.getY(), 200);
-
-            QuadColor gradient = QuadColor.gradient(Color.WHITE.getRGB(), Color.GREEN.getRGB(), QuadColor.CardinalDirection.SOUTH);
-
-            Renderer3D.drawBoxBoth(new BlockPos(player.getBlockPos().getX() - 5, player.getBlockPos().getY() + 2, player.getBlockPos().getZ() + 6), gradient, 3);
-            Renderer3D.drawLine(Renderer3D.getEyeTracer(), end, LineColor.gradient(Color.WHITE.getRGB(), Color.GREEN.getRGB()), 1f);
-            Renderer3D.renderItem(Items.DIAMOND_BLOCK.getDefaultStack(), end);
-            Renderer3D.drawItemWithPhysics(Items.DIAMOND_BLOCK.getDefaultStack(), end2, mc.getTickDelta());
+            Renderer3D.renderThroughWalls();
+            for(Entity entity: PlayerUtils.getEntitiesWithinDistance(player,299)){
+                Renderer2D.drawEntityBoxOutline(entity,QuadColor.gradient(Color.RED.getRGB(),Color.BLUE.getRGB(), QuadColor.CardinalDirection.NORTH),3);
+            }
+            Renderer3D.stopRenderingThroughWalls();
         }
     }
 

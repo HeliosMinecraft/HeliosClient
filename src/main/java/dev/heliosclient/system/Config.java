@@ -5,10 +5,9 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.hud.HudElementList;
-import dev.heliosclient.managers.CategoryManager;
-import dev.heliosclient.managers.ConfigManager;
-import dev.heliosclient.managers.HudManager;
-import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.managers.*;
+import dev.heliosclient.module.Categories;
+import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -36,6 +35,10 @@ public class Config {
 
     // ConfigManager instance.
     public ConfigManager configManager;
+
+    // A secondary Config Manager is required to allow easy switch between module configs.
+    // Not required for default hud and client config since those
+    // files are expected to be replaced by the user instead of switching through the client.
     public ConfigManager modulesManager;
     public List<String> CONFIGS, MODULE_CONFIGS;
 
@@ -79,15 +82,7 @@ public class Config {
             paneConfigMap.put("y", yOffset[0]);
             paneConfigMap.put("collapsed", false);
             for (Module_ module : ModuleManager.INSTANCE.getModulesByCategory(category)) {
-                Map<String, Object> ModuleConfig = new HashMap<>();
-                for (SettingGroup settingGroup : module.settingGroups) {
-                    for (Setting<?> setting : settingGroup.getSettings()) {
-                        if (setting.name != null) {
-                            ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
-                        }
-                    }
-                }
-                paneConfigMap.put(module.name.replace(" ", ""), ModuleConfig);
+                paneConfigMap.put(module.name.replace(" ", ""), module.saveToToml(new ArrayList<>()));
             }
             categoryPaneMap.put(category.name, paneConfigMap);
             getModuleMap().put("panes", categoryPaneMap);
@@ -127,21 +122,13 @@ public class Config {
                     Single_Pane_Map.put("x", categoryPane.x);
                     Single_Pane_Map.put("y", categoryPane.y);
                     Single_Pane_Map.put("collapsed", categoryPane.collapsed);
-                    // Put values of each module into the map
-                    for (Module_ module : ModuleManager.INSTANCE.getModulesByCategory(category)) {
 
-                        // Map for storing the values of each module
-                        Map<String, Object> ModuleConfig = new HashMap<>();
-                        for (SettingGroup settingGroup : module.settingGroups) {
-                            for (Setting<?> setting : settingGroup.getSettings()) {
-                                if (setting.name != null) {
-                                    // Put the value of each setting into the map. Call the setting saveToToml method to get the value of the setting.
-                                    ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
-                                }
-                            }
+                    if(category != Categories.SEARCH) {
+                        // Put values of each module into the map
+                        for (Module_ module : ModuleManager.INSTANCE.getModulesByCategory(category)) {
+                            // Put the map of the module into the map of the category pane. Save all values of the module into the pane map.
+                            Single_Pane_Map.put(module.name.replace(" ", ""), module.saveToToml(new ArrayList<>()));
                         }
-                        // Put the map of the module into the map of the category pane. Save all values of the module into the pane map.
-                        Single_Pane_Map.put(module.name.replace(" ", ""), ModuleConfig);
                     }
                     // Put all the data of the paneConfigMap into the universal CategoryPaneMap keyed with the name of the category.
                     All_Category_Panes_Map.put(category.name, Single_Pane_Map);
@@ -183,7 +170,7 @@ public class Config {
      */
     public void loadHudElements() {
         if(FileUtils.isFileEmpty(configManager.getConfigFiles().get(HUD))){
-            LOGGER.warn(HUD + " config is empty! Creating new default hud config");
+            LOGGER.warn("\"" + HUD + "\" config is empty! Creating new default hud config");
             getHudConfig();
             configManager.save();
         }
@@ -225,20 +212,24 @@ public class Config {
         loadHudElementSettings();
     }
 
+    /**
+     * Loads HudElement settings only for the registered hud-elements from the config
+     */
     public void loadHudElementSettings() {
         Toml tomlElementMap = configManager.getTomls().get(HUD).getTable("hudElements");
         if (tomlElementMap != null) {
             Toml toml = tomlElementMap.getTable("elements");
             if(toml != null) {
-                tomlElementMap.toMap().forEach((string, object) -> {
+                toml.toMap().forEach((string, object) -> {
                     // Get the table of the hudElement
                     Toml hudElementTable = toml.getTable(string);
-
 
                     for (HudElement element : HudManager.INSTANCE.hudElements) {
                         if (string.equals(element.id.uniqueID)) {
                             for (SettingGroup settingGroup : element.settingGroups) {
                                 for (Setting<?> setting : settingGroup.getSettings()) {
+                                    if(!setting.shouldSaveAndLoad()) break;
+
                                     setting.loadFromToml(hudElementTable.toMap(), hudElementTable);
                                 }
                             }
@@ -258,15 +249,14 @@ public class Config {
             this.getModuleConfig();
         } else {
             LOGGER.info("Loading default config...");
-            this.getDefaultModuleConfig();
-            this.save();
+            configManager.save();
         }
         if (modulesManager.load()) {
             this.getModuleConfig();
         } else {
             LOGGER.info("Loading default modules config...");
             this.getDefaultModuleConfig();
-            this.save();
+            modulesManager.save(MODULES);
         }
 
         this.getClientConfig();
@@ -280,26 +270,30 @@ public class Config {
 
     public void loadModules() {
         if(FileUtils.isFileEmpty(modulesManager.getConfigFiles().get(MODULES))){
-            LOGGER.warn(MODULES + " module config is empty! Creating new default Modules config");
+            LOGGER.warn("\"" + MODULES + "\" module config is empty! Creating new default Modules config");
             getDefaultModuleConfig();
-            this.save();
+            modulesManager.save(MODULES);
         }
 
-        //Worlds most ineffcient code with complexity of O(4)
-        Toml panesToml = modulesManager.getTomls().get(MODULES).getTable("panes");
+        //World's most inefficient code with complexity of O(4)
+        Toml panesTable = modulesManager.getTomls().get(MODULES).getTable("panes");
+        // This is the file structure //
+        //     panes                  //
+        //       |                    //
+        //    category  - x,y values of pane   // 1 - loop
+        //       |                    //
+        //     modules                // - 1 loop
+        //       |                    //
+        // module settings            // - 2 loops
 
         CategoryManager.getCategories().forEach((s, category) -> {
-            for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
-                for (SettingGroup settingGroup : m.settingGroups) {
-                    for (Setting<?> setting : settingGroup.getSettings()) {
-                        Toml newToml = panesToml.getTable(category.name).getTable(m.name.replace(" ", ""));
-                        if (newToml != null) {
-                            setting.loadFromToml(newToml.toMap(), newToml);
-                        }
-                        if (setting == m.active && m.isActive()) {
-                            m.onEnable();
-                        }
-                    }
+            if(category == Categories.SEARCH) return;
+
+            if(panesTable != null && panesTable.containsTable(category.name)) {
+                Toml categoryTable = panesTable.getTable(category.name);
+
+                for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
+                  m.loadFromToml(categoryTable.toMap(),categoryTable);
                 }
             }
         });
@@ -307,26 +301,28 @@ public class Config {
 
     public void loadClientConfigModules() {
         if(FileUtils.isFileEmpty(configManager.getConfigFiles().get(CLIENT))){
-            LOGGER.warn(CLIENT + " client config is empty! Creating new default Modules config");
+            LOGGER.warn("\""+CLIENT + "\" config is empty! Creating new default Modules config");
             getDefaultModuleConfig();
-            this.save();
+            modulesManager.save(MODULES);
         }
+        Toml toml = configManager.getTomls().get(CLIENT);
+        CommandManager.prefix = toml.getString("prefix");
 
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
+                if(!setting.shouldSaveAndLoad()) break;
+
                 if (setting.name != null) {
-                    Toml settingsToml = configManager.getTomls().get(CLIENT).getTable("settings");
+                    Toml settingsToml = toml.getTable("settings");
                     if (settingsToml != null)
                         setting.loadFromToml(settingsToml.toMap(), settingsToml);
 
-                    if(setting.iSettingChange != null && setting != HeliosClient.CLICKGUI.switchConfigs && setting != ClickGUI.FontRenderer){
+                    if(setting.iSettingChange != null && setting != HeliosClient.CLICKGUI.switchConfigs && setting != HeliosClient.CLICKGUI.FontRenderer){
                         setting.iSettingChange.onSettingChange(setting);
                     }
                 }
             }
         }
-
-        HeliosClient.CLICKGUI.onLoad();
     }
 
     public void getClientConfig() {
@@ -334,6 +330,8 @@ public class Config {
         Map<String, Object> ModuleConfig = new HashMap<>();
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
+                if(!setting.shouldSaveAndLoad()) break;
+
                 if (setting.name != null) {
                     ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
                 }

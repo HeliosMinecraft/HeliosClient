@@ -23,11 +23,13 @@ import static com.mojang.text2speech.Narrator.LOGGER;
 public class DropDownSetting extends Setting<Integer> {
     public List options;
     public int value;
+    List<String> tooltipText;
+
     public boolean selecting = false;
     Color color = new Color(4, 3, 3, 157);
     int maxOptionWidth = 0;
 
-    public <T> DropDownSetting(String name, String description, ISettingChange iSettingChange, List<T> options, int value, BooleanSupplier shouldRender, int defaultValue) {
+    public <T> DropDownSetting(String name, String description, ISettingChange iSettingChange, List<T> options, int value, BooleanSupplier shouldRender, int defaultValue, List<String> optionsTooltips) {
         super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
@@ -39,20 +41,12 @@ public class DropDownSetting extends Setting<Integer> {
         for (Object option : options) {
             maxOptionWidth = Math.max(maxOptionWidth, Math.round(Renderer2D.getFxStringWidth(option.toString())));
         }
+        this.tooltipText = optionsTooltips;
+
     }
 
-    public <T> DropDownSetting(String name, String description, ISettingChange iSettingChange, T[] options, int value, BooleanSupplier shouldRender, int defaultValue) {
-        super(shouldRender, defaultValue);
-        this.name = name;
-        this.description = description;
-        this.options = Arrays.asList(options);
-        this.height = 24;
-        this.heightCompact = 12;
-        this.iSettingChange = iSettingChange;
-        this.value = value;
-        for (Object option : options) {
-            maxOptionWidth = Math.max(maxOptionWidth, Math.round(Renderer2D.getFxStringWidth(option.toString())));
-        }
+    public <T> DropDownSetting(String name, String description, ISettingChange iSettingChange, T[] options, int value, BooleanSupplier shouldRender, int defaultValue, List<String> optionsTooltips) {
+        this(name,description,iSettingChange,Arrays.asList(options),value,shouldRender,defaultValue,optionsTooltips);
     }
 
     public void setOptions(List options) {
@@ -82,14 +76,14 @@ public class DropDownSetting extends Setting<Integer> {
                 Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, y + 2f, maxOptionWidth + 4, Renderer2D.getFxStringHeight() + 2, 3, color.darker().darker().getRGB());
             }
             //Render arrow
-            FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), selecting ? "\uF123" : "\uF120", x + Renderer2D.getFxStringWidth(name + ": ") + 2 + maxOptionWidth + 5, y + 4, ColorManager.INSTANCE.defaultTextColor());
+            FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), selecting ? "\uF123" : "\uEB11", x + Renderer2D.getFxStringWidth(name + ": ") + 2 + maxOptionWidth + 5, y + 4, ColorManager.INSTANCE.defaultTextColor());
             if (selecting) {
                 //Render the settings and center them horizontally
                 if(options.size() > 1) {
                     // Render full size box including the options
-                    Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), startX, y + 2f, maxOptionWidth + 4, this.height - 2.0f, 3,4, color.brighter().getRGB());
+                    Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, y + 2f, maxOptionWidth + 4, this.height - 3.0f, 3,color.brighter().getRGB());
 
-                    float offset = y + 6.0f + Renderer2D.getFxStringHeight();
+                    float offset = y + 6.5f + Renderer2D.getFxStringHeight();
                     for (Object option : options) {
                         //Skip the chosen option
                         if (option == options.get(value)) {
@@ -129,7 +123,14 @@ public class DropDownSetting extends Setting<Integer> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 350) {
+        // Mouse hovers over the options
+        if(hoveredOverAllOptions(mouseX,mouseY) && !tooltipText.isEmpty()){
+            int Val = mouseHoveringOverOptions(mouseX,mouseY);
+            if(Val < options.size() && Val != -1){
+                Tooltip.tooltip.changeText(tooltipText.get(mouseHoveringOverOptions(mouseX,mouseY)));
+            }
+        }
+        else if (hovertimer >= 150) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -151,10 +152,32 @@ public class DropDownSetting extends Setting<Integer> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+      if (hovertimer >= 150) {
             Tooltip.tooltip.changeText(description);
         }
     }
+    public int mouseHoveringOverOptions(int mouseX, int mouseY) {
+        if (selecting && hoveredOverAllOptions(mouseX,mouseY)) {
+                // Calculate the index of the hovered option
+            float offset = y + 2.0f + Renderer2D.getFxStringHeight();
+            for (Object option : options) {
+                if (option.equals( options.get(value))) {
+                    continue;
+                }
+                if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + maxOptionWidth && mouseY >= offset && mouseY <= offset + Renderer2D.getFxStringHeight() + 2.0f) {
+                    return options.indexOf(option);
+
+                }
+                offset += Renderer2D.getFxStringHeight() + 5.0f;
+            }
+        }
+        return -1; // No option found
+    }
+    public boolean hoveredOverAllOptions(int mouseX, int mouseY){
+        return mouseX >= x + Renderer2D.getFxStringWidth(name + ": ") + 2 && mouseX <= x + maxOptionWidth + 2 + Renderer2D.getFxStringWidth(name + ": ") &&
+                mouseY >= y + 2f  && mouseY <= y + 2f + Renderer2D.getFxStringHeight() + this.height;
+    }
+
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
@@ -184,9 +207,9 @@ public class DropDownSetting extends Setting<Integer> {
 
         if (selecting) {
             // Clicked on the options other than the value textbox
-            float offset = y + 4.0f + Renderer2D.getFxStringHeight() + 2.0f;
+            float offset = y + 6.5f + Renderer2D.getFxStringHeight();
             for (Object option : options) {
-                if (option == options.get(value)) {
+                if (option.equals( options.get(value))) {
                     continue;
                 }
                 if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + maxOptionWidth && mouseY >= offset && mouseY <= offset + Renderer2D.getFxStringHeight() + 2.0f) {
@@ -195,17 +218,8 @@ public class DropDownSetting extends Setting<Integer> {
                     iSettingChange.onSettingChange(this);
                     break;
                 }
-                offset += Renderer2D.getFxStringHeight() + 2.0f;
+                offset += Renderer2D.getFxStringHeight() + 5.0f;
             }
-            /*
-            // If the user clicks on the value textbox, then do an early escape and stop the selection. (Final selection  = value box option)
-            if (mouseX >= Renderer2D.getFxStringWidth(name + ": ") + x + 2 && mouseX <= Renderer2D.getFxStringWidth(name + ": ") + x + 2 + maxOptionWidth && mouseY >= y + 2.0f && mouseY <= y + Renderer2D.getFxStringHeight() + 2.0f) {
-                selecting = false;
-                iSettingChange.onSettingChange(this);
-                return;
-            }
-
-             */
         }
     }
 
@@ -216,25 +230,30 @@ public class DropDownSetting extends Setting<Integer> {
         }
         return options.get(value);
     }
-
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
         super.loadFromToml(MAP,toml);
-        if( MAP.get(name.replace(" ", "")) == null){
+        if(MAP.get(name.replace(" ", "")) == null){
             value = defaultValue;
             return;
         }
-        int optionIndex = options.indexOf(MAP.get(name.replace(" ", "")));
-        if (optionIndex != -1) {
-            value = optionIndex;
-        } else {
-            LOGGER.error("List option not found for: " + MAP.get(name.replace(" ", "")) + ", " + name + " Setting during loading config: " + Config.MODULES);
+        String mapGet = MAP.get(name.replace(" ", "")).toString().trim();
+
+        for (Object object:
+                options) {
+            if(object.toString().trim().equalsIgnoreCase(mapGet)){
+                value = options.indexOf(object);
+                return;
+            }
         }
+        LOGGER.error("List option not found for: " + mapGet + ", " + name + " Setting during loading config: " + Config.MODULES);
     }
 
-    public static class Builder extends SettingBuilder<Builder, List, DropDownSetting> {
+    public static class Builder extends SettingBuilder<Builder, List<?>, DropDownSetting> {
         ISettingChange ISettingChange;
         int defaultListIndex;
+        List<String> optionsTooltips = new ArrayList<>();
+
 
         public Builder() {
             super(new ArrayList<>());
@@ -250,9 +269,20 @@ public class DropDownSetting extends Setting<Integer> {
             return this;
         }
 
+        /**
+         * Option order should be corresponding to value list order
+         *
+         * @param optionToolTip tooltip for the option index
+         * @return Builder
+         */
+        public Builder addOptionToolTip(String optionToolTip) {
+            optionsTooltips.add(optionToolTip);
+            return this;
+        }
+
         @Override
         public DropDownSetting build() {
-            return new DropDownSetting(name, description, ISettingChange, value, defaultListIndex, shouldRender, defaultListIndex);
+            return new DropDownSetting(name, description, ISettingChange, value, defaultListIndex, shouldRender, defaultListIndex,optionsTooltips);
         }
     }
 }

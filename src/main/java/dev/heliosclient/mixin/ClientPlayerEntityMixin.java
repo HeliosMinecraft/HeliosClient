@@ -25,7 +25,7 @@ public class ClientPlayerEntityMixin {
         }
     }
 
-    @Inject(method = "init", at = @At(value = "TAIL"))
+  @Inject(method = "init", at = @At(value = "TAIL"))
     public void onInit(CallbackInfo ci) {
         for (Module_ m : ModuleManager.INSTANCE.getEnabledModules()) {
             m.onEnable();

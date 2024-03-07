@@ -66,11 +66,12 @@ public class StringSetting extends Setting<String> {
 
     @Override
     public Object saveToToml(List<Object> objectList) {
-        return shouldSaveOrLoad? value : "";
+        return shouldSaveOrLoad ? value : "";
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        super.loadFromToml(MAP,toml);
         if(!shouldSaveOrLoad){
             return;
         }

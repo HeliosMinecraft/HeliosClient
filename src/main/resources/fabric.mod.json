@@ -11,6 +11,8 @@
     "TomPlaneta"
   ],
   "contact": {
+    "homepage": "https://github.com/HeliosMinecraft/HeliosClient/?tab=readme-ov-file#",
+    "issues": "https://github.com/HeliosMinecraft/HeliosClient/issues"
   },
   "license": "MIT",
   "icon": "assets/heliosclient/icon.png",
@@ -28,10 +30,13 @@
     "heliosclient.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.21",
+    "fabricloader": ">=0.15.0",
     "fabric-api": "*",
     "minecraft": "~1.20",
     "java": ">=17",
     "modmenu": ">=9.0.0"
+  },
+  "suggests": {
+    "ModMenu": "*"
   }
 }

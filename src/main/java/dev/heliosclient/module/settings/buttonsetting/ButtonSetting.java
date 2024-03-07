@@ -14,7 +14,7 @@ import java.util.function.BooleanSupplier;
 
 public class ButtonSetting extends Setting<Boolean> {
     private final String ButtonCategoryText;
-    private final Table table = new Table();
+    private final Table buttonTable = new Table();
     private int hovertimer = 0;
 
 
@@ -26,18 +26,20 @@ public class ButtonSetting extends Setting<Boolean> {
 
     public void addButton(String buttonText, int rowIndex, int columnIndex, Runnable task) {
         Button button = new Button(buttonText, task, this.x, this.y, this.width, this.height);
-        table.addButton(rowIndex, columnIndex, button);
-        this.height = table.adjustButtonLayout(this.x, this.y, this.width, false) + 5;
+        buttonTable.addButton(rowIndex, columnIndex, button);
+
+        // Adjust the layout after every button has been added
+        this.height = buttonTable.adjustButtonLayout(this.x, this.y, this.width, false) + 5;
     }
 
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         Renderer2D.drawFixedString(drawContext.getMatrices(), ButtonCategoryText, (float) HeliosClient.MC.getWindow().getScaledWidth() / 2 - (float) textRenderer.getWidth(ButtonCategoryText) / 2 + 1, y + 2, ColorManager.INSTANCE.defaultTextColor());
-        this.height = table.adjustButtonLayout(x, Math.round(y + 4 + Renderer2D.getFxStringHeight(ButtonCategoryText)), this.width, false) + 5;
+        this.height = buttonTable.adjustButtonLayout(x, Math.round(y + 4 + Renderer2D.getFxStringHeight(ButtonCategoryText)), this.width, false) + 5;
 
 
-        for (List<Button> row : table.table) {
+        for (List<Button> row : buttonTable.table) {
             for (Button button : row) {
                 if (button != null)
                     button.render(drawContext, mouseX, mouseY, textRenderer);
@@ -57,7 +59,7 @@ public class ButtonSetting extends Setting<Boolean> {
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
-        for (List<Button> row : table.table) {
+        for (List<Button> row : buttonTable.table) {
             for (Button button1 : row) {
                 if (button1 != null)
                     button1.mouseClicked(mouseX, mouseY);

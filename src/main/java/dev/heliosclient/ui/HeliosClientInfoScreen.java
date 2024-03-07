@@ -24,12 +24,10 @@ public class HeliosClientInfoScreen extends Screen {
         GridWidget gridWidget = this.layout.addBody(new GridWidget()).setSpacing(8);
         gridWidget.getMainPositioner().alignHorizontalCenter();
         GridWidget.Adder adder = gridWidget.createAdder(1);
-        adder.add(ButtonWidget.builder(Text.literal("GitHub"), ConfirmLinkScreen.opening(this, "https://github.com/HeliosClient/HeliosClient/")).width(210).build());
-        adder.add(ButtonWidget.builder(Text.literal("Contributors"), ConfirmLinkScreen.opening(this, "https://github.com/HeliosClient/HeliosClient/#contributors")).width(210).build());
-        adder.add(ButtonWidget.builder(Text.literal("Credits"), ConfirmLinkScreen.opening(this, "https://github.com/HeliosClient/HeliosClient/#contributors")).width(210).build());
-        this.layout.addFooter(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-            this.close();
-        }).build());
+        adder.add(ButtonWidget.builder(Text.literal("GitHub"), ConfirmLinkScreen.opening(this, "https://github.com/HeliosMinecraft/HeliosClient/")).width(210).build());
+        adder.add(ButtonWidget.builder(Text.literal("Contributors"), ConfirmLinkScreen.opening(this, "https://github.com/HeliosMinecraft/HeliosClient/#contributors")).width(210).build());
+        adder.add(ButtonWidget.builder(Text.literal("Credits"), ConfirmLinkScreen.opening(this, "https://github.com/HeliosMinecraft/HeliosClient/?tab=readme-ov-file#thanks-to")).width(210).build());
+        this.layout.addFooter(ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.close()).build());
         this.layout.refreshPositions();
         this.layout.forEachChild(this::addDrawableChild);
     }

@@ -18,6 +18,7 @@ import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.GlAllocationUtils;
+import net.minecraft.client.util.math.MatrixStack;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -99,6 +100,8 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.x = x;
         this.y = y;
 
+
+        // Draw the name of setting and the value of the color we have set
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 3, y + 2, -1);
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, value.getRGB());
 
@@ -133,8 +136,8 @@ public class RGBASetting extends Setting<Color> implements Listener {
         Renderer2D.drawFixedString(drawContext.getMatrices(), "Rainbow ", x + offsetX + 1, y + offsetY + gradientBoxHeight + 7, rainbow ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
         //Draw picker button
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 5, y + offsetY + gradientBoxHeight + 6, FontRenderers.Mid_iconRenderer.getStringWidth("\uF17C ") + 3, FontRenderers.Mid_iconRenderer.getStringHeight("\uF17C ") + 1, 2, Color.LIGHT_GRAY.getRGB());
-        FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), "\uF14B", x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 6.5f, y + offsetY + gradientBoxHeight + 6.5f, isPicking ? Color.GREEN.getRGB() : Color.RED.getRGB());
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 5, y + offsetY + gradientBoxHeight + 6, FontRenderers.Mid_iconRenderer.getStringWidth("\uF1FB") + 3, FontRenderers.Mid_iconRenderer.getStringHeight("\uF17C ") + 1, 2, Color.LIGHT_GRAY.getRGB());
+        FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), "\uF1FB", x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 6.5f, y + offsetY + gradientBoxHeight + 6.5f, isPicking ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
         //Render the texts
         Renderer2D.drawFixedString(drawContext.getMatrices(), "Alpha: " + value.getAlpha(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 9, -1);
@@ -154,7 +157,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
         if (isPicking && !hoveredOverPickBool(mouseX, mouseY)) {
             drawContext.getMatrices().push();
             drawContext.getMatrices().translate(0, 0, 1000);
-            // Draw the cursor
+            // Draw the cursor box
             double mouseXPick = HeliosClient.MC.mouse.getX() * HeliosClient.MC.getWindow().getScaledWidth() / (double) HeliosClient.MC.getWindow().getWidth();
             double mouseYPick = HeliosClient.MC.mouse.getY() * HeliosClient.MC.getWindow().getScaledHeight() / (double) HeliosClient.MC.getWindow().getHeight();
 
@@ -169,6 +172,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
             int blue = buffer.get(2) & 0xFF;
 
 
+            // Render the outline box and also the color of the pixel
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) (mouseXPick + 10), (float) mouseYPick, 14, 14, -1);
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), (float) (mouseXPick + 11), (float) (mouseYPick + 1), 12, 12, new Color(red, green, blue, (int) (alpha * 255)).getRGB());
 
@@ -177,7 +181,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
     }
 
     public void drawGradientBox(DrawContext drawContext, int x, int y, int value) {
-        // Draw the value gradient box
+        // Draw the rainbow gradient box from which we pick the colors
         Renderer2D.drawRainbowGradient(drawContext.getMatrices().peek().getPositionMatrix(), x, y, boxWidth, gradientBoxHeight);
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, boxWidth + 2, gradientBoxHeight + 2, 1, 1, value);
@@ -196,6 +200,7 @@ public class RGBASetting extends Setting<Color> implements Listener {
     }
 
     public void drawBrightnessSaturationBox(DrawContext drawContext, int x, int y, float hue, int value3) {
+        // Draw the box from which we change the shade of the colors picked from gradient box
         Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), x, y, boxWidth, boxHeight, Color.BLACK, Color.WHITE, Color.getHSBColor(hue, 1.0f, 1.0f), Color.BLACK, 2, 4, getColor());
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, boxWidth + 2, boxHeight + 2, 3, 1, value3);

@@ -1,16 +1,19 @@
 package dev.heliosclient.ui.clickgui;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -19,7 +22,6 @@ import java.util.concurrent.Executors;
 
 public class SettingsScreen extends AbstractSettingScreen implements IWindowContentRenderer {
     private final float delayBetweenSettings = 0.2f;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     int x, y, windowWidth = 224, windowHeight;
 
     public SettingsScreen(Module_ module, Screen parentScreen) {
@@ -28,8 +30,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
     }
 
     public void updateSetting() {
-        synchronized (executor) {
-            executor.submit(() -> module.settingGroups.stream()
+        HeliosExecutor.execute(() -> module.settingGroups.stream()
                     .filter(SettingGroup::shouldRender)
                     .flatMap(settingGroup -> settingGroup.getSettings().stream()
                             .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
@@ -43,7 +44,6 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
                             delay.set(delay.get() - setting.animationSpeed);
                         }
                     }));
-        }
     }
 
 
@@ -114,6 +114,14 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
         setting.animationDone = false;
         delay.set(0);
         setting.setAnimationProgress(0.5f);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if(keyCode == GLFW.GLFW_KEY_ESCAPE){
+            mc.setScreen(ClickGUIScreen.INSTANCE);
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }
 

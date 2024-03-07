@@ -11,7 +11,7 @@ import net.minecraft.command.CommandSource;
 public class Friend extends Command {
 
     public Friend() {
-        super("friend", "Adds or removes friend", "f");
+        super("friend", "Adds or removes friend");
     }
 
     @Override
@@ -61,12 +61,11 @@ public class Friend extends Command {
                 )
                 .then(literal("list")
                         .executes(context -> {
-                            FriendManager friendManager = new FriendManager();
-                            if (friendManager.getFriendsName().isEmpty()) {
+                            if (FriendManager.getFriendsName().isEmpty()) {
                                 ChatUtils.sendHeliosMsg("You don't have any friends. :(");
                             } else {
                                 ChatUtils.sendHeliosMsg("You are friends with " + ColorUtils.green
-                                        + String.join(", ", friendManager.getFriendsName()));
+                                        + String.join(", ", FriendManager.getFriendsName()));
                             }
 
                             return SINGLE_SUCCESS;

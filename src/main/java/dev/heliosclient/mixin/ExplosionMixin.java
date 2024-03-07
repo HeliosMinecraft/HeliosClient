@@ -52,7 +52,7 @@ public class ExplosionMixin implements IExplosion {
     private Explosion.DestructionType destructionType;
 
     @Override
-    public void set(Vec3d pos, float power, boolean createFire) {
+    public void heliosClient$set(Vec3d pos, float power, boolean createFire) {
         this.world = HeliosClient.MC.world;
         this.entity = null;
         this.x = pos.x;

@@ -51,43 +51,68 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         EventManager.register(this);
     }
 
+    /**
+     * Updates the animation progress towards the target Y position.
+     *
+     * @param targetY The target Y position.
+     */
     public void update(float targetY) {
+        // If the animation is not done yet
         if (!animationDone) {
-            //the first update, set the initial position above the target
+            // If this is the first update, set the initial position above the target
             if (animationProgress == 0) {
                 y = (int) (targetY);
             }
 
+            // Set the target Y position
             this.targetY = targetY;
+            // Increase the animation progress by the speed of the animation
             animationProgress += animationSpeed;
+            // Ensure the animation progress does not exceed 1
             animationProgress = Math.min(animationProgress, 1);
 
+            // Calculate the eased progress using a linear in-out easing function
             float easedProgress = Easing.ease(EasingType.LINEAR_IN_OUT, animationProgress);
+            // Update the current Y position by interpolating between the current and target Y positions
             y = Math.round(AnimationUtils.lerp(y, this.targetY, easedProgress));
+            // If the animation progress has reached or exceeded 1, mark the animation as done
             if (animationProgress >= 1) {
                 animationDone = true;
             }
         }
     }
 
+    /**
+     * Resets the animation progress towards the target Y position in reverse.
+     *
+     * @param targetY The target Y position.
+     */
     public void reset(float targetY) {
+        // If the animation is not done yet
         if (!animationDone) {
-            //the first update, set the initial position above the target
+            // If this is the first update, set the initial position above the target
             if (animationProgress == 0) {
                 y = (int) (targetY);
             }
 
+            // Set the target Y position
             this.targetY = targetY;
+            // Increase the animation progress by the speed of the animation
             animationProgress += animationSpeed;
+            // Ensure the animation progress does not exceed 1
             animationProgress = Math.min(animationProgress, 1);
 
+            // Calculate the eased progress using a linear in-out easing function
             float easedProgress = Easing.ease(EasingType.LINEAR_IN_OUT, animationProgress);
+            // Update the current Y position by interpolating between the current and target Y positions in reverse
             y = Math.round(AnimationUtils.lerp(y, this.targetY, -easedProgress));
+            // If the animation progress has reached or exceeded 1, mark the animation as done
             if (animationProgress >= 1) {
                 animationDone = true;
             }
         }
     }
+
 
     /**
      * Renders setting in GUI.
@@ -121,14 +146,15 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
      * Rendering call along with the main render method.
      * Added so that you can render other stuff along with only specific settings.
      *
-     * @param renderContext Object to get all the necessary arguments.
+     * @param renderContext  {@link RenderContext} object to get all the necessary arguments.
      */
     private void alsoRender(RenderContext renderContext) {
         alsoRenderLogic.accept(renderContext);
     }
     /**
      * Rendering call along with the main render method.
-     * Added so that you can render other stuff along with only specific settings.
+     * Added so that you can render other stuff along with the settings.
+     * Handles all the scrolling and no-render automatic
      *
      * @param alsoRenderLogic Consumer object to receive the arguments and render.
      */
@@ -174,7 +200,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         }
     }
 
-    public Setting setShouldSaveOrLoad(boolean shouldSaveOrLoad) {
+    public Setting<?> setShouldSaveOrLoad(boolean shouldSaveOrLoad) {
         this.shouldSaveOrLoad = shouldSaveOrLoad;
         return this;
     }
@@ -282,6 +308,14 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         this.animationSpeed = animationSpeed;
     }
 
+    public boolean shouldSaveAndLoad(){
+        return shouldSaveOrLoad;
+    }
+
+    public void setValue(T value) {
+        this.value = value;
+    }
+
     @Override
     public Object saveToToml(List<Object> objectList) {
         return objectList;
@@ -294,9 +328,15 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         }
     }
 
-    // Credits: Meteor client
+    /**
+     *  Credits: <a href="https://github.com/MeteorDevelopment/meteor-client">Meteor Client</a>
+     *
+     * @param <B> Type representing the Builder Class
+     * @param <V> Type representing the Data type object of the value
+     * @param <S> Type representing the Class object to build
+     */
     public abstract static class SettingBuilder<B, V, S> {
-        protected String name = "null", description = "";
+        protected String name = "UnDefined", description = "";
         protected V value;
         protected BooleanSupplier shouldRender = () -> true; // Default to true
         protected V defaultValue;
@@ -339,7 +379,5 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         public abstract S build();
     }
 
-    public record RenderContext(DrawContext drawContext, int x, int y, int mouseX, int mouseY,
-                                TextRenderer textRenderer) {
-    }
+    public record RenderContext(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) { }
 }

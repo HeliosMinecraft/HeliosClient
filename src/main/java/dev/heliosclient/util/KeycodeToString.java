@@ -16,6 +16,10 @@ public class KeycodeToString {
      * @return Translated string.
      */
     public static String translate(Integer keyCode) {
+        if(keyCode == -1){
+            return "None";
+        }
+
         //Automatic translation. Works for simple keys like numbers or letters.
         String keyName = GLFW.glfwGetKeyName(keyCode, 0);
 
@@ -206,6 +210,9 @@ public class KeycodeToString {
      * @return Translated string.
      */
     public static String translateShort(Integer keyCode) {
+        if(keyCode == -1){
+            return "Bind";
+        }
         String keyName = GLFW.glfwGetKeyName(keyCode, 0);
         if (keyName == null) {
             switch (keyCode) {

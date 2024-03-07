@@ -89,7 +89,7 @@ public class ConfigManager {
                     configMaps.put(name, tomls.get(name).toMap());
                 }
             } catch (Exception e) {
-                HeliosClient.LOGGER.error("Error occurred while loading config. Load default config.", e);
+                HeliosClient.LOGGER.error("Error occurred while loading config. Loading default config....", e);
 
                 //Save the config,i.e load a new empty config.
                 save(name);
@@ -110,7 +110,7 @@ public class ConfigManager {
                 }
                 tomlWriter.write(configMaps.get(name), configFiles.get(name));
             } catch (Exception e) {
-                e.printStackTrace();
+                HeliosClient.LOGGER.error("There was a error during saving file: " + name, e);
             }
         }
     }

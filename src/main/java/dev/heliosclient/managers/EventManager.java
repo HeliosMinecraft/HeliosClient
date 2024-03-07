@@ -2,8 +2,14 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
+import dev.heliosclient.event.LuaEvent;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.scripting.LuaEventManager;
+import dev.heliosclient.system.HeliosExecutor;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -65,6 +71,9 @@ public class EventManager {
                 }
             }
         }
+        if (event.getClass().isAnnotationPresent(LuaEvent.class) && LuaEventManager.INSTANCE.hasListeners()) {
+            HeliosExecutor.execute(() -> LuaEventManager.INSTANCE.post(event.getClass().getAnnotation(LuaEvent.class).value(), CoerceJavaToLua.coerce(event)));
+        }
         return event;
     }
 
@@ -75,6 +84,7 @@ public class EventManager {
      * @param event      Event to be posted
      * @param TIME_FRAME Time frame to check
      */
+    @Deprecated
     public static void postEvent(Event event, long TIME_FRAME) {
         Class<?> eventType = event.getClass();
         Long lastPosted = LAST_POSTED.get(eventType);

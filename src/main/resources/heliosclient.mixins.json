@@ -12,14 +12,14 @@
     "MixinServerPlayNetworkHandler"
   ],
   "client": [
+    "AbstractClientPlayerEntityMixin",
     "AccessorFrustum",
     "AccessorWorldRenderer",
     "CapeFeatureRendererMixin",
     "ChatInputSuggestorMixin",
     "ClientConnectionMixin",
     "ClientPlayerEntityMixin",
-    "ElytraFeatureRendererMixin",
-    "EntityRendererMixin",
+    "EntityRenderDispatcherMixin",
     "GameRendererMixin",
     "InGameHudMixin",
     "ItemEntityRendererMixin",

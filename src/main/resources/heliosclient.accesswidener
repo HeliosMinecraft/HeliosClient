@@ -1,2 +1,3 @@
 accessWidener v1 named
 accessible method net/minecraft/client/gui/DrawContext fillGradient (IIIIIII)V
+accessible field net/minecraft/client/render/entity/model/PlayerEntityModel cloak Lnet/minecraft/client/model/ModelPart;

@@ -142,6 +142,33 @@ public class Vertexer {
             vertexLine(matrices, vertexConsumer, x1, y2, z2, x1, y2, z1, LineColor.single(color[12], color[13], color[14], color[15]));
         }
     }
+    public static void drawCircle(MatrixStack matrices, VertexConsumer vertexConsumer, float centerX, float centerY, float centerZ, float radius, LineColor lineColor) {
+        int segments = 100;  // Increase this for a smoother circle
+        float angleStep = 360.0f / segments;
+
+        Matrix4f model = matrices.peek().getPositionMatrix();
+        Matrix3f normal = matrices.peek().getNormalMatrix();
+
+        for (int i = 0; i < segments; i++) {
+            float angle1 = (float) Math.toRadians(i * angleStep);
+            float angle2 = (float) Math.toRadians((i + 1) * angleStep);
+
+            float x1 = centerX + radius * (float) Math.cos(angle1);
+            float z1 = centerZ + radius * (float) Math.sin(angle1);
+
+            float x2 = centerX + radius * (float) Math.cos(angle2);
+            float z2 = centerZ + radius * (float) Math.sin(angle2);
+
+            Vector3f normalVec = getNormal(x1, centerY, z1, x2, centerY, z2);
+
+            int[] color1 = lineColor.getColor(x1, centerY, z1, 0);
+            int[] color2 = lineColor.getColor(x2, centerY, z2, 1);
+
+            vertexConsumer.vertex(model, x1, centerY, z1).color(color1[0], color1[1], color1[2], color1[3]).normal(normal, normalVec.x(), normalVec.y(), normalVec.z()).next();
+            vertexConsumer.vertex(model, x2, centerY, z2).color(color2[0], color2[1], color2[2], color2[3]).normal(normal, normalVec.x(), normalVec.y(), normalVec.z()).next();
+        }
+    }
+
 
     public static void vertexLine(MatrixStack matrices, VertexConsumer vertexConsumer, float x1, float y1, float z1, float x2, float y2, float z2, LineColor lineColor) {
         Matrix4f model = matrices.peek().getPositionMatrix();

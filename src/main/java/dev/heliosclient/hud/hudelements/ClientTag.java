@@ -15,14 +15,16 @@ public class ClientTag extends HudElement {
         this.height = 13;
         this.draggable = false;
         this.renderOutLineBox = false;
-    }    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
+    }
+
+    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         String text = HeliosClient.clientTag + " " + HeliosClient.versionTag;
         this.width = (int) (Renderer2D.getStringWidth(text));
-        this.x = MinecraftClient.getInstance().getWindow().getScaledWidth() - this.width - 3;
-        this.y = MinecraftClient.getInstance().getWindow().getScaledHeight() - this.height - 1;
+        this.x = HeliosClient.MC.getWindow().getScaledWidth() - this.width - 3;
+        this.y =  HeliosClient.MC.getWindow().getScaledHeight() - this.height - 1;
 
         super.renderElement(drawContext, textRenderer);
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, HeliosClient.uiColor);

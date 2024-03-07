@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW;
 public class RGBASettingScreen extends Screen implements IWindowContentRenderer {
     private final Window window;
     private final RGBASetting setting;
-    int windowWidth = 192, windowHeight = 142;
+    int windowWidth = 192, windowHeight = 140;
 
     public RGBASettingScreen(RGBASetting setting) {
         super(Text.literal(setting.name == null ? "NULL" : setting.name));
@@ -25,6 +25,7 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
         if (this.client.world == null) {
             super.renderBackgroundTexture(drawContext);
         }
+
         if (textRenderer.getWidth(setting.description) > windowWidth) {
             windowWidth = textRenderer.getWidth(setting.description) + 5;
         } else if (textRenderer.getWidth(setting.name) > windowWidth) {
@@ -93,7 +94,7 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
     @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         if (setting != null) {
-            setting.renderSetting(drawContext, x, y + 15, mouseX, mouseY, textRenderer);
+            setting.renderSetting(drawContext, x + 3, y + 2, mouseX, mouseY, textRenderer);
         }
     }
 }

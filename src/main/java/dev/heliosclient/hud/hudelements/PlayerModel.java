@@ -15,7 +15,9 @@ import java.awt.*;
 import java.util.List;
 
 public class PlayerModel extends HudElement {
-    public SettingGroup group = new SettingGroup("Size");
+  public static HudElementData<PlayerModel> DATA = new HudElementData<>("Player Model", "Shows player model in a small cute way", PlayerModel::new);
+
+public SettingGroup group = new SettingGroup("Size");
     public DoubleSetting size = group.add(new DoubleSetting.Builder()
             .name("Size")
             .description("Change the size of the model")
@@ -45,17 +47,8 @@ public class PlayerModel extends HudElement {
         if (player == null && !renderBg.value) {
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, this.y, width - 1, height - 1, Color.BLACK.getRGB());
         }
-        if (player != null && !renderBg.value) {
-            Renderer2D.drawEntity(drawContext, x + width / 2, y + height - 6, ((int) (25 * size.value)), 0.5D, player, MinecraftClient.getInstance().getTickDelta());
+        if (player != null) {
+            Renderer2D.drawEntity(drawContext, x + width / 2, y + height - 6, ((int) (25 * size.value)), player, HeliosClient.MC.getTickDelta());
         }
-    }    public static HudElementData<PlayerModel> DATA = new HudElementData<>("Player Model", "Shows player model in a small cute way", PlayerModel::new);
-
-
-
-    @Override
-    public Object saveToToml(List<Object> objects) {
-        return super.saveToToml(objects);
     }
-
-
 }

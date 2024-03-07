@@ -27,7 +27,7 @@ public class Button {
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width - 4, 14, 2, 0.7f, borderColor);
 
         // Render button text
-        int textX = Math.round(x + (width/2.0f) - (Renderer2D.getFxStringWidth(text)/2.0f));
+        float textX = x + (width/2.0f) - (Renderer2D.getFxStringWidth(text)/2.0f);
 
         float textHeight = Renderer2D.getFxStringHeight();
         float textY = y + (14 - textHeight) / 2; // Center the text vertically

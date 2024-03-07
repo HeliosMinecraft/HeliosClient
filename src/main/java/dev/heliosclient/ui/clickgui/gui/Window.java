@@ -20,6 +20,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Window implements Listener {
@@ -91,24 +92,6 @@ public class Window implements Listener {
         }
 
         x = Math.max(drawContext.getScaledWindowWidth() / 2 - windowWidth / 2, 0);
-
-        if (!isCollapsed && contentRenderer != null) {
-            int color = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 180).getRGB();
-            List<String> wrappedText = Renderer2D.wrapText("§o" + description, windowWidth - 2);
-
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 20, windowWidth, windowHeight, 5, color);
-
-            int textOffsetY = 0;
-            for (String text : wrappedText) {
-                int warpedTextWidth = textRenderer.getWidth(text);
-                drawContext.drawText(textRenderer, text, x + windowWidth / 2 - warpedTextWidth / 2 + 1, y + 26 + textOffsetY, ColorManager.INSTANCE.defaultTextColor(), false);
-                windowHeight += textRenderer.fontHeight + 4;
-                textOffsetY += textRenderer.fontHeight + 3;
-            }
-
-            contentRenderer.renderContent(this, drawContext, x, y + 30 + (wrappedText.size() * textRenderer.fontHeight), mouseX, mouseY);
-        }
-
         // Draw the screen
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, true, true, false, false, windowWidth, 18, 5, ColorManager.INSTANCE.clickGuiPrimary);
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 16, windowWidth, 2, ColorManager.INSTANCE.clickGuiSecondary());
@@ -120,6 +103,25 @@ public class Window implements Listener {
         if (isCollapsible) {
             // Render the collapse button
             collapseButton.render(drawContext, textRenderer, x + windowWidth - collapseButton.width - 4, y + 4, mouseX, mouseY);
+        }
+
+        if (!isCollapsed && contentRenderer != null) {
+            int color = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 180).getRGB();
+            List<String> wrappedText = new ArrayList<>();
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 20, windowWidth, windowHeight, 5, color);
+            if(!description.isEmpty()) {
+                wrappedText = Renderer2D.wrapText("§o" + description, windowWidth, HeliosClient.MC.textRenderer);
+
+                int textOffsetY = 0;
+                for (String text : wrappedText) {
+                    int warpedTextWidth = textRenderer.getWidth(text);
+                    drawContext.drawText(textRenderer, text, x + windowWidth / 2 - warpedTextWidth / 2 + 1, y + 26 + textOffsetY, ColorManager.INSTANCE.defaultTextColor(), false);
+                    windowHeight += textRenderer.fontHeight + 4;
+                    textOffsetY += textRenderer.fontHeight + 3;
+                }
+            }
+
+            contentRenderer.renderContent(this, drawContext, x, y + 30 + (wrappedText.size() * (textRenderer.fontHeight + 3)), mouseX, mouseY);
         }
     }
 
@@ -136,7 +138,7 @@ public class Window implements Listener {
     }
 
     public void mouseScrolled(double mouseX, double mouseY, double amount) {
-        offsetY += (int) (amount * (Easing.ease(EasingType.QUADRATIC_IN, (float) ClickGUI.ScrollSpeed.value)));
+        offsetY += (int) (amount * (Easing.ease(EasingType.QUADRATIC_IN, (float) HeliosClient.CLICKGUI.ScrollSpeed.value)));
     }
 
     private boolean hoveredOver(double mouseX, double mouseY) {

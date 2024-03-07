@@ -10,6 +10,8 @@ import net.minecraft.util.Identifier;
 import java.util.Objects;
 import java.util.UUID;
 
+
+@Deprecated
 public class CapeSynchronizer {
     private static final Identifier CAPE_SYNC_PACKET_ID = new Identifier("heliosclient", "cape_sync");
 
@@ -28,7 +30,8 @@ public class CapeSynchronizer {
             Identifier capeTexture = buf.readIdentifier();
             Identifier elytraIdentifier = buf.readIdentifier();
 
-            server.execute(() -> CapeManager.setCapeAndElytra(Objects.requireNonNull(server.getPlayerManager().getPlayer(uuid)), capeTexture, elytraIdentifier));
+
+///            server.execute(() -> CapeManager.set(Objects.requireNonNull(server.getPlayerManager().getPlayer(uuid)), capeTexture, elytraIdentifier));
         });
     }
 }

@@ -8,6 +8,7 @@ import dev.heliosclient.module.modules.chat.ChatHighlight;
 import dev.heliosclient.module.modules.misc.CapeModule;
 import dev.heliosclient.module.modules.misc.DiscordRPCModule;
 import dev.heliosclient.module.modules.misc.NotificationModule;
+import dev.heliosclient.module.modules.misc.ScriptModule;
 import dev.heliosclient.module.modules.movement.Fly;
 import dev.heliosclient.module.modules.movement.Speed;
 import dev.heliosclient.module.modules.movement.Step;
@@ -19,20 +20,14 @@ import java.util.ArrayList;
 
 public class ModuleManager {
     public static ModuleManager INSTANCE = new ModuleManager();
-    public static CapeModule capeModule;
-    public static NotificationModule notificationModule;
-    public static GUI GUI;
+
     public ArrayList<Module_> modules = new ArrayList<>();
 
     public ModuleManager() {
-        capeModule = new CapeModule();
-        notificationModule = new NotificationModule();
-        GUI = new GUI();
-
         registerModules(
                 new Fly(),
                 new NoFall(),
-                GUI,
+                GUI.get(),
                 new HUDModule(),
                 new Step(),
                 new Fullbright(),
@@ -41,11 +36,12 @@ public class ModuleManager {
                 new Test(),
                 new ChatHighlight(),
                 new DiscordRPCModule(),
-                notificationModule,
-                capeModule
+                NotificationModule.get(),
+                CapeModule.get(),
+                ScriptModule.get()
         );
 
-        AddonManager.addons.forEach(HeliosAddon::registerModules);
+        AddonManager.HELIOS_ADDONS.forEach(HeliosAddon::registerModules);
     }
 
     public void registerModule(Module_ module) {

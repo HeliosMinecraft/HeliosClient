@@ -30,14 +30,14 @@ public class FontManager implements Listener {
         fontNames.clear();
         fonts = FontLoader.loadFonts();
         iconFonts = FontLoader.loadIconFonts();
-        Originalfonts = fonts;
-        for (Font font : fonts) {
+        Originalfonts = fonts.clone();
+        for (Font font : Originalfonts) {
             fontNames.add(font.getName());
         }
         EventManager.register(this);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority =  SubscribeEvent.Priority.HIGHEST)
     public void onTick(TickEvent.CLIENT event) {
         if (HeliosClient.MC.getWindow() != null) {
             registerFonts();
@@ -62,6 +62,7 @@ public class FontManager implements Listener {
         FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
         FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
 
+        FontRenderers.Ultra_Large_iconRenderer = new fxFontRenderer(iconFonts, 25f);
 
         //Post the font change event to the EventManager
         EventManager.postEvent(new FontChangeEvent(FontManager.fonts));

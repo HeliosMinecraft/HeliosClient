@@ -8,26 +8,30 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Categories;
+import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.scripting.LuaExecutor;
+import dev.heliosclient.scripting.LuaScriptManager;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.system.DiscordRPC;
 import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.system.TickRate;
-import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ConsoleScreen;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.*;
-import dev.heliosclient.util.cape.CapeSynchronizer;
+import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
+import me.x150.renderer.font.FontRenderer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static dev.heliosclient.managers.FontManager.fontSize;
+import static dev.heliosclient.managers.FontManager.fonts;
 
 public class HeliosClient implements ModInitializer, Listener {
     public static final HeliosClient INSTANCE = new HeliosClient();
@@ -43,13 +47,12 @@ public class HeliosClient implements ModInitializer, Listener {
     public static int uiColor = 0x55FFFF;
     public static AddonManager addonManager = new AddonManager();
     public static ClickGUI CLICKGUI = new ClickGUI();
-    public static boolean isSaving = false;
     public static ConsoleScreen CONSOLE = new ConsoleScreen();
 
     public static void loadConfig() {
         configTimer.startTimer();
-        CONFIG.loadConfig();
         CommandManager.prefix = (String) CONFIG.getClientConfigMap().get("prefix");
+        CONFIG.loadConfig();
         CONFIG.loadClientConfigModules();
 
         // Font event is posted to allow the GUI to reset its calculation for the new font by the config.
@@ -59,33 +62,36 @@ public class HeliosClient implements ModInitializer, Listener {
         CONFIG.loadHudElements();
         CONFIG.loadModules();
         LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
-        if(shouldSendNotification()){
+        if(NotificationModule.get().clientNotification.value && shouldSendNotification()){
             NotificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+        }
+        if (HeliosClient.MC.getWindow() != null) {
+            FontManager.INSTANCE.registerFonts();
+            FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
+            EventManager.postEvent(new FontChangeEvent(fonts));
         }
         configTimer.resetTimer();
     }
 
     public static void saveConfig() {
-        if (isSaving) return;
-
-        HeliosExecutor.execute(()->{
-        isSaving = true;
-        LOGGER.info("Saving config... \t Module Config being saved: " + Config.MODULES);
-        configTimer.startTimer();
-        CONFIG.getModuleConfig();
-        CONFIG.getClientConfig();
-        CONFIG.save();
-        LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
-        if(shouldSendNotification()){
-            NotificationManager.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
-        }
-        configTimer.resetTimer();
-        isSaving = false;
-        });
+        HeliosExecutor.execute(HeliosClient::saveConfigHook);
+    }
+    public static void saveConfigHook() {
+            LOGGER.info("Saving config... \t Module Config being saved: " + Config.MODULES);
+            configTimer.startTimer();
+            CONFIG.getModuleConfig();
+            CONFIG.getClientConfig();
+            CONFIG.save();
+            LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
+            if(NotificationModule.get().clientNotification.value && shouldSendNotification()){
+                NotificationManager.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+            }
+            configTimer.resetTimer();
     }
 
+
     public static boolean shouldSendNotification() {
-        return (NotificationManager.INSTANCE != null && ModuleManager.notificationModule != null && ModuleManager.notificationModule.clientNotification.value && MC.getWindow() != null);
+        return (NotificationManager.INSTANCE != null && NotificationModule.get() != null && MC.getWindow() != null);
     }
     @SubscribeEvent
     public void tick(TickEvent.CLIENT client){
@@ -97,12 +103,17 @@ public class HeliosClient implements ModInitializer, Listener {
 
     @Override
     public void onInitialize() {
+        LOGGER.info("Initialising Helios Client...");
+
         EventManager.register(this);
         registerEvents();
-        DiscordRPC.INSTANCE.getLibrary();
 
+        LOGGER.info("Downloading and extracting Discord Native Library-2.5.6...");
+        DiscordRPC.INSTANCE.init();
+        LOGGER.info("Downloading Completed...");
 
-        LOGGER.info("Initialising Helios Client...");
+        LuaScriptManager.getScripts();
+
 
         FontManager.INSTANCE.refresh();
         addonManager.loadAddons();
@@ -113,27 +124,16 @@ public class HeliosClient implements ModInitializer, Listener {
         HudElementList.INSTANCE = new HudElementList();
 
 
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            if (MC.player != null) {
-                for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                    Identifier capeTexture = CapeManager.cape;
-                    CapeSynchronizer.sendCapeSyncPacket(player, capeTexture, CapeManager.getElytraTexture(MC.player));
-                }
-            }
-        });
+        CapeManager.capes = CapeManager.loadCapes();
 
-
-
-        loadConfig();
-        ClickGUIScreen.INSTANCE.onLoad();
-        HeliosClient.CLICKGUI.onLoad();
+        HeliosExecutor.execute(HeliosClient::loadConfig);
 
         // Save
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> HeliosClient.saveConfig());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((a,b,c) -> HeliosClient.saveConfig());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> HeliosClient.saveConfig());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            saveConfig();
+            saveConfigHook();
             if (DiscordRPC.INSTANCE.isRunning) {
                 DiscordRPC.INSTANCE.stopPresence();
             }
@@ -149,10 +149,20 @@ public class HeliosClient implements ModInitializer, Listener {
         ctx.updateLoggers(config);
 
         */
+        MC.execute(()->{
+            while(MC.getWindow() == null){
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    // Cope
+                }
+            }
+           HeliosClient.CLICKGUI.onLoad();
+        });
     }
 
     public static boolean shouldUpdate() {
-        return MC.getWindow() == null && MC.player == null;
+        return MC != null && MC.getWindow() != null && MC.player != null;
     }
 
     public void registerEvents() {
@@ -162,7 +172,6 @@ public class HeliosClient implements ModInitializer, Listener {
         EventManager.register(KeybindManager.INSTANCE);
         EventManager.register(ColorManager.INSTANCE);
         EventManager.register(TickRate.INSTANCE);
-        EventManager.register(CapeManager.INSTANCE);
         EventManager.register(DamageUtils.INSTANCE);
     }
 }

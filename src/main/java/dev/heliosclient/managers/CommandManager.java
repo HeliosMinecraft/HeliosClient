@@ -29,6 +29,8 @@ public class CommandManager {
         add(new Friend());
         add(new Prefix());
         add(new OpenConsole());
+        add(new ReloadScripts());
+        add(new LoadScript());
         commands.sort(Comparator.comparing(Command::getName));
     }
 

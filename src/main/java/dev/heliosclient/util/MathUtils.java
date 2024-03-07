@@ -125,19 +125,6 @@ public class MathUtils {
         return jaro + l * p * (1 - jaro);
     }
 
-
-    public static HashMap<String, Object> filterAndSortMap(HashMap<String, Object> map, String input) {
-        List<Map.Entry<String, Object>> list = new ArrayList<>(map.entrySet());
-        list.sort(Comparator.comparingInt((Map.Entry<String, Object> entry) -> calculateLevenshteinDistance(entry.getKey(), input)));
-
-        HashMap<String, Object> sortedMap = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> entry : list) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-
-        return sortedMap;
-    }
-
     public static List<String> filterAndSortList(List<String> list, String input) {
         List<String> filteredList = new ArrayList<>();
         for (String entry : list) {

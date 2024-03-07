@@ -1,6 +1,7 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.event.events.input.MouseClickEvent;
+import dev.heliosclient.event.events.input.MouseReleaseEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
@@ -32,8 +33,13 @@ public abstract class MouseMixin {
 
         if (action == GLFW.GLFW_PRESS) {
             MouseClickEvent event = new MouseClickEvent(window, button, action, mouseX, mouseY, client.currentScreen, mods);
-            EventManager.postEvent(event);
-            if (event.isCanceled()) {
+            if (EventManager.postEvent(event).isCanceled()) {
+                ci.cancel();
+            }
+        }
+        if (action == GLFW.GLFW_RELEASE) {
+            MouseReleaseEvent event = new MouseReleaseEvent(window, button, action, mouseX, mouseY, client.currentScreen, mods);
+            if (EventManager.postEvent(event).isCanceled()) {
                 ci.cancel();
             }
         }

@@ -1,5 +1,6 @@
 package dev.heliosclient.module;
 
+import com.moandjiezana.toml.Toml;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
@@ -9,6 +10,7 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.managers.NotificationManager;
+import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.Setting;
@@ -16,19 +18,17 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.MinecraftClient;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Template for modules.
  */
-public abstract class Module_ implements Listener, ISettingChange {
+public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad {
     protected static MinecraftClient mc = MinecraftClient.getInstance();
     public String name;
     public String description;
@@ -102,14 +102,31 @@ public abstract class Module_ implements Listener, ISettingChange {
         quickSettings = new ArrayList<>(1);
     }
 
+
+    /**
+     * Adds a setting group to the main {@link #settingGroups} list
+     * @param settingGroup settingGroup to be added
+     */
     public void addSettingGroup(SettingGroup settingGroup) {
         this.settingGroups.add(settingGroup);
     }
 
+    /**
+     * Adds a setting to the {@link #quickSettings} list
+     * @param setting setting to be added
+     */
     public void addQuickSetting(Setting setting) {
         this.quickSettings.add(setting);
     }
 
+    /**
+     * Adds all the settings from the list to the {@link #quickSettings} list
+     * <p>
+     * Intended to be used with {@link SettingGroup#getSettings()}
+     * </p>
+     *
+     * @param setting setting list to be added
+     */
     public void addQuickSettings(List<Setting> setting) {
         this.quickSettings.addAll(setting);
     }
@@ -118,12 +135,10 @@ public abstract class Module_ implements Listener, ISettingChange {
      * Called on enable. Probably shouldn't disable original functionality since it will remove chat feedback.
      */
     public void onEnable() {
+        active.value = true;
         if (chatFeedback.value) {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was enabled.");
-        }
-        if (ModuleManager.notificationModule.moduleNotification.value && HeliosClient.shouldSendNotification()) {
-            NotificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
         }
         EventManager.register(this);
     }
@@ -139,12 +154,10 @@ public abstract class Module_ implements Listener, ISettingChange {
      * Called on disable. Probably shouldn't disable original functionality since it will remove chat feedback.
      */
     public void onDisable() {
+        active.value = false;
         if (chatFeedback.value) {
             assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
-        }
-        if (ModuleManager.notificationModule.moduleNotification.value && HeliosClient.shouldSendNotification()) {
-            NotificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
         }
         EventManager.unregister(this);
     }
@@ -177,8 +190,20 @@ public abstract class Module_ implements Listener, ISettingChange {
         active.value = !active.value;
         if (active.value) {
             onEnable();
+           sendEnableNotification();
         } else {
             onDisable();
+           sendDisableNotification();
+        }
+    }
+    public void sendEnableNotification(){
+        if (NotificationModule.get().moduleNotification.value && HeliosClient.shouldSendNotification()) {
+            NotificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
+        }
+    }
+    public void sendDisableNotification(){
+        if (NotificationModule.get().moduleNotification.value && HeliosClient.shouldSendNotification()) {
+            NotificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
         }
     }
 
@@ -210,12 +235,49 @@ public abstract class Module_ implements Listener, ISettingChange {
      *
      * @param setting Setting that got changed.
      */
-    public void onSettingChange(Setting setting) {
+    public void onSettingChange(Setting<?> setting) {
         if (setting == active) {
             if (active.value) {
                 onEnable();
+                sendEnableNotification();
             } else {
                 onDisable();
+                sendDisableNotification();
+            }
+        }
+    }
+
+    @Override
+    public Object saveToToml(List<Object> list) {
+        Map<String, Object> ModuleConfig = new HashMap<>();
+        // Map for storing the values of each module
+        for (SettingGroup settingGroup : this.settingGroups) {
+            for (Setting<?> setting : settingGroup.getSettings()) {
+                if (!setting.shouldSaveAndLoad()) continue;
+
+                if (setting.name != null) {
+                    // Put the value of each setting into the map. Call the setting saveToToml method to get the value of the setting.
+                    ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
+                }
+            }
+        }
+        return ModuleConfig;
+    }
+
+    @Override
+    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+        for (SettingGroup settingGroup : this.settingGroups) {
+            for (Setting<?> setting : settingGroup.getSettings()) {
+                if(!setting.shouldSaveAndLoad()) break;
+
+
+                Toml settingTable = toml.getTable(this.name.replace(" ", ""));
+                if (settingTable != null) {
+                    setting.loadFromToml(settingTable.toMap(), settingTable);
+                }
+                if (setting == this.active && this.isActive()) {
+                    this.onEnable();
+                }
             }
         }
     }

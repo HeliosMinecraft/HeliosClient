@@ -35,7 +35,7 @@ public class DamageUtils implements Listener {
 
         // Calculate damage reductions
         float armorReduction = getArmorReduction(player);
-        ((IExplosion) explosion).set(source, 6, false);
+        ((IExplosion) explosion).heliosClient$set(source, 6, false);
         float blastProtectionReduction = getBlastProtectionReduction(player, explosion);
         float protectionReduction = getProtectionReduction(player);
 
@@ -66,7 +66,7 @@ public class DamageUtils implements Listener {
         rawDamage = DamageUtil.getDamageLeft((float) rawDamage, (float) target.getArmor(), (float) Objects.requireNonNull(target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS)).getValue());
 
         // Reduce damage based on blast protection enchantment
-        ((IExplosion) explosion).set(bedLocation, 5, true);
+        ((IExplosion) explosion).heliosClient$set(bedLocation, 5, true);
         rawDamage = getBlastProtectionReduction(target, rawDamage, explosion);
 
         if (rawDamage < 0) rawDamage = 0;
@@ -86,7 +86,7 @@ public class DamageUtils implements Listener {
 
         // Calculate damage reductions
         float armorReduction = getArmorReduction(player);
-        ((IExplosion) explosion).set(source, 6, false);
+        ((IExplosion) explosion).heliosClient$set(source, 6, false);
         float blastProtectionReduction = getBlastProtectionReduction(player, explosion);
         float protectionReduction = getProtectionReduction(player);
 

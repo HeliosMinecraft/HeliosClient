@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.suggestion.Suggestions;
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CommandManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatInputSuggestor;
@@ -48,6 +49,12 @@ public abstract class ChatInputSuggestorMixin {
             locals = LocalCapture.CAPTURE_FAILHARD)
     public void onRefresh(CallbackInfo ci, String string, StringReader reader) {
         String prefix = CommandManager.get().getPrefix();
+
+        // Because Null-exception are very bad.
+        if(prefix == null) {
+            prefix = ".";
+        }
+
         int length = prefix.length();
         if (reader.canRead(length) && reader.getString().startsWith(prefix, reader.getCursor())) {
             reader.setCursor(reader.getCursor() + length);

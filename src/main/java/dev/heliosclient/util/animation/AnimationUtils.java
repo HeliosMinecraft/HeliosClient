@@ -3,6 +3,7 @@ package dev.heliosclient.util.animation;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.animation.toasts.InfoToast;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.toasts.ErrorToast;
 import net.minecraft.client.gui.DrawContext;
@@ -22,6 +23,13 @@ public class AnimationUtils implements Listener {
             HeliosClient.MC.getToastManager().add(toast);
         }
     }
+    public static void addInfoToast(String message, boolean hasProgressBar, long endDelay) {
+        Toast toast = new InfoToast(message, hasProgressBar, endDelay);
+        if(HeliosClient.MC.getToastManager() != null && toast != null) {
+            HeliosClient.MC.getToastManager().add(toast);
+        }
+    }
+
 
     public static float lerp(float point1, float point2, float alpha) {
         return (1 - alpha) * point1 + alpha * point2;

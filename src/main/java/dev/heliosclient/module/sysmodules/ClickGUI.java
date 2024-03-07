@@ -38,21 +38,20 @@ import static dev.heliosclient.managers.FontManager.fonts;
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
-    public static SettingGroup sgMisc = new SettingGroup("Misc");
+    public SettingGroup sgMisc = new SettingGroup("Misc");
 
-    public static ClickGUI INSTANCE = new ClickGUI();
-    public static CycleSetting ScrollType = sgMisc.add(new CycleSetting.Builder()
+    public CycleSetting ScrollType = sgMisc.add(new CycleSetting.Builder()
             .name("Scrolling System")
             .description("Scrolling for the ClickGui")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(new ArrayList<>(List.of(ScrollTypes.values())))
             .defaultListIndex(0)
             .build()
     );
-    public static DoubleSetting CategoryHeight = sgMisc.add(new DoubleSetting.Builder()
+    public DoubleSetting CategoryHeight = sgMisc.add(new DoubleSetting.Builder()
             .name("CategoryPane Height")
             .description("CategoryPane Height for the ClickGUI")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(150.0)
             .max(1000)
             .min(25)
@@ -60,38 +59,38 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> ScrollType.value == 1)
             .build()
     );
-    public static DoubleSetting ScrollSpeed = sgMisc.add(new DoubleSetting.Builder()
+    public DoubleSetting ScrollSpeed = sgMisc.add(new DoubleSetting.Builder()
             .name("Scroll Speed")
             .description("Change your scroll speed for the ClickGUI")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(7.0)
             .min(1)
             .max(8)
             .roundingPlace(1)
             .build()
     );
-    public static CycleSetting FontRenderer = sgMisc.add(new CycleSetting.Builder()
+    public CycleSetting FontRenderer = sgMisc.add(new CycleSetting.Builder()
             .name("Font Renderer")
             .description("Font Rendering for the client")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(new ArrayList<>(List.of("Custom", "Vanilla")))
             .defaultListIndex(0)
             .shouldRender(() -> true)
             .build()
     );
-    public static CycleSetting Font = sgMisc.add(new CycleSetting.Builder()
+    public CycleSetting Font = sgMisc.add(new CycleSetting.Builder()
             .name("Font")
             .description("Font for the client")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(FontManager.fontNames)
             .defaultListIndex(0)
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
-    public static DoubleSetting FontSize = sgMisc.add(new DoubleSetting.Builder()
+    public DoubleSetting FontSize = sgMisc.add(new DoubleSetting.Builder()
             .name("Font Size")
             .description("Change your FontSize")
-            .onSettingChange(INSTANCE)
+            .onSettingChange(this)
             .value(8.0)
             .min(1)
             .max(15)
@@ -99,10 +98,10 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
-    public static DoubleSetting RainbowSpeed = sgMisc.add(new DoubleSetting.Builder()
+    public DoubleSetting RainbowSpeed = sgMisc.add(new DoubleSetting.Builder()
             .name("Rainbow/Gradient speed")
             .description("Speed of the rainbow and gradients throughout the client")
-            .onSettingChange(ClickGUI.INSTANCE)
+            .onSettingChange(this)
             .value(14.0)
             .max(20)
             .min(1)
@@ -171,51 +170,6 @@ public class ClickGUI extends Module_ {
             .value(true)
             .build()
     );
-    public SettingGroup sgRender = new SettingGroup("Render");
-    public CycleSetting ColorMode = sgRender.add(new CycleSetting.Builder()
-            .name("Color Mode")
-            .description("Color mode for parts of the client")
-            .onSettingChange(this)
-            .value(new ArrayList<>(List.of("Static", "Gradient")))
-            .defaultListIndex(0)
-            .build()
-    );
-    public RGBASetting staticColor = sgRender.add(new RGBASetting.Builder()
-            .name("Color")
-            .description("Simple single color for parts of the client")
-            .onSettingChange(this)
-            .value(new Color(ColorManager.INSTANCE.clickGuiSecondary))
-            .defaultValue(new Color(ColorManager.INSTANCE.clickGuiSecondary))
-            .shouldRender(() -> ColorMode.value == 0)
-            .build()
-    );
-    public CycleSetting GradientType = sgRender.add(new CycleSetting.Builder()
-            .name("Gradient Type")
-            .description("Gradient type for the gradient color mode")
-            .onSettingChange(this)
-            .value(new ArrayList<>(List.of("Rainbow", "DaySky", "EveningSky", "NightSky", "Linear2D")))
-            .defaultListIndex(0)
-            .shouldRender(() -> ColorMode.value == 1)
-            .build()
-    );
-    public RGBASetting linear2Start = sgRender.add(new RGBASetting.Builder()
-            .name("Linear-Start")
-            .description("Linear Color Start of Linear mode")
-            .onSettingChange(this)
-            .value(Color.GREEN)
-            .defaultValue(Color.GREEN)
-            .shouldRender(() -> GradientType.value == 4 && ColorMode.value == 1)
-            .build()
-    );
-    public RGBASetting linear2end = sgRender.add(new RGBASetting.Builder()
-            .name("Linear-End")
-            .description("Linear Color End of Linear mode")
-            .onSettingChange(this)
-            .value(Color.YELLOW)
-            .shouldRender(() -> GradientType.value == 4 && ColorMode.value == 1)
-            .defaultValue(Color.YELLOW)
-            .build()
-    );
     public RGBASetting AccentColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Accent color")
             .description("Accent color of Click GUI.")
@@ -263,13 +217,13 @@ public class ClickGUI extends Module_ {
         super("ClickGUI", "ClickGui related stuff.", Categories.RENDER);
 
         addSettingGroup(sgMisc);
-        addSettingGroup(sgRender);
         addSettingGroup(sgGeneral);
         addSettingGroup(sgSound);
         addSettingGroup(sgTooltip);
         addSettingGroup(sgConfig);
 
         active.value = true;
+
         configPath.setShouldSaveOrLoad(false);
 
         loadFonts.addButton("Load Fonts", 0, 0, () -> {
@@ -310,15 +264,17 @@ public class ClickGUI extends Module_ {
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
         pause = Pause.value;
         keybinds = Keybinds.value;
+        fontSize = ((int) FontSize.value);
 
         if(HeliosClient.MC.getWindow() != null) {
-            if (setting == FontRenderer || setting == Font) {
-                FontManager.INSTANCE.registerFonts();
-            }
             if (setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font) {
                 fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
                 FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
                 EventManager.postEvent(new FontChangeEvent(fonts));
+            }
+
+            if (setting == FontRenderer || setting == Font) {
+                FontManager.INSTANCE.registerFonts();
             }
         }
 
@@ -358,36 +314,11 @@ public class ClickGUI extends Module_ {
 
         pause = Pause.value;
         keybinds = Keybinds.value;
+        fontSize = ((int) FontSize.value);
 
         fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
 
-        if (MinecraftClient.getInstance().getWindow() != null) {
-            FontManager.INSTANCE.registerFonts();
-            FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
-            EventManager.postEvent(new FontChangeEvent(fonts));
-        }
-
-
-        if (ColorMode.value == 0) {
-            ColorManager.INSTANCE.primaryGradientStart = staticColor.getColor();
-            ColorManager.INSTANCE.primaryGradientEnd = staticColor.getColor();
-        }
-        if (ColorMode.value == 1) {
-            switch (GradientType.value) {
-                case 0 -> {
-                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
-                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor2();
-                }
-                case 1, 2, 3 -> {
-                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
-                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor();
-                }
-                case 4 -> {
-                    ColorManager.INSTANCE.primaryGradientStart = linear2Start.getColor();
-                    ColorManager.INSTANCE.primaryGradientEnd = linear2end.getColor();
-                }
-            }
-        }
+        FontManager.INSTANCE.registerFonts();
     }
 
     @Override

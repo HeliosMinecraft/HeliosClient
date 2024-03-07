@@ -32,7 +32,9 @@ public class HudEditorSettingScreen extends AbstractSettingScreen implements IWi
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        this.renderBackground(drawContext, mouseX, mouseY, delta);
+        if (this.client.world == null) {
+            super.renderBackgroundTexture(drawContext);
+        }
 
         windowHeight = 50;
         for (SettingGroup settingGroup : hudElement.settingGroups) {

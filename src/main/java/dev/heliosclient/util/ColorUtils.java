@@ -96,7 +96,7 @@ public class ColorUtils {
      * @return Current rainbow color.
      */
     public static Color getRainbowColor() {
-        float hue = (System.currentTimeMillis() % ((int) ClickGUI.RainbowSpeed.value * 1000)) / ((int) ClickGUI.RainbowSpeed.value * 1000.0f);
+        float hue = (System.currentTimeMillis() % ((int) HeliosClient.CLICKGUI.RainbowSpeed.value * 1000)) / ((int) HeliosClient.CLICKGUI.RainbowSpeed.value * 1000.0f);
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
 
@@ -106,9 +106,12 @@ public class ColorUtils {
      * @return Current rainbow color.
      */
     public static Color getRainbowColor2() {
-        float hue = (System.currentTimeMillis() % ((int) ClickGUI.RainbowSpeed.value * 1025)) / ((int) ClickGUI.RainbowSpeed.value * 1025.0f);
+        float hueOffset = 0.1f;
+        float hue = ((System.currentTimeMillis() % ((int) HeliosClient.CLICKGUI.RainbowSpeed.value * 1000)) / ((int) HeliosClient.CLICKGUI.RainbowSpeed.value * 1000.0f)) + hueOffset;
+        hue += (int) hue;
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
+
 
 
     /**

@@ -13,7 +13,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.joml.Vector3f;
 
 /*
- * Credits: Bleachack 1.19.4
+ * Credits: Bleach-hack 1.19.4
  * Todo:  Replace this with original code
  */
 public class WorldRenderer {
@@ -40,7 +40,7 @@ public class WorldRenderer {
 
     /**
      * Draws text in the world.
-     **/
+     */
     public static void drawText(Text text, double x, double y, double z, double offX, double offY, double scale, boolean fill) {
         MatrixStack matrices = matrixFrom(x, y, z);
 

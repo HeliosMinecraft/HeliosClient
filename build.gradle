@@ -64,6 +64,8 @@ dependencies {
 	// Baritone API
 	modCompileOnly "com.github.wagyourtail:baritone:${project.baritone_version}"
 
+	modInclude("org.luaj:luaj-jse:3.0.1")
+
 	// TOML parser
 	modInclude('com.moandjiezana.toml:toml4j:0.7.2')
 

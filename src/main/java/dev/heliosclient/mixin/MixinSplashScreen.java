@@ -58,6 +58,7 @@ public abstract class MixinSplashScreen {
     private ResourceReload reload;
     @Unique
     private static final Identifier CLEAR_TEXTURE = new Identifier(HeliosClient.MODID, "splashscreen/clear.png");
+    @Unique
     MutableText subtitleText = Text.literal("Made with " + ColorUtils.red + "♥" + ColorUtils.white + " by HeliosDevelopment").setStyle(Style.EMPTY.withColor(Formatting.WHITE));
 
 

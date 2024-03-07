@@ -1,6 +1,6 @@
 package dev.heliosclient.module;
 
-import dev.heliosclient.util.render.Texture;
+import dev.heliosclient.util.render.textures.Texture;
 
 public class Category {
     public String name;
@@ -15,7 +15,6 @@ public class Category {
     public Category(String name, String svgIconSrc) {
         this.name = name;
         this.svgiconSrc = new Texture(svgIconSrc);
-
     }
 
     public Category(String name, Texture iconSrc) {

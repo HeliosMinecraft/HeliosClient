@@ -31,7 +31,7 @@ public class ErrorToast implements net.minecraft.client.toast.Toast {
 
     public Toast.Visibility draw(DrawContext context, ToastManager manager, long startTime) {
         //  context.drawTexture(TEXTURE, 0, 0, 0, 96, this.getWidth(), this.getHeight());
-        List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth() - 36);
+        List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth(),HeliosClient.MC.textRenderer);
 
         int yOffset = 2;
         for (String s : messageWarp) {
@@ -52,14 +52,15 @@ public class ErrorToast implements net.minecraft.client.toast.Toast {
             context.fill(3, 28, (int) (3.0F + 154.0F * f), 29, i);
             this.lastProgress = f;
             this.lastTime = startTime;
+
+
+            // Calculate the progress based on the delay
+            float progress = Math.min(1.0F, (float) startTime / this.endDelay);
+            int progressBarWidth = (int) (154.0F * progress);
+
+            // Draw the progress bar
+            context.fill(3, 28, 3 + progressBarWidth, 29, Color.RED.getRGB());
         }
-
-        // Calculate the progress based on the delay
-        float progress = Math.min(1.0F, (float) startTime / this.endDelay);
-        int progressBarWidth = (int) (154.0F * progress);
-
-        // Draw the progress bar
-        context.fill(3, 28, 3 + progressBarWidth, 29, Color.RED.getRGB());
 
         return startTime >= this.endDelay ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
     }

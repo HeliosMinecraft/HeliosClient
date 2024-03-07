@@ -41,7 +41,7 @@ public class CustomFov extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-        if (mc.options == null) return;
+        if (mc.options == null && mc.options.getFov().getValue() <= 110) return;
 
         previousFov = mc.options.getFov().getValue();
     }
@@ -49,7 +49,7 @@ public class CustomFov extends Module_ {
     @Override
     public void onDisable() {
         super.onDisable();
-        if (mc.options == null) return;
+        if (mc.options == null && mc.options.getFov().getValue() <= 110) return;
 
         ((ISimpleOption<Integer>) (Object) mc.options.getFov()).heliosClient$setValueUnrestricted(previousFov);
     }
