@@ -108,7 +108,7 @@ public class Renderer2D implements Listener {
 
         RenderSystem.disableBlend();
     }
-    private static final String TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-=_+|{};<>?~`,./;'[] ";
+    public static final String TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-=_+|{};<>?~`,./;'[] ";
     public static DrawContext drawContext;
     public static Renderers renderer = Renderers.CUSTOM;
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();

@@ -40,6 +40,15 @@ public class LuaFile extends File {
     public Reader getReader() throws FileNotFoundException {
         return new BufferedReader(new FileReader(this));
     }
+    /**
+     * Retrieves a Buffered reader for the Lua script file.
+     *
+     * @return A reader for the Lua script file.
+     * @throws FileNotFoundException If the Lua script file does not exist.
+     */
+    public BufferedReader getBufferedReader() throws FileNotFoundException {
+        return new BufferedReader(new FileReader(this));
+    }
 
     public File getFile() {
         return this;
@@ -73,5 +82,24 @@ public class LuaFile extends File {
      */
     public LuaExecutor getExecutor() {
         return executor;
+    }
+
+
+    /**
+     * Retrieves the text inside the Lua script file.
+     *
+     * @return The text inside the Lua script file.
+     * @throws IOException If an I/O error occurs.
+     */
+    public String getText() throws IOException {
+        StringBuilder text = new StringBuilder();
+        try (BufferedReader reader = getBufferedReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+        }
+        return text.toString();
     }
 }

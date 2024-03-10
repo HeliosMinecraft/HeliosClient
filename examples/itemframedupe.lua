@@ -1,6 +1,6 @@
 local breakDelaytimer = 0
 
-local function setFullBrightModuleOn()
+local function doItemFrameDupe()
     -- Check if the player is holding an item frame, if yes then dont continue the dupe.
     if mc.player:getMainHandStack():getItem() == Items.ITEM_FRAME then
         return
@@ -53,7 +53,7 @@ end
 
 
 function onTick()
-    return setFullBrightModuleOn()
+    return doItemFrameDupe()
 end
 
 function onStop()

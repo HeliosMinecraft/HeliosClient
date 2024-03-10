@@ -18,6 +18,27 @@ public class fxFontRenderer extends FontRenderer {
         super(fonts, sizePx);
     }
 
+    /**
+     * Trims a string to fit within a specified width when rendered.
+     *
+     * @param text  The text to trim.
+     * @param width The maximum width of the rendered text.
+     * @return The trimmed text.
+     */
+    public String trimToWidth(String text, int width) {
+        float textWidth = this.getStringWidth(text);
+        if (textWidth <= width) {
+            return text;
+        } else {
+            String trimmedText = text;
+            while (textWidth > width && !trimmedText.isEmpty()) {
+                trimmedText = trimmedText.substring(0, trimmedText.length() - 1);
+                textWidth = this.getStringWidth(trimmedText);
+            }
+            return trimmedText;
+        }
+    }
+
     public void drawString(MatrixStack matrixStack, String text, float x, float y, int color) {
 
         int r = 256 - ColorUtils.getRed(color);
