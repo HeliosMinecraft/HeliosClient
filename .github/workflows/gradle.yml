@@ -31,3 +31,16 @@ jobs:
         with:
           name: HeliosClient
           path: build/libs
+
+      - name: Release upload
+        uses: softprops/action-gh-release@v2
+        with:
+                 tag_name: "latest"
+                 name: "HeliosClient"
+                 prerelease: true
+                 fail_on_unmatched_files: true
+                 generate_release_notes: true
+                 body:
+                     "Generated pre-release. Maybe unstable to use"
+                 files: |
+                      ./build/libs/*.jar
