@@ -100,7 +100,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
             settingGroup.renderBuilder(drawContext, x + 16, yOffset - 3, windowWidth - 32);
 
             if (settingGroup.shouldRender()) {
-                List<Setting> settings = settingGroup.getSettings();
+                List<Setting<?>> settings = settingGroup.getSettings();
                 for (Setting<?> setting : settings) {
                     if (setting.shouldRender()) {
                         if (setting instanceof RGBASetting rgbaSetting) {
