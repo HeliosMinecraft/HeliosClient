@@ -68,7 +68,7 @@ public class LuaExecutor {
         globals.set("Box", CoerceJavaToLua.coerce(Box.class));
         globals.set("Hand", CoerceJavaToLua.coerce(Hand.class));
 
-        for(Module_ module: ModuleManager.INSTANCE.modules){
+        for(Module_ module: ModuleManager.INSTANCE.getModules()){
             globals.set(module.name, CoerceJavaToLua.coerce(module));
         }
     }

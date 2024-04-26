@@ -20,6 +20,7 @@ import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.*;
@@ -33,8 +34,8 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public String name;
     public String description;
     public Category category;
-    public List<SettingGroup> settingGroups;
-    public List<Setting> quickSettings;
+    public Set<SettingGroup> settingGroups;
+    public Set<Setting> quickSettings;
     public boolean settingsOpen = false;
     public SettingGroup sgbind = new SettingGroup("Bind");
 
@@ -98,8 +99,8 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
         this.name = name;
         this.description = description;
         this.category = category;
-        settingGroups = new ArrayList<>(1);
-        quickSettings = new ArrayList<>(1);
+        settingGroups = new ObjectArraySet<>();
+        quickSettings = new ObjectArraySet<>();
     }
 
 
@@ -251,6 +252,8 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public Object saveToToml(List<Object> list) {
         Map<String, Object> ModuleConfig = new HashMap<>();
         // Map for storing the values of each module
+        if(this.settingGroups == null) return ModuleConfig;
+
         for (SettingGroup settingGroup : this.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldSaveAndLoad()) continue;

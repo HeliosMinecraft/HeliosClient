@@ -120,10 +120,5 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
             }
         }
     }
-
-    @ModifyVariable(method = "render*", at = @At("STORE"), ordinal = 6)
-    private float render(float n, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, AbstractClientPlayerEntity abstractClientPlayerEntity, float f, float g, float h, float j, float k, float l) {
-        return MathHelper.lerp(h, abstractClientPlayerEntity.prevBodyYaw, abstractClientPlayerEntity.bodyYaw);
-    }
 }
 

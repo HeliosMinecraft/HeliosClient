@@ -15,13 +15,15 @@ import dev.heliosclient.module.modules.movement.Step;
 import dev.heliosclient.module.modules.player.NoFall;
 import dev.heliosclient.module.modules.render.*;
 import dev.heliosclient.util.MathUtils;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class ModuleManager {
     public static ModuleManager INSTANCE = new ModuleManager();
 
-    public ArrayList<Module_> modules = new ArrayList<>();
+    Set<Module_> modules = new ObjectArraySet<>();
 
     public ModuleManager() {
         registerModules(
@@ -103,5 +105,9 @@ public class ModuleManager {
             enabledModules.add(module);
         }
         return enabledModules;
+    }
+
+    public Set<Module_> getModules() {
+        return modules;
     }
 }

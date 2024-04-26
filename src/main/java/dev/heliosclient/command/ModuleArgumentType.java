@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class ModuleArgumentType implements ArgumentType<Module_> {
-    private static final Collection<String> EXAMPLES = ModuleManager.INSTANCE.modules
+    private static final Collection<String> EXAMPLES = ModuleManager.INSTANCE.getModules()
             .stream()
             .limit(3)
             .map(module -> addQuotes(module.name))
@@ -54,7 +54,7 @@ public class ModuleArgumentType implements ArgumentType<Module_> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(ModuleManager.INSTANCE.modules.stream().map(module -> addQuotes(module.name)), builder);
+        return CommandSource.suggestMatching(ModuleManager.INSTANCE.getModules().stream().map(module -> addQuotes(module.name)), builder);
     }
 
     @Override

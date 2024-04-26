@@ -35,6 +35,13 @@ public class HudEditorScreen extends Screen implements Listener {
         super(Text.of("Hud editor"));
         EventManager.register(this);
         dragBox = new HudBox(0, 0, 0, 0);
+        selectedElements.clear();
+    }
+
+    @Override
+    public void onDisplayed() {
+        super.onDisplayed();
+        selectedElements.clear();
     }
 
     @Override

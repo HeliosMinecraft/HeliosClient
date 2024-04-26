@@ -35,7 +35,6 @@ public SettingGroup group = new SettingGroup("Size");
         this.width = 30;
         this.height = 55;
         addSettingGroup(group);
-
     }
 
     @Override

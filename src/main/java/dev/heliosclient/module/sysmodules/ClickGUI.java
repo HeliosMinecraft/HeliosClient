@@ -279,15 +279,18 @@ public class ClickGUI extends Module_ {
         }
 
         if (setting == switchConfigs) {
-            HeliosClient.saveConfig();
-            Config.MODULES = HeliosClient.CONFIG.MODULE_CONFIGS.get(switchConfigs.value).replace(".toml", "");
-            HeliosClient.loadConfig();
-            for (NavBarItem item : NavBarManager.INSTANCE.navBarItems) {
-                if (item.name.equalsIgnoreCase("ClickGUI")) {
-                    item.target = ClickGUIScreen.INSTANCE;
+            //Todo: Replace with cleaner config manager
+            if(!HeliosClient.CONFIG.MODULE_CONFIGS.isEmpty()) {
+                HeliosClient.saveConfig();
+                Config.MODULES = HeliosClient.CONFIG.MODULE_CONFIGS.get(switchConfigs.value).replace(".toml", "");
+                HeliosClient.loadConfig();
+                for (NavBarItem item : NavBarManager.INSTANCE.navBarItems) {
+                    if (item.name.equalsIgnoreCase("ClickGUI")) {
+                        item.target = ClickGUIScreen.INSTANCE;
+                    }
                 }
+                EventManager.postEvent(new FontChangeEvent(fonts));
             }
-            EventManager.postEvent(new FontChangeEvent(fonts));
         }
     }
 

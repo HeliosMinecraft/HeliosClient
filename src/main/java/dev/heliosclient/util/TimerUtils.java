@@ -45,5 +45,11 @@ public class TimerUtils {
             resetTimer();
         return getElapsedTime() >= ms / 1000.0;
     }
-
+    public boolean every(long ms, Runnable task) {
+        if (getElapsedTime() >= ms / 1000.0) {
+            task.run();
+            resetTimer();
+        }
+        return getElapsedTime() >= ms / 1000.0;
+    }
 }
