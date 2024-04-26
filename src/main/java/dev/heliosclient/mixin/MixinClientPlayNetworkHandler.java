@@ -4,6 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.events.player.PlayerDeathEvent;
 import dev.heliosclient.event.events.player.PlayerJoinEvent;
+import dev.heliosclient.event.events.player.PlayerRespawnEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,7 +23,7 @@ public abstract class MixinClientPlayNetworkHandler {
     @Inject(method = "onGameJoin", at = @At("RETURN"), cancellable = true)
     private void onGameJoin(GameJoinS2CPacket packet, CallbackInfo info) {
         PlayerEntity player = HeliosClient.MC.player;
-        Event event = new PlayerJoinEvent(player);
+        Event event = new PlayerJoinEvent(player,packet);
         EventManager.postEvent(event);
         if (event.isCanceled()) {
             info.cancel();
@@ -33,9 +34,8 @@ public abstract class MixinClientPlayNetworkHandler {
     @Inject(method = "onPlayerRespawn", at = @At("RETURN"), cancellable = true)
     private void onPlayerRespawn(PlayerRespawnS2CPacket packet, CallbackInfo info) {
         PlayerEntity player = HeliosClient.MC.player;
-        Event event = new PlayerJoinEvent(player);
-        EventManager.postEvent(event);
-        if (event.isCanceled()) {
+        Event event = new PlayerRespawnEvent(player,packet);
+        if (EventManager.postEvent(event).isCanceled()) {
             info.cancel();
         }
     }

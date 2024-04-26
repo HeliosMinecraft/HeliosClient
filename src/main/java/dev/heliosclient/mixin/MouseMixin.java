@@ -28,6 +28,7 @@ public abstract class MouseMixin {
 
     @Inject(method = "onMouseButton", at = @At(value = "TAIL"), cancellable = true)
     private void onButton(long window, int button, int action, int mods, CallbackInfo ci) {
+        //Translate screen mouse positions to minecraft friendly positions
         double mouseX = getX() * (double) this.client.getWindow().getScaledWidth() / (double) this.client.getWindow().getWidth();
         double mouseY = getY() * (double) this.client.getWindow().getScaledHeight() / (double) this.client.getWindow().getHeight();
 

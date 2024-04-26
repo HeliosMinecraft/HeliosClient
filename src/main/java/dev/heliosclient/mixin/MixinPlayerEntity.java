@@ -40,14 +40,8 @@ public abstract class MixinPlayerEntity {
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
     private void onPlayerDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         // This variable holds the event object
-        PlayerDamageEvent event = new PlayerDamageEvent((PlayerEntity) (Object) this, source);
-
-        // This line posts the event to the event manager
-        EventManager.postEvent(event);
-
-        // This line checks if the event is canceled and returns false if so
-        if (event.isCanceled()) {
-            cir.setReturnValue(event.isCanceled());
+        if(EventManager.postEvent(new PlayerDamageEvent((PlayerEntity) (Object) this, source)).isCanceled()){
+            cir.cancel();
         }
     }
 }

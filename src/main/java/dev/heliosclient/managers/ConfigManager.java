@@ -11,6 +11,9 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Manager class for configs. Manages multiple config TOMLs and their maps for saving/loading.
+ */
 public class ConfigManager {
     // Stores the configuration maps.
     private final Map<String, Map<String, Object>> configMaps = new HashMap<>();

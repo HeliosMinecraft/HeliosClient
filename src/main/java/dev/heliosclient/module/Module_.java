@@ -8,7 +8,6 @@ import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.module.settings.BooleanSetting;
@@ -24,7 +23,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Template for modules.
@@ -35,7 +33,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public String description;
     public Category category;
     public Set<SettingGroup> settingGroups;
-    public Set<Setting> quickSettings;
+    public Set<Setting<?>> quickSettings;
     public boolean settingsOpen = false;
     public SettingGroup sgbind = new SettingGroup("Bind");
 
@@ -116,7 +114,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
      * Adds a setting to the {@link #quickSettings} list
      * @param setting setting to be added
      */
-    public void addQuickSetting(Setting setting) {
+    public void addQuickSetting(Setting<?> setting) {
         this.quickSettings.add(setting);
     }
 
@@ -128,7 +126,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
      *
      * @param setting setting list to be added
      */
-    public void addQuickSettings(List<Setting> setting) {
+    public void addQuickSettings(List<Setting<?>> setting) {
         this.quickSettings.addAll(setting);
     }
 
@@ -152,7 +150,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     }
 
     /**
-     * Called on disable. Probably shouldn't disable original functionality since it will remove chat feedback.
+     * Called on disable. Probably shouldn't override without super call since it will remove chat feedback.
      */
     public void onDisable() {
         active.value = false;
@@ -164,7 +162,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     }
 
     /**
-     * Called on motion.
+     * Called on player motion.
      */
     @SubscribeEvent
     public void onMotion(PlayerMotionEvent event) {

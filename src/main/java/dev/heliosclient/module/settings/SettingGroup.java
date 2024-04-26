@@ -11,7 +11,7 @@ import java.util.List;
 public class SettingGroup {
     private final String name;
     private final float groupNameHeight;
-    private List<Setting> settings = new ArrayList<>();
+    private List<Setting<?>> settings = new ArrayList<>();
     private float height;
     private boolean shouldRender = true;
     private int x, y, windowWidth;
@@ -110,11 +110,11 @@ public class SettingGroup {
         return windowWidth;
     }
 
-    public List<Setting> getSettings() {
+    public List<Setting<?>> getSettings() {
         return settings;
     }
 
-    public void setSettings(List<Setting> settings) {
+    public void setSettings(List<Setting<?>> settings) {
         this.settings = settings;
     }
 

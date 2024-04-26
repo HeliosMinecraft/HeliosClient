@@ -33,6 +33,7 @@ public class ClientConnectionMixin {
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"), cancellable = true)
     public void send(Packet<?> packet, CallbackInfo ci) {
         if (EventManager.postEvent(new PacketEvent.SEND(packet)).isCanceled()) ci.cancel();
+
         // Call commands if the prefix is sent
         if (packet instanceof ChatMessageC2SPacket && ((ChatMessageC2SPacket) packet).chatMessage().startsWith(CommandManager.get().getPrefix())) {
             try {

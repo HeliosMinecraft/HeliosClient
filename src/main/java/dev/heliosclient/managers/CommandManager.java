@@ -62,6 +62,8 @@ public class CommandManager {
         command.registerTo(DISPATCHER);
         commands.add(command);
         commandInstances.put(command.getClass(), command);
+
+        commands.sort(Comparator.comparing(Command::getName));
     }
 
     public Command getCommandByName(String commandName) {
