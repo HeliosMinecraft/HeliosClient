@@ -186,6 +186,7 @@ public class InputBox implements Listener {
 
         renderBackground(drawContext);
 
+        Renderer2D.enableScissor(x,y,width,height);
         float textHeight = Renderer2D.getFxStringHeight();
         float textY = y + (height - textHeight) / 2; // Center the text vertically
 
@@ -197,7 +198,7 @@ public class InputBox implements Listener {
         } else {
             displayFirstSegment(drawContext, textY);
         }
-
+        Renderer2D.disableScissor();
 
         drawSelectionBox(drawContext, textY, textHeight);
     }
@@ -396,6 +397,7 @@ public class InputBox implements Listener {
     public void paste() {
         // Get the text from the system clipboard
         String clipboardText = MinecraftClient.getInstance().keyboard.getClipboard();
+        clipboardText =  clipboardText.replace("\n","");
 
         // If text is selected, replace it with the clipboard text
         // Otherwise, insert the clipboard text at the cursor position

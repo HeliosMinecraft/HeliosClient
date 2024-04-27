@@ -119,12 +119,14 @@ public class ClickGUI extends Module_ {
             .description("The key to open the ClickGUI screen")
             .value(GLFW.GLFW_KEY_RIGHT_SHIFT)
             .defaultValue(GLFW.GLFW_KEY_RIGHT_SHIFT)
+            .onSettingChange(this)
             .build()
     );
     public KeyBind consoleScreen = sgConfig.add(new KeyBind.Builder()
             .name("Console Screen bind")
             .description("The key to open the console / minecraft terminal screen")
             .value(-1)
+            .onSettingChange(this)
             .build()
     );
     public StringSetting configPath = sgConfig.add(new StringSetting.Builder()

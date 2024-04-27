@@ -1,9 +1,11 @@
 package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
@@ -23,6 +25,7 @@ public class KeyBind extends Setting<Integer> {
     public static boolean listeningMouse = false;
     public int value;
     public static boolean listening = false;
+    public boolean isListening = false;
 
     public KeyBind(String name, String description, ISettingChange iSettingChange, Integer value, BooleanSupplier shouldRender, int defaultValue) {
         super(shouldRender, defaultValue);
@@ -39,7 +42,7 @@ public class KeyBind extends Setting<Integer> {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        if (listening) {
+        if (isListening) {
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": §lLISTENING", x + 2, y + 8, defaultColor);
         } else if (value == -1) {
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": None", x + 2, y + 8, defaultColor);
@@ -64,7 +67,7 @@ public class KeyBind extends Setting<Integer> {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
-        if (listening) {
+        if (isListening) {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": §lLISTENING", x + 2, y + 6, defaultColor);
         } else if (value == -1) {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": None", x + 2, y + 6, defaultColor);
@@ -86,16 +89,17 @@ public class KeyBind extends Setting<Integer> {
 
     @Override
     public void keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (listening) {
+        if (isListening) {
             if (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_ESCAPE) {
                 this.value = -1;
             } else {
                 this.value = keyCode;
             }
+            iSettingChange.onSettingChange(this);
             listening = false;
             listeningKey = false;
             listeningMouse = false;
-            iSettingChange.onSettingChange(this);
+            isListening = false;
         }
     }
 
@@ -104,43 +108,44 @@ public class KeyBind extends Setting<Integer> {
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             value = defaultValue;
             iSettingChange.onSettingChange(this);
+            isListening = false;
             listeningKey = false;
             listeningMouse = false;
             listening = false;
         }
 
-        if (listeningMouse && listening) {
+        if (listeningMouse && isListening) {
             value = button;
             iSettingChange.onSettingChange(this);
+            isListening = !isListening;
             listening = !listening;
             listeningKey = false;
             listeningMouse = false;
         }
-        if (hovered((int) mouseX, (int) mouseY) && button == 0 && !listeningMouse) {
+        if (hovered((int) mouseX, (int) mouseY) && button == 0 && !listeningMouse && !isListening) {
             listening = !listening;
             listeningKey = !listeningKey;
+            isListening = true;
             listeningMouse = true;
         }
     }
 
     @Override
     public Object saveToToml(List<Object> objectList) {
-        return value == -1 ? "None" : (char) value;
+
+        //The actual key code.
+        objectList.add(value);
+        return objectList;
     }
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
         super.loadFromToml(MAP,toml);
-        if(toml.getString(name.replace(" ", "")) == null){
+        if(toml.getList(this.name.replace(" ", "")) == null){
             value = defaultValue;
             return;
         }
-        if (Objects.equals(toml.getString(name.replace(" ", "")), "None")) {
-            value = -1;
-        } else {
-            char ch = toml.getString(name.replace(" ", "")).toLowerCase().charAt(0);
-            value = KeycodeToString.charToGLFWKeycode(ch);
-        }
+        value = Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(0).toString());
     }
 
     @Override

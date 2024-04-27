@@ -9,6 +9,7 @@ import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.events.input.MouseReleaseEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
@@ -36,14 +37,16 @@ public class KeybindManager implements Listener {
     public void keyPressedEvent(KeyPressedEvent event) {
         int key = event.getKey();
 
-        if (key == HeliosClient.CLICKGUI.clickGUIKeyBind.value && !(HeliosClient.MC.currentScreen instanceof ChatScreen) && !(HeliosClient.MC.currentScreen instanceof AbstractInventoryScreen)
-                && !(HeliosClient.MC.currentScreen instanceof GameMenuScreen)) {
-            ClickGUIScreen.INSTANCE.onLoad();
-            HeliosClient.MC.setScreen(ClickGUIScreen.INSTANCE);
+        if(!KeyBind.listening && !KeyBind.listeningKey) {
+            if (key == HeliosClient.CLICKGUI.clickGUIKeyBind.value && shouldOpen()) {
+                ClickGUIScreen.INSTANCE.onLoad();
+                HeliosClient.MC.setScreen(ClickGUIScreen.INSTANCE);
+            }
+            if (key == HeliosClient.CLICKGUI.consoleScreen.value && shouldOpen()) {
+                HeliosClient.MC.setScreen(HeliosClient.CONSOLE);
+            }
         }
-        if (key == HeliosClient.CLICKGUI.consoleScreen.value) {
-            HeliosClient.MC.setScreen(HeliosClient.CONSOLE);
-        }
+
         if (HeliosClient.MC.currentScreen != null) return;
 
         for (Module_ module : ModuleManager.INSTANCE.modules) {
@@ -149,6 +152,10 @@ public class KeybindManager implements Listener {
             CPS[1] = 0;
             lastRightClick = currentTime;
         }
+    }
+    public boolean shouldOpen(){
+        return !(HeliosClient.MC.currentScreen instanceof ChatScreen) && !(HeliosClient.MC.currentScreen instanceof AbstractInventoryScreen)
+                && !(HeliosClient.MC.currentScreen instanceof GameMenuScreen);
     }
 
     public int getLeftCPS() {

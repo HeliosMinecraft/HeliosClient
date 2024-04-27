@@ -67,7 +67,7 @@ public class ConsoleScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if(this.enterBox.isFocused() && (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER)){
+        if(keyCode == GLFW.GLFW_KEY_ENTER ||  keyCode == GLFW.GLFW_KEY_KP_ENTER){
             if (!enterBox.getValue().isEmpty()) {
                 HeliosClient.LOGGER.info(enterBox.getValue());
                 enterBox.setText("");

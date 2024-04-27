@@ -37,7 +37,7 @@ public class ConsoleAppender extends AbstractAppender {
             message = ColorUtils.yellow + "[HeliosClient] " + ColorUtils.reset + message;
         }
         if(event.getLoggerName().contains("net.minecraft") || event.getLoggerName().contains("com.mojang")){
-            message = ColorUtils.green + "[Minecraft] " + ColorUtils.reset + message;
+            message = ColorUtils.darkGreen + "[Minecraft] " + ColorUtils.reset + message;
         }
         if(event.getLoggerName().contains("Fabric")){
             message = ColorUtils.darkAqua + "[Fabric] " + ColorUtils.reset + message;

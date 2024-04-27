@@ -148,7 +148,6 @@ public class HeliosClient implements ModInitializer, Listener {
             }
             HeliosExecutor.shutdown();
         });
-        MC.getSession().getUsername();
 
         MC.execute(()->{
             while(MC.getWindow() == null){

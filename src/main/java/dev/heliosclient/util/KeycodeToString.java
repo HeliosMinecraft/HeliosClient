@@ -391,38 +391,4 @@ public class KeycodeToString {
         }
         return keyName;
     }
-
-    public static int charToGLFWKeycode(char c) {
-        // Convert the char to uppercase
-        c = Character.toUpperCase(c);
-
-        // Check if the char is a printable alphanumeric character
-        if (c >= 'A' && c <= 'Z') {
-            // Return the corresponding GLFW keycode
-            return GLFW_KEY_A + (c - 'A');
-        }
-        if (c >= '0' && c <= '9') {
-            // Return the corresponding GLFW keycode
-            return GLFW_KEY_0 + (c - '0');
-        }
-
-        // Check if the char is a printable non-alphanumeric character
-        return switch (c) {
-            case ' ' -> GLFW_KEY_SPACE;
-            case '\'' -> GLFW_KEY_APOSTROPHE;
-            case ',' -> GLFW_KEY_COMMA;
-            case '-' -> GLFW_KEY_MINUS;
-            case '.' -> GLFW_KEY_PERIOD;
-            case '/' -> GLFW_KEY_SLASH;
-            case ';' -> GLFW_KEY_SEMICOLON;
-            case '=' -> GLFW_KEY_EQUAL;
-            case '[' -> GLFW_KEY_LEFT_BRACKET;
-            case '\\' -> GLFW_KEY_BACKSLASH;
-            case ']' -> GLFW_KEY_RIGHT_BRACKET;
-            case '`' -> GLFW_KEY_GRAVE_ACCENT;
-            default -> GLFW_KEY_UNKNOWN;
-        };
-    }
-
-
 }
