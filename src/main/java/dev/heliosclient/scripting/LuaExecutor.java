@@ -7,6 +7,10 @@ import dev.heliosclient.scripting.libraries.ChatLib;
 import dev.heliosclient.scripting.libraries.PacketLib;
 import dev.heliosclient.scripting.libraries.PlayerLib;
 import dev.heliosclient.util.*;
+import dev.heliosclient.util.player.DamageUtils;
+import dev.heliosclient.util.player.InventoryUtils;
+import dev.heliosclient.util.player.PlayerUtils;
+import dev.heliosclient.util.player.RotationUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.render.Renderer3D;
 import net.minecraft.block.Blocks;
@@ -23,10 +27,7 @@ import org.luaj.vm2.lib.DebugLib;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 
 /**
  * This class provides an execution environment for Lua scripts.

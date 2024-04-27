@@ -42,13 +42,8 @@ public abstract class KeyboardMixin {
                 info.cancel();
             }
         }
-        if (key == GLFW.GLFW_KEY_RIGHT_SHIFT && !(HeliosClient.MC.currentScreen instanceof ChatScreen) && !(mc.currentScreen instanceof AbstractInventoryScreen)
-                && !(mc.currentScreen instanceof GameMenuScreen)) {
-            ClickGUIScreen.INSTANCE.onLoad();
-            MinecraftClient.getInstance().setScreen(ClickGUIScreen.INSTANCE);
-        }
         KeyHeldEvent event = new KeyHeldEvent(window, key, scancode, action, modifiers);
-        EventManager.postEvent(event, TimeUnit.NANOSECONDS.toMillis(1));
+        EventManager.postEvent(event);
         if (event.isCanceled()) {
             info.cancel();
         }

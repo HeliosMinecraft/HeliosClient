@@ -23,6 +23,7 @@ import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.MinecraftClient;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.io.File;
@@ -33,12 +34,16 @@ import static dev.heliosclient.managers.FontManager.fontSize;
 import static dev.heliosclient.managers.FontManager.fonts;
 
 /**
- * Setting for ClickGUI.
+ * Settings for the client and ClickGUI.
  */
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
     public SettingGroup sgMisc = new SettingGroup("Misc");
+    private final SettingGroup sgConfig = new SettingGroup("Config");
+    public SettingGroup sgTooltip = new SettingGroup("ToolTip");
+    public SettingGroup sgGeneral = new SettingGroup("General");
+    public SettingGroup sgSound = new SettingGroup("Sound");
 
     public CycleSetting ScrollType = sgMisc.add(new CycleSetting.Builder()
             .name("Scrolling System")
@@ -109,7 +114,19 @@ public class ClickGUI extends Module_ {
             .roundingPlace(0)
             .build()
     );
-    private final SettingGroup sgConfig = new SettingGroup("Config");
+    public KeyBind clickGUIKeyBind = sgConfig.add(new KeyBind.Builder()
+            .name("ClickGUI bind")
+            .description("The key to open the ClickGUI screen")
+            .value(GLFW.GLFW_KEY_RIGHT_SHIFT)
+            .defaultValue(GLFW.GLFW_KEY_RIGHT_SHIFT)
+            .build()
+    );
+    public KeyBind consoleScreen = sgConfig.add(new KeyBind.Builder()
+            .name("Console Screen bind")
+            .description("The key to open the console / minecraft terminal screen")
+            .value(-1)
+            .build()
+    );
     public StringSetting configPath = sgConfig.add(new StringSetting.Builder()
             .name("Save Config Path")
             .description("Saves current config to that path. It only saves there for temporary purposes, otherwise it selects the default HeliosClient directory")
@@ -133,7 +150,6 @@ public class ClickGUI extends Module_ {
             .description("Reload or save Configs")
             .build()
     );
-    public SettingGroup sgSound = new SettingGroup("Sound");
     public BooleanSetting clickGUISound = sgSound.add(new BooleanSetting.Builder()
             .name("Play module toggle sound")
             .description("Play ClickGUI button sound on toggling modules")
@@ -143,8 +159,6 @@ public class ClickGUI extends Module_ {
             .build()
     );
 
-    public SettingGroup sgTooltip = new SettingGroup("ToolTip");
-    public SettingGroup sgGeneral = new SettingGroup("General");
     public CycleSetting TooltipMode = sgTooltip.add(new CycleSetting.Builder()
             .name("Tooltip mode")
             .description("Mode in what tooltips should be shown.")

@@ -29,7 +29,11 @@ public class MathUtils {
         try {
             out = (int) Math.floor((double) value);
         } catch (Exception e) {
-            out = (int) value;
+            try {
+                out = (int) value;
+            }catch (Exception exception){
+                out = Math.toIntExact((long) value);
+            }
         }
         return out;
     }

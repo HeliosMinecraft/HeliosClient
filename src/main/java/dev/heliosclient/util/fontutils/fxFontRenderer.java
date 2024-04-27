@@ -5,6 +5,7 @@ import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
 
 public class fxFontRenderer extends FontRenderer {
 
@@ -48,7 +49,10 @@ public class fxFontRenderer extends FontRenderer {
 
         // Draw the text at the specified coordinates with the specified color
         //this.drawString(matrixStack, text, x / scaleFactor, y / scaleFactor, r, g, b, a);
-        super.drawString(matrixStack, text, x, y, r, g, b, a);
+        try {
+            super.drawString(matrixStack, text, x, y, r, g, b, a);
+        }catch(NullPointerException ignored){
+        }
     }
 
     public void drawCenteredString(MatrixStack stack, String s, float x, float y, int color) {

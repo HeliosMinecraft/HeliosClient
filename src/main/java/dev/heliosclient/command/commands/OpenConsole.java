@@ -15,7 +15,7 @@ public class OpenConsole extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
-            mc.setScreen(HeliosClient.CONSOLE);
+            HeliosClient.openConsoleScreen();
             return SINGLE_SUCCESS;
         });
     }

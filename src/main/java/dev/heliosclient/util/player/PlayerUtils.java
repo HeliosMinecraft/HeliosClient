@@ -1,10 +1,9 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.mixin.AccessorMinecraftClient;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;

@@ -10,26 +10,24 @@ import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.scripting.LuaExecutor;
 import dev.heliosclient.scripting.LuaScriptManager;
-import dev.heliosclient.system.Config;
-import dev.heliosclient.system.DiscordRPC;
-import dev.heliosclient.system.HeliosExecutor;
-import dev.heliosclient.system.TickRate;
+import dev.heliosclient.system.*;
 import dev.heliosclient.ui.clickgui.ConsoleScreen;
 import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.*;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import org.luaj.vm2.lib.jse.CoerceLuaToJava;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +37,7 @@ import static dev.heliosclient.managers.FontManager.fonts;
 public class HeliosClient implements ModInitializer, Listener {
     public static final HeliosClient INSTANCE = new HeliosClient();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
-    public static final Logger LOGGER = LoggerFactory.getLogger("Helios Client");
+    public static final Logger LOGGER = LoggerFactory.getLogger("HeliosClient");
     public static final String clientTag = ColorUtils.yellow + "Helios" + ColorUtils.white + "Client";
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
@@ -50,7 +48,7 @@ public class HeliosClient implements ModInitializer, Listener {
     public static int uiColor = 0x55FFFF;
     public static AddonManager addonManager = new AddonManager();
     public static ClickGUI CLICKGUI = new ClickGUI();
-    public static ConsoleScreen CONSOLE = new ConsoleScreen();
+    public volatile static ConsoleScreen CONSOLE = new ConsoleScreen();
 
     public static void loadConfig() {
         configTimer.startTimer();
@@ -64,7 +62,7 @@ public class HeliosClient implements ModInitializer, Listener {
         
         CONFIG.loadHudElements();
         CONFIG.loadModules();
-        LOGGER.info("Loading Config complete in: " + configTimer.getElapsedTime() + "s");
+        LOGGER.info("Loading Config complete in: {}s", configTimer.getElapsedTime());
         if(NotificationModule.get().clientNotification.value && shouldSendNotification()){
             NotificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
@@ -80,12 +78,12 @@ public class HeliosClient implements ModInitializer, Listener {
         HeliosExecutor.execute(HeliosClient::saveConfigHook);
     }
     public static void saveConfigHook() {
-            LOGGER.info("Saving config... \t Module Config being saved: " + Config.MODULES);
+        LOGGER.info("Saving config... \t Module Config being saved: {}", Config.MODULES);
             configTimer.startTimer();
             CONFIG.getModuleConfig();
             CONFIG.getClientConfig();
             CONFIG.save();
-            LOGGER.info("Saving Config complete in: " + configTimer.getElapsedTime() + "s");
+        LOGGER.info("Saving Config complete in: {}s", configTimer.getElapsedTime());
             if(NotificationModule.get().clientNotification.value && shouldSendNotification()){
                 NotificationManager.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
             }
@@ -106,6 +104,14 @@ public class HeliosClient implements ModInitializer, Listener {
 
     @Override
     public void onInitialize() {
+        ConsoleAppender consoleAppender = new ConsoleAppender(CONSOLE);
+
+        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        Configuration config = ctx.getConfiguration();
+        config.addAppender(consoleAppender);
+        config.getRootLogger().addAppender(consoleAppender, null, null);
+        ctx.updateLoggers(config);
+
         LOGGER.info("Initialising Helios Client...");
 
         EventManager.register(this);
@@ -135,23 +141,15 @@ public class HeliosClient implements ModInitializer, Listener {
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> HeliosClient.saveConfig());
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((a,b,c) -> HeliosClient.saveConfig());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> HeliosClient.saveConfig());
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        ClientLifecycleEvents.CLIENT_STOPPING.register((client) -> {
             saveConfigHook();
             if (DiscordRPC.INSTANCE.isRunning) {
                 DiscordRPC.INSTANCE.stopPresence();
             }
             HeliosExecutor.shutdown();
-        }));
+        });
+        MC.getSession().getUsername();
 
-       /* ConsoleAppender consoleAppender = new ConsoleAppender(CONSOLE);
-
-        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        Configuration config = ctx.getConfiguration();
-        config.addAppender(consoleAppender);
-        config.getRootLogger().addAppender(consoleAppender, null, null);
-        ctx.updateLoggers(config);
-
-        */
         MC.execute(()->{
             while(MC.getWindow() == null){
                 try {
@@ -176,5 +174,8 @@ public class HeliosClient implements ModInitializer, Listener {
         EventManager.register(ColorManager.INSTANCE);
         EventManager.register(TickRate.INSTANCE);
         EventManager.register(DamageUtils.INSTANCE);
+    }
+    public static void openConsoleScreen(){
+        MC.setScreen(CONSOLE);
     }
 }

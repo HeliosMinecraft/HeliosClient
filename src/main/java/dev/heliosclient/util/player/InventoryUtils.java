@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.settings.Option;
@@ -12,7 +12,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class InventoryUtils {
     private static final PlayerEntity player = HeliosClient.MC.player;

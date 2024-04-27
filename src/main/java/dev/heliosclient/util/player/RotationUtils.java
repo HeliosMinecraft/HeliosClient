@@ -1,7 +1,6 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.player;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import static dev.heliosclient.util.render.Renderer3D.mc;

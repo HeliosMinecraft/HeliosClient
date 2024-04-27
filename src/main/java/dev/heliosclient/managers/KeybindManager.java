@@ -11,8 +11,12 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
+import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.SoundUtils;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.GameMenuScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import org.lwjgl.glfw.GLFW;
 
 public class KeybindManager implements Listener {
@@ -30,8 +34,17 @@ public class KeybindManager implements Listener {
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
     public void keyPressedEvent(KeyPressedEvent event) {
-        if (HeliosClient.MC.currentScreen != null) return;
         int key = event.getKey();
+
+        if (key == HeliosClient.CLICKGUI.clickGUIKeyBind.value && !(HeliosClient.MC.currentScreen instanceof ChatScreen) && !(HeliosClient.MC.currentScreen instanceof AbstractInventoryScreen)
+                && !(HeliosClient.MC.currentScreen instanceof GameMenuScreen)) {
+            ClickGUIScreen.INSTANCE.onLoad();
+            HeliosClient.MC.setScreen(ClickGUIScreen.INSTANCE);
+        }
+        if (key == HeliosClient.CLICKGUI.consoleScreen.value) {
+            HeliosClient.MC.setScreen(HeliosClient.CONSOLE);
+        }
+        if (HeliosClient.MC.currentScreen != null) return;
 
         for (Module_ module : ModuleManager.INSTANCE.modules) {
             if (module.getKeybind() != null && module.getKeybind() != -1 && key == module.getKeybind()) {

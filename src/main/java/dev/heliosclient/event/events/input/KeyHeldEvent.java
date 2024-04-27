@@ -19,7 +19,6 @@ public class KeyHeldEvent extends Event {
         this.scancode = scancode;
         this.action = action;
         this.modifiers = modifiers;
-
     }
 
     public int getKey() {

@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;

@@ -218,7 +218,7 @@ public class CapeManager {
             }
 
             if (jsonElement.isJsonNull()) {
-                HeliosClient.LOGGER.error("UUID does not contain any capes: " + UUID + " If you are sure that this UUID should contain a cape then try other service (i.e Craftar or Minecraft capes");
+                HeliosClient.LOGGER.error("UUID does not contain any capes: {} If you are sure that this UUID should contain a cape then try other service (i.e Craftar or Minecraft capes", UUID);
                 AnimationUtils.addErrorToast("UUID does not contain any capes, Check Logs for details", true, 1500);
                 connection.disconnect();
                 throw new NullPointerException("UUID does not contain any capes");

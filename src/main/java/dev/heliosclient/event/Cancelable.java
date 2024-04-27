@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation indicates that an event can be canceled
+ * To be used over Event Class declaration
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
