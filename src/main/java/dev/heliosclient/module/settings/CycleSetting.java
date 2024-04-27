@@ -151,7 +151,11 @@ public class CycleSetting extends Setting<Integer> {
                 return;
             }
         }
-        LOGGER.error("Option not found for: " + mapGet + ", " + name + " Setting during loading config: " + Config.MODULES);
+        LOGGER.error("Option not found for: {}, {} Setting during loading config: {}", mapGet, name, Config.MODULES);
+    }
+
+    public Object getOption() {
+        return options.get(value);
     }
 
     public static class Builder extends SettingBuilder<Builder, List<?>, CycleSetting> {
@@ -170,6 +174,15 @@ public class CycleSetting extends Setting<Integer> {
 
         public Builder defaultListIndex(int defaultListIndex) {
             this.defaultListIndex = defaultListIndex;
+            return this;
+        }
+        public Builder defaultListOption(Object o) {
+            if(value == null){
+                throw new NullPointerException("Option List is null, could not add default option");
+            }
+            if(value.contains(o)) {
+                this.defaultListIndex = value.indexOf(o);
+            }
             return this;
         }
 

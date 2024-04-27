@@ -11,6 +11,7 @@ import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -44,16 +45,19 @@ public class DoubleSetting extends Setting<Double> {
         int defaultColor = ColorManager.INSTANCE.defaultTextColor();
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
+        //I dont understand these calculations.
         double diff = Math.min(100, Math.max(0, (mouseX - x) / 1.9));
 
         if (sliding) {
-            if (diff == 0) {
+            if (diff <= 0) {
                 value = min;
             } else {
                 value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
             }
             iSettingChange.onSettingChange(this);
         }
+
+        value = MathHelper.clamp(value,min,max);
 
         float valueWidth = Renderer2D.getFxStringWidth(value + ".00") + 3;
 
@@ -91,14 +95,14 @@ public class DoubleSetting extends Setting<Double> {
         double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
 
         if (sliding) {
-            if (diff == 0) {
+            if (diff <= 0) {
                 value = min;
             } else {
                 value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
             }
             iSettingChange.onSettingChange(this);
         }
-
+        value = MathHelper.clamp(value,min,max);
         String valueString = "" + MathUtils.round(value, roundingPlace);
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), valueString, (x + moduleWidth - 10) - FontRenderers.Small_fxfontRenderer.getStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, moduleWidth - 8, 2, 1, 0xFFAAAAAA);

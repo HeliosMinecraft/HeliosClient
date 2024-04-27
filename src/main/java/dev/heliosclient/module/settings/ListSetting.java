@@ -1,10 +1,13 @@
 package dev.heliosclient.module.settings;
 
+import com.google.common.base.Enums;
 import com.moandjiezana.toml.Toml;
+import de.javagl.obj.Obj;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ListSettingScreen;
 import dev.heliosclient.util.render.Renderer2D;
+import it.unimi.dsi.fastutil.Arrays;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
+@Deprecated
 public class ListSetting extends Setting<ArrayList<String>> {
     public ArrayList<String> options;
     Screen parentScreen;
@@ -84,6 +88,7 @@ public class ListSetting extends Setting<ArrayList<String>> {
             this.options = options;
             return this;
         }
+
 
         @Override
         public ListSetting build() {
