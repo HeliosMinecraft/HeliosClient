@@ -3,13 +3,17 @@ package dev.heliosclient.util.animation;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.animation.toasts.ErrorToast;
 import dev.heliosclient.util.animation.toasts.InfoToast;
 import dev.heliosclient.util.render.Renderer2D;
-import dev.heliosclient.util.animation.toasts.ErrorToast;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.util.math.MatrixStack;
 
+/**
+ * Unstable to use now.
+ * Todo: Update and optimise
+ */
 public class AnimationUtils implements Listener {
     public float FADE_SPEED = 0.05f;
     private float alpha = 1.0f;
@@ -19,13 +23,14 @@ public class AnimationUtils implements Listener {
 
     public static void addErrorToast(String message, boolean hasProgressBar, long endDelay) {
         Toast toast = new ErrorToast(message, hasProgressBar, endDelay);
-        if(HeliosClient.MC.getToastManager() != null && toast != null) {
+        if (HeliosClient.MC.getToastManager() != null && toast != null) {
             HeliosClient.MC.getToastManager().add(toast);
         }
     }
+
     public static void addInfoToast(String message, boolean hasProgressBar, long endDelay) {
         Toast toast = new InfoToast(message, hasProgressBar, endDelay);
-        if(HeliosClient.MC.getToastManager() != null && toast != null) {
+        if (HeliosClient.MC.getToastManager() != null && toast != null) {
             HeliosClient.MC.getToastManager().add(toast);
         }
     }

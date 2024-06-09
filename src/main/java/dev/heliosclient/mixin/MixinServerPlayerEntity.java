@@ -23,7 +23,6 @@ public abstract class MixinServerPlayerEntity {
             if (event.isCanceled()) {
                 info.cancel();
             }
-            //TODO: Future MobEntityPickUp Event
         }
     }
 }

@@ -13,15 +13,15 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class ButtonSetting extends Setting<Boolean> {
-    private final String ButtonCategoryText;
     private final Table buttonTable = new Table();
+    private String buttonCategoryText;
     private int hovertimer = 0;
 
 
     public ButtonSetting(String ButtonCategoryText, BooleanSupplier shouldRender, boolean defaultValue) {
         super(shouldRender, defaultValue);
         this.heightCompact = 0;
-        this.ButtonCategoryText = ButtonCategoryText;
+        this.buttonCategoryText = ButtonCategoryText;
     }
 
     public void addButton(String buttonText, int rowIndex, int columnIndex, Runnable task) {
@@ -35,8 +35,8 @@ public class ButtonSetting extends Setting<Boolean> {
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        Renderer2D.drawFixedString(drawContext.getMatrices(), ButtonCategoryText, (float) HeliosClient.MC.getWindow().getScaledWidth() / 2 - (float) textRenderer.getWidth(ButtonCategoryText) / 2 + 1, y + 2, ColorManager.INSTANCE.defaultTextColor());
-        this.height = buttonTable.adjustButtonLayout(x, Math.round(y + 4 + Renderer2D.getFxStringHeight(ButtonCategoryText)), this.width, false) + 5;
+        Renderer2D.drawFixedString(drawContext.getMatrices(), buttonCategoryText, (float) HeliosClient.MC.getWindow().getScaledWidth() / 2 - (float) textRenderer.getWidth(buttonCategoryText) / 2 + 1, y + 2, ColorManager.INSTANCE.defaultTextColor());
+        this.height = buttonTable.adjustButtonLayout(x, Math.round(y + 4 + Renderer2D.getFxStringHeight(buttonCategoryText)), this.width, false) + 5;
 
 
         for (List<Button> row : buttonTable.table) {
@@ -51,7 +51,7 @@ public class ButtonSetting extends Setting<Boolean> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -67,6 +67,9 @@ public class ButtonSetting extends Setting<Boolean> {
         }
     }
 
+    public void setButtonCategoryText(String buttonCategoryText) {
+        this.buttonCategoryText = buttonCategoryText;
+    }
 
     public static class Builder extends SettingBuilder<Builder, Boolean, ButtonSetting> {
         public Builder() {

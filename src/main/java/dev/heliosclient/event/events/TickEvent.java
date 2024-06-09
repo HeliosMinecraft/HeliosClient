@@ -5,7 +5,6 @@ import dev.heliosclient.event.Event;
 import dev.heliosclient.event.LuaEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
 
 /**
  * Something really important
@@ -30,25 +29,23 @@ public class TickEvent extends Event {
 
     //Called for every world Tick
     @LuaEvent("WorldTick")
+    /**
+     * Note only works for single player worlds!!!
+     */
     public static class WORLD extends TickEvent {
-        private final MinecraftServer server;
-
-        public WORLD(MinecraftServer server) {
-            this.server = server;
-        }
-
-        public MinecraftServer getServer() {
-            return server;
-        }
     }
 
-    //Called for every player alive tick
+    //Called for every client player alive tick
     @LuaEvent("PlayerTick")
     public static class PLAYER extends TickEvent {
-        private final PlayerEntity player;
 
-        public PLAYER(PlayerEntity player) {
-            this.player = player;
+        public static PLAYER INSTANCE = new PLAYER();
+
+        private PlayerEntity player;
+
+        public static PLAYER get(PlayerEntity player){
+            INSTANCE.player = player;
+            return INSTANCE;
         }
 
         public PlayerEntity getPlayer() {

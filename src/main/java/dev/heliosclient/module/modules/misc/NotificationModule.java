@@ -3,12 +3,9 @@ package dev.heliosclient.module.modules.misc;
 import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.ui.notification.Notification;
-import dev.heliosclient.util.render.Renderer2D;
 
-import java.util.Collections;
 import java.util.List;
 
 public class NotificationModule extends Module_ {
@@ -78,10 +75,8 @@ public class NotificationModule extends Module_ {
             .shouldRender(() -> playSound.value)
             .build()
     );
-    private static NotificationModule INSTANCE = new NotificationModule();
 
-
-    protected NotificationModule() {
+    public NotificationModule() {
         super("Notifications", "Change notifications for certain events", Categories.MISC);
         addSettingGroup(sgNotifications);
         addSettingGroup(sgConfig);
@@ -94,9 +89,5 @@ public class NotificationModule extends Module_ {
     public void onSettingChange(Setting<?> setting) {
         Notification.ANIMATE = Notification.AnimationStyle.values()[animationStyle.value];
         NotificationManager.setMaxDisplayed((int) maxNotifications.value);
-    }
-
-    public static NotificationModule get() {
-        return INSTANCE;
     }
 }

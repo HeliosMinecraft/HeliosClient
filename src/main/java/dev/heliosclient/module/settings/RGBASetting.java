@@ -9,16 +9,15 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.GlAllocationUtils;
-import net.minecraft.client.util.math.MatrixStack;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -78,7 +77,8 @@ public class RGBASetting extends Setting<Color> implements Listener {
         this.brightnessSaturationBoxHeight = boxHeight;
 
         updateHandles();
-        alpha = value.getAlpha() / 255f;
+        alpha = defaultColor.getAlpha() / 255f;
+        alphaHandleY = Math.round((1.0f - alpha) * (float) boxHeight);
 
         hexInput = new InputBox(50, 11, ColorUtils.colorToHex(value), 7, InputBox.InputMode.ALL);
     }
@@ -155,13 +155,17 @@ public class RGBASetting extends Setting<Color> implements Listener {
             hexInput.setText(ColorUtils.colorToHex(value));
         }
         if (isPicking && !hoveredOverPickBool(mouseX, mouseY)) {
+            //This can get pretty FPS intensive because of the buffer and rendering the box.
+
             drawContext.getMatrices().push();
-            drawContext.getMatrices().translate(0, 0, 1000);
+            drawContext.getMatrices().translate(0, 0, 2000);
             // Draw the cursor box
             double mouseXPick = HeliosClient.MC.mouse.getX() * HeliosClient.MC.getWindow().getScaledWidth() / (double) HeliosClient.MC.getWindow().getWidth();
             double mouseYPick = HeliosClient.MC.mouse.getY() * HeliosClient.MC.getWindow().getScaledHeight() / (double) HeliosClient.MC.getWindow().getHeight();
 
             Framebuffer framebuffer = HeliosClient.MC.getFramebuffer();
+
+            //Get the position of the pixel to pick the color from
             int pickX = (int) (mouseXPick * framebuffer.textureWidth / HeliosClient.MC.getWindow().getScaledWidth());
             int pickY = (int) ((HeliosClient.MC.getWindow().getScaledHeight() - mouseYPick) * framebuffer.textureHeight / HeliosClient.MC.getWindow().getScaledHeight());
 
@@ -367,15 +371,15 @@ public class RGBASetting extends Setting<Color> implements Listener {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP,toml);
-        if(toml.getList(this.name.replace(" ", "")) == null){
+        super.loadFromToml(MAP, toml);
+        if (toml.getList(this.getSaveName()) == null) {
             value = defaultValue;
             rainbow = defaultRainbow;
-            HeliosClient.LOGGER.error(this.name.replace(" ","") + " is null, Setting loaded to default");
+            HeliosClient.LOGGER.error(this.getSaveName() + " is null, Setting loaded to default");
             return;
         }
-        value = ColorUtils.intToColor(Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(0).toString()));
-        rainbow = Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(1).toString()) == 1;
+        value = ColorUtils.intToColor(Integer.parseInt(toml.getList(this.getSaveName()).get(0).toString()));
+        rainbow = Integer.parseInt(toml.getList(this.getSaveName()).get(1).toString()) == 1;
         updateHandles();
     }
 

@@ -5,10 +5,10 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.ui.notification.Notification;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvent;
 
@@ -28,14 +28,15 @@ public class InfoNotification extends Notification {
         this.WIDTH = 63;
         initialise();
     }
+
     public InfoNotification(String title, String description, long endDelay, SoundEvent soundEvent) {
-        this(title,description,endDelay,soundEvent,1.0f);
+        this(title, description, endDelay, soundEvent, 1.0f);
     }
 
     @Override
     public void playSound(SoundEvent soundEvent, float volume, float pitch) {
-        if (NotificationModule.get().playSound.value && NotificationModule.get().isActive()) {
-            SoundUtils.playSound(soundEvent, (float) (NotificationModule.get().volume.value / 100f), pitch);
+        if (ModuleManager.get(NotificationModule.class).playSound.value && ModuleManager.get(NotificationModule.class).isActive()) {
+            SoundUtils.playSound(soundEvent, (float) (ModuleManager.get(NotificationModule.class).volume.value / 100f), pitch);
         }
     }
 

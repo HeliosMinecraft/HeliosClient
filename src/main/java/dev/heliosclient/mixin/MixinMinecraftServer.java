@@ -10,17 +10,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
 @Mixin(MinecraftServer.class)
-public class MixinMinecraftServer {
+public abstract class MixinMinecraftServer {
     @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
     public void onTick(CallbackInfo ci) {
-        MinecraftServer server = (MinecraftServer) (Object) this;
-        if (server != null) {
-
-            TickEvent event = new TickEvent.WORLD(server);
-            EventManager.postEvent(event);
-            if (event.isCanceled()) {
-                ci.cancel();
-            }
+        TickEvent event = new TickEvent.WORLD();
+        EventManager.postEvent(event);
+        if (event.isCanceled()) {
+            ci.cancel();
         }
     }
 }

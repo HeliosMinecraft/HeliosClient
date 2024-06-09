@@ -1,7 +1,6 @@
 package dev.heliosclient.scripting.libraries;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.util.ChatUtils;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.Packet;
@@ -14,6 +13,13 @@ public class PacketLib extends TwoArgFunction {
     public PacketLib() {
 
     }
+
+    public static void sendPacket(Packet<?> packet) {
+        if (HeliosClient.MC.player != null && HeliosClient.MC.player.networkHandler != null) {
+            HeliosClient.MC.player.networkHandler.sendPacket(packet);
+        }
+    }
+
     @Override
     public LuaValue call(LuaValue modname, LuaValue env) {
         LuaValue library = tableOf();
@@ -21,11 +27,6 @@ public class PacketLib extends TwoArgFunction {
 
         env.set("PacketLib", library);
         return library;
-    }
-    public static void sendPacket(Packet<?> packet){
-        if(HeliosClient.MC.player != null && HeliosClient.MC.player.networkHandler != null){
-            HeliosClient.MC.player.networkHandler.sendPacket(packet);
-        }
     }
 
     static class sendChatMessagePacket extends OneArgFunction {

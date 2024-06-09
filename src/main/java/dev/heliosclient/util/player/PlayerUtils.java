@@ -29,8 +29,40 @@ public class PlayerUtils {
     }
 
     public static boolean isMoving(PlayerEntity player) {
-        return player.getVelocity().lengthSquared() > 0;
+        return player.getVelocity().lengthSquared() > 0 && (player.getX() != player.prevX && player.getY() != player.prevY && player.getZ() != player.prevZ);
     }
+
+    public static boolean isPlayerLookingAtEntity(PlayerEntity player, Entity target, float lookRange, int numSegments) {
+        Vec3d playerPos = player.getCameraPosVec(HeliosClient.MC.getTickDelta());
+        Vec3d lookDir = player.getRotationVec(HeliosClient.MC.getTickDelta());
+
+        // Calculate the step size for each segment
+        double stepSize = (HeliosClient.MC.interactionManager.getReachDistance() / numSegments);
+
+        // Perform intersection checks for each segment
+        for (int i = 0; i < numSegments; i++) {
+            Vec3d segmentStart = playerPos.add(lookDir.multiply(i * stepSize));
+            Vec3d segmentEnd = playerPos.add(lookDir.multiply((i + 1) * stepSize));
+
+            // Create a bounding box for the segment
+            Box segmentBox = new Box(
+                    Math.min(segmentStart.x, segmentEnd.x),
+                    Math.min(segmentStart.y, segmentEnd.y),
+                    Math.min(segmentStart.z, segmentEnd.z),
+                    Math.max(segmentStart.x, segmentEnd.x),
+                    Math.max(segmentStart.y, segmentEnd.y),
+                    Math.max(segmentStart.z, segmentEnd.z)
+            );
+
+            // Check if the segment intersects with the target's bounding box
+            if (target.getBoundingBox().expand(lookRange, 0, lookRange).intersects(segmentBox)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     public static boolean isSprinting(PlayerEntity player) {
         return player.isSprinting();
@@ -65,41 +97,74 @@ public class PlayerUtils {
         }
         return blocks;
     }
-        /**
-         * Interacts with an entity.
-         *
-         * @param entity The entity to interact with.
-         * @param hand The hand to use.
-         */
-        public static void interactEntity(Entity entity, Hand hand) {
-            ClientPlayerInteractionManager interactionManager = HeliosClient.MC.interactionManager;
-            if (interactionManager != null) {
-                interactionManager.interactEntity(HeliosClient.MC.player, entity, hand);
-            }
-        }
 
-        /**
-         * Attacks an entity.
-         *
-         * @param entity The entity to attack.
-         */
-        public static void attackEntity(Entity entity) {
-            ClientPlayerInteractionManager interactionManager = HeliosClient.MC.interactionManager;
-            if (interactionManager != null) {
-                interactionManager.attackEntity(HeliosClient.MC.player, entity);
+    public static List<BlockPos> getBlocksWithinDistance(PlayerEntity player, double distance, double Ydistance) {
+        List<BlockPos> blocks = new ArrayList<>();
+        BlockPos playerPos = player.getBlockPos();
+        for (int x = (int) -distance; x <= distance; x++) {
+            for (int z = (int) -distance; z <= distance; z++) {
+                for (int y = Math.max(HeliosClient.MC.world.getBottomY(), (int) -Ydistance); y <= Ydistance; y++) {
+                    if (y > HeliosClient.MC.world.getTopY()) break;
+                    blocks.add(playerPos.add(x, y, z));
+                }
             }
         }
-        public static void doLeftClick(){
-            HeliosClient.MC.options.attackKey.setPressed(true);
-           ((AccessorMinecraftClient) HeliosClient.MC).leftClick();
-            HeliosClient.MC.options.attackKey.setPressed(false);
+        return blocks;
+    }
+
+    public static Vec3d getHorizontalVelocity(double bps) {
+        if (HeliosClient.MC.player == null) return Vec3d.ZERO;
+        bps = bps / 10.0;
+        double yawRadians = Math.toRadians(HeliosClient.MC.player.getYaw());
+        double forwardInput = HeliosClient.MC.player.input.movementForward;
+        double sidewardInput = HeliosClient.MC.player.input.movementSideways;
+
+        // Calculate the velocity components based on input
+        double velX = bps * (sidewardInput * Math.cos(yawRadians) - forwardInput * Math.sin(yawRadians));
+        double velZ = bps * (sidewardInput * Math.sin(yawRadians) + forwardInput * Math.cos(yawRadians));
+
+        return new Vec3d(velX, 0.0, velZ);
+    }
+
+
+    /**
+     * Interacts with an entity.
+     *
+     * @param entity The entity to interact with.
+     * @param hand   The hand to use.
+     */
+    public static void interactEntity(Entity entity, Hand hand) {
+        ClientPlayerInteractionManager interactionManager = HeliosClient.MC.interactionManager;
+        if (interactionManager != null) {
+            interactionManager.interactEntity(HeliosClient.MC.player, entity, hand);
         }
-        public static void doRightClick(){
-            HeliosClient.MC.options.useKey.setPressed(true);
-            ((AccessorMinecraftClient) HeliosClient.MC).rightClick();
-            HeliosClient.MC.options.useKey.setPressed(false);
+    }
+
+    /**
+     * Attacks an entity.
+     *
+     * @param entity The entity to attack.
+     */
+    public static void attackEntity(Entity entity) {
+        ClientPlayerInteractionManager interactionManager = HeliosClient.MC.interactionManager;
+        if (interactionManager != null) {
+            interactionManager.attackEntity(HeliosClient.MC.player, entity);
         }
-    public PlayerEntity getPlayer(){
+    }
+
+    public static void doLeftClick() {
+        HeliosClient.MC.options.attackKey.setPressed(true);
+        ((AccessorMinecraftClient) HeliosClient.MC).leftClick();
+        HeliosClient.MC.options.attackKey.setPressed(false);
+    }
+
+    public static void doRightClick() {
+        HeliosClient.MC.options.useKey.setPressed(true);
+        ((AccessorMinecraftClient) HeliosClient.MC).rightClick();
+        HeliosClient.MC.options.useKey.setPressed(false);
+    }
+
+    public PlayerEntity getPlayer() {
         return HeliosClient.MC.player;
     }
 }

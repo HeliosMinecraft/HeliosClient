@@ -8,20 +8,20 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvent;
 
 public abstract class Notification {
+    public static AnimationStyle ANIMATE = AnimationStyle.SLIDE;
     public final int HEIGHT = 25;
     public long creationTime;
     public int WIDTH = 60;
     public int targetY;
     public int y;
     public long timeElapsed;
+    public int x;
+    public float scale = 0.0f;
+    public SoundEvent soundEvent;
+    public float volume = 1.0f, pitch = 1.0f;
     protected boolean expired;
     protected long endDelay = 5000;
     protected float endDelayInS = 5.0f;
-    public int x;
-    public float scale = 0.0f;
-    public static AnimationStyle ANIMATE = AnimationStyle.SLIDE;
-    public SoundEvent soundEvent;
-    public float volume = 1.0f, pitch = 1.0f;
 
     public Notification() {
         initialise();
@@ -37,18 +37,18 @@ public abstract class Notification {
         timeElapsed = System.currentTimeMillis() - creationTime;
         float t = timeElapsed / 1000.0f;
 
-        if(ANIMATE == AnimationStyle.POP){
+        if (ANIMATE == AnimationStyle.POP) {
             if (timeElapsed < 200) {
                 scale = Easing.ease(EasingType.CUBIC_OUT, (float) timeElapsed / 200);
             }
-            if(timeElapsed > endDelay) {
+            if (timeElapsed > endDelay) {
                 scale = 1.0f - Easing.ease(EasingType.CUBIC_IN, (float) (timeElapsed - endDelay) / 200);
                 if (scale < 0.0f) {
                     expired = true;
                 }
             }
         }
-        if(ANIMATE == AnimationStyle.SLIDE) {
+        if (ANIMATE == AnimationStyle.SLIDE) {
             if (timeElapsed > endDelay) {
                 float time = (timeElapsed - endDelay) / 1000.0f;
                 int deltaX = (int) (WIDTH * Easing.ease(EasingType.CUBIC_IN, time));
@@ -76,9 +76,11 @@ public abstract class Notification {
     }
 
     public abstract void render(MatrixStack matrices, int y, fxFontRenderer fontRenderer);
-    public void playSound(SoundEvent soundEvent, float volume, float pitch){
+
+    public void playSound(SoundEvent soundEvent, float volume, float pitch) {
 
     }
+
     public enum AnimationStyle {
         SLIDE,
         POP

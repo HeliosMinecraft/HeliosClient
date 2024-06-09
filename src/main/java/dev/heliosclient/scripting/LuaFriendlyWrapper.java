@@ -9,9 +9,10 @@ import java.lang.reflect.Method;
 /**
  * This class provides a Lua-friendly wrapper for Java objects.
  * It allows Lua scripts to interact with Java objects by exposing their public fields and methods.
- *
+ * <p>
  * To be used in times when certain objects cant be {@link org.luaj.vm2.lib.jse.CoerceJavaToLua}
  */
+@Deprecated(forRemoval = true)
 public class LuaFriendlyWrapper {
     private final Object javaObject;
 
@@ -44,7 +45,7 @@ public class LuaFriendlyWrapper {
      * Calls a method of the wrapped Java object.
      *
      * @param methodName the name of the method
-     * @param args the arguments to pass to the method
+     * @param args       the arguments to pass to the method
      * @return the result of the method call
      * @throws RuntimeException if the method does not exist, cannot be accessed, or throws an exception
      */

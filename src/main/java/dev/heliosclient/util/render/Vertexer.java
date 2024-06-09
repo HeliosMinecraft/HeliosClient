@@ -7,6 +7,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.ArrayUtils;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -29,7 +30,7 @@ public class Vertexer {
         int cullMode = excludeDirs.length == 0 ? CULL_BACK : CULL_NONE;
 
         if (!ArrayUtils.contains(excludeDirs, Direction.DOWN)) {
-            vertexQuad(matrices, vertexConsumer, x1, y1, z1, x2, y1, z1, x2, y1, z2, x1, y1, z2, cullMode, quadColor);
+            vertexQuad(matrices, vertexConsumer, x1, y1, z1, x2, y1, z1, x2, y1, z2, x1, y1, z2, cullMode, QuadColor.single(quadColor.getColor(0)[0], quadColor.getColor(0)[1], quadColor.getColor(0)[2], quadColor.getColor(0)[3]));
         }
 
         if (!ArrayUtils.contains(excludeDirs, Direction.WEST)) {
@@ -49,7 +50,7 @@ public class Vertexer {
         }
 
         if (!ArrayUtils.contains(excludeDirs, Direction.UP)) {
-            vertexQuad(matrices, vertexConsumer, x1, y2, z2, x2, y2, z2, x2, y2, z1, x1, y2, z1, cullMode, quadColor);
+            vertexQuad(matrices, vertexConsumer, x1, y2, z2, x2, y2, z2, x2, y2, z1, x1, y2, z1, cullMode, QuadColor.single(quadColor.getColor(2)[0], quadColor.getColor(2)[1], quadColor.getColor(2)[2], quadColor.getColor(2)[3]));
         }
     }
 
@@ -96,44 +97,45 @@ public class Vertexer {
         }
 
         if (!exWest) {
-            if (exDown)
+            if (!exDown)
                 vertexLine(matrices, vertexConsumer, x1, y1, z1, x1, y1, z2, LineColor.single(color[0], color[1], color[2], color[3]));
             vertexLine(matrices, vertexConsumer, x1, y1, z2, x1, y2, z2, LineColor.single(color[4], color[5], color[6], color[7]));
             vertexLine(matrices, vertexConsumer, x1, y1, z1, x1, y2, z1, LineColor.single(color[8], color[9], color[10], color[11]));
-            if (exUp)
+            if (!exUp)
                 vertexLine(matrices, vertexConsumer, x1, y2, z1, x1, y2, z2, LineColor.single(color[12], color[13], color[14], color[15]));
         }
 
         if (!exEast) {
-            if (exDown)
+            if (!exDown)
                 vertexLine(matrices, vertexConsumer, x2, y1, z1, x2, y1, z2, LineColor.single(color[0], color[1], color[2], color[3]));
             vertexLine(matrices, vertexConsumer, x2, y1, z2, x2, y2, z2, LineColor.single(color[4], color[5], color[6], color[7]));
             vertexLine(matrices, vertexConsumer, x2, y1, z1, x2, y2, z1, LineColor.single(color[8], color[9], color[10], color[11]));
-            if (exUp)
+            if (!exUp)
                 vertexLine(matrices, vertexConsumer, x2, y2, z1, x2, y2, z2, LineColor.single(color[12], color[13], color[14], color[15]));
         }
 
         if (!exNorth) {
-            if (exDown)
+            if (!exDown)
                 vertexLine(matrices, vertexConsumer, x1, y1, z1, x2, y1, z1, LineColor.single(color[0], color[1], color[2], color[3]));
-            if (exEast)
+            if (!exEast)
                 vertexLine(matrices, vertexConsumer, x2, y1, z1, x2, y2, z1, LineColor.single(color[4], color[5], color[6], color[7]));
-            if (exWest)
+            if (!exWest)
                 vertexLine(matrices, vertexConsumer, x1, y1, z1, x1, y2, z1, LineColor.single(color[8], color[9], color[10], color[11]));
-            if (exUp)
+            if (!exUp)
                 vertexLine(matrices, vertexConsumer, x1, y2, z1, x2, y2, z1, LineColor.single(color[12], color[13], color[14], color[15]));
         }
 
         if (!exSouth) {
-            if (exDown)
+            if (!exDown)
                 vertexLine(matrices, vertexConsumer, x1, y1, z2, x2, y1, z2, LineColor.single(color[0], color[1], color[2], color[3]));
-            if (exEast)
+            if (!exEast)
                 vertexLine(matrices, vertexConsumer, x2, y1, z2, x2, y2, z2, LineColor.single(color[4], color[5], color[6], color[7]));
-            if (exWest)
+            if (!exWest)
                 vertexLine(matrices, vertexConsumer, x1, y1, z2, x1, y2, z2, LineColor.single(color[8], color[9], color[10], color[11]));
-            if (exUp)
+            if (!exUp)
                 vertexLine(matrices, vertexConsumer, x1, y2, z2, x2, y2, z2, LineColor.single(color[12], color[13], color[14], color[15]));
         }
+
 
         if (!exUp) {
             vertexLine(matrices, vertexConsumer, x1, y2, z1, x2, y2, z1, LineColor.single(color[0], color[1], color[2], color[3]));
@@ -142,31 +144,13 @@ public class Vertexer {
             vertexLine(matrices, vertexConsumer, x1, y2, z2, x1, y2, z1, LineColor.single(color[12], color[13], color[14], color[15]));
         }
     }
-    public static void drawCircle(MatrixStack matrices, VertexConsumer vertexConsumer, float centerX, float centerY, float centerZ, float radius, LineColor lineColor) {
-        int segments = 100;  // Increase this for a smoother circle
-        float angleStep = 360.0f / segments;
 
-        Matrix4f model = matrices.peek().getPositionMatrix();
-        Matrix3f normal = matrices.peek().getNormalMatrix();
+    public static void vertexTriangle(MatrixStack matrices, VertexConsumer vertexConsumer, Vec3d v1, Vec3d v2, Vec3d v3, QuadColor quadColor) {
+        int[] color = quadColor.getAllColors();
 
-        for (int i = 0; i < segments; i++) {
-            float angle1 = (float) Math.toRadians(i * angleStep);
-            float angle2 = (float) Math.toRadians((i + 1) * angleStep);
-
-            float x1 = centerX + radius * (float) Math.cos(angle1);
-            float z1 = centerZ + radius * (float) Math.sin(angle1);
-
-            float x2 = centerX + radius * (float) Math.cos(angle2);
-            float z2 = centerZ + radius * (float) Math.sin(angle2);
-
-            Vector3f normalVec = getNormal(x1, centerY, z1, x2, centerY, z2);
-
-            int[] color1 = lineColor.getColor(x1, centerY, z1, 0);
-            int[] color2 = lineColor.getColor(x2, centerY, z2, 1);
-
-            vertexConsumer.vertex(model, x1, centerY, z1).color(color1[0], color1[1], color1[2], color1[3]).normal(normal, normalVec.x(), normalVec.y(), normalVec.z()).next();
-            vertexConsumer.vertex(model, x2, centerY, z2).color(color2[0], color2[1], color2[2], color2[3]).normal(normal, normalVec.x(), normalVec.y(), normalVec.z()).next();
-        }
+        vertexConsumer.vertex(matrices.peek().getPositionMatrix(), (float) v1.getX(), (float) v1.getY(), (float) v1.getZ()).color(color[0], color[1], color[2], color[3]).next();
+        vertexConsumer.vertex(matrices.peek().getPositionMatrix(), (float) v2.getX(), (float) v2.getY(), (float) v2.getZ()).color(color[4], color[5], color[6], color[7]).next();
+        vertexConsumer.vertex(matrices.peek().getPositionMatrix(), (float) v3.getX(), (float) v3.getY(), (float) v3.getZ()).color(color[8], color[9], color[10], color[11]).next();
     }
 
 

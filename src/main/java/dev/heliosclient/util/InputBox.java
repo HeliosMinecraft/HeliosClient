@@ -77,7 +77,7 @@ public class InputBox implements Listener {
                     }
                 }
                 case GLFW.GLFW_KEY_ENTER,
-                        GLFW.GLFW_KEY_KP_ENTER -> {
+                     GLFW.GLFW_KEY_KP_ENTER -> {
                     focused = false;
                 }
             }
@@ -85,6 +85,8 @@ public class InputBox implements Listener {
     }
 
     public void setText(String text) {
+        if (text == null) return;
+
         this.value = text;
         this.textSegments.clear();
 
@@ -111,7 +113,11 @@ public class InputBox implements Listener {
     }
 
     public boolean isFocusedHover(double mouseX, double mouseY) {
-        return focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y) && mouseY <= (y + height));
+        return focused = isMouseOverInputBox(mouseX, mouseY);
+    }
+
+    public boolean isMouseOverInputBox(double mouseX, double mouseY) {
+        return (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= y && mouseY <= (y + height));
     }
 
 
@@ -177,7 +183,7 @@ public class InputBox implements Listener {
             if (endX > x + width) {
                 endX = x + width;
             }
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, Renderer2D.isVanillaRenderer() ? textY - 1 : textY, endX - startX + 1, textHeight - 1, new Color(0, 166, 255, 64).getRGB());
+            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, Renderer2D.isVanillaRenderer() ? textY - 1 : textY, endX - startX + 1, textHeight + 0.5f, new Color(0, 166, 255, 64).getRGB());
         }
     }
 
@@ -186,7 +192,7 @@ public class InputBox implements Listener {
 
         renderBackground(drawContext);
 
-        Renderer2D.enableScissor(x,y,width,height);
+        Renderer2D.enableScissor(x, y, width, height);
         float textHeight = Renderer2D.getFxStringHeight();
         float textY = y + (height - textHeight) / 2; // Center the text vertically
 
@@ -216,6 +222,11 @@ public class InputBox implements Listener {
     @SubscribeEvent
     public void keyPressed(KeyPressedEvent event) {
         int keyCode = event.getKey();
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            focused = false;
+            return;
+        }
+
         if (focused && canWrite()) {
             if (Screen.isSelectAll(keyCode)) {
                 selecting = true;
@@ -276,7 +287,7 @@ public class InputBox implements Listener {
 
                 }
                 case GLFW.GLFW_KEY_ENTER,
-                        GLFW.GLFW_KEY_KP_ENTER -> focused = false;
+                     GLFW.GLFW_KEY_KP_ENTER -> focused = false;
             }
             if (keyCode == GLFW.GLFW_KEY_HOME) {
                 if (Screen.hasShiftDown()) {
@@ -397,7 +408,7 @@ public class InputBox implements Listener {
     public void paste() {
         // Get the text from the system clipboard
         String clipboardText = MinecraftClient.getInstance().keyboard.getClipboard();
-        clipboardText =  clipboardText.replace("\n","");
+        clipboardText = clipboardText.replace("\n", "");
 
         // If text is selected, replace it with the clipboard text
         // Otherwise, insert the clipboard text at the cursor position

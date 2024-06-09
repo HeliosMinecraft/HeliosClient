@@ -17,6 +17,7 @@ public class ColorManager implements Listener {
     public final int clickGuiPrimary = new Color(17, 18, 19, 255).getRGB();
     //Global
     public int defaultTextColor = 0xFFFFFFFF;
+
     public int clickGuiPrimaryAlpha = 255;
 
     public boolean clickGuiSecondaryRainbow = false;
@@ -24,10 +25,15 @@ public class ColorManager implements Listener {
 
     public int clickGuiSecondary = 0xffff6e78;
     public int clickGuiSecondaryAlpha = 255;
+
     public boolean clickGuiPaneTextRainbow = false;
+
     public int clickGuiPaneText = 0xFFFFFFFF;
     public int clickGuiPaneTextAlpha = 255;
 
+    public int hudColor = 0x55FFFF;
+
+    //This is the gradient we use across the GUI
     public Color primaryGradientStart = new Color(0);
     public Color primaryGradientEnd = new Color(0);
 
@@ -49,6 +55,10 @@ public class ColorManager implements Listener {
         } else {
             return clickGuiSecondary;
         }
+    }
+
+    public int hudColor(){
+        return hudColor;
     }
 
     public Color ClickGuiPrimary() {
@@ -75,12 +85,13 @@ public class ColorManager implements Listener {
 
         float hue = (System.currentTimeMillis() % 10000) / 10000f;
 
-        if (GUI.get().ColorMode.value == 0) {
-            this.primaryGradientStart = GUI.get().staticColor.getColor();
-            this.primaryGradientEnd = GUI.get().staticColor.getColor();
+
+        if (ModuleManager.get(GUI.class).ColorMode.value == 0) {
+            this.primaryGradientStart = ModuleManager.get(GUI.class).staticColor.getColor();
+            this.primaryGradientEnd = ModuleManager.get(GUI.class).staticColor.getColor();
         }
-        if (GUI.get().ColorMode.value == 1) {
-            switch (GUI.get().GradientType.value) {
+        if (ModuleManager.get(GUI.class).ColorMode.value == 1) {
+            switch (ModuleManager.get(GUI.class).GradientType.value) {
                 case 0 -> {
                     this.primaryGradientStart = ColorUtils.getRainbowColor();
                     this.primaryGradientEnd = ColorUtils.getRainbowColor2();
@@ -98,8 +109,8 @@ public class ColorManager implements Listener {
                     this.primaryGradientEnd = ColorUtils.getNightSkyColors(hue)[1];
                 }
                 case 4 -> {
-                    this.primaryGradientStart = GUI.get().linear2Start.getColor();
-                    this.primaryGradientEnd = GUI.get().linear2end.getColor();
+                    this.primaryGradientStart = (ModuleManager.get(GUI.class)).linear2Start.getColor();
+                    this.primaryGradientEnd = (ModuleManager.get(GUI.class)).linear2end.getColor();
                 }
             }
         }

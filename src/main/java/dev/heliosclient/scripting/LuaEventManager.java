@@ -1,39 +1,39 @@
 package dev.heliosclient.scripting;
 
 import dev.heliosclient.HeliosClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.item.Item;
+import dev.heliosclient.util.ChatUtils;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * This class manages Lua event listeners.
  */
 public class LuaEventManager {
     public static LuaEventManager INSTANCE = new LuaEventManager();
-    private Map<String, List<org.luaj.vm2.LuaFunction>> listeners = new HashMap<>();
+    private final Map<String, List<org.luaj.vm2.LuaFunction>> listeners = new HashMap<>();
 
     /**
      * Registers a Lua event listener.
      *
      * @param eventType The type of the event.
-     * @param listener The Lua function to call when the event is fired.
+     * @param listener  The Lua function to call when the event is fired.
      */
     public void register(String eventType, LuaValue listener) {
         org.luaj.vm2.LuaFunction luaFunction = listener.checkfunction();
-        listeners.computeIfAbsent(eventType, k -> new ArrayList<>()).add(luaFunction);
+        listeners.computeIfAbsent(eventType, k -> new CopyOnWriteArrayList<>()).add(luaFunction);
     }
+
     /**
      * Unregisters a Lua event listener.
      *
      * @param eventType The type of the event.
-     * @param listener The Lua function to remove.
+     * @param listener  The Lua function to remove.
      */
     public void unregister(String eventType, LuaValue listener) {
         org.luaj.vm2.LuaFunction luaFunction = listener.checkfunction();
@@ -48,7 +48,7 @@ public class LuaEventManager {
      *
      * @return True if there are any Lua event listeners, false otherwise.
      */
-    public boolean hasListeners(){
+    public boolean hasListeners() {
         return !listeners.isEmpty();
     }
 
@@ -64,10 +64,11 @@ public class LuaEventManager {
      * Lua function. If the status is false or nil, it logs an error message with the result
      * returned by the Lua function.
      * <p>
-     *     Check {@link dev.heliosclient.event.LuaEvent} for code example.
-     *</p>
+     * Check {@link dev.heliosclient.event.LuaEvent} for code example.
+     * </p>
+     *
      * @param eventType The type of the event.
-     * @param event The event data.
+     * @param event     The event data.
      */
     public void post(String eventType, LuaValue event) {
         List<LuaFunction> eventListeners = listeners.get(eventType);
@@ -82,10 +83,12 @@ public class LuaEventManager {
                     result = varargs.arg(2);
                 } catch (Exception e) {
                     HeliosClient.LOGGER.error("Error while invoking Lua function", e);
+                    ChatUtils.sendHeliosMsg("Error while invoking LuaFunction: " + e.getMessage());
                 }
                 // Check if an error occurred
                 if (!status.toboolean() && !status.isnil()) {
-                    HeliosClient.LOGGER.error("Error in Lua script: " + result.tojstring());
+                    HeliosClient.LOGGER.error("Error in Lua script: {}", result.tojstring());
+                    ChatUtils.sendHeliosMsg("Error in Lua script: " + result.tojstring());
                 }
             }
         }

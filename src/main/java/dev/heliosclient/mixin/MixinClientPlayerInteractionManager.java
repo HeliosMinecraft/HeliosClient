@@ -1,27 +1,110 @@
 package dev.heliosclient.mixin;
 
-import dev.heliosclient.event.events.block.BlockBreakEvent;
+import dev.heliosclient.event.events.block.BeginBreakingBlockEvent;
+import dev.heliosclient.event.events.block.BlockInteractEvent;
+import dev.heliosclient.event.events.block.CancelBlockBreakingEvent;
+import dev.heliosclient.event.events.player.PlayerAttackEntityEvent;
 import dev.heliosclient.event.events.player.ReachEvent;
 import dev.heliosclient.managers.EventManager;
-import net.minecraft.block.BlockState;
+import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.modules.player.NoBreakDelay;
+import dev.heliosclient.module.modules.render.Freecam;
+import dev.heliosclient.util.player.FreeCamEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayerInteractionManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerInteractionManager.class)
-public class MixinClientPlayerInteractionManager {
+public abstract class MixinClientPlayerInteractionManager {
 
-    @Inject(method = "getReachDistance", at = @At(value = "RETURN"), cancellable = true)
+    @Shadow
+    public abstract float getReachDistance();
+
+    @Shadow @Final private MinecraftClient client;
+
+    @Inject(method = "getReachDistance()F", at = @At(value = "HEAD"), cancellable = true)
     private void getReach(CallbackInfoReturnable<Float> cir) {
         ReachEvent reachEvent = new ReachEvent(cir.getReturnValueF());
         EventManager.postEvent(reachEvent);
-        cir.setReturnValue(reachEvent.getReach());
+        if (reachEvent.isCanceled())
+            cir.setReturnValue(reachEvent.getReach());
     }
+
+    @Inject(method = "hasExtendedReach()Z", at = @At(value = "HEAD"), cancellable = true)
+    private void onHasExtendedReach(CallbackInfoReturnable<Boolean> cir) {
+        ReachEvent reachEvent = new ReachEvent(getReachDistance());
+        EventManager.postEvent(reachEvent);
+        if (reachEvent.isCanceled()) cir.setReturnValue(true);
+    }
+
+    @Inject(method = "attackEntity", at = @At(value = "TAIL"), cancellable = true)
+    private void onAttackEntity(PlayerEntity player, Entity target, CallbackInfo ci) {
+        PlayerAttackEntityEvent event = new PlayerAttackEntityEvent(player, target);
+        if (EventManager.postEvent(event).isCanceled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "attackEntity", at = @At(value = "HEAD"), cancellable = true)
+    private void onAttackEntityPRE(PlayerEntity player, Entity target, CallbackInfo ci) {
+        Freecam freecam = ModuleManager.get(Freecam.class);
+        if(freecam.isActive() && player instanceof FreeCamEntity && target == client.player){
+            ci.cancel();
+        }
+
+        PlayerAttackEntityEvent.PRE event = new PlayerAttackEntityEvent.PRE(player, target);
+        if (EventManager.postEvent(event).isCanceled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "attackBlock", at = @At(value = "TAIL"), cancellable = true)
+    private void onAttackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        BeginBreakingBlockEvent event = new BeginBreakingBlockEvent(pos, direction);
+        if (EventManager.postEvent(event).isCanceled()) {
+            cir.cancel();
+        }
+    }
+    @Inject(method = "interactBlock", at = @At(value = "HEAD"), cancellable = true)
+    private void onInteractBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
+        BlockInteractEvent event = new BlockInteractEvent(hitResult, hand);
+        if (EventManager.postEvent(event).isCanceled()) {
+            cir.setReturnValue(ActionResult.PASS);
+            cir.cancel();
+        }
+    }
+
+    @ModifyConstant(method = "updateBlockBreakingProgress", constant = @Constant(intValue = 5))
+    private int updateBlockBreakingProgress(int value) {
+        NoBreakDelay nbd = ModuleManager.get(NoBreakDelay.class);
+        if (nbd.isActive()) {
+            return (int) nbd.breakDelay.value;
+        }
+
+        return value;
+    }
+
+    @Inject(method = "cancelBlockBreaking", at = @At("HEAD"), cancellable = true)
+    private void hookCancelBlockBreaking(CallbackInfo callbackInfo) {
+        if (EventManager.postEvent(new CancelBlockBreakingEvent()).isCanceled()) {
+            callbackInfo.cancel();
+        }
+    }
+
 }

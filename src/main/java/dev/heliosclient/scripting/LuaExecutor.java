@@ -34,10 +34,11 @@ import java.io.Reader;
  */
 public class LuaExecutor {
     private Globals globals;
+
     /**
      * Constructs a new LuaExecutor with the given Minecraft client, Helios client, and Lua event manager instance.
      *
-     * @param mc The Minecraft client.
+     * @param mc           The Minecraft client.
      * @param eventManager The Lua event manager.
      */
     public LuaExecutor(MinecraftClient mc, LuaEventManager eventManager) {
@@ -69,7 +70,7 @@ public class LuaExecutor {
         globals.set("Box", CoerceJavaToLua.coerce(Box.class));
         globals.set("Hand", CoerceJavaToLua.coerce(Hand.class));
 
-        for(Module_ module: ModuleManager.INSTANCE.getModules()){
+        for (Module_ module : ModuleManager.getModules()) {
             globals.set(module.name, CoerceJavaToLua.coerce(module));
         }
     }

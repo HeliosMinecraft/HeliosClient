@@ -1,6 +1,6 @@
 package dev.heliosclient.hud.hudelements;
 
-import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.util.ColorUtils;
@@ -16,7 +16,7 @@ public class Ping extends HudElement {
 
         this.width = 20;
         this.height = 10;
-    }    public static HudElementData<Ping> DATA = new HudElementData<>("Ping", "Shows current player ping", Ping::new);
+    }
 
     public static int getPing() {
         if (mc.player == null) {
@@ -34,8 +34,10 @@ public class Ping extends HudElement {
         super.renderElement(drawContext, textRenderer);
         String text = "Ping: " + ColorUtils.gray + getPing();
         this.width = Math.round(Renderer2D.getStringWidth(text) + 1);
-        Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, HeliosClient.uiColor);
+        Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, ColorManager.INSTANCE.hudColor);
     }
+
+    public static HudElementData<Ping> DATA = new HudElementData<>("Ping", "Shows current player ping", Ping::new);
 
 
 }

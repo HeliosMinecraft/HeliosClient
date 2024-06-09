@@ -4,13 +4,13 @@ import com.moandjiezana.toml.Toml;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.CategoryPane;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -24,25 +24,26 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     public final T defaultValue;
     public String name;
     public String description;
-    public int height = 24;
-    public int width = 192;
-    public int widthCompact = CategoryPane.getWidth();
     public T value;
     public boolean quickSettings = false;
     public int heightCompact = 18;
-    public float animationProgress = 0;
-    public float animationSpeed = 0.13f;
-    public boolean animationDone = false;
+    public ISettingChange iSettingChange;
+    protected int height = 24;
+    protected int width = 192;
+    protected int widthCompact = CategoryPane.getWidth();
+    protected boolean animationDone = false;
     protected int moduleWidth = CategoryPane.getWidth();
     protected int x = 0;
     protected int y = 0;
     protected BooleanSupplier shouldRender; // Default to true
-    int hovertimer = 0;
-    private int hoverAnimationTimer = 0;
-    private float targetY;
+    protected int hovertimer = 0;
+    protected int hoverAnimationTimer = 0;
     protected boolean shouldSaveOrLoad = true;
-    private Consumer<RenderContext> alsoRenderLogic = (renderContext) -> {};
-    public ISettingChange iSettingChange;
+    private float animationProgress = 0;
+    private float animationSpeed = 0.13f;
+    private float targetY;
+    private Consumer<RenderContext> alsoRenderLogic = (renderContext) -> {
+    };
 
 
     public Setting(BooleanSupplier shouldRender, T defaultValue) {
@@ -146,11 +147,12 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
      * Rendering call along with the main render method.
      * Added so that you can render other stuff along with only specific settings.
      *
-     * @param renderContext  {@link RenderContext} object to get all the necessary arguments.
+     * @param renderContext {@link RenderContext} object to get all the necessary arguments.
      */
-    private void alsoRender(RenderContext renderContext) {
+    protected void alsoRender(RenderContext renderContext) {
         alsoRenderLogic.accept(renderContext);
     }
+
     /**
      * Rendering call along with the main render method.
      * Added so that you can render other stuff along with the settings.
@@ -165,6 +167,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     public boolean hoveredOverReset(double mouseX, double mouseY) {
         return mouseX >= x + 195 && mouseX <= x + 206 && mouseY >= y + (double) this.height / 2 - 5.5f && mouseY <= y + (double) this.height / 2 + 5.5f;
     }
+
     /**
      * Compact rendering for clickGUI.
      */
@@ -196,7 +199,6 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
      */
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (getAnimationProgress() <= 1) {
-            return;
         }
     }
 
@@ -257,6 +259,15 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     }
 
     /**
+     * Returns the value
+     *
+     * @return value selected
+     */
+    public T get() {
+        return value;
+    }
+
+    /**
      * Boolean that tells if mouse is hovering this setting.
      *
      * @param mouseX Current mouseX.
@@ -304,11 +315,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         this.animationProgress = animationProgress;
     }
 
-    public void setAnimationSpeed(float animationSpeed) {
-        this.animationSpeed = animationSpeed;
-    }
-
-    public boolean shouldSaveAndLoad(){
+    public boolean shouldSaveAndLoad() {
         return shouldSaveOrLoad;
     }
 
@@ -323,13 +330,40 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        if(!shouldSaveOrLoad){
-            return;
+        if (!shouldSaveOrLoad) {
         }
     }
 
+    public int getWidthCompact() {
+        return widthCompact;
+    }
+
+    public float getAnimationSpeed() {
+        return animationSpeed;
+    }
+
+    public void setAnimationSpeed(float animationSpeed) {
+        this.animationSpeed = animationSpeed;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSaveName() {
+        return this.name.replace(" ", "").replace(".", "_");
+    }
+
     /**
-     *  Credits: <a href="https://github.com/MeteorDevelopment/meteor-client">Meteor Client</a>
+     * Credits: <a href="https://github.com/MeteorDevelopment/meteor-client">Meteor Client</a>
      *
      * @param <B> Type representing the Builder Class
      * @param <V> Type representing the Data type object of the value
@@ -339,7 +373,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
         protected String name = "UnDefined", description = "";
         protected V value;
         protected BooleanSupplier shouldRender = () -> true; // Default to true
-        protected V defaultValue;
+        protected V defaultValue = null;
         protected boolean shouldSaveAndLoad = true;
 
         protected SettingBuilder(V value) {
@@ -366,6 +400,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
             this.shouldRender = shouldRender;
             return (B) this;
         }
+
         public B shouldSaveAndLoad(boolean shouldSaveAndLoad) {
             this.shouldSaveAndLoad = shouldSaveAndLoad;
             return (B) this;
@@ -373,11 +408,14 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
 
         public B defaultValue(V defaultValue) {
             this.defaultValue = defaultValue;
+            this.value = defaultValue;
             return (B) this;
         }
 
         public abstract S build();
     }
 
-    public record RenderContext(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) { }
+    public record RenderContext(DrawContext drawContext, int x, int y, int mouseX, int mouseY,
+                                TextRenderer textRenderer) {
+    }
 }

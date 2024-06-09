@@ -2,6 +2,8 @@ package dev.heliosclient.util.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.client.MinecraftClient;
@@ -10,16 +12,14 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.*;
+import java.util.function.Consumer;
 
 /*
 Credits: BleachHack 1.19.4
@@ -29,6 +29,7 @@ Todo: Replace this later with original code or not ig
 public class Renderer3D {
     public static boolean renderThroughWalls = false;
     public static MinecraftClient mc = MinecraftClient.getInstance();
+
     /**
      * Offsets this box so that minX, minY and minZ are all zero.
      **/
@@ -45,7 +46,7 @@ public class Renderer3D {
     // -------------------- Fill + Outline Boxes --------------------
 
     public static void drawBoxBoth(BlockPos blockPos, QuadColor color, float lineWidth, Direction... excludeDirs) {
-        drawBoxBoth(new Box(blockPos), color, lineWidth, excludeDirs);
+        drawBoxBoth(new Box(blockPos).expand(0.005f), color, lineWidth, excludeDirs);
     }
 
     public static void drawBoxBoth(Box box, QuadColor color, float lineWidth, Direction... excludeDirs) {
@@ -283,6 +284,38 @@ public class Renderer3D {
         RenderSystem.disableBlend();
     }
 
+    public static void drawText(fxFontRenderer font, String text, float x, float y, float z, float offX, float offY, float scale, int color) {
+        MatrixStack matrices = matrixFrom(x, y, z);
+
+        Camera camera = mc.gameRenderer.getCamera();
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        matrices.scale(-0.025f * scale, -0.025f * scale, 1.0F);
+
+        font.drawString(matrices, text, offX, offY, color);
+
+        RenderSystem.disableBlend();
+    }
+
+    public static void draw2DIn3D(float x, float y, float z, float scale, Consumer<MatrixStack> taskConsume) {
+        MatrixStack matrices = matrixFrom(x, y, z);
+
+        Camera camera = mc.gameRenderer.getCamera();
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-camera.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        matrices.scale(-0.025f * scale, -0.025f * scale, 1.0F);
+
+        taskConsume.accept(matrices);
+
+        RenderSystem.disableBlend();
+    }
+
     public static void renderItem(ItemStack itemStack, Vec3d position) {
         if (HeliosClient.MC.world == null) return;
 
@@ -296,49 +329,155 @@ public class Renderer3D {
         DiffuseLighting.disableGuiDepthLighting();
 
 
-        MinecraftClient.getInstance().getItemRenderer().renderItem(itemStack, ModelTransformationMode.GROUND, 0xF000F0, OverlayTexture.DEFAULT_UV, matrices, mc.getBufferBuilders().getEntityVertexConsumers(), HeliosClient.MC.world, 0);
+        mc.getItemRenderer().renderItem(itemStack, ModelTransformationMode.GROUND, 0xF000F0, OverlayTexture.DEFAULT_UV, matrices, mc.getBufferBuilders().getEntityVertexConsumers(), HeliosClient.MC.world, 0);
 
         DiffuseLighting.enableGuiDepthLighting();
         mc.getBufferBuilders().getEntityVertexConsumers().draw();
 
         RenderSystem.disableBlend();
     }
-    public static void drawCircleAroundEntity(MatrixStack matrix, Entity entity, float radius, int color, int points) {
-        setup();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuffer();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
 
-        double x = entity.prevX + (entity.getX() - entity.prevX) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getX();
-        double y = entity.prevY + (entity.getY() - entity.prevY) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getY();
-        double z = entity.prevZ + (entity.getZ() - entity.prevZ) * mc.getTickDelta() - mc.getEntityRenderDispatcher().camera.getPos().getZ();
-        matrix.push();
-        matrix.translate(x, y, z);
+    public static void drawOutlineCircleAroundPos(MatrixStack matrix, Vec3d pos, float radius, float lineWidth, LineColor color, int points) {
+        double y = pos.y;
 
-        Matrix4f matrix4 = matrix.peek().getPositionMatrix();
-        for (int i = 0; i <= points; i++) {
-            double angle = 2 * Math.PI * i / points;
-            float xCoord = (float) (radius * Math.cos(angle));
-            float zCoord = (float) (radius * Math.sin(angle));
+        for (int i = 0; i < points; i++) {
+            double angle1 = ((double) i / points) * 2.0 * Math.PI;
+            double angle2 = ((double) (i + 1) / points) * 2.0 * Math.PI;
 
-            bufferBuilder.vertex(matrix4, xCoord, 0.0f, zCoord)
-                    .color(color)
-                    .next();
+            // Calculate the start and end points for this segment of the circle
+            Vec3d start = new Vec3d(pos.x + Math.cos(angle1) * radius, y, pos.z + Math.sin(angle1) * radius);
+            Vec3d end = new Vec3d(pos.x + Math.cos(angle2) * radius, y, pos.z + Math.sin(angle2) * radius);
+
+            // Draw the line segment
+            Renderer3D.drawLine(start, end, color, lineWidth);
+        }
+    }
+
+    public static void drawTriangle(Vec3d pos1, Vec3d center, Vec3d pos3, QuadColor color) {
+        if (!FrustumUtils.isPointVisible(center)) {
+            return;
         }
 
+        MatrixStack matrices = matrixFrom(center.x, center.y, center.z);
+
+        setup();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        buffer.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+        Vertexer.vertexTriangle(matrices, buffer, Vec3d.ZERO, pos1, pos3, color);
         tessellator.draw();
+
+        RenderSystem.enableCull();
+        RenderSystem.enableDepthTest();
         cleanup();
-        matrix.translate(-x, -y, -z);
-        matrix.pop();
     }
+
+    public static void drawTriangle(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3, double z3, QuadColor color) {
+        Vec3d center = new Vec3d(x2, y2, z2);
+        Vec3d pos1 = new Vec3d(x1, y1, z1);
+        Vec3d pos3 = new Vec3d(x3, y3, z3);
+        drawTriangle(pos1, center, pos3, color);
+    }
+
+    public static void drawFlatFilledCircle(float radius, Vec3d center, int segments, QuadColor color) {
+        if (!FrustumUtils.isPointVisible(center)) {
+            return;
+        }
+
+
+        MatrixStack matrices = matrixFrom(center.x, center.y, center.z);
+
+        setup();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        buffer.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+        for (int i = 0; i < segments; i++) {
+            float angle1 = ((float) i / segments) * 360f;
+            float angle2 = ((float) (i + 1) / segments) * 360f;
+
+            Vec3d pos1 = new Vec3d((float) Math.cos(Math.toRadians(angle1)) * radius, 0, (float) Math.sin(Math.toRadians(angle1)) * radius);
+            Vec3d pos2 = new Vec3d((float) Math.cos(Math.toRadians(angle2)) * radius, 0, (float) Math.sin(Math.toRadians(angle2)) * radius);
+
+            Vertexer.vertexTriangle(matrices, buffer, Vec3d.ZERO, pos1, pos2, color);
+        }
+        tessellator.draw();
+
+        RenderSystem.enableCull();
+        RenderSystem.enableDepthTest();
+        cleanup();
+    }
+
+    @Deprecated
+    public static void renderSphere(float radius, Vec3d center, int segments) {
+        if (!FrustumUtils.isPointVisible(center)) {
+            return;
+        }
+        MatrixStack matrices = matrixFrom(center.x, center.y, center.z);
+
+        setup();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableCull();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        buffer.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+        for (int i = 0; i < segments; i++) {
+            for (int j = 0; j < segments; j++) {
+                float u1 = ((float) i / segments) * 360f;
+                float u2 = ((float) (i + 1) / segments) * 360f;
+                float v1 = ((float) j / segments) * 180f - 90f;
+                float v2 = ((float) (j + 1) / segments) * 180f - 90f;
+
+                Vec3d pos1 = new Vec3d(center.x + (float) Math.cos(Math.toRadians(u1)) * Math.cos(Math.toRadians(v1)) * radius, center.y + (float) Math.sin(Math.toRadians(v1)) * radius, center.z + (float) Math.sin(Math.toRadians(u1)) * Math.cos(Math.toRadians(v1)) * radius);
+                Vec3d pos2 = new Vec3d(center.x + (float) Math.cos(Math.toRadians(u2)) * Math.cos(Math.toRadians(v1)) * radius, center.y + (float) Math.sin(Math.toRadians(v1)) * radius, center.z + (float) Math.sin(Math.toRadians(u2)) * Math.cos(Math.toRadians(v1)) * radius);
+                Vec3d pos3 = new Vec3d(center.x + (float) Math.cos(Math.toRadians(u1)) * Math.cos(Math.toRadians(v2)) * radius, center.y + (float) Math.sin(Math.toRadians(v2)) * radius, center.z + (float) Math.sin(Math.toRadians(u1)) * Math.cos(Math.toRadians(v2)) * radius);
+                Vec3d pos4 = new Vec3d(center.x + (float) Math.cos(Math.toRadians(u2)) * Math.cos(Math.toRadians(v2)) * radius, center.y + (float) Math.sin(Math.toRadians(v2)) * radius, center.z + (float) Math.sin(Math.toRadians(u2)) * Math.cos(Math.toRadians(v2)) * radius);
+
+                Vertexer.vertexTriangle(matrices, buffer, pos1, pos2, pos3, QuadColor.single(ColorUtils.changeAlpha(Color.WHITE, 100).getRGB()));
+                Vertexer.vertexTriangle(matrices, buffer, pos2, pos4, pos3, QuadColor.single(ColorUtils.changeAlpha(Color.WHITE, 100).getRGB()));
+            }
+        }
+        tessellator.draw();
+
+        RenderSystem.enableCull();
+        RenderSystem.enableDepthTest();
+        cleanup();
+    }
+
+    public static void drawSphere(MatrixStack matrices, double radius, float z, Color color) {
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        setup();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+        for (int i = 0; i <= 20; i++) {
+            final float x2 = (float) (Math.sin(((i * 56.548656f) / 180f)) * radius);
+            final float y2 = (float) (Math.cos(((i * 56.548656f) / 180f)) * radius);
+            bufferBuilder.vertex(matrix, x2, y2, z).color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f).next();
+        }
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        cleanup();
+    }
+
 
     // -------------------- Utils --------------------
 
     public static MatrixStack matrixFrom(double x, double y, double z) {
         MatrixStack matrices = new MatrixStack();
 
-        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
+        Camera camera = mc.gameRenderer.getCamera();
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0F));
 
@@ -347,28 +486,30 @@ public class Renderer3D {
         return matrices;
     }
 
-    public static Vec3d getInterpolationOffset(Entity e) {
-        if (MinecraftClient.getInstance().isPaused()) {
+    public static Vec3d getInterpolatedPosition(Entity e) {
+        if (mc.isPaused()) {
             return Vec3d.ZERO;
         }
 
-        double tickDelta = MinecraftClient.getInstance().getTickDelta();
+        double tickDelta = mc.getTickDelta();
         return new Vec3d(
-                e.getX() - MathHelper.lerp(tickDelta, e.lastRenderX, e.getX()),
-                e.getY() - MathHelper.lerp(tickDelta, e.lastRenderY, e.getY()),
-                e.getZ() - MathHelper.lerp(tickDelta, e.lastRenderZ, e.getZ()));
+                MathHelper.lerp(tickDelta, e.lastRenderX, e.getX()),
+                MathHelper.lerp(tickDelta, e.lastRenderY, e.getY()),
+                MathHelper.lerp(tickDelta, e.lastRenderZ, e.getZ()));
     }
 
     public static void setup() {
-            RenderSystem.enableBlend();
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-            RenderSystem.enableDepthTest();
-            RenderSystem.depthFunc(renderThroughWalls ? GL11.GL_ALWAYS : GL11.GL_LEQUAL);
+        RenderSystem.enableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(renderThroughWalls ? GL11.GL_ALWAYS : GL11.GL_LEQUAL);
     }
-    public static void renderThroughWalls(){
+
+    public static void renderThroughWalls() {
         renderThroughWalls = true;
     }
-    public static void stopRenderingThroughWalls(){
+
+    public static void stopRenderingThroughWalls() {
         renderThroughWalls = false;
     }
 

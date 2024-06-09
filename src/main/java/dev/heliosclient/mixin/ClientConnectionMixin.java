@@ -5,13 +5,14 @@ import dev.heliosclient.event.events.player.PacketEvent;
 import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.util.ChatUtils;
+import io.netty.channel.SimpleChannelInboundHandler;
 import net.minecraft.network.ClientConnection;
+import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.s2c.play.BundleS2CPacket;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Iterator;
 
 @Mixin(ClientConnection.class)
-public class ClientConnectionMixin {
+public abstract class ClientConnectionMixin extends SimpleChannelInboundHandler<Packet<?>> {
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
     private static <T extends PacketListener> void onHandlePacket(Packet<T> packet, PacketListener listener, CallbackInfo info) {
         if (packet instanceof BundleS2CPacket bundle) {
@@ -30,8 +31,8 @@ public class ClientConnectionMixin {
         } else if (EventManager.postEvent(new PacketEvent.RECEIVE(packet)).isCanceled()) info.cancel();
     }
 
-    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"), cancellable = true)
-    public void send(Packet<?> packet, CallbackInfo ci) {
+    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;)V", at = @At("HEAD"), cancellable = true)
+    public void send(Packet<?> packet, PacketCallbacks callbacks, CallbackInfo ci) {
         if (EventManager.postEvent(new PacketEvent.SEND(packet)).isCanceled()) ci.cancel();
 
         // Call commands if the prefix is sent

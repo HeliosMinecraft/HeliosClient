@@ -4,12 +4,19 @@ import java.util.Random;
 
 public class UniqueID {
     private static final String ALPHANUMERIC = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
-    private static final int LENGTH = 5;
     private static final Random RANDOM = new Random();
+    private static int LENGTH = 5;
     public String uniqueID;
 
     public UniqueID(String id) {
         this.uniqueID = id;
+    }
+
+    public static UniqueID setLengthAndGet(int length) {
+        LENGTH = length;
+        UniqueID id = generate();
+        LENGTH = 5;
+        return id;
     }
 
     public static UniqueID generate() {

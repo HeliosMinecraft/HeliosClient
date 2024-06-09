@@ -10,6 +10,7 @@ public class ChatLib extends TwoArgFunction {
     public ChatLib() {
 
     }
+
     @Override
     public LuaValue call(LuaValue modname, LuaValue env) {
         LuaValue library = tableOf();
@@ -23,36 +24,42 @@ public class ChatLib extends TwoArgFunction {
         env.set("ChatLib", library);
         return library;
     }
+
     static class sendHeliosMsg extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendHeliosMsg(textString.tojstring());
             return NIL;
         }
     }
+
     static class sendMsg extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendMsg(textString.tojstring());
             return NIL;
         }
     }
+
     static class sendScriptMsg extends TwoArgFunction {
-        public LuaValue call(LuaValue scriptName,LuaValue textString) {
-            ChatUtils.sendMsg(ColorUtils.gray  + "[" +ColorUtils.darkAqua +scriptName.tojstring() + ColorUtils.gray  + "]" + textString.tojstring());
+        public LuaValue call(LuaValue scriptName, LuaValue textString) {
+            ChatUtils.sendMsg(ColorUtils.gray + "[" + ColorUtils.darkAqua + scriptName.tojstring() + ColorUtils.gray + "]" + textString.tojstring());
             return NIL;
         }
     }
+
     static class sendPlayerMsg extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendPlayerMessage(textString.tojstring());
             return NIL;
         }
     }
+
     static class sendCommandMsg extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendCommand(textString.tojstring());
             return NIL;
         }
     }
+
     static class sendCommand extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendCommand(textString.tojstring());

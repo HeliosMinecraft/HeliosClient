@@ -6,9 +6,9 @@ import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.MathHelper;
@@ -39,6 +39,11 @@ public class DoubleSetting extends Setting<Double> {
         inputBox = new InputBox(String.valueOf(max).length() * 6, 11, String.valueOf(value), 10, InputBox.InputMode.DIGITS);
     }
 
+    private void onSettingChange() {
+        if (this.iSettingChange != null)
+            iSettingChange.onSettingChange(this);
+    }
+
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
@@ -54,11 +59,10 @@ public class DoubleSetting extends Setting<Double> {
             } else {
                 value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
             }
-            iSettingChange.onSettingChange(this);
+            onSettingChange();
         }
 
-        value = MathHelper.clamp(value,min,max);
-
+        value = MathHelper.clamp(value, min, max);
         float valueWidth = Renderer2D.getFxStringWidth(value + ".00") + 3;
 
         inputBox.render(drawContext, (x + 180) - Math.round(valueWidth), y + 2, mouseX, mouseY, textRenderer);
@@ -79,7 +83,7 @@ public class DoubleSetting extends Setting<Double> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 10) {
             Tooltip.tooltip.changeText(description);
         }
         if (!inputBox.isFocused()) {
@@ -100,9 +104,9 @@ public class DoubleSetting extends Setting<Double> {
             } else {
                 value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
             }
-            iSettingChange.onSettingChange(this);
+            onSettingChange();
         }
-        value = MathHelper.clamp(value,min,max);
+        value = MathHelper.clamp(value, min, max);
         String valueString = "" + MathUtils.round(value, roundingPlace);
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), valueString, (x + moduleWidth - 10) - FontRenderers.Small_fxfontRenderer.getStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, moduleWidth - 8, 2, 1, 0xFFAAAAAA);
@@ -118,7 +122,7 @@ public class DoubleSetting extends Setting<Double> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -129,7 +133,7 @@ public class DoubleSetting extends Setting<Double> {
         super.mouseClicked(mouseX, mouseY, button);
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             value = defaultValue;
-            iSettingChange.onSettingChange(this);
+            onSettingChange();
         }
         if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.isFocused() && !inputBox.isFocusedHover(mouseX, mouseY)) {
             this.sliding = true;
@@ -142,7 +146,7 @@ public class DoubleSetting extends Setting<Double> {
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
         sliding = false;
-        iSettingChange.onSettingChange(this);
+        onSettingChange();
     }
 
     @Override
@@ -152,13 +156,13 @@ public class DoubleSetting extends Setting<Double> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP,toml);
-        if (toml.getDouble(name.replace(" ", "")) == null) {
+        super.loadFromToml(MAP, toml);
+        if (toml.getDouble(getSaveName()) == null) {
             value = defaultValue;
-        }else{
-            value = toml.getDouble(name.replace(" ", ""));
+        } else {
+            value = toml.getDouble(getSaveName());
         }
-        iSettingChange.onSettingChange(this);
+        onSettingChange();
     }
 
     @Override
@@ -196,7 +200,7 @@ public class DoubleSetting extends Setting<Double> {
                 }
                 value = newVal;
                 inputBox.setValue(String.valueOf(value));
-                iSettingChange.onSettingChange(this);
+                onSettingChange();
             } catch (NumberFormatException ignored) {
             }
         }
@@ -231,8 +235,17 @@ public class DoubleSetting extends Setting<Double> {
             return this;
         }
 
+        public Builder range(double min, double max) {
+            this.min = min;
+            this.max = max;
+            return this;
+        }
+
         @Override
         public DoubleSetting build() {
+            if (defaultValue == null) {
+                defaultValue = value;
+            }
             return new DoubleSetting(name, description, ISettingChange, value, min, max, roundingPlace, shouldRender, defaultValue);
         }
     }

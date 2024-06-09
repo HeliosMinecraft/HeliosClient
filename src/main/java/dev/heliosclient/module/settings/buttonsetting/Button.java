@@ -27,14 +27,14 @@ public class Button {
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width - 4, 14, 2, 0.7f, borderColor);
 
         // Render button text
-        double textX = x + ((width/2.0d) - (Renderer2D.getFxStringWidth(text)/2.0d)) - 0.2f;
+        double textX = x + ((width / 2.0d) - (Renderer2D.getFxStringWidth(text) / 2.0d)) - 0.2f;
 
         float textHeight = Renderer2D.getFxStringHeight();
         float textY = y + (14 - textHeight) / 2; // Center the text vertically
         if (Renderer2D.isVanillaRenderer()) {
             textY += 1;
         }
-        Renderer2D.drawFixedString(drawContext.getMatrices(), text,(float) textX, textY, Color.WHITE.getRGB());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), text, (float) textX, textY, Color.WHITE.getRGB());
     }
 
     private boolean hovered(int mouseX, int mouseY) {

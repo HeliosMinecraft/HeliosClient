@@ -1,13 +1,10 @@
 package dev.heliosclient.module.settings;
 
-import com.google.common.base.Enums;
 import com.moandjiezana.toml.Toml;
-import de.javagl.obj.Obj;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.ListSettingScreen;
 import dev.heliosclient.util.render.Renderer2D;
-import it.unimi.dsi.fastutil.Arrays;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -55,12 +52,12 @@ public class ListSetting extends Setting<ArrayList<String>> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP,toml);
-        if( MAP.get(name.replace(" ", "")) == null){
+        super.loadFromToml(MAP, toml);
+        if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;
         }
-        value = (ArrayList<String>) MAP.get(name.replace(" ", ""));
+        value = (ArrayList<String>) MAP.get(getSaveName());
     }
 
     public boolean isOptionEnabled(String option) {

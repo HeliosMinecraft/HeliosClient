@@ -3,29 +3,6 @@ package dev.heliosclient.util.fontutils;
 import java.awt.*;
 
 public class FontUtils {
-    public static void rearrangeFonts(Font[] fonts, Font fontToMove) {
-        // Find the index of the fontToMove in the array
-        int index = -1;
-        for (int i = 0; i < fonts.length; i++) {
-            if (fonts[i].equals(fontToMove)) {
-                index = i;
-                break;
-            }
-        }
-
-        // If the fontToMove is not found in the array, return
-        if (index == -1) {
-            return;
-        }
-
-        // Move all the fonts one position forward
-        for (int i = index; i > 0; i--) {
-            fonts[i] = fonts[i - 1];
-        }
-
-        // Place the fontToMove at index 0
-        fonts[0] = fontToMove;
-    }
 
     public static Font[] rearrangeFontsArray(Font[] fonts, Font fontToMove) {
         // Find the index of the fontToMove in the array

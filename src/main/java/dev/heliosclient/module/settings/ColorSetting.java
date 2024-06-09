@@ -4,8 +4,8 @@ import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.MathUtils;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -96,7 +96,7 @@ public class ColorSetting extends Setting<Integer> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -152,7 +152,7 @@ public class ColorSetting extends Setting<Integer> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -240,12 +240,12 @@ public class ColorSetting extends Setting<Integer> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP,toml);
-        if( MAP.get(name.replace(" ", "")) == null){
+        super.loadFromToml(MAP, toml);
+        if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;
         }
-        value = (int) MAP.get(name.replace(" ", ""));
+        value = (int) MAP.get(getSaveName());
     }
 
     public static class Builder extends SettingBuilder<Builder, Integer, ColorSetting> {

@@ -6,7 +6,7 @@ import dev.heliosclient.managers.CategoryManager;
 
 public class Categories {
     public static final Category MISC = new Category("Misc", '\uF156');
-    public static final Category CHAT = new Category("Chat", '\uF172');
+    public static final Category WORLD = new Category("World", '\uF198');
     public static final Category COMBAT = new Category("Combat", '\uEAC4');
     public static final Category MOVEMENT = new Category("Movement", '\uF16A');
     public static final Category PLAYER = new Category("Player", '\uEA08');
@@ -15,7 +15,7 @@ public class Categories {
 
     public static void registerCategories() {
         CategoryManager.register(MISC);
-        CategoryManager.register(CHAT);
+        CategoryManager.register(WORLD);
         CategoryManager.register(MOVEMENT);
         CategoryManager.register(COMBAT);
         CategoryManager.register(PLAYER);

@@ -1,8 +1,10 @@
 package dev.heliosclient.event.events.player;
 
+import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 
 
+@Cancelable
 public class ReachEvent extends Event {
     private float reach;
 

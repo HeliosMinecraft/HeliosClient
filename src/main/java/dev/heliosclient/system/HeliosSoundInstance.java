@@ -14,11 +14,12 @@ public class HeliosSoundInstance extends AbstractSoundInstance {
     public HeliosSoundInstance(Identifier soundId, SoundCategory category, Random random) {
         super(soundId, category, random);
     }
-    public void setVolume(float volume){
+
+    public void setVolume(float volume) {
         this.volume = volume;
     }
 
-    public void setPitch(float pitch){
+    public void setPitch(float pitch) {
         this.pitch = pitch;
     }
 }

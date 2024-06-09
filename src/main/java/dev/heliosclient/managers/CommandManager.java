@@ -28,7 +28,6 @@ public class CommandManager {
         add(new Reset());
         add(new Friend());
         add(new Prefix());
-        add(new OpenConsole());
         add(new ReloadScripts());
         add(new LoadScript());
         commands.sort(Comparator.comparing(Command::getName));
@@ -89,7 +88,7 @@ public class CommandManager {
     }
 
     public String getPrefix() {
-        return prefix;
+        return prefix == null? prefix = "." : prefix;
     }
 
     private final static class ChatCommandSource extends ClientCommandSource {

@@ -3,9 +3,9 @@ package dev.heliosclient.module.settings;
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -17,10 +17,10 @@ public class StringSetting extends Setting<String> {
     private final InputBox inputBoxCompact;
     private final int characterLimit;
     private final InputBox.InputMode inputMode;
-    public String value;
-    String description;
     private final InputBox inputBox;
+    public String value;
     public ISettingChange settingChange;
+    String description;
 
     public StringSetting(String name, String description, String value, int characterLimit, ISettingChange settingChange, InputBox.InputMode inputMode, BooleanSupplier shouldRender, String defaultValue) {
         super(shouldRender, defaultValue);
@@ -71,15 +71,15 @@ public class StringSetting extends Setting<String> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP,toml);
-        if(!shouldSaveOrLoad){
+        super.loadFromToml(MAP, toml);
+        if (!shouldSaveOrLoad) {
             return;
         }
-        if(toml.getString(name.replace(" ", "")) == null){
+        if (toml.getString(getSaveName()) == null) {
             value = defaultValue;
             return;
         }
-        value = toml.getString(name.replace(" ", ""));
+        value = toml.getString(getSaveName());
         inputBox.setValue(value);
     }
 

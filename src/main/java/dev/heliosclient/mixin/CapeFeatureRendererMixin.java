@@ -1,6 +1,5 @@
 package dev.heliosclient.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.misc.CapeModule;
@@ -22,32 +21,23 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeEffects;
-import net.minecraft.world.biome.BiomeKeys;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
 @Mixin(CapeFeatureRenderer.class)
 public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
-    private float prevYaw = 0.0F;
+    private final float prevYaw = 0.0F;
 
     public CapeFeatureRendererMixin(FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> context) {
         super(context);
     }
-    @Redirect(method = "render*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;getEntitySolid(Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/render/RenderLayer;"))
-    private RenderLayer fixCapeTransparency(Identifier texture) {
-        return RenderLayer.getArmorCutoutNoCull(texture);
-    }
 
-
-    @Inject(method = "render*", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/network/AbstractClientPlayerEntity;FFFFFF)V", at = @At("HEAD"), cancellable = true)
     public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, AbstractClientPlayerEntity abstractClientPlayerEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
-        if (!abstractClientPlayerEntity.isInvisible() && abstractClientPlayerEntity.isPartVisible(PlayerModelPart.CAPE) && CapeModule.get().isActive()) {
+        if (!abstractClientPlayerEntity.isInvisible() && abstractClientPlayerEntity.isPartVisible(PlayerModelPart.CAPE) && ModuleManager.get(CapeModule.class).isActive()) {
             if (CapeManager.shouldPlayerHaveCape(abstractClientPlayerEntity)) {
                 Identifier capeTexture = CapeManager.getCapeTexture(abstractClientPlayerEntity);
                 ItemStack itemStack = abstractClientPlayerEntity.getEquippedStack(EquipmentSlot.CHEST);
@@ -83,7 +73,7 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
                         q += 25.0F;
                     }
 
-                    if (CapeModule.get().customPhysics.value) {
+                    if (ModuleManager.get(CapeModule.class).customPhysics.value) {
                         //New custom physics which adds speed modifier along with a small wind simulation
                         double playerSpeed = Math.sqrt(abstractClientPlayerEntity.getVelocity().x * abstractClientPlayerEntity.getVelocity().x + abstractClientPlayerEntity.getVelocity().z * abstractClientPlayerEntity.getVelocity().z);
                         float speedModifier = (float) Math.min(1, playerSpeed / 0.5);
@@ -99,7 +89,7 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
                         float windStrength = isWindyBiome && isRaining ? 0.2F : 0.1F;
                         float windEffect = windStrength * windDirection;
 
-                        // Add wind effect to cape rotation
+                        // Add wind effect to CURRENT_PLAYER_CAPE rotation
                         matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(6.0F + r / 2.0F + q + speedModifier * 15.0F + windEffect));
                         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(s / 2.0F));
                         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F - s / 2.0F));
@@ -115,9 +105,9 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
                     VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderLayer.getEntitySolid(capeTexture));
                     this.getContextModel().renderCape(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV);
                     matrixStack.pop();
-                    ci.cancel();
                 }
             }
+            ci.cancel();
         }
     }
 }

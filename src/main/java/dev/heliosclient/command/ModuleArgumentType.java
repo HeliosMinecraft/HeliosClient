@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class ModuleArgumentType implements ArgumentType<Module_> {
-    private static final Collection<String> EXAMPLES = ModuleManager.INSTANCE.getModules()
+    private static final Collection<String> EXAMPLES = ModuleManager.getModules()
             .stream()
             .limit(3)
             .map(module -> addQuotes(module.name))
@@ -45,7 +45,7 @@ public class ModuleArgumentType implements ArgumentType<Module_> {
     @Override
     public Module_ parse(StringReader reader) throws CommandSyntaxException {
         String argument = reader.readString();
-        Module_ module = ModuleManager.INSTANCE.getModuleByName(argument.replace("\"", ""));
+        Module_ module = ModuleManager.getModuleByName(argument.replace("\"", ""));
 
         if (module == null) throw NO_SUCH_MODULE.create(argument);
 
@@ -54,7 +54,7 @@ public class ModuleArgumentType implements ArgumentType<Module_> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(ModuleManager.INSTANCE.getModules().stream().map(module -> addQuotes(module.name)), builder);
+        return CommandSource.suggestMatching(ModuleManager.getModules().stream().map(module -> addQuotes(module.name)), builder);
     }
 
     @Override

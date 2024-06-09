@@ -4,157 +4,113 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.player.PlayerJoinEvent;
 import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.util.interfaces.IExplosion;
+import dev.heliosclient.system.mixininterface.IExplosion;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.explosion.ExplosionBehavior;
 
 import java.util.Objects;
 
 public class DamageUtils implements Listener {
     public static DamageUtils INSTANCE = new DamageUtils();
-    private static final float MAX_DAMAGE = 100.0F; // Maximum damage value
+    static ExplosionBehavior behavior = new ExplosionBehavior();
     private static Explosion explosion;
 
-    public static float calculateMaxDamage(World world, Vec3d source, PlayerEntity player) {
-        double exposure = getExposure(world, source, player);
-        float rawDamage = (float) (exposure * MAX_DAMAGE);
-
-        // Calculate damage reductions
-        float armorReduction = getArmorReduction(player);
-        ((IExplosion) explosion).heliosClient$set(source, 6, false);
-        float blastProtectionReduction = getBlastProtectionReduction(player, explosion);
-        float protectionReduction = getProtectionReduction(player);
-
-        // Calculate final damage
-
-        return rawDamage * (1.0F - armorReduction) * (1.0F - blastProtectionReduction) * (1.0F - protectionReduction);
-    }
-
-    public static double calculateBedBlastDamage(LivingEntity target, Vec3d bedLocation) {
+    public static double calculateBedBlastDamage(Vec3d bedLocation, LivingEntity target) {
         if (target instanceof PlayerEntity && ((PlayerEntity) target).getAbilities().creativeMode) return 0;
         assert HeliosClient.MC.world != null;
-        explosion = new Explosion(HeliosClient.MC.world, null, 0, 0, 0, 6, false, Explosion.DestructionType.DESTROY);
+        explosion = new Explosion(HeliosClient.MC.world, null, bedLocation.x, bedLocation.y, bedLocation.z, 5, false, Explosion.DestructionType.DESTROY);
 
-        double distance = Math.sqrt(target.squaredDistanceTo(bedLocation));
-        if (distance > 10) return 0;
-
-        double exposure = Explosion.getExposure(bedLocation, target);
-        double impactFactor = (1.0 - (distance / 10.0)) * exposure;
-        double rawDamage = (impactFactor * impactFactor + impactFactor) / 2 * 7 * (5 * 2) + 1;
-
-        // Adjust damage based on difficulty
-        rawDamage = getDamageForDifficulty(rawDamage);
-
-        // Reduce damage based on resistance
-        rawDamage = getResistanceReduction(target, rawDamage);
-
-        // Reduce damage based on armor
-        rawDamage = DamageUtil.getDamageLeft((float) rawDamage, (float) target.getArmor(), (float) Objects.requireNonNull(target.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS)).getValue());
-
-        // Reduce damage based on blast protection enchantment
-        ((IExplosion) explosion).heliosClient$set(bedLocation, 5, true);
-        rawDamage = getBlastProtectionReduction(target, rawDamage, explosion);
+        double rawDamage = behavior.calculateDamage(explosion, target);
+        rawDamage = calculateReductions(rawDamage, target, HeliosClient.MC.world.getDamageSources().explosion(null));
 
         if (rawDamage < 0) rawDamage = 0;
         return rawDamage;
     }
 
-    public static float calculateCrystalDamage(World world, Vec3d source, PlayerEntity player) {
+    /**
+     * Use minecraft's method to calculate damage.
+     *
+     * @see ExplosionBehavior#calculateDamage(Explosion, Entity)
+     */
+    public static double calculateCrystalDamage(Vec3d source, PlayerEntity player) {
         if (player == null || player.isCreative()) return 0;
-        explosion = new Explosion(HeliosClient.MC.world, null, 0, 0, 0, 6, false, Explosion.DestructionType.DESTROY);
-
-        double distance = source.distanceTo(player.getPos());
-        double exposure = getExposure(world, source, player);
-        double impactFactor = (1.0 - (distance / 10.0)) * exposure;
-
-        // Calculate raw damage based on impact factor
-        float rawDamage = (float) ((impactFactor * impactFactor + impactFactor) / 2 * 7 * (5 * 2) + 1);
-
-        // Calculate damage reductions
-        float armorReduction = getArmorReduction(player);
+        explosion = new Explosion(HeliosClient.MC.world, null, source.x, source.y, source.z, 6, false, Explosion.DestructionType.DESTROY);
         ((IExplosion) explosion).heliosClient$set(source, 6, false);
-        float blastProtectionReduction = getBlastProtectionReduction(player, explosion);
-        float protectionReduction = getProtectionReduction(player);
 
-        // Subtract reductions from raw damage
-        float finalDamage = rawDamage - armorReduction - blastProtectionReduction - protectionReduction;
+        double rawDamage = behavior.calculateDamage(explosion, player);
 
-        if (finalDamage < 0) finalDamage = 0;
+        rawDamage = calculateReductions(rawDamage, player, HeliosClient.MC.world.getDamageSources().explosion(null));
 
-        return finalDamage;
+
+        if (rawDamage < 0) rawDamage = 0;
+
+        return rawDamage;
     }
 
     private static double getDamageForDifficulty(double damage) {
         return switch (HeliosClient.MC.world.getDifficulty()) {
-            case PEACEFUL -> 0;
             case EASY -> Math.min(damage / 2 + 1, damage);
-            case HARD -> damage * 3 / 2;
+            case HARD -> damage * (3.0 / 2.0);
             default -> damage;
         };
     }
 
-    private static double getProtectionReduction(Entity entity, double damage) {
-        int protLevel = EnchantmentHelper.getProtectionAmount(entity.getArmorItems(), HeliosClient.MC.world.getDamageSources().generic());
-        if (protLevel > 20) protLevel = 20;
-
-        damage *= 1 - (protLevel / 25.0);
-        return damage < 0 ? 0 : damage;
-    }
-
-    private static double getBlastProtectionReduction(Entity player, double damage, Explosion explosion) {
-        int protLevel = EnchantmentHelper.getProtectionAmount(player.getArmorItems(), HeliosClient.MC.world.getDamageSources().explosion((explosion)));
-        if (protLevel > 20) protLevel = 20;
-
-        damage *= 1 - (protLevel / 25.0);
-        return damage < 0 ? 0 : damage;
-    }
-
-    private static double getResistanceReduction(LivingEntity player, double damage) {
-        if (player.hasStatusEffect(StatusEffects.RESISTANCE)) {
-            int lvl = (player.getStatusEffect(StatusEffects.RESISTANCE).getAmplifier() + 1);
-            damage *= (1 - (lvl * 0.2));
+    /**
+     * @see LivingEntity#applyDamage(DamageSource, float)
+     */
+    public static double calculateReductions(double damage, LivingEntity entity, DamageSource damageSource) {
+        if (damageSource.isScaledWithDifficulty()) {
+            damage = getDamageForDifficulty(damage);
         }
 
-        return damage < 0 ? 0 : damage;
+        // Armor reduction
+        damage = DamageUtil.getDamageLeft((float) damage, getArmor(entity), (float) entity.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS));
+
+        // Resistance reduction
+        damage = resistanceReduction(entity, (float) damage);
+
+        // Protection reduction
+        damage = protectionReduction(entity, (float) damage, damageSource);
+
+        return Math.max(damage, 0);
     }
 
-    private static float getArmorReduction(LivingEntity entity) {
-        int armorValue = entity.getArmor();
-        return (float) armorValue * 0.04F; // Each point of armor reduces damage by 4%
+    private static float getArmor(LivingEntity entity) {
+        return (float) Math.floor(entity.getAttributeValue(EntityAttributes.GENERIC_ARMOR));
     }
 
-    private static float getBlastProtectionReduction(LivingEntity entity, Explosion explosion) {
-        int blastProtectionLevel = EnchantmentHelper.getProtectionAmount(entity.getArmorItems(), HeliosClient.MC.world.getDamageSources().explosion(explosion));
-
-        return (float) blastProtectionLevel * 0.15F; // Each level of Blast Protection reduces explosion damage by an additional 15%
+    /**
+     * @see LivingEntity#modifyAppliedDamage(DamageSource, float)
+     */
+    private static float protectionReduction(LivingEntity player, float damage, DamageSource source) {
+        int protLevel = EnchantmentHelper.getProtectionAmount(player.getArmorItems(), source);
+        return DamageUtil.getInflictedDamage(damage, protLevel);
     }
 
-    private static float getProtectionReduction(LivingEntity entity) {
-        int protectionLevel = EnchantmentHelper.getLevel(Enchantments.PROTECTION, entity.getActiveItem());
-        return (float) protectionLevel * 0.04F; // Each level of Protection reduces all damage by an additional 4%
-    }
-
-    private static float getResistanceReduction(LivingEntity entity) {
-        if (entity.hasStatusEffect(StatusEffects.RESISTANCE)) {
-            int resistanceLevel = entity.getStatusEffect(StatusEffects.RESISTANCE).getAmplifier() + 1;
-            return resistanceLevel * 0.20F; // Each level of Resistance reduces all damage by an additional 20%
-        } else {
-            return 0.0F;
+    /**
+     * @see LivingEntity#modifyAppliedDamage(DamageSource, float)
+     */
+    private static float resistanceReduction(LivingEntity player, float damage) {
+        StatusEffectInstance resistance = player.getStatusEffect(StatusEffects.RESISTANCE);
+        if (resistance != null) {
+            int lvl = resistance.getAmplifier() + 1;
+            damage *= (1 - (lvl * 0.2f));
         }
+
+        return Math.max(damage, 0);
     }
 
     public static float calculateSwordDamage(ItemStack sword, PlayerEntity attacker, LivingEntity target) {
@@ -174,34 +130,9 @@ public class DamageUtils implements Listener {
             swordDamage += strengthLevel * 3.0F; // Each level of Strength adds 3 damage
         }
 
-        // Apply damage reductions
-        float armorReduction = getArmorReduction(target);
-        float protectionReduction = getProtectionReduction(target);
+        swordDamage = (float) calculateReductions(swordDamage, target, HeliosClient.MC.world.getDamageSources().playerAttack(attacker));
 
-        // Calculate final damage
-
-        return swordDamage * (1.0F - armorReduction) * (1.0F - protectionReduction);
-    }
-
-    private static double getExposure(World world, Vec3d source, Entity entity) {
-        Box box = entity.getBoundingBox();
-        int totalRays = 0;
-        int unobstructedRays = 0;
-
-        for (double x = box.minX; x < box.maxX; x += 1.0D) {
-            for (double y = box.minY; y < box.maxY; y += 1.0D) {
-                for (double z = box.minZ; z < box.maxZ; z += 1.0D) {
-                    totalRays++;
-                    Vec3d target = new Vec3d(x, y, z);
-                    RaycastContext context = new RaycastContext(source, target, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity);
-                    if (world.raycast(context).getType() == HitResult.Type.MISS) {
-                        unobstructedRays++;
-                    }
-                }
-            }
-        }
-
-        return (double) unobstructedRays / totalRays;
+        return swordDamage;
     }
 
     @SubscribeEvent

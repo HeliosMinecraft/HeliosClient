@@ -4,6 +4,9 @@ import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.LuaEvent;
 import net.minecraft.block.BlockState;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -12,25 +15,20 @@ import net.minecraft.util.math.BlockPos;
 @Cancelable
 @LuaEvent("BlockInteractEvent")
 public class BlockInteractEvent extends Event {
-    private final BlockPos pos;
-    private final BlockState state;
+    private final BlockHitResult hitResult;
+    private final Hand hand;
 
-    public BlockInteractEvent(BlockPos pos, BlockState state) {
-        this.pos = pos;
-        this.state = state;
+
+    public BlockInteractEvent(BlockHitResult hitResult, Hand hand) {
+        this.hitResult = hitResult;
+        this.hand = hand;
     }
 
-    /**
-     * @return Position of BlockInteractEvent
-     */
-    public BlockPos getPos() {
-        return pos;
+    public Hand getHand() {
+        return hand;
     }
 
-    /**
-     * @return State of interacted block.
-     */
-    public BlockState getState() {
-        return state;
+    public BlockHitResult getHitResult() {
+        return hitResult;
     }
 }

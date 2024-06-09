@@ -4,17 +4,20 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CategoryManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
+import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.MathUtils;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ClickGUIScreen extends Screen {
@@ -29,18 +32,13 @@ public class ClickGUIScreen extends Screen {
         reset();
     }
 
-    @Override
-    protected void init() {
-        super.init();
-    }
-
     public void reset() {
         scrollX = 0;
         scrollY = 0;
         categoryPanes = new ArrayList<>();
 
-        Object panesObject = HeliosClient.CONFIG.modulesManager.getConfigMaps().get("modules").get("panes");
-        if (panesObject instanceof Map<?,?> panePos) {
+        Object panesObject = HeliosClient.CONFIG.modulesManager.getConfigMaps().get(Config.MODULES).get("panes");
+        if (panesObject instanceof Map<?, ?> panePos) {
             CategoryManager.getCategories().forEach((s, category) -> {
                 Object categoryObject = panePos.get(category.name);
                 if (categoryObject instanceof Map<?, ?> map) {
@@ -54,6 +52,16 @@ public class ClickGUIScreen extends Screen {
         searchBar = new SearchBar();
     }
 
+    @Override
+    public void onDisplayed() {
+        super.onDisplayed();
+        //Rerun for any missed font changes.
+        if(categoryPanes != null && !categoryPanes.isEmpty()){
+            for(CategoryPane pane: categoryPanes){
+                pane.onFontChange(null);
+            }
+        }
+    }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
@@ -87,13 +95,15 @@ public class ClickGUIScreen extends Screen {
             category.x += scrollX * 10;
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
             if (category.category == Categories.SEARCH && !category.collapsed) {
-                category.addModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()));
-                if (ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()).size() == 1) {
-                    category.keepOnlyModule(ModuleManager.INSTANCE.getModuleByNameSearch(searchBar.getValue()).get(0));
-                }
-
                 if (searchBar.getValue().isEmpty()) {
                     category.removeModules();
+                } else {
+                    List<Module_> modulesToAdd = ModuleManager.getModuleByNameSearch(searchBar.getValue(), 10);
+
+                    category.addModule(modulesToAdd);
+                    if (modulesToAdd.size() == 1) {
+                        category.keepOnlyModule(modulesToAdd.get(0));
+                    }
                 }
             }
         }
@@ -113,7 +123,7 @@ public class ClickGUIScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if(keyCode == GLFW.GLFW_KEY_S && Screen.hasControlDown() && !searchBar.isFocused()){
+        if (keyCode == GLFW.GLFW_KEY_S && Screen.hasControlDown() && !searchBar.isFocused()) {
             searchBar.setFocused(true);
             return true;
         }

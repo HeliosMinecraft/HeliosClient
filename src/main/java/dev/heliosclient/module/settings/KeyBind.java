@@ -1,15 +1,13 @@
 package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
@@ -17,14 +15,13 @@ import org.lwjgl.glfw.GLFW;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
 public class KeyBind extends Setting<Integer> {
     public static boolean listeningKey = false;
     public static boolean listeningMouse = false;
-    public int value;
     public static boolean listening = false;
+    public int value;
     public boolean isListening = false;
 
     public KeyBind(String name, String description, ISettingChange iSettingChange, Integer value, BooleanSupplier shouldRender, int defaultValue) {
@@ -35,6 +32,10 @@ public class KeyBind extends Setting<Integer> {
         this.value = value;
         this.height = 24;
         EventManager.register(this);
+    }
+
+    public static int none() {
+        return -1;
     }
 
     @Override
@@ -57,7 +58,7 @@ public class KeyBind extends Setting<Integer> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -82,7 +83,7 @@ public class KeyBind extends Setting<Integer> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -140,12 +141,12 @@ public class KeyBind extends Setting<Integer> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP,toml);
-        if(toml.getList(this.name.replace(" ", "")) == null){
+        super.loadFromToml(MAP, toml);
+        if (toml.getList(this.getSaveName()) == null) {
             value = defaultValue;
             return;
         }
-        value = Integer.parseInt(toml.getList(this.name.replace(" ", "")).get(0).toString());
+        value = Integer.parseInt(toml.getList(this.getSaveName()).get(0).toString());
     }
 
     @Override

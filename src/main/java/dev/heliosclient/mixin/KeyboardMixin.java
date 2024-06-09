@@ -1,25 +1,23 @@
 package dev.heliosclient.mixin;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.events.input.CharTypedEvent;
 import dev.heliosclient.event.events.input.KeyHeldEvent;
 import dev.heliosclient.event.events.input.KeyPressedEvent;
 import dev.heliosclient.event.events.input.KeyReleasedEvent;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.ui.clickgui.ClickGUIScreen;
+import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.modules.misc.NoNarrator;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.GameMenuScreen;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.SimpleOption;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.concurrent.TimeUnit;
 
 @Mixin(Keyboard.class)
 public abstract class KeyboardMixin {
@@ -28,7 +26,7 @@ public abstract class KeyboardMixin {
 
     @Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
-        if (action == GLFW.GLFW_PRESS) { //Fixes a bug
+        if (action == GLFW.GLFW_PRESS) {
             KeyPressedEvent event = new KeyPressedEvent(window, key, scancode, action, modifiers);
             EventManager.postEvent(event);
             if (event.isCanceled()) {
@@ -42,11 +40,21 @@ public abstract class KeyboardMixin {
                 info.cancel();
             }
         }
-        KeyHeldEvent event = new KeyHeldEvent(window, key, scancode, action, modifiers);
-        EventManager.postEvent(event);
-        if (event.isCanceled()) {
-            info.cancel();
+        if (action != GLFW.GLFW_RELEASE) {
+            KeyHeldEvent event = new KeyHeldEvent(window, key, scancode, action, modifiers);
+            EventManager.postEvent(event);
+            if (event.isCanceled()) {
+                info.cancel();
+            }
         }
+    }
+
+    @Redirect(method = "onKey", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/GameOptions;getNarratorHotkey()Lnet/minecraft/client/option/SimpleOption;"))
+    private SimpleOption<Boolean> disableNarratorKey(GameOptions instance) {
+        if (ModuleManager.get(NoNarrator.class).isActive()) {
+            instance.getNarratorHotkey().setValue(false);
+        }
+        return instance.getNarratorHotkey();
     }
 
     @Inject(method = "onChar", at = @At("HEAD"), cancellable = true)

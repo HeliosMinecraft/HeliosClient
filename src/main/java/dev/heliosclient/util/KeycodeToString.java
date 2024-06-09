@@ -2,7 +2,7 @@ package dev.heliosclient.util;
 
 import org.lwjgl.glfw.GLFW;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
 /**
  * Utils for working with GLFW keycodes.
@@ -16,7 +16,7 @@ public class KeycodeToString {
      * @return Translated string.
      */
     public static String translate(Integer keyCode) {
-        if(keyCode == -1){
+        if (keyCode == -1) {
             return "None";
         }
 
@@ -210,7 +210,7 @@ public class KeycodeToString {
      * @return Translated string.
      */
     public static String translateShort(Integer keyCode) {
-        if(keyCode == -1){
+        if (keyCode == -1) {
             return "Bind";
         }
         String keyName = GLFW.glfwGetKeyName(keyCode, 0);

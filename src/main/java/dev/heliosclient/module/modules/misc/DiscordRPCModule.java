@@ -24,9 +24,9 @@ public class DiscordRPCModule extends Module_ {
     public void onEnable() {
         super.onEnable();
         if (DiscordRPC.INSTANCE.isRunning) {
-            if(mc.player == null) {
+            if (mc.player == null) {
                 AnimationUtils.addErrorToast("DiscordRPC is already running!", false, 1000);
-            }else{
+            } else {
                 ChatUtils.sendHeliosMsg("DiscordRPC is already running");
             }
             HeliosClient.LOGGER.error("DiscordRPC is already running!");

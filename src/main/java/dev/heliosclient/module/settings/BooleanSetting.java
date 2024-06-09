@@ -3,11 +3,11 @@ package dev.heliosclient.module.settings;
 import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -31,6 +31,10 @@ public class BooleanSetting extends Setting<Boolean> {
         CheckBoxAnimation.startFading(true, EasingType.QUADRATIC_IN_OUT);
     }
 
+    public BooleanSetting(String name, String description, ISettingChange iSettingChange, boolean defaultValue) {
+        this(name, description, iSettingChange, defaultValue, () -> true, defaultValue);
+    }
+
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
@@ -45,7 +49,7 @@ public class BooleanSetting extends Setting<Boolean> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -54,11 +58,13 @@ public class BooleanSetting extends Setting<Boolean> {
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
 
-        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name, x + 3, y + 4, ColorManager.INSTANCE.defaultTextColor());
+        String trimmedName = FontRenderers.Small_fxfontRenderer.trimToWidth(name, getWidthCompact());
 
-        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + widthCompact - 12, y + 4, 7, 7, 2, 0.6f, 0xFFFFFFFF);
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), trimmedName, x + 3, y + 4, ColorManager.INSTANCE.defaultTextColor());
 
-        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + widthCompact - 11.6f, y + 4.4f, 5f, 5f, value ? 0xAA55FFFF : 0xFF222222, true, 1);
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + getWidthCompact() - 12, y + 4, 7, 7, 2, 0.6f, 0xFFFFFFFF);
+
+        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + getWidthCompact() - 11.6f, y + 4.4f, 5f, 5f, value ? 0xAA55FFFF : 0xFF222222, true, 1);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -66,7 +72,7 @@ public class BooleanSetting extends Setting<Boolean> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 100) {
+        if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -93,12 +99,12 @@ public class BooleanSetting extends Setting<Boolean> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP,toml);
-        if( MAP.get(name.replace(" ", "")) == null){
+        super.loadFromToml(MAP, toml);
+        if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;
         }
-        value = (boolean) MAP.get(name.replace(" ", ""));
+        value = (boolean) MAP.get(getSaveName());
     }
 
     public static class Builder extends SettingBuilder<Builder, Boolean, BooleanSetting> {

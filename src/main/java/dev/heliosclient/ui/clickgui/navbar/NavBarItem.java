@@ -3,7 +3,6 @@ package dev.heliosclient.ui.clickgui.navbar;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.render.Renderer2D;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
@@ -46,7 +45,7 @@ public class NavBarItem {
 
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (hovered(mouseX, mouseY) && button == 0) {
-           HeliosClient.MC.setScreen(target);
+            HeliosClient.MC.setScreen(target);
         }
     }
 }

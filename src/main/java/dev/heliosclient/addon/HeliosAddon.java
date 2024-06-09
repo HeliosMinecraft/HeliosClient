@@ -15,6 +15,8 @@ public abstract class HeliosAddon {
 
     // Register stuff
     public abstract void registerCategories();
+
     public abstract void registerHudElementData();
+
     public abstract void registerModules();
 }

@@ -4,8 +4,8 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.HudManager;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
 
 public class HudElementButton {
@@ -62,7 +62,7 @@ public class HudElementButton {
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).distanceX = 0;
             HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).distanceY = 0;
         } catch (Exception e) {
-            HeliosClient.LOGGER.error("Error adding hud element instance to list",e);
+            HeliosClient.LOGGER.error("Error adding hud element instance to list", e);
         }
     }
 

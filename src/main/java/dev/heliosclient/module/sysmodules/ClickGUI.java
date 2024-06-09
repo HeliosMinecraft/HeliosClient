@@ -17,12 +17,11 @@ import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
+import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
-import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -39,17 +38,29 @@ import static dev.heliosclient.managers.FontManager.fonts;
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
-    public SettingGroup sgMisc = new SettingGroup("Misc");
     private final SettingGroup sgConfig = new SettingGroup("Config");
+    public SettingGroup sgMisc = new SettingGroup("Misc");
     public SettingGroup sgTooltip = new SettingGroup("ToolTip");
     public SettingGroup sgGeneral = new SettingGroup("General");
     public SettingGroup sgSound = new SettingGroup("Sound");
+
+
+    public CycleSetting theme = sgMisc.add(new CycleSetting.Builder()
+            .name("GUI Theme")
+            .description("Theme for only the ClickGUI. Rounded GUI may cause frame drops.")
+            .onSettingChange(this)
+            .value(List.of(Theme.values()))
+            .defaultListIndex(0)
+            .build()
+    );
+
+    //Sorry guys, this all aren't camel cased.
 
     public CycleSetting ScrollType = sgMisc.add(new CycleSetting.Builder()
             .name("Scrolling System")
             .description("Scrolling for the ClickGui")
             .onSettingChange(this)
-            .value(new ArrayList<>(List.of(ScrollTypes.values())))
+            .value(List.of(ScrollTypes.values()))
             .defaultListIndex(0)
             .build()
     );
@@ -57,9 +68,9 @@ public class ClickGUI extends Module_ {
             .name("CategoryPane Height")
             .description("CategoryPane Height for the ClickGUI")
             .onSettingChange(this)
-            .value(150.0)
+            .value(230.0)
             .max(1000)
-            .min(25)
+            .min(230.0)
             .roundingPlace(0)
             .shouldRender(() -> ScrollType.value == 1)
             .build()
@@ -114,18 +125,21 @@ public class ClickGUI extends Module_ {
             .roundingPlace(0)
             .build()
     );
+    public DoubleSetting animationSpeed = sgMisc.add(new DoubleSetting.Builder()
+            .name("Animation speed")
+            .description("Speed of the animations in the GUI")
+            .onSettingChange(this)
+            .max(2)
+            .min(0d)
+            .defaultValue(0.5d)
+            .roundingPlace(2)
+            .build()
+    );
     public KeyBind clickGUIKeyBind = sgConfig.add(new KeyBind.Builder()
             .name("ClickGUI bind")
             .description("The key to open the ClickGUI screen")
             .value(GLFW.GLFW_KEY_RIGHT_SHIFT)
             .defaultValue(GLFW.GLFW_KEY_RIGHT_SHIFT)
-            .onSettingChange(this)
-            .build()
-    );
-    public KeyBind consoleScreen = sgConfig.add(new KeyBind.Builder()
-            .name("Console Screen bind")
-            .description("The key to open the console / minecraft terminal screen")
-            .value(-1)
             .onSettingChange(this)
             .build()
     );
@@ -179,9 +193,19 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> TooltipMode.value == 1)
             .build()
     );
+    public DoubleSetting tooltipSize = sgTooltip.add(new DoubleSetting.Builder()
+            .name("Tooltip Size")
+            .description("Change size of tooltips")
+            .onSettingChange(this)
+            .defaultValue(1d)
+            .min(0)
+            .max(3)
+            .roundingPlace(1)
+            .build()
+    );
     public BooleanSetting ScreenHelp = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Show keybind Help")
-            .description("Show keybind Help for client screens.")
+            .name("Show Keybind Help")
+            .description("Show keybind help for HeliosClient screens.")
             .onSettingChange(this)
             .value(true)
             .build()
@@ -256,9 +280,9 @@ public class ClickGUI extends Module_ {
             HeliosClient.loadConfig();
             switchConfigs.value = var;
         });
-        config.addButton("Save Config", 1, 0,()-> {
+        config.addButton("Save Config", 1, 0, () -> {
             File pathFile = new File(configPath.value);
-            if(!pathFile.exists() || !pathFile.isDirectory() || !FileUtils.doesFileInPathExist(configPath.value)){
+            if (!pathFile.exists() || !pathFile.isDirectory() || !FileUtils.doesFileInPathExist(configPath.value)) {
                 AnimationUtils.addErrorToast(ColorUtils.red + "Invalid Save Path. Path should be a valid directory", true, 2000);
                 return;
             }
@@ -282,9 +306,10 @@ public class ClickGUI extends Module_ {
         keybinds = Keybinds.value;
         fontSize = ((int) FontSize.value);
 
-        if(HeliosClient.MC.getWindow() != null) {
+        //Font changes
+        if (HeliosClient.MC.getWindow() != null) {
             if (setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font) {
-                fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
+                fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
                 FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
                 EventManager.postEvent(new FontChangeEvent(fonts));
             }
@@ -294,18 +319,18 @@ public class ClickGUI extends Module_ {
             }
         }
 
+        //Config changes
         if (setting == switchConfigs) {
             //Todo: Replace with cleaner config manager
-            if(!HeliosClient.CONFIG.MODULE_CONFIGS.isEmpty()) {
+            if (!HeliosClient.CONFIG.MODULE_CONFIGS.isEmpty()) {
+                //Save current config
                 HeliosClient.saveConfig();
+
+                //Change the file name we want to load
                 Config.MODULES = HeliosClient.CONFIG.MODULE_CONFIGS.get(switchConfigs.value).replace(".toml", "");
+
+                //Load the new config
                 HeliosClient.loadConfig();
-                for (NavBarItem item : NavBarManager.INSTANCE.navBarItems) {
-                    if (item.name.equalsIgnoreCase("ClickGUI")) {
-                        item.target = ClickGUIScreen.INSTANCE;
-                    }
-                }
-                EventManager.postEvent(new FontChangeEvent(fonts));
             }
         }
     }
@@ -318,7 +343,7 @@ public class ClickGUI extends Module_ {
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
 
         ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getColor().getAlpha();
-        ColorManager.INSTANCE.clickGuiSecondary = AccentColor.getColor().getRGB();
+        ColorManager.INSTANCE.clickGuiSecondary = getAccentColor();
         ColorManager.INSTANCE.clickGuiSecondaryRainbow = AccentColor.isRainbow();
 
         ColorManager.INSTANCE.defaultTextColor = TextColor.getColor().getRGB();
@@ -335,17 +360,33 @@ public class ClickGUI extends Module_ {
         keybinds = Keybinds.value;
         fontSize = ((int) FontSize.value);
 
-        fonts = FontUtils.rearrangeFontsArray(FontManager.Originalfonts, FontManager.Originalfonts[Font.value]);
+        fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
 
         FontManager.INSTANCE.registerFonts();
+    }
+    public int getAccentColor(){
+        return AccentColor.getColor().getRGB();
     }
 
     @Override
     public void toggle() {
     }
+    public Theme getTheme(){
+        return (Theme) theme.getOption();
+    }
+
+    public enum Theme{
+        Rounded,
+        Rectangle
+    }
 
     public enum ScrollTypes {
         OLD,
         NEW
+    }
+
+    public enum ScriptEditorType {
+        System,
+        Client
     }
 }

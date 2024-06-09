@@ -13,16 +13,17 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
+import org.joml.Matrix4f;
 
-import java.util.ArrayList;
+import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -32,20 +33,21 @@ public class CategoryPane implements Listener {
     public static List<HudBox> hudBoxes = new CopyOnWriteArrayList<>();
     public final char icon;
     private final Screen parentScreen;
-    private final float delayBetweenButtons = 0.0f;
     private final HudBox hudBox;
+    public int maxWidth = 0;
     public Category category;
     public int x;
     public int y;
     public int height;
     public boolean collapsed;
     public Screen screen;
+    protected float scale = 0.0f;
     int startX, startY;
     boolean dragging = false;
-    ArrayList<ModuleButton> moduleButtons;
-    float delay = 0;
+    List<ModuleButton> moduleButtons;
     int categoryNameHeight = 2;
     private int scrollOffset = 0;
+
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
         this.category = category;
@@ -53,11 +55,26 @@ public class CategoryPane implements Listener {
         this.y = initialY;
         this.collapsed = collapsed;
         this.parentScreen = parentScreen;
-        moduleButtons = new ArrayList<ModuleButton>();
-        for (Module_ m : ModuleManager.INSTANCE.getModulesByCategory(category)) {
-            moduleButtons.add(new ModuleButton(m, parentScreen));
+        moduleButtons = new CopyOnWriteArrayList<ModuleButton>();
+        this.maxWidth = 0;
+        this.height = 4;
+        for (Module_ m : ModuleManager.getModulesByCategory(category)) {
+            ModuleButton mb = new ModuleButton(m, parentScreen);
+            moduleButtons.add(mb);
+            maxWidth = Math.max(maxWidth, mb.width);
+            height += mb.height + 3;
         }
-        height = Math.round((moduleButtons.size() * (5 + Renderer2D.getStringHeight())));
+        if (maxWidth < getWidth()) {
+            maxWidth = getWidth();
+        }
+        if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
+            MAX_HEIGHT = height;
+        } else {
+            MAX_HEIGHT = (int) Math.round(HeliosClient.CLICKGUI.CategoryHeight.value);
+            if (MAX_HEIGHT > height) {
+                MAX_HEIGHT = height;
+            }
+        }
 
         icon = category.icon;
 
@@ -65,7 +82,6 @@ public class CategoryPane implements Listener {
         hudBoxes.add(hudBox);
 
         EventManager.register(this);
-        update();
     }
 
     public static int getWidth() {
@@ -73,6 +89,8 @@ public class CategoryPane implements Listener {
     }
 
     public void addModule(List<Module_> moduleS) {
+
+        int prevSize = moduleButtons.size();
         for (Module_ module : moduleS) {
             boolean exists = false;
             for (ModuleButton button : moduleButtons) {
@@ -86,7 +104,26 @@ public class CategoryPane implements Listener {
                 moduleButtons.add(moduleButton);
             }
         }
+        if(moduleButtons.size() != prevSize) {
+            height = 4;
+            for (ModuleButton button : moduleButtons) {
+                maxWidth = Math.max(maxWidth, button.width);
+                height += button.height + 3;
+                if (maxWidth < getWidth()) {
+                    maxWidth = getWidth();
+                }
+            }
+        }
     }
+
+    public void update(float delta) {
+        // Update the scale
+        scale += delta;
+        if (scale > 1.0f) {
+            scale = 1.0f;
+        }
+    }
+
 
     public void removeModule(Module_ module) {
         moduleButtons.removeIf(button -> button.module == module);
@@ -94,45 +131,32 @@ public class CategoryPane implements Listener {
 
     public void keepOnlyModule(Module_ module) {
         moduleButtons.removeIf(button -> button.module != module);
+        height = 20;
     }
 
     public void removeModules() {
         moduleButtons.clear();
-    }
-
-    public void update() {
-        HeliosExecutor.execute(() -> {
-            float prevbuttonY = hudBox.getY();
-            for (ModuleButton button : moduleButtons) {
-                button.update(prevbuttonY);
-                if (!button.isAnimationDone()) {
-                    if (delay <= 0) {
-                        delay = delayBetweenButtons;
-                    }
-                    delay -= button.animationSpeed;
-                }
-                prevbuttonY = button.y;
-            }
-        });
+        height = 4;
+        maxWidth = 0;
     }
 
     @SubscribeEvent
     public void onFontChange(FontChangeEvent e) {
         categoryNameHeight = Math.round(Renderer2D.getFxStringHeight(category.name));
-    }
-
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
-        this.screen = HeliosClient.MC.currentScreen;
-        int maxWidth = 0;
+        maxWidth = 0;
         height = 4;
         for (ModuleButton m : moduleButtons) {
             maxWidth = Math.max(maxWidth, m.width);
-            height += categoryNameHeight + 10;
+            height += m.height + 3;
         }
-        if (maxWidth < getWidth() - 3) {
-            maxWidth = getWidth() - 3;
+        if (maxWidth < getWidth()) {
+            maxWidth = getWidth();
         }
+    }
 
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
+        update((float) (delta * HeliosClient.CLICKGUI.animationSpeed.value));
+        this.screen = HeliosClient.MC.currentScreen;
         if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
             MAX_HEIGHT = height;
         } else {
@@ -145,35 +169,33 @@ public class CategoryPane implements Listener {
             x = mouseX - startX;
             y = mouseY - startY;
         }
+        Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + (width + 5) / 2.0f, y + categoryNameHeight + 6, scale);
         if (!collapsed && height >= 10) {
-            Renderer2D.enableScissor(x-2,y+categoryNameHeight+6,width+5,(int) hudBox.getHeight());
-            if(GUI.get().categoryBorder.value) {
-                Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight, width + 2f, hudBox.getHeight() + 6, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
+            Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, width + 5, (int) hudBox.getHeight());
+            if (ModuleManager.get(GUI.class).categoryBorder.value) {
+                drawOutlineGradientBox(drawContext.getMatrices().peek().getPositionMatrix(),x,y,width);
             }
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary(), 100).getRGB());
-            Renderer2D.disableScissor();
+            drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary(), 100).getRGB());
         }
 
         if (collapsed) {
-            delay = 0;
+            scale = 0.0f;
         } else {
-            update();
             int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
-            Renderer2D.enableScissor(x - 2, y + 10, width + 2, Math.round(hudBox.getHeight()) + 6);
             for (ModuleButton m : moduleButtons) {
-                int animatedY = Math.round(m.getY() + (buttonYOffset - m.getY()) * m.getAnimationProgress());
-                m.render(drawContext, mouseX, mouseY, x , animatedY, maxWidth);
+                m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth);
 
                 int settingsHeight = m.renderSettings(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                 buttonYOffset += settingsHeight;
                 MAX_HEIGHT = settingsHeight + MAX_HEIGHT;
 
-                buttonYOffset += Math.round(Renderer2D.getFxStringHeight() + 10);
+                buttonYOffset += m.height + 3;
             }
             Renderer2D.disableScissor();
         }
+        Renderer2D.stopScaling(drawContext.getMatrices());
 
-        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 2, y, width + 4.5f, categoryNameHeight + 8, 3,2, ColorUtils.changeAlpha(GUI.get().categoryPaneColors.getColor(), 255).getRGB());
+        drawRectangleWithShadow(drawContext.getMatrices(), x - 2, y,true,true,true,true, width + 4.5f, categoryNameHeight + 8, 3, 2, ColorUtils.changeAlpha(ModuleManager.get(GUI.class).categoryPaneColors.getColor(), 255).getRGB());
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
         hudBox.set(x, y, width, MAX_HEIGHT);
@@ -181,7 +203,6 @@ public class CategoryPane implements Listener {
         FontRenderers.iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), -1);
 
     }
-
 
     public boolean hovered(double mouseX, double mouseY) {
         return mouseX >= x - 2 && mouseX <= x + width + 4.5f && mouseY >= y && mouseY <= y + categoryNameHeight + 8;
@@ -194,12 +215,17 @@ public class CategoryPane implements Listener {
 
     @SubscribeEvent
     public void mouseClicked(MouseClickEvent event) {
+
+        //Do not accept any clicks if the mouse is over the search bar
+        if (ClickGUIScreen.INSTANCE.searchBar.isMouseOverInputBox(event.getMouseX(), event.getMouseY())) return;
+
+
         if (screen != null && event.getScreen() == screen) {
             int mouseX = (int) event.getMouseX();
             int mouseY = (int) event.getMouseY();
             int button = event.getButton();
 
-            if (hovered(mouseX, mouseY) && button == 1) collapsed = !collapsed;
+            if (hovered(mouseX, mouseY) && button == 1) toggleCollapsed();
             else if (hovered(mouseX, mouseY) && button == 0) {
                 startX = mouseX - x;
                 startY = mouseY - y;
@@ -213,6 +239,34 @@ public class CategoryPane implements Listener {
             for (ModuleButton moduleButton : moduleButtons) {
                 moduleButton.collapsed = collapsed;
             }
+        }
+    }
+    private void drawOutlineGradientBox(Matrix4f matrix4f, float x, float y, float width){
+        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
+            Renderer2D.drawOutlineGradientRoundedBox(matrix4f, x - 1, y + categoryNameHeight, width + 2f, hudBox.getHeight() + 6, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
+        }else{
+            Renderer2D.drawOutlineGradientBox(matrix4f,x-1,y + categoryNameHeight,width + 2f, hudBox.getHeight() + 6,1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
+        }
+    }
+    private void drawRectangle(Matrix4f matrix4f, float x, float y,boolean TL, boolean TR, boolean BL, boolean BR, float width, float height,float radius, int color){
+        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
+            Renderer2D.drawRoundedRectangle(matrix4f, x, y,TL,TR,BL,BR, width, height, radius, color);
+        }else{
+            Renderer2D.drawRectangle(matrix4f,x,y,width,height,color);
+        }
+    }
+    private void drawRectangleWithShadow(MatrixStack stack, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int blurRadius, int color){
+        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
+            Renderer2D.drawRoundedRectangleWithShadow(stack, x, y, width, height, radius,blurRadius, color,TL,TR,BL,BR);
+        }else{
+            Renderer2D.drawRectangleWithShadow(stack,x,y,width,height,color,blurRadius);
+        }
+    }
+
+    public void toggleCollapsed() {
+        collapsed = !collapsed;
+        if (collapsed) {
+            scale = 0.0f;
         }
     }
 

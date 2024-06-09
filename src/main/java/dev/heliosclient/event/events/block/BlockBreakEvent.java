@@ -30,7 +30,7 @@ public class BlockBreakEvent extends Event {
     }
 
     /**
-     *  Lua code: "state"
+     * Lua code: "state"
      *
      * @return State of BlockBreakEvent
      */

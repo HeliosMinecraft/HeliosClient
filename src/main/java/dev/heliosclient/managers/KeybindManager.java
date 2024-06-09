@@ -13,17 +13,22 @@ import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
-import dev.heliosclient.ui.notification.notifications.InfoNotification;
-import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
+import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.AnvilScreen;
+import net.minecraft.client.gui.screen.multiplayer.AddServerScreen;
+import net.minecraft.client.gui.screen.multiplayer.DirectConnectScreen;
+import net.minecraft.client.gui.screen.world.CreateWorldScreen;
+import net.minecraft.client.gui.screen.world.EditWorldScreen;
 import org.lwjgl.glfw.GLFW;
 
 public class KeybindManager implements Listener {
     private static final int[] CPS = new int[2];
     public static KeybindManager INSTANCE = new KeybindManager();
-    static boolean isWPressed = false, isAPressed  = false, isSPressed  = false, isDPressed  = false, isSpacePressed  = false;
+    static boolean isWPressed = false, isAPressed = false, isSPressed = false, isDPressed = false, isSpacePressed = false;
     // For KeyStrokes.
     //Todo: Make KeyStrokes element
     private static long lastLeftClick = 0;
@@ -37,32 +42,29 @@ public class KeybindManager implements Listener {
     public void keyPressedEvent(KeyPressedEvent event) {
         int key = event.getKey();
 
-        if(!KeyBind.listening && !KeyBind.listeningKey) {
+        if (!KeyBind.listening && !KeyBind.listeningKey) {
             if (key == HeliosClient.CLICKGUI.clickGUIKeyBind.value && shouldOpen()) {
                 ClickGUIScreen.INSTANCE.onLoad();
                 HeliosClient.MC.setScreen(ClickGUIScreen.INSTANCE);
-            }
-            if (key == HeliosClient.CLICKGUI.consoleScreen.value && shouldOpen()) {
-                HeliosClient.MC.setScreen(HeliosClient.CONSOLE);
             }
         }
 
         if (HeliosClient.MC.currentScreen != null) return;
 
-        for (Module_ module : ModuleManager.INSTANCE.modules) {
+        for (Module_ module : ModuleManager.getModules()) {
             if (module.getKeybind() != null && module.getKeybind() != -1 && key == module.getKeybind()) {
                 if (module.toggleOnBindRelease.value) {
                     module.onEnable();
-                    module.sendEnableNotification();
+                    module.sendNotification(true);
                 } else {
                     module.toggle();
                 }
             }
         }
 
-        for(int i = 0; i < LuaScriptManager.luaFiles.size();i++){
+        for (int i = 0; i < LuaScriptManager.luaFiles.size(); i++) {
             LuaFile file = LuaScriptManager.luaFiles.get(i);
-            if(file.bindKey != -1 && file.bindKey == key) {
+            if (file.bindKey != -1 && file.bindKey == key) {
                 LuaScriptManager.toggleScript(file);
             }
         }
@@ -83,11 +85,11 @@ public class KeybindManager implements Listener {
         if (HeliosClient.MC.currentScreen != null) return;
         int key = event.getKey();
 
-        for (Module_ module : ModuleManager.INSTANCE.modules) {
+        for (Module_ module : ModuleManager.getModules()) {
             if (module.getKeybind() != null && module.getKeybind() != -1 && key == module.getKeybind()) {
                 if (module.toggleOnBindRelease.value) {
                     module.onDisable();
-                    module.sendDisableNotification();
+                    module.sendNotification(false);
                 }
             }
         }
@@ -106,11 +108,11 @@ public class KeybindManager implements Listener {
     public void mouseClicked(MouseClickEvent event) {
         if (HeliosClient.MC.currentScreen != null) return;
 
-        for (Module_ module : ModuleManager.INSTANCE.modules) {
+        for (Module_ module : ModuleManager.getModules()) {
             if (module.getKeybind() != null && module.getKeybind() != -1 && event.getButton() == module.getKeybind()) {
                 if (module.toggleOnBindRelease.value) {
                     module.onEnable();
-                    module.sendEnableNotification();
+                    module.sendNotification(true);
                 } else {
                     module.toggle();
                 }
@@ -123,15 +125,16 @@ public class KeybindManager implements Listener {
             CPS[1]++;
         }
     }
+
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
     public void mouseReleased(MouseReleaseEvent event) {
         if (HeliosClient.MC.currentScreen != null) return;
 
-        for (Module_ module : ModuleManager.INSTANCE.modules) {
+        for (Module_ module : ModuleManager.getModules()) {
             if (module.getKeybind() != null && module.getKeybind() != -1 && event.getButton() == module.getKeybind()) {
                 if (module.toggleOnBindRelease.value) {
                     module.onDisable();
-                    module.sendDisableNotification();
+                    module.sendNotification(false);
                 }
             }
         }
@@ -153,9 +156,19 @@ public class KeybindManager implements Listener {
             lastRightClick = currentTime;
         }
     }
-    public boolean shouldOpen(){
-        return !(HeliosClient.MC.currentScreen instanceof ChatScreen) && !(HeliosClient.MC.currentScreen instanceof AbstractInventoryScreen)
-                && !(HeliosClient.MC.currentScreen instanceof GameMenuScreen);
+
+    public boolean shouldOpen() {
+        return !(HeliosClient.MC.currentScreen instanceof ChatScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof AbstractInventoryScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof GameMenuScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof AddServerScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof DirectConnectScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof CreateWorldScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof EditWorldScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof AbstractSettingScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof AnvilScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof HudEditorScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof ClickGUIScreen);
     }
 
     public int getLeftCPS() {

@@ -1,6 +1,7 @@
 package dev.heliosclient.scripting;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
@@ -13,7 +14,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class is responsible for loading Lua scripts from a specified directory.
@@ -39,13 +42,13 @@ public class LuaLoader {
             if (onRunFunction.isfunction()) {
                 onRunFunction.call();
             } else {
-                ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onRun() function not found for " +  ColorUtils.blue + luaFile.getAbsolutePath() + ColorUtils.darkRed  + " during loading");
-                HeliosClient.LOGGER.error("onRun() function not found for file: " + luaFile.getName() + " during loading");
+                ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onRun() function not found for " + ColorUtils.blue + luaFile.getAbsolutePath() + ColorUtils.darkRed + " during loading");
+                HeliosClient.LOGGER.error("onRun() function not found for file: {} during loading", luaFile.getName());
             }
             luaFile.isLoaded = true;
-            ChatUtils.sendHeliosMsg(ColorUtils.green + "Loaded LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + luaFile.getName() +ColorUtils.gray+ "]" );
-            if(HeliosClient.shouldSendNotification() && NotificationModule.get().scriptNotifications.value){
-                NotificationManager.addNotification(new InfoNotification(luaFile.getName(), "was loaded!",1000, SoundUtils.TING_SOUNDEVENT));
+            ChatUtils.sendHeliosMsg(ColorUtils.green + "Loaded LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + luaFile.getName() + ColorUtils.gray + "]");
+            if (HeliosClient.shouldSendNotification() && ModuleManager.get(NotificationModule.class).scriptNotifications.value) {
+                NotificationManager.addNotification(new InfoNotification(luaFile.getName(), "was loaded!", 1000, SoundUtils.TING_SOUNDEVENT));
             }
 
         } catch (FileNotFoundException e) {
@@ -67,19 +70,20 @@ public class LuaLoader {
             if (onRunFunction.isfunction()) {
                 onRunFunction.call();
             } else {
-                ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onStop() function not found for " +  ColorUtils.blue + file.getAbsolutePath() + ColorUtils.darkRed  + " during loading");
+                ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onStop() function not found for " + ColorUtils.blue + file.getAbsolutePath() + ColorUtils.darkRed + " during loading");
                 HeliosClient.LOGGER.error("onStop() function not found for file: " + file.getAbsolutePath() + " during loading");
             }
             file.getReader().close();
             file.isLoaded = false;
-            ChatUtils.sendHeliosMsg(ColorUtils.green + "Closed LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + file.getScriptName() +ColorUtils.gray+ "]" );
-            if(HeliosClient.shouldSendNotification() && NotificationModule.get().scriptNotifications.value){
-                NotificationManager.addNotification(new InfoNotification(file.getScriptName(), "was unloaded!",1000, SoundUtils.TING_SOUNDEVENT));
+            ChatUtils.sendHeliosMsg(ColorUtils.green + "Closed LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + file.getScriptName() + ColorUtils.gray + "]");
+            if (HeliosClient.shouldSendNotification() && ModuleManager.get(NotificationModule.class).scriptNotifications.value) {
+                NotificationManager.addNotification(new InfoNotification(file.getScriptName(), "was unloaded!", 1000, SoundUtils.TING_SOUNDEVENT));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Retrieves all Lua scripts from the scripts folder.
      *
@@ -95,10 +99,10 @@ public class LuaLoader {
         return files;
     }
 
-    public void toggleScript(LuaFile file){
-        if(file.isLoaded()){
+    public void toggleScript(LuaFile file) {
+        if (file.isLoaded()) {
             this.close(file);
-        }else{
+        } else {
             this.load(file);
         }
     }
@@ -131,13 +135,13 @@ public class LuaLoader {
     }
 
     private LuaFile createLuaFile(File f) {
-        HeliosClient.LOGGER.info("Getting Script " + f.getAbsolutePath());
-        LuaExecutor executor = new LuaExecutor(HeliosClient.MC,LuaEventManager.INSTANCE);
+        HeliosClient.LOGGER.info("Getting Script {}", f.getAbsolutePath());
+        LuaExecutor executor = new LuaExecutor(HeliosClient.MC, LuaEventManager.INSTANCE);
         LuaFile file;
-        for(int i = 0;i<LuaScriptManager.luaFiles.size(); i++){
+        for (int i = 0; i < LuaScriptManager.luaFiles.size(); i++) {
             file = LuaScriptManager.luaFiles.get(i);
-            if(f.toString().equalsIgnoreCase(file.toString())){
-                file =  new LuaFile(f.getPath(), executor);
+            if (f.toString().equalsIgnoreCase(file.toString())) {
+                file = new LuaFile(f.getPath(), executor);
                 file.setBindKey(file.bindKey);
                 return file;
             }

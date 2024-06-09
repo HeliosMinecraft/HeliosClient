@@ -23,7 +23,6 @@ public class ConfigManager {
     private final Map<String, File> configFiles = new HashMap<>();
     // TomlWriter to write the configuration to the file.
     private final TomlWriter tomlWriter = new TomlWriter.Builder()
-            .indentTablesBy(2)
             .build();
     // Directory where the configuration files are stored.
     private File configDir;
@@ -125,7 +124,7 @@ public class ConfigManager {
         for (String name : names) {
             try {
                 if (!configFiles.containsKey(name) || !configMaps.containsKey(name)) {
-                    HeliosClient.LOGGER.warn(name + " not found for saving configuration");
+                    HeliosClient.LOGGER.warn("{} not found for saving configuration", name);
                     throw new FileNotFoundException();
                 }
                 if (!FileUtils.doesFileInPathExist(configFiles.get(name).getPath())) {
@@ -160,6 +159,7 @@ public class ConfigManager {
                 })
                 .collect(Collectors.toList());
     }
+
     /**
      * Checks if any of the TOML files is empty.
      *

@@ -6,9 +6,6 @@ import dev.heliosclient.event.LuaEvent;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.scripting.LuaEventManager;
-import dev.heliosclient.system.HeliosExecutor;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import java.lang.invoke.MethodHandle;
@@ -29,7 +26,7 @@ public class EventManager {
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     private static final Map<Class<?>, Long> LAST_POSTED = new ConcurrentHashMap<>();
     private static final long TIME_FRAME = TimeUnit.MINUTES.toMillis(1); // 1 minute timeframe
-    private static Executor executor = Executors.newFixedThreadPool(10);
+    private static final Executor executor = Executors.newFixedThreadPool(10);
 
     public static void register(Listener listener) {
         Map<Class<?>, List<MethodHandle>> listenerMethods = new HashMap<>();
@@ -60,12 +57,17 @@ public class EventManager {
         INSTANCE.remove(listener);
     }
 
+    /**
+     * @param event Event to post
+     * @return Same event returned.
+     */
     public static Event postEvent(Event event) {
         Class<?> eventType = event.getClass();
         for (Map.Entry<Listener, Map<Class<?>, List<MethodHandle>>> entry : INSTANCE.entrySet()) {
             List<MethodHandle> methodHandles = entry.getValue().get(eventType);
             if (methodHandles != null) {
                 for (MethodHandle methodHandle : methodHandles) {
+                    //     System.out.println(methodHandle + ", Event: "+event);
                     try {
                         methodHandle.invoke(entry.getKey(), event);
                     } catch (Throwable e) {
@@ -115,7 +117,7 @@ public class EventManager {
 
 
     private static void handleException(Throwable e, Listener listener, Event event) {
-        HeliosClient.LOGGER.info("Exception occurred while processing event: " + event.getClass().getName() + " \n Following was the listener: " + listener, e);
+        HeliosClient.LOGGER.info("Exception occurred while processing event: {} \n Following was the listener: {}", event.getClass().getName(), listener, e);
         HeliosClient.LOGGER.warn("An error occurred while processing an event. Please check the log file for details.");
     }
 

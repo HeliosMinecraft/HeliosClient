@@ -76,6 +76,7 @@ public class SettingGroup {
         }
     }
 
+    //Todo: Rename to renderGroup
     public void renderBuilder(DrawContext drawContext, int x, int yOffset, int windowWidth) {
         this.x = x;
         this.y = yOffset;

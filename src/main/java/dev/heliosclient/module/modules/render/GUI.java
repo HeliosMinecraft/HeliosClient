@@ -2,9 +2,11 @@ package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Categories;
-import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.*;
+import dev.heliosclient.module.settings.BooleanSetting;
+import dev.heliosclient.module.settings.CycleSetting;
+import dev.heliosclient.module.settings.RGBASetting;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 
@@ -79,18 +81,18 @@ public class GUI extends Module_ {
             .onSettingChange(this)
             .build()
     );
-    private static GUI INSTANCE = new GUI();
 
-
-    protected GUI() {
+    public GUI() {
         super("GUI", "The HeliosClient GUI settings.", Categories.RENDER);
         active.value = true;
 
         GradientType.alsoRender(renderContext -> {
-            Renderer2D.drawRoundedGradientRectangle(renderContext.drawContext().getMatrices().peek().getPositionMatrix(),ColorManager.INSTANCE.primaryGradientStart,ColorManager.INSTANCE.primaryGradientEnd,ColorManager.INSTANCE.primaryGradientEnd,ColorManager.INSTANCE.primaryGradientStart, renderContext.x() + 170,renderContext.y() + 2,20,15,2);
+            Renderer2D.drawRoundedGradientRectangle(renderContext.drawContext().getMatrices().peek().getPositionMatrix(), ColorManager.INSTANCE.primaryGradientStart, ColorManager.INSTANCE.primaryGradientEnd, ColorManager.INSTANCE.primaryGradientEnd, ColorManager.INSTANCE.primaryGradientStart, renderContext.x() + 170, renderContext.y() + 2, 20, 15, 2);
         });
 
         addSettingGroup(sgColors);
+        addQuickSettings(sgColors.getSettings());
+
     }
 
     @Override
@@ -120,9 +122,5 @@ public class GUI extends Module_ {
                 }
             }
         }
-    }
-
-    public static GUI get(){
-        return INSTANCE;
     }
 }

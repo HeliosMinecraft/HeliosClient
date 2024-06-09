@@ -1,6 +1,5 @@
 package dev.heliosclient.ui.clickgui;
 
-import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
@@ -17,8 +16,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.AbstractMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class SettingsScreen extends AbstractSettingScreen implements IWindowContentRenderer {
     private final float delayBetweenSettings = 0.2f;
@@ -31,19 +28,19 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
 
     public void updateSetting() {
         HeliosExecutor.execute(() -> module.settingGroups.stream()
-                    .filter(SettingGroup::shouldRender)
-                    .flatMap(settingGroup -> settingGroup.getSettings().stream()
-                            .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
-                    .filter(entry -> entry.getValue().shouldRender())
-                    .forEach(entry -> {
-                        SettingGroup settingGroup = entry.getKey();
-                        Setting<?> setting = entry.getValue();
-                        setting.update(settingGroup.getY());
-                        if (!setting.isAnimationDone() && delay.get() <= 0) {
-                            delay.set(delayBetweenSettings);
-                            delay.set(delay.get() - setting.animationSpeed);
-                        }
-                    }));
+                .filter(SettingGroup::shouldRender)
+                .flatMap(settingGroup -> settingGroup.getSettings().stream()
+                        .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
+                .filter(entry -> entry.getValue().shouldRender())
+                .forEach(entry -> {
+                    SettingGroup settingGroup = entry.getKey();
+                    Setting<?> setting = entry.getValue();
+                    setting.update(settingGroup.getY());
+                    if (!setting.isAnimationDone() && delay.get() <= 0) {
+                        delay.set(delayBetweenSettings);
+                        delay.set(delay.get() - setting.getAnimationSpeed());
+                    }
+                }));
     }
 
 
@@ -60,9 +57,9 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
-                windowHeight += setting.height + 1;
+                windowHeight += setting.getHeight() + 1;
             }
-            windowHeight += Math.round(settingGroup.getGroupNameHeight() + 2);
+            windowHeight += 8;
         }
 
         window.setWindowHeight(windowHeight);
@@ -97,7 +94,7 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
                         // Update the y position of the setting based on its animation progress
                         int animatedY = Math.round(setting.getY() + (yOffset - setting.getY()) * setting.getAnimationProgress());
                         setting.render(drawContext, x + 16, animatedY + 6, mouseX, mouseY, textRenderer);
-                        yOffset += setting.height + 1;
+                        yOffset += setting.getHeight() + 1;
                     } else {
                         resetSettingAnimation(setting);
                     }
@@ -111,14 +108,14 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
     }
 
     private void resetSettingAnimation(Setting<?> setting) {
-        setting.animationDone = false;
+        setting.setAnimationDone(false);
         delay.set(0);
         setting.setAnimationProgress(0.5f);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if(keyCode == GLFW.GLFW_KEY_ESCAPE){
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             mc.setScreen(ClickGUIScreen.INSTANCE);
         }
         return super.keyPressed(keyCode, scanCode, modifiers);

@@ -1,8 +1,5 @@
 package dev.heliosclient.addon;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import dev.heliosclient.HeliosClient;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
@@ -10,12 +7,8 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
 
 import java.io.File;
-import java.io.FileReader;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class AddonManager {
     public static final List<HeliosAddon> HELIOS_ADDONS = new ArrayList<>();
@@ -44,12 +37,12 @@ public class AddonManager {
             try {
                 addon = entrypoint.getEntrypoint();
             } catch (Throwable e) {
-                throw new RuntimeException("An error has occured during loading addon \"%s\"".formatted(metadata.getName()), e);
+                throw new RuntimeException("An error has occurred during loading addon \"%s\"".formatted(metadata.getName()), e);
             }
 
             addon.name = metadata.getName();
 
-            if (metadata.getAuthors().isEmpty()){
+            if (metadata.getAuthors().isEmpty()) {
                 throw new RuntimeException("The authors field in fabric.mod.json must contain at least one author for addon \"%s\"".formatted(addon.name));
             }
 

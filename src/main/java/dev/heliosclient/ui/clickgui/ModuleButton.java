@@ -17,37 +17,31 @@ import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.SoundUtils;
-import dev.heliosclient.util.animation.AnimationUtils;
-import dev.heliosclient.util.animation.Easing;
-import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 
 public class ModuleButton implements Listener {
+
     public final Screen parentScreen;
     private final HudBox hitBox;
-    private final float delayBetweenSettings = 0.1f;
     public int hoverAnimationTimer;
     public Module_ module;
     public float x, y;
     public int width, height;
     public boolean settingsOpen = false;
     public int boxHeight = 0;
-    public boolean animationDone = false;
     public Screen screen;
     public boolean collapsed = false;
-    float animationSpeed = 0.13f;
-    float delay = 0;
-    int settingHeight = 0;
-    private boolean faded = true;
-    private float targetY;
-    private float animationProgress = 0;
+    protected float scale = 0.0f;
+
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
         this.width = CategoryPane.getWidth() - 2;
@@ -57,49 +51,24 @@ public class ModuleButton implements Listener {
         EventManager.register(this);
     }
 
+    public void updateScale(boolean expand) {
+        if (expand) {
+            scale += (float) (HeliosClient.MC.getTickDelta() * HeliosClient.CLICKGUI.animationSpeed.value);
+            if (scale > 1.0f) {
+                scale = 1.0f;
 
-    public void updateSetting() {
-        settingHeight = 2;
-
-        module.quickSettings.stream().filter(Setting::shouldRender)
-                .forEach(entry -> {
-                    entry.update(entry.getY());
-                    settingHeight += entry.heightCompact;
-                    if (!entry.isAnimationDone() && delay <= 0) {
-                        delay = delayBetweenSettings;
-                        delay -= entry.animationSpeed;
-                    }
-                });
-    }
-
-    public void update(float targetY) {
-        if (!animationDone) {
-            //the first update, set the initial position above the target
-            if (animationProgress == 0) {
-                y = (int) (targetY);
             }
+        } else {
+            scale -= (float) (HeliosClient.MC.getTickDelta() * HeliosClient.CLICKGUI.animationSpeed.value);
+            if (scale < 0.0f) {
+                scale = 0.0f;
 
-            this.targetY = targetY;
-            animationProgress += animationSpeed;
-            animationProgress = Math.min(animationProgress, 1);
-
-            float easedProgress = Easing.ease(EasingType.LINEAR_IN_OUT, animationProgress);
-            y = Math.round(AnimationUtils.lerp(y, this.targetY, easedProgress));
-            if (animationProgress >= 1) {
-                animationDone = true;
             }
         }
+
     }
 
-    public void setFaded(boolean faded) {
-        this.faded = faded;
-    }
-
-    public boolean hasFaded() {
-        return faded;
-    }
-
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float  x, int y, int maxWidth) {
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float x, int y, int maxWidth) {
         this.screen = HeliosClient.MC.currentScreen;
         this.x = x;
         this.y = y;
@@ -116,20 +85,22 @@ public class ModuleButton implements Listener {
 
         hitBox.set(x, y, width, height);
 
-        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(GUI.get().buttonColor.getColor(), 100);
-        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(GUI.get().buttonColor.getColor(), 100);
+        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(ModuleManager.get(GUI.class).buttonColor.getColor(), 100);
+        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(ModuleManager.get(GUI.class).buttonColor.getColor(), 100);
         Color blendedColor = ColorUtils.blend(fillColorStart, fillColorEnd, 1 / 2f);
 
         int textY = y + (height - moduleNameHeight) / 2;
 
         if (hitBox.contains(mouseX, mouseY)) {
             textY = textY - 1;
-            Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y-1, width, height, fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, 2, 5, blendedColor);
+            drawGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y - 1, fillColorStart, fillColorEnd, fillColorEnd, fillColorStart,width, height, 2, 5, blendedColor);
         } else {
-            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y, width, height, 2);
+            drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y, width, height, 2);
         }
         if (settingsOpen && boxHeight >= 4) {
-            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorStart, 100), x + 1, y + height, width, boxHeight + 2, 2);
+            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2.0f, y + this.height + 2, scale);
+            drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorStart, 100), x + 1, y + height, width, boxHeight + 2, 2);
+            Renderer2D.stopScaling(drawContext.getMatrices());
         }
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor());
@@ -142,18 +113,30 @@ public class ModuleButton implements Listener {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getCustomStringWidth(keyName, FontRenderers.Small_fxfontRenderer)), textY, ColorManager.INSTANCE.defaultTextColor);
         }
     }
+    private void drawGradientRectangle(Matrix4f matrix4f, Color color1, Color color2, Color color3, Color color4,float x, float y, float width, float height, float radius){
+        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
+            Renderer2D.drawRoundedGradientRectangle(matrix4f,color1,color2,color3,color4,x, y,width, height, radius);
+        }else{
+            Renderer2D.drawGradient(matrix4f,x,y,width,height,color1.getRGB(),color3.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
+        }
+    }
+    private void drawGradientRectangleWithShadow(MatrixStack stack, float x, float y,Color color1, Color color2, Color color3, Color color4,float width, float height, float radius, int blurRadius, Color blurColor){
+        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
+            Renderer2D.drawRoundedGradientRectangleWithShadow(stack, x, y, width, height,color1,color2,color3,color4, radius,blurRadius,blurColor);
+        }else{
+            Renderer2D.drawGradientWithShadow(stack,x,y,width,height,blurRadius,color1.getRGB(),color3.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
+        }
+    }
 
     public int renderSettings(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         int buttonYOffset = 0;
-        if (settingsOpen) {
-            updateSetting();
+        updateScale(settingsOpen);
+        if (scale > 0.0f) {
             buttonYOffset = y + this.height + 2;
-
+            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2, y + this.height + 2, scale);
             for (Setting<?> setting : module.quickSettings) {
-
                 // Reset the animation if the setting is not visible.
                 if (!setting.shouldRender()) {
-                    resetAnimation(setting);
                     continue;
                 }
                 // Set the screen for the settings
@@ -167,45 +150,39 @@ public class ModuleButton implements Listener {
                 if (buttonYOffset >= y + 3) {
                     setting.quickSettings = settingsOpen;
 
-                    int animatedY = getAnimatedY(setting, buttonYOffset);
-
-                    setting.renderCompact(drawContext, x, animatedY + 1, mouseX, mouseY, textRenderer);
+                    setting.renderCompact(drawContext, x, buttonYOffset + 1, mouseX, mouseY, textRenderer);
                     buttonYOffset += setting.heightCompact + 1;
                 }
             }
+            Renderer2D.stopScaling(drawContext.getMatrices());
 
             if (!module.quickSettings.isEmpty()) {
                 buttonYOffset += 2;
             }
-            setBoxHeight(buttonYOffset - y - this.height - 2);
-        } else {
-            module.quickSettings.forEach(this::resetAnimation);
         }
+
+        //Multiplying by the scale gives us the "sliding in/out" effect.
+
+        int finalHeight = Math.round((buttonYOffset - y - this.height - 2) * scale);
+        setBoxHeight(finalHeight);
+
         // Return the total height of the quick settings
-        return buttonYOffset > 2 ? buttonYOffset - y - this.height - 2 : 0;
-    }
-
-    public int getAnimatedY(Setting<?> setting, int offset) {
-        return Math.round(setting.getY() + (offset - setting.getY()) * setting.getAnimationProgress());
-    }
-
-    private void resetAnimation(Setting<?> setting) {
-        setting.animationDone = false;
-        delay = 0;
-        setting.setAnimationProgress(0.5f);
+        return buttonYOffset > 2 ? finalHeight : 0;
     }
 
     @SubscribeEvent
     public boolean mouseClicked(MouseClickEvent event) {
+        //Do not accept any clicks if the mouse is over the search bar
+        if (ClickGUIScreen.INSTANCE.searchBar.isMouseOverInputBox(event.getMouseX(), event.getMouseY())) return false;
+
         if (screen != null && event.getScreen() == screen) {
             double mouseX = event.getMouseX();
             double mouseY = event.getMouseY();
             int button = event.getButton();
             if (!collapsed) {
-                setFaded(false);
                 if (hitBox.contains(mouseX, mouseY)) {
                     if (button == 0) {
-                        if(HeliosClient.CLICKGUI.clickGUISound.value) {
+                        if (HeliosClient.CLICKGUI.clickGUISound.value) {
                             SoundUtils.playInstanceSound(SoundUtils.CLICK_SOUNDEVENT);
                         }
                         module.toggle();
@@ -228,12 +205,7 @@ public class ModuleButton implements Listener {
             }
 
             if (collapsed) {
-                for (Setting<?> setting : module.quickSettings) {
-                    resetAnimation(setting);
-                }
-                setFaded(true);
-                animationDone = false;
-                setAnimationProgress(0.0f);
+                scale = 0.0f;
             }
         }
         return false;
@@ -247,23 +219,7 @@ public class ModuleButton implements Listener {
         this.boxHeight = boxHeight;
     }
 
-    public float getAnimationProgress() {
-        return animationProgress;
-    }
-
-    public void setAnimationProgress(float animationProgress) {
-        this.animationProgress = animationProgress;
-    }
-
-    public float getTargetY() {
-        return targetY;
-    }
-
     public float getY() {
         return y;
-    }
-
-    public boolean isAnimationDone() {
-        return animationDone;
     }
 }

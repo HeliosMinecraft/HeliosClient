@@ -30,15 +30,25 @@ public class DiscordRPC {
     private Thread callbackThread;
     private Core discordCore;
     private Activity activity;
+    static File tempDir = new File(System.getProperty("java.io.tmpdir"), "java");
+
+
     public void init() {
         try {
-            File temp = this.getSDKLibrary();
+            File sdkFile = this.getSDKLibrary();
 
             // Initialize the Core with the existing or downloaded file
-            Core.init(temp);
+
+            File tempJNIDir = new File(System.getProperty("java.io.tmpdir") + "/java", "jni-"+System.nanoTime());
+            if(!(tempJNIDir.exists() && tempJNIDir.isDirectory()) && !tempJNIDir.mkdir())
+                throw new RuntimeException(new IOException("Cannot create temporary JNI directory"));
+            tempJNIDir.deleteOnExit();
+
+            Core.init(sdkFile,tempJNIDir);
+
         } catch (IOException | RuntimeException e) {
             AnimationUtils.addErrorToast("Discord Core init failed. Check logs for details.", false, 1500);
-            HeliosClient.LOGGER.error("Discord Core init failed.",e);
+            HeliosClient.LOGGER.error("Discord Core init failed.", e);
         }
     }
 
@@ -47,95 +57,95 @@ public class DiscordRPC {
      * In this version, it checks if the required file already exists in the Temp folder,
      * If not then it will proceed to download and extract a new one.
      * <p>
-     * Modified because the original downloads the file everytime.
+     * Modified because the original downloads the file everytime and fills the temp folder quickly.
      * </p>
      *
      * @return Temp file needed
      * @throws IOException
      */
-    private File getSDKLibrary() throws IOException{
-            // Find out which name Discord's library has (.dll for Windows, .so for Linux)
-            String name = "discord_game_sdk";
-            String suffix;
+    private File getSDKLibrary() throws IOException {
+        // Find out which name Discord's library has (.dll for Windows, .so for Linux)
+        String name = "discord_game_sdk";
+        String suffix;
 
-            String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-            String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+        String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
 
-            if (osName.contains("windows")) {
-                suffix = ".dll";
-            } else if (osName.contains("linux")) {
-                suffix = ".so";
-            } else if (osName.contains("mac os")) {
-                suffix = ".dylib";
-            } else {
-                throw new RuntimeException("cannot determine OS type: " + osName);
-            }
+        if (osName.contains("windows")) {
+            suffix = ".dll";
+        } else if (osName.contains("linux")) {
+            suffix = ".so";
+        } else if (osName.contains("mac os")) {
+            suffix = ".dylib";
+        } else {
+            throw new RuntimeException("cannot determine OS type: " + osName);
+        }
 
-            if (arch.equals("amd64"))
-                arch = "x86_64";
+        if (arch.equals("amd64"))
+            arch = "x86_64";
 
-            // Path of Discord's library inside the ZIP
-            String zipPath = "lib/" + arch + "/" + name + suffix;
+        // Path of Discord's library inside the ZIP
+        String zipPath = "lib/" + arch + "/" + name + suffix;
 
-            // Create a new temporary directory
-            File tempDir = new File(System.getProperty("java.io.tmpdir"), "java");
-            File temp = new File(tempDir, name + suffix);
+        // Create a new temporary directory
+        File temp = new File(tempDir, name + suffix);
 
-            // Check if the file already exists
-            if (!temp.exists()) {
-                // If not, download discord sdk and extract it
-                URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip");
-                ZipInputStream zin = new ZipInputStream(downloadUrl.openStream());
+        // Check if the file already exists
+        if (!temp.exists()) {
+            // If not, download discord sdk and extract it
+            URL downloadUrl = new URL("https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip");
+            ZipInputStream zin = new ZipInputStream(downloadUrl.openStream());
 
-                // Search for the right file inside the ZIP
-                ZipEntry entry;
-                while ((entry = zin.getNextEntry()) != null) {
-                    if (entry.getName().equals(zipPath)) {
-                        if (!tempDir.mkdir())
-                            throw new IOException("Cannot create temporary directory");
-                        tempDir.deleteOnExit();
+            // Search for the right file inside the ZIP
+            ZipEntry entry;
+            while ((entry = zin.getNextEntry()) != null) {
+                if (entry.getName().equals(zipPath)) {
+                    if (!tempDir.mkdir())
+                        throw new IOException("Cannot create temporary directory");
 
-                        // Copy the file in the ZIP to our temporary file
-                        Files.copy(zin, temp.toPath());
+                    tempDir.deleteOnExit();
 
-                        // We are done, so close the input stream
-                        zin.close();
+                    // Copy the file in the ZIP to our temporary file
+                    Files.copy(zin, temp.toPath());
 
-                        return temp;
-                    }
+                    // We are done, so close the input stream
+                    zin.close();
 
-                    // Next entry
-                    zin.closeEntry();
+                    return temp;
                 }
-                // Close if not found and throw new error
-                zin.close();
-                throw new FileNotFoundException("Required GameSDK file was not found");
+
+                // Next entry
+                zin.closeEntry();
             }
-            return temp;
+            // Close if not found and throw new error
+            zin.close();
+            throw new FileNotFoundException("Required GameSDK file was not found");
+        }
+        return temp;
     }
 
-    public void runPresence(Module_ module) throws GameSDKException{
+    public void runPresence(Module_ module) throws GameSDKException {
         callbackThread = new Thread(() -> {
-        LOGGER.info("Discord Rich Presence is running!");
+            LOGGER.info("Discord Rich Presence is running!");
 
-        try (CreateParams params = new CreateParams()) {
-            // Please don't hack me ಥ_ಥ
-            params.setClientID(1203402546626957373L);
-            params.setFlags(CreateParams.Flags.NO_REQUIRE_DISCORD);
+            try (CreateParams params = new CreateParams()) {
+                // Please don't hack me ಥ_ಥ
+                params.setClientID(1203402546626957373L);
+                params.setFlags(CreateParams.Flags.NO_REQUIRE_DISCORD);
 
-            // Create the Core
-            try {
-                discordCore = new Core(params);
-            } catch (GameSDKException e) {
-                AnimationUtils.addErrorToast("Discord Application is not running. Toggling off", false, 1500);
-                module.toggle();
-                return;
-            }
+                // Create the Core
+                try {
+                    discordCore = new Core(params);
+                } catch (GameSDKException e) {
+                    AnimationUtils.addErrorToast("Discord Application is not running. Toggling off", false, 1500);
+                    module.toggle();
+                    return;
+                }
 
-            activity = new Activity();
+                activity = new Activity();
 
-            updateActivity();
-            activity.timestamps().setStart(Instant.now());
+                updateActivity();
+                activity.timestamps().setStart(Instant.now());
 
 
                 // Run callbacks forever
@@ -144,12 +154,12 @@ public class DiscordRPC {
                     discordCore.runCallbacks();
                     try {
                         //More delay == More CPU happy
-                        Thread.sleep(45);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-        }
+            }
         });
         callbackThread.setName("Discord-Callback");
         callbackThread.start();

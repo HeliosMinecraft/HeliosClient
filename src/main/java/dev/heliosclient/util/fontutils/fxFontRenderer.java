@@ -5,7 +5,6 @@ import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
 
 public class fxFontRenderer extends FontRenderer {
 
@@ -26,7 +25,7 @@ public class fxFontRenderer extends FontRenderer {
      * @param width The maximum width of the rendered text.
      * @return The trimmed text.
      */
-    public String trimToWidth(String text, int width) {
+    public String trimToWidth(String text, float width) {
         float textWidth = this.getStringWidth(text);
         if (textWidth <= width) {
             return text;
@@ -51,7 +50,7 @@ public class fxFontRenderer extends FontRenderer {
         //this.drawString(matrixStack, text, x / scaleFactor, y / scaleFactor, r, g, b, a);
         try {
             super.drawString(matrixStack, text, x, y, r, g, b, a);
-        }catch(NullPointerException ignored){
+        } catch (NullPointerException ignored) {
         }
     }
 

@@ -1,7 +1,7 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.util.interfaces.IExplosion;
+import dev.heliosclient.system.mixininterface.IExplosion;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;

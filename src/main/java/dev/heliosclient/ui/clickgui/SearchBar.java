@@ -12,15 +12,15 @@ import java.awt.*;
 
 public class SearchBar extends InputBox {
     public SearchBar() {
-        super(146, 16, "", 25, InputMode.ALL);
+        super(133, 16, "", 25, InputMode.ALL);
     }
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         update(x, y);
 
-        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 15 + 1.5f, y - 0.5f, width + 1f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 255).getRGB());
-        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 15 + 2, y, width, height, 2, 6, ColorManager.INSTANCE.clickGuiPrimary);
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 15 + 1.5f, y - 0.5f, width + 14f, height + 1f, 3, 0.5f, focused ? Color.WHITE.getRGB() : ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 255).getRGB());
+        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x - 15 + 2, y, width + 13f, height, 2, 6, ColorManager.INSTANCE.clickGuiPrimary);
         FontRenderers.Large_iconRenderer.drawString(drawContext.getMatrices(), "\uEA17", x - 15 + 4, y + 1, -1);
 
         float textHeight = Renderer2D.getFxStringHeight();

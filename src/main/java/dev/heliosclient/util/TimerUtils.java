@@ -6,21 +6,44 @@ import java.util.concurrent.TimeUnit;
 
 public class TimerUtils {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private long startTime;
-    private boolean hasTimerStarted;
+    public long startTime;
+    private boolean hasTimerStarted = false;
     final Runnable resetter = this::resetTimer;
+
+    public TimerUtils(boolean start) {
+        if (start)
+            startTimer();
+    }
+
+    public TimerUtils() {
+    }
 
     // Starts the timer
     public void startTimer() {
-        if(hasTimerStarted) return;
+        if (hasTimerStarted) return;
         startTime = System.currentTimeMillis();
         hasTimerStarted = true;
     }
 
-    // Returns the elapsed time (in seconds) since the timer was started
+    //Sets the time
+    public void setTime(long time) {
+        this.startTime = System.currentTimeMillis() - time;
+    }
+
+    /**
+     * Returns the elapsed time (in seconds) since the timer was started
+     */
     public double getElapsedTime() {
         long endTime = System.currentTimeMillis();
         return (endTime - startTime) / 1000.0;
+    }
+
+    /**
+     * Returns the elapsed time (in milliseconds) since the timer was started
+     */
+    public double getElapsedTimeMS() {
+        long endTime = System.currentTimeMillis();
+        return endTime - startTime;
     }
 
     // Resets the timer
@@ -45,6 +68,7 @@ public class TimerUtils {
             resetTimer();
         return getElapsedTime() >= ms / 1000.0;
     }
+
     public boolean every(long ms, Runnable task) {
         if (getElapsedTime() >= ms / 1000.0) {
             task.run();

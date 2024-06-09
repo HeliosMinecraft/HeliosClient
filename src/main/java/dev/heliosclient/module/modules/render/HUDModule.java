@@ -4,9 +4,11 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
 
@@ -14,12 +16,20 @@ import java.awt.*;
 
 public class HUDModule extends Module_ implements Listener {
     private final SettingGroup sgGeneral = new SettingGroup("General");
+    public BooleanSetting accentColor = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Use Accent Color")
+            .description("Uses the accent color of the client as the hud color")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .build()
+    );
     public RGBASetting colorSetting = sgGeneral.add(new RGBASetting.Builder()
             .name("Color")
             .description("Color of HUD.")
             .onSettingChange(this)
             .value(new Color(241, 83, 92, 255))
             .defaultValue(new Color(241, 83, 92, 255))
+            .shouldRender(() -> !accentColor.value)
             .build()
     );
 
@@ -29,10 +39,18 @@ public class HUDModule extends Module_ implements Listener {
         this.showInModulesList.value = false;
 
         addSettingGroup(sgGeneral);
+        addQuickSettings(sgGeneral.getSettings());
 
-        HeliosClient.uiColorA = colorSetting.getColor().getAlpha();
-        HeliosClient.uiColor = colorSetting.getColor().getRGB();
         EventManager.register(this);
+        updateUIColor();
+    }
+
+    public void updateUIColor() {
+        if (accentColor.value && HeliosClient.CLICKGUI != null) {
+            ColorManager.INSTANCE.hudColor = HeliosClient.CLICKGUI.getAccentColor();
+        } else {
+            ColorManager.INSTANCE.hudColor = colorSetting.getColor().getRGB();
+        }
     }
 
     @Override
@@ -46,15 +64,13 @@ public class HUDModule extends Module_ implements Listener {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent.CLIENT event) {
-        HeliosClient.uiColorA = colorSetting.getColor().getAlpha();
-        HeliosClient.uiColor = colorSetting.getColor().getRGB();
+    public void onTickClient(TickEvent event) {
+        updateUIColor();
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
-        HeliosClient.uiColorA = colorSetting.getColor().getAlpha();
-        HeliosClient.uiColor = colorSetting.getColor().getRGB();
+        updateUIColor();
     }
 }

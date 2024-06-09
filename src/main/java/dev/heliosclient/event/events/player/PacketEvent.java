@@ -16,6 +16,10 @@ public class PacketEvent extends Event {
         public RECEIVE(Packet<?> packet) {
             this.packet = packet;
         }
+
+        public Packet<?> getPacket() {
+            return packet;
+        }
     }
 
     @Cancelable
@@ -25,6 +29,10 @@ public class PacketEvent extends Event {
 
         public SEND(Packet<?> packet) {
             this.packet = packet;
+        }
+
+        public Packet<?> getPacket() {
+            return packet;
         }
     }
 }

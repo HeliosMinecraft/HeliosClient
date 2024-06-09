@@ -1,13 +1,11 @@
 package dev.heliosclient.util.cape;
 
-import dev.heliosclient.managers.CapeManager;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-import java.util.Objects;
 import java.util.UUID;
 
 

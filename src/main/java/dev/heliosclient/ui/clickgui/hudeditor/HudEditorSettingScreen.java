@@ -43,7 +43,7 @@ public class HudEditorSettingScreen extends AbstractSettingScreen implements IWi
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
-                windowHeight += setting.height + 1;
+                windowHeight += setting.getHeight() + 1;
             }
             windowHeight += Math.round(settingGroup.getGroupNameHeight() + 2);
         }
@@ -80,7 +80,7 @@ public class HudEditorSettingScreen extends AbstractSettingScreen implements IWi
                             listSetting.setParentScreen(this);
                         }
                         setting.render(drawContext, x + 16, yOffset + 6, mouseX, mouseY, textRenderer);
-                        yOffset += setting.height + 1;
+                        yOffset += setting.getHeight() + 1;
                         setting.setAnimationProgress(1f);
                     } else {
                         setting.setAnimationProgress(0f);

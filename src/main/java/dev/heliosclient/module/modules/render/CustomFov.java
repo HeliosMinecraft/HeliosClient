@@ -31,6 +31,7 @@ public class CustomFov extends Module_ {
         addQuickSetting(FOV);
     }
 
+    @SuppressWarnings("unchecked")
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
         if (mc.options == null) return;
@@ -46,6 +47,7 @@ public class CustomFov extends Module_ {
         previousFov = mc.options.getFov().getValue();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onDisable() {
         super.onDisable();

@@ -1,13 +1,13 @@
 package dev.heliosclient.util;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.module.sysmodules.ClickGUI;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.util.GlAllocationUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 /**
  * Utils for working with color and chat formatting.
@@ -113,7 +113,6 @@ public class ColorUtils {
     }
 
 
-
     /**
      * Changes alpha on color.
      *
@@ -126,6 +125,31 @@ public class ColorUtils {
             return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
         else
             return new Color(0);
+    }
+
+    /**
+     * Changes alpha on integer color only if the alpha value is less than the given float.
+     *
+     * @param color Target color.
+     * @param alpha Target alpha.
+     * @return Color with changed alpha.
+     */
+    public static Color changeAlpha(Integer color, int alpha, float lessThanValue) {
+        if (color != null && getAlpha(color) > lessThanValue)
+            return new Color(ColorUtils.getRed(color), ColorUtils.getGreen(color), ColorUtils.getBlue(color), alpha);
+        else
+            return new Color(Objects.requireNonNullElse(color, -1));
+    }
+
+    /**
+     * Changes alpha on integer color.
+     *
+     * @param color Target color.
+     * @param alpha Target alpha.
+     * @return Color with changed alpha.
+     */
+    public static Color changeAlpha(Integer color, int alpha) {
+        return changeAlpha(color, alpha, -1);
     }
 
     /**

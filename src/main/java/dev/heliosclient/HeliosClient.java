@@ -13,11 +13,13 @@ import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.scripting.LuaScriptManager;
 import dev.heliosclient.system.*;
 import dev.heliosclient.ui.clickgui.ConsoleScreen;
-import dev.heliosclient.ui.clickgui.gui.Quadtree;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
-import dev.heliosclient.util.*;
+import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.util.TimerUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.player.DamageUtils;
+import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
 import net.fabricmc.api.ModInitializer;
@@ -31,6 +33,8 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 import static dev.heliosclient.managers.FontManager.fontSize;
 import static dev.heliosclient.managers.FontManager.fonts;
 
@@ -42,62 +46,61 @@ public class HeliosClient implements ModInitializer, Listener {
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
     private static final TimerUtils configTimer = new TimerUtils();
-    public static Quadtree quadTree;
     public static Config CONFIG = new Config();
-    public static int uiColorA = 0xFF55FFFF;
-    public static int uiColor = 0x55FFFF;
-    public static AddonManager addonManager = new AddonManager();
+    public static AddonManager ADDONMANAGER = new AddonManager();
     public static ClickGUI CLICKGUI = new ClickGUI();
     public volatile static ConsoleScreen CONSOLE = new ConsoleScreen();
+    public static File SAVE_FOLDER = new File(MC.runDirectory.getPath() + "/heliosclient");
 
     public static void loadConfig() {
         configTimer.startTimer();
-        CommandManager.prefix = (String) CONFIG.getClientConfigMap().get("prefix");
         CONFIG.loadConfig();
         CONFIG.loadClientConfigModules();
 
-        // Font event is posted to allow the GUI to reset its calculation for the new font by the config.
-        if (FontManager.fonts != null)
-            EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
-        
         CONFIG.loadHudElements();
         CONFIG.loadModules();
         LOGGER.info("Loading Config complete in: {}s", configTimer.getElapsedTime());
-        if(NotificationModule.get().clientNotification.value && shouldSendNotification()){
+        if (ModuleManager.get(NotificationModule.class).clientNotification.value && shouldSendNotification()) {
             NotificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
-        if (HeliosClient.MC.getWindow() != null) {
-            FontManager.INSTANCE.registerFonts();
-            FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
-            EventManager.postEvent(new FontChangeEvent(fonts));
-        }
         configTimer.resetTimer();
+
+        // Font event is posted to allow the GUI to reset its calculation for the new font by the config.
+        if (fonts != null)
+            EventManager.postEvent(new FontChangeEvent(fonts));
     }
 
     public static void saveConfig() {
         HeliosExecutor.execute(HeliosClient::saveConfigHook);
     }
+
     public static void saveConfigHook() {
         LOGGER.info("Saving config... \t Module Config being saved: {}", Config.MODULES);
-            configTimer.startTimer();
-            CONFIG.getModuleConfig();
-            CONFIG.getClientConfig();
-            CONFIG.save();
+        configTimer.startTimer();
+        CONFIG.getModuleConfig();
+        CONFIG.getClientConfig();
+        CONFIG.save();
         LOGGER.info("Saving Config complete in: {}s", configTimer.getElapsedTime());
-            if(NotificationModule.get().clientNotification.value && shouldSendNotification()){
-                NotificationManager.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
-            }
-            configTimer.resetTimer();
+        if (ModuleManager.get(NotificationModule.class).clientNotification.value && shouldSendNotification()) {
+            NotificationManager.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
+        }
+        configTimer.resetTimer();
     }
 
 
     public static boolean shouldSendNotification() {
-        return (NotificationManager.INSTANCE != null && NotificationModule.get() != null && MC.getWindow() != null);
+        return (NotificationManager.INSTANCE != null && ModuleManager.get(NotificationModule.class) != null && MC.getWindow() != null);
     }
+
+    public static boolean shouldUpdate() {
+        return MC != null && MC.getWindow() != null && MC.player != null;
+    }
+
     @SubscribeEvent
-    public void tick(TickEvent.CLIENT client){
+    public void tick(TickEvent.CLIENT client) {
         if (MC.getWindow() != null) {
-            quadTree = new Quadtree(0);
+            FontManager.INSTANCE.registerFonts();
+            EventManager.postEvent(new FontChangeEvent(fonts));
             EventManager.unregister(this);
         }
     }
@@ -125,7 +128,7 @@ public class HeliosClient implements ModInitializer, Listener {
 
 
         FontManager.INSTANCE.refresh();
-        addonManager.loadAddons();
+        ADDONMANAGER.loadAddons();
         AddonManager.initializeAddons();
 
         Categories.registerCategories();
@@ -133,36 +136,31 @@ public class HeliosClient implements ModInitializer, Listener {
         HudElementList.INSTANCE = new HudElementList();
 
 
-        CapeManager.capes = CapeManager.loadCapes();
+        CapeManager.CAPE_NAMES = CapeManager.loadCapes();
 
         HeliosExecutor.execute(HeliosClient::loadConfig);
 
         // Save
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> HeliosClient.saveConfig());
-        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((a,b,c) -> HeliosClient.saveConfig());
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((a, b, c) -> HeliosClient.saveConfig());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, packetSender) -> HeliosClient.saveConfig());
         ClientLifecycleEvents.CLIENT_STOPPING.register((client) -> {
             saveConfigHook();
             if (DiscordRPC.INSTANCE.isRunning) {
                 DiscordRPC.INSTANCE.stopPresence();
             }
-            HeliosExecutor.shutdown();
         });
 
-        MC.execute(()->{
-            while(MC.getWindow() == null){
+        MC.execute(() -> {
+            while (MC.getWindow() == null) {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
                     // Cope
                 }
             }
-           HeliosClient.CLICKGUI.onLoad();
+            HeliosClient.CLICKGUI.onLoad();
         });
-    }
-
-    public static boolean shouldUpdate() {
-        return MC != null && MC.getWindow() != null && MC.player != null;
     }
 
     public void registerEvents() {
@@ -173,8 +171,7 @@ public class HeliosClient implements ModInitializer, Listener {
         EventManager.register(ColorManager.INSTANCE);
         EventManager.register(TickRate.INSTANCE);
         EventManager.register(DamageUtils.INSTANCE);
-    }
-    public static void openConsoleScreen(){
-        MC.setScreen(CONSOLE);
+        EventManager.register(RotationSimulator.INSTANCE);
+
     }
 }

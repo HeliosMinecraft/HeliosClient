@@ -18,7 +18,7 @@ public class FontLoader {
     private static final String FONTS_FOLDER = "heliosclient/fonts";
     private static final String ICON_FONTS_FOLDER = "heliosclient/fonts/icons";
     private static final String[] DEFAULT_FONT = {"Minecraft.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf"};
-    private static final String[] DEFAULT_ICON_FONT = {"fontello.ttf","icons2.ttf", "icons.ttf"};
+    private static final String[] DEFAULT_ICON_FONT = {"fontello.ttf", "icons2.ttf", "icons.ttf"};
 
     /**
      * Loads all the font files (with {@code .ttf and .otf} extension) present in the {@link  #FONTS_FOLDER} directory
@@ -41,7 +41,7 @@ public class FontLoader {
     /**
      * Loads all the font files (with {@code .ttf and .otf} present in the given folder
      *
-     * @param folder Folder where the fonts are to be searched in
+     * @param folder       Folder where the fonts are to be searched in
      * @param defaultFonts Default font files in the assets folder to be copied.
      * @return An array of all the fonts created from the files
      */
@@ -68,7 +68,7 @@ public class FontLoader {
                     Font[] fontArray = Font.createFonts(file);
                     Collections.addAll(fonts, fontArray);
                 } catch (FontFormatException | IOException e) {
-                    HeliosClient.LOGGER.error("An error has occured while converting file to font format",e);
+                    HeliosClient.LOGGER.error("An error has occured while converting file to font format", e);
                 }
             }
         }

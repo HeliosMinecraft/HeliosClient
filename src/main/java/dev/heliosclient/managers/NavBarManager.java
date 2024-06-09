@@ -18,6 +18,7 @@ public class NavBarManager {
         registerItems(
                 new NavBarItem("ClickGUI", "ClickGUI", () -> ClickGUIScreen.INSTANCE),
                 new NavBarItem("Settings", "ClickGUI Setting", new ClientSettingsScreen(HeliosClient.CLICKGUI)),
+                new NavBarItem("Console", "Console screen", () -> HeliosClient.CONSOLE),
                 new NavBarItem("Scripts", "Script Manager", () -> ScriptManagerScreen.INSTANCE),
                 new NavBarItem("HudEditor", "HUD editor", () -> HudEditorScreen.INSTANCE)
         );

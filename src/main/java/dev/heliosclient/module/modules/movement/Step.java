@@ -7,10 +7,8 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import net.minecraft.client.MinecraftClient;
 
 public class Step extends Module_ {
-    protected static MinecraftClient mc = MinecraftClient.getInstance();
     private final SettingGroup sgGeneral = new SettingGroup("General");
     DoubleSetting stepHeight = sgGeneral.add(new DoubleSetting.Builder()
             .name("Height")
@@ -18,7 +16,7 @@ public class Step extends Module_ {
             .onSettingChange(this)
             .value(1.0)
             .defaultValue(1.0)
-            .min(1.0)
+            .min(0.0)
             .max(10)
             .roundingPlace(1)
             .build()
@@ -31,6 +29,16 @@ public class Step extends Module_ {
             .defaultValue(true)
             .build()
     );
+    BooleanSetting reverseStep = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Reverse Step")
+            .description("Allows you to step down faster")
+            .onSettingChange(this)
+            .value(true)
+            .defaultValue(true)
+            .build()
+    );
+
+    private float previousHeight = 0.5f;
 
     public Step() {
         super("Step", "Allows you to step up full blocks.", Categories.MOVEMENT);
@@ -38,6 +46,13 @@ public class Step extends Module_ {
         addSettingGroup(sgGeneral);
 
         addQuickSettings(sgGeneral.getSettings());
+    }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        if (mc.player != null)
+            previousHeight = mc.player.getStepHeight();
     }
 
     @SubscribeEvent
@@ -52,6 +67,12 @@ public class Step extends Module_ {
         } else {
             mc.player.setStepHeight((float) stepHeight.value);
         }
+
+        if (reverseStep.value) {
+            if (mc.player.isInLava() || mc.player.isTouchingWater() || !mc.player.isOnGround() || mc.player.isFallFlying())
+                return;
+            mc.player.addVelocity(0, -1, 0);
+        }
     }
 
     @Override
@@ -60,6 +81,6 @@ public class Step extends Module_ {
         if (mc.player == null) {
             return;
         }
-        mc.player.setStepHeight(0.5f);
+        mc.player.setStepHeight(previousHeight);
     }
 }

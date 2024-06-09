@@ -1,9 +1,11 @@
 package dev.heliosclient.util.animation.toasts;
 
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.util.Identifier;
@@ -30,8 +32,11 @@ public class ErrorToast implements net.minecraft.client.toast.Toast {
     }
 
     public Toast.Visibility draw(DrawContext context, ToastManager manager, long startTime) {
-        //  context.drawTexture(TEXTURE, 0, 0, 0, 96, this.getWidth(), this.getHeight());
-        List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth(),HeliosClient.MC.textRenderer);
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
+        context.drawTexture(TEXTURE, 0, 0, 0, 96, this.getWidth(), this.getHeight());
+
+        List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth(), HeliosClient.MC.textRenderer);
 
         int yOffset = 2;
         for (String s : messageWarp) {

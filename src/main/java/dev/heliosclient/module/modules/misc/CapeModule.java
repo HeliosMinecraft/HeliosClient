@@ -7,6 +7,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
 import dev.heliosclient.util.ChatUtils;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.animation.AnimationUtils;
 
@@ -18,14 +19,14 @@ public class CapeModule extends Module_ {
     public CycleSetting capes = sgCape.add(new CycleSetting.Builder()
             .name("Cape")
             .description("Custom cape texture to use. Turn on modules to see options")
-            .value(List.of(CapeManager.capes))
+            .value(List.of(CapeManager.CAPE_NAMES))
             .defaultListIndex(0)
             .onSettingChange(this)
             .build()
     );
     public DropDownSetting getCapeFrom = sgCape.add(new DropDownSetting.Builder()
             .name("Get Cape from")
-            .description("Gets your favourite cape from the following places. Need valid UUID or player name")
+            .description("Gets your favourite CURRENT_PLAYER_CAPE from the following places. Need valid UUID or player name")
             .value(List.of(CapeManager.CapeType.values()))
             .defaultListIndex(0)
             .addOptionToolTip("None")
@@ -56,8 +57,8 @@ public class CapeModule extends Module_ {
             .build()
     );
     public BooleanSetting customPhysics = sgCape.add(new BooleanSetting.Builder()
-            .name("Better Physics")
-            .description("Improved physics for capes")
+            .name("Extra Physics")
+            .description("Adds extra physics for capes")
             .value(true)
             .defaultValue(false)
             .onSettingChange(this)
@@ -66,21 +67,20 @@ public class CapeModule extends Module_ {
     public BooleanSetting elytra = sgCape.add(new BooleanSetting.Builder()
             .name("Elytra")
             .description("Cape Texture for elytra (Bad most of times with improper textures)")
-            .value(false)
             .defaultValue(false)
             .onSettingChange(this)
+            .shouldSaveAndLoad(true)
             .build()
     );
     public ButtonSetting loadCapes = sgCape.add(new ButtonSetting.Builder()
             .name("Capes")
             .build()
     );
-    private static CapeModule INSTANCE = new CapeModule();
 
-    protected CapeModule() {
+    public CapeModule() {
         super("Capes", "Use Custom Capes from `heliosclient/capes` directory", Categories.MISC);
 
-        capes.options = List.of(CapeManager.capes);
+        capes.options = List.of(CapeManager.CAPE_NAMES);
         addSettingGroup(sgCape);
 
 
@@ -101,18 +101,18 @@ public class CapeModule extends Module_ {
                 }
                 capes.iSettingChange.onSettingChange(capes);
 
-                if(mc.player == null) {
-                    AnimationUtils.addInfoToast("Fetched cape successfully", false, 1000);
-                }else{
-                    ChatUtils.sendHeliosMsg("Fetched cape successfully");
+                if (mc.player == null) {
+                    AnimationUtils.addInfoToast("Fetched CURRENT_PLAYER_CAPE successfully", false, 1000);
+                } else {
+                    ChatUtils.sendHeliosMsg(ColorUtils.green + "Fetched CURRENT_PLAYER_CAPE successfully");
                 }
             } catch (Exception e) {
-                HeliosClient.LOGGER.error("An error occurred while fetching cape. ", e);
-                if(mc.player == null) {
-                    AnimationUtils.addErrorToast("Failed to fetch cape. Check logs", false, 1000);
+                HeliosClient.LOGGER.error("An error occurred while fetching CURRENT_PLAYER_CAPE. ", e);
+                if (mc.player == null) {
+                    AnimationUtils.addErrorToast("Failed to fetch CURRENT_PLAYER_CAPE. Check logs", false, 1000);
                     AnimationUtils.addErrorToast("Reason: " + e.getMessage().trim(), false, 1000);
-                }else{
-                    ChatUtils.sendHeliosMsg("Failed to fetch cape. Check logs");
+                } else {
+                    ChatUtils.sendHeliosMsg("Failed to fetch CURRENT_PLAYER_CAPE. Check logs");
                     ChatUtils.sendHeliosMsg("Reason: " + e.getMessage().trim());
                 }
             }
@@ -144,10 +144,10 @@ public class CapeModule extends Module_ {
     public void setCape() {
         if (CapeManager.capeIdentifiers.isEmpty()) return;
 
-        capes.options = List.of(CapeManager.capes);
+        capes.options = List.of(CapeManager.CAPE_NAMES);
 
         if (capes.value < CapeManager.capeIdentifiers.size()) {
-            CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
+            CapeManager.CURRENT_PLAYER_CAPE = CapeManager.capeIdentifiers.get(capes.value);
         }
     }
 
@@ -156,11 +156,7 @@ public class CapeModule extends Module_ {
     public void onLoad() {
         super.onLoad();
         if (capes.value < CapeManager.capeIdentifiers.size()) {
-            CapeManager.cape = CapeManager.capeIdentifiers.get(capes.value);
+            CapeManager.CURRENT_PLAYER_CAPE = CapeManager.capeIdentifiers.get(capes.value);
         }
-    }
-
-    public static CapeModule get() {
-        return INSTANCE;
     }
 }

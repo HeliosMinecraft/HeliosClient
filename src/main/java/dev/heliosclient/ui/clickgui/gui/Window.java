@@ -7,14 +7,13 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.NavBarManager;
-import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -109,7 +108,7 @@ public class Window implements Listener {
             int color = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 180).getRGB();
             List<String> wrappedText = new ArrayList<>();
             Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 20, windowWidth, windowHeight, 5, color);
-            if(!description.isEmpty()) {
+            if (!description.isEmpty()) {
                 wrappedText = Renderer2D.wrapText("§o" + description, windowWidth, HeliosClient.MC.textRenderer);
 
                 int textOffsetY = 0;

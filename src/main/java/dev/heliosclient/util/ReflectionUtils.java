@@ -2,6 +2,9 @@ package dev.heliosclient.util;
 
 import java.lang.reflect.Method;
 
+/**
+ * uhh why do we need this again?
+ */
 public class ReflectionUtils {
     public static Method tryGetMethod(String methodName, Class<?> class1) {
         // safety be damned this is my own code I get to control when it crashes

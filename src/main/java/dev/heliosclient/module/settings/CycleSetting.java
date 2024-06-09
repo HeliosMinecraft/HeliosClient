@@ -4,9 +4,9 @@ import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
@@ -37,8 +37,8 @@ public class CycleSetting extends Setting<Integer> {
         this.tooltipText = optionsTooltips;
     }
 
-    public <T> CycleSetting(String name, String description, ISettingChange iSettingChange, T[] options, int value, BooleanSupplier shouldRender, int defaultValue,List<String> optionsTooltips) {
-        this(name,description,iSettingChange,Arrays.asList(options),value,shouldRender,defaultValue,optionsTooltips);
+    public <T> CycleSetting(String name, String description, ISettingChange iSettingChange, T[] options, int value, BooleanSupplier shouldRender, int defaultValue, List<String> optionsTooltips) {
+        this(name, description, iSettingChange, Arrays.asList(options), value, shouldRender, defaultValue, optionsTooltips);
     }
 
     public void setOptions(List<?> options) {
@@ -66,17 +66,17 @@ public class CycleSetting extends Setting<Integer> {
 
 
         // Mouse hovers over the options
-        if(mouseHoveringOverOptions(mouseX,mouseY) && !tooltipText.isEmpty()){
-            if(value < options.size()){
+        if (mouseHoveringOverOptions(mouseX, mouseY) && !tooltipText.isEmpty()) {
+            if (value < options.size()) {
                 Tooltip.tooltip.changeText(tooltipText.get(value));
             }
-        }
-        else if (hovertimer >= 150) {
+        } else if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
-    public boolean mouseHoveringOverOptions(int mouseX, int mouseY){
-        return  mouseX >= x + 2 && mouseX <= x + 2 + Renderer2D.getFxStringWidth(name + ": ") && mouseY>= y + 3 && mouseY<= y + 3 +  Renderer2D.getFxStringHeight() + 4;
+
+    public boolean mouseHoveringOverOptions(int mouseX, int mouseY) {
+        return mouseX >= x + 2 && mouseX <= x + 2 + Renderer2D.getFxStringWidth(name + ": ") && mouseY >= y + 3 && mouseY <= y + 3 + Renderer2D.getFxStringHeight() + 4;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class CycleSetting extends Setting<Integer> {
             hovertimer = 0;
         }
 
-        if (hovertimer >= 150) {
+        if (hovertimer >= 50) {
             Tooltip.tooltip.changeText(description);
         }
     }
@@ -137,16 +137,16 @@ public class CycleSetting extends Setting<Integer> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP,toml);
-        if(MAP.get(name.replace(" ", "")) == null){
+        super.loadFromToml(MAP, toml);
+        if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;
         }
-        String mapGet = MAP.get(name.replace(" ", "")).toString().trim();
+        String mapGet = MAP.get(getSaveName()).toString().trim();
 
-        for (Object object:
-            options) {
-            if(object.toString().trim().equalsIgnoreCase(mapGet)){
+        for (Object object :
+                options) {
+            if (object.toString().trim().equalsIgnoreCase(mapGet)) {
                 value = options.indexOf(object);
                 return;
             }
@@ -176,11 +176,12 @@ public class CycleSetting extends Setting<Integer> {
             this.defaultListIndex = defaultListIndex;
             return this;
         }
+
         public Builder defaultListOption(Object o) {
-            if(value == null){
+            if (value == null) {
                 throw new NullPointerException("Option List is null, could not add default option");
             }
-            if(value.contains(o)) {
+            if (value.contains(o)) {
                 this.defaultListIndex = value.indexOf(o);
             }
             return this;
@@ -199,7 +200,7 @@ public class CycleSetting extends Setting<Integer> {
 
         @Override
         public CycleSetting build() {
-            return new CycleSetting(name, description, ISettingChange, value, defaultListIndex, shouldRender, defaultListIndex,optionsTooltips);
+            return new CycleSetting(name, description, ISettingChange, value, defaultListIndex, shouldRender, defaultListIndex, optionsTooltips);
         }
     }
 }

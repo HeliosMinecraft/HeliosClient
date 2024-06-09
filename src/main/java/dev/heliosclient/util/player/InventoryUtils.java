@@ -3,112 +3,85 @@ package dev.heliosclient.util.player;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.settings.Option;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
+import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 
 public class InventoryUtils {
-    private static final PlayerEntity player = HeliosClient.MC.player;
     private static int previousHotbarSlot = -1;
-    private static int previousInventorySlot = -1;
-    private static ItemStack previousHotbarItem = ItemStack.EMPTY;
-    private static ItemStack previousInventoryItem = ItemStack.EMPTY;
 
     // Swap back to the previous slot in the hotbar
     public static void swapBackHotbar() {
-        if (previousHotbarSlot != -1 && !previousHotbarItem.isEmpty()) {
-            ItemStack currentItem = player.getInventory().getStack(previousHotbarSlot);
-            player.getInventory().setStack(previousHotbarSlot, previousHotbarItem);
-            previousHotbarItem = currentItem;
+        if (previousHotbarSlot != -1) {
+            HeliosClient.MC.player.getInventory().selectedSlot = previousHotbarSlot;
+            HeliosClient.MC.interactionManager.syncSelectedSlot();
         }
     }
 
-    // Swap back to the previous slot in the inventory
-    public static void swapBackInventory() {
-        if (previousInventorySlot != -1 && !previousInventoryItem.isEmpty()) {
-            ItemStack currentItem = player.getInventory().getStack(previousInventorySlot);
-            player.getInventory().setStack(previousInventorySlot, previousInventoryItem);
-            previousInventoryItem = currentItem;
+
+    public static boolean swapToSlot(int hotbarSlot, boolean swapBack) {
+        if (hotbarSlot == 45) return true;
+        if (HeliosClient.MC.player.getInventory().selectedSlot == hotbarSlot) return true;
+        if (hotbarSlot < 0 || hotbarSlot > 8) return false;
+        if (swapBack) {
+            previousHotbarSlot = HeliosClient.MC.player.getInventory().selectedSlot;
         }
+
+        HeliosClient.MC.player.getInventory().selectedSlot = hotbarSlot;
+        HeliosClient.MC.interactionManager.syncSelectedSlot();
+
+        return true;
     }
 
-    // Swap items between hotbar and inventory and remember the previous state old
-    public static void swapHotbarAndInventoryPrvO(int hotbarSlot, int inventorySlot) {
-        // Remember the current state
-        previousHotbarSlot = hotbarSlot;
-        previousHotbarItem = player.getInventory().getStack(hotbarSlot);
-        previousInventorySlot = inventorySlot;
-        previousInventoryItem = player.getInventory().getStack(inventorySlot + 9);
-
-        // Swap the items
-        player.getInventory().setStack(hotbarSlot, previousInventoryItem);
-        player.getInventory().setStack(inventorySlot + 9, previousHotbarItem);
-    }
-
-    // Swap items between hotbar and inventory
-    public static void swapHotbarAndInventory(int hotbarSlot, int inventorySlot) {
-        // Get the ItemStack in the hotbar slot
-        ItemStack hotbarItem = player.getInventory().getStack(hotbarSlot);
-
-        // Get the ItemStack in the inventory slot
-        ItemStack inventoryItem = player.getInventory().getStack(inventorySlot + 9); // The player's inventory starts at slot 9
-
-        // Swap the ItemStacks
-        player.getInventory().setStack(hotbarSlot, inventoryItem);
-        player.getInventory().setStack(inventorySlot + 9, hotbarItem);
-    }
-
-    // Swap items between inventory and container
-    public static void swapInventoryAndContainer(int inventorySlot, Inventory container, int containerSlot) {
-        // Get the ItemStack in the inventory slot
-        ItemStack inventoryItem = player.getInventory().getStack(inventorySlot);
-
-        // Get the ItemStack in the container slot
-        ItemStack containerItem = container.getStack(containerSlot);
-
-        // Swap the ItemStacks
-        player.getInventory().setStack(inventorySlot, containerItem);
-        container.setStack(containerSlot, inventoryItem);
-    }
-
-    // Check if player can swap the specified item
+    // Check if HeliosClient.MC.player can swap the specified item
     public static boolean canSwapItem(ItemStack itemStack) {
-        // Check if the player's inventory contains the itemStack
-        return player.getInventory().contains(itemStack);
+        // Check if the HeliosClient.MC.player's inventory contains the itemStack
+        return HeliosClient.MC.player.getInventory().contains(itemStack);
     }
 
-    // Get the count of the specified item in the player's inventory
+    // Get the count of the specified item in the HeliosClient.MC.player's inventory
     public static int getItemCount(ItemStack itemStack) {
-        return player.getInventory().count(itemStack.getItem());
+        return HeliosClient.MC.player.getInventory().count(itemStack.getItem());
     }
 
-    // Drop the specified item from the player's inventory
+    // Drop the specified item from the HeliosClient.MC.player's inventory
     public static void dropItem(ItemStack itemStack) {
-        player.dropItem(itemStack, false);
+        HeliosClient.MC.player.dropStack(itemStack);
     }
 
     // Drop all items of the same type as the specified item from the player's inventory
-    public static void dropAllItems(ItemStack itemStack) {
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            if (player.getInventory().getStack(i) == itemStack) {
-                dropItem(player.getInventory().removeStack(i));
+    public static void dropAllItems(Item item) {
+        swapToSlot(HeliosClient.MC.player.getInventory().selectedSlot, true);
+        for (int i = 0; i < 9; i++) {
+            if (HeliosClient.MC.player.getInventory().getStack(i).getItem() == item) {
+                swapToSlot(i, false);
+                HeliosClient.MC.player.dropSelectedItem(true);
+            }
+        }
+        swapBackHotbar();
+
+        for (int i = 9; i < HeliosClient.MC.player.getInventory().size(); i++) {
+            if (HeliosClient.MC.player.getInventory().getStack(i).getItem() == item) {
+                HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, i, 0, SlotActionType.THROW, HeliosClient.MC.player);
             }
         }
     }
 
-    // Move the specified item from the player's inventory to their hotbar
+    // Move the specified item from the HeliosClient.MC.player's inventory to their hotbar
     public static void moveItemToHotbar(ItemStack itemStack) {
         for (int i = 0; i < 9; i++) {
-            if (player.getInventory().getStack(i).isEmpty()) {
-                for (int j = 9; j < player.getInventory().size(); j++) {
-                    if (player.getInventory().getStack(j) == itemStack) {
-                        swapHotbarAndInventory(i, j - 9);
+            if (HeliosClient.MC.player.getInventory().getStack(i).isEmpty()) {
+                for (int j = 9; j < HeliosClient.MC.player.getInventory().size(); j++) {
+                    if (HeliosClient.MC.player.getInventory().getStack(j) == itemStack) {
+                        moveItem(i, j - 9, SlotActionType.PICKUP);
                         break;
                     }
                 }
@@ -117,10 +90,20 @@ public class InventoryUtils {
         }
     }
 
+    // Find an item stack in the inventory
+    public static int findItemStackInInventory(ItemStack itemStack) {
+        for (int i = 0; i < HeliosClient.MC.player.getInventory().size(); i++) {
+            if (HeliosClient.MC.player.getInventory().getStack(i) == itemStack) {
+                return i;
+            }
+        }
+        return -1; // Return -1 if the item was not found
+    }
+
     // Find an item in the inventory
-    public static int findItemInInventory(ItemStack itemStack) {
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            if (player.getInventory().getStack(i) == itemStack) {
+    public static int findItemInInventory(Item item) {
+        for (int i = 0; i < HeliosClient.MC.player.getInventory().size(); i++) {
+            if (HeliosClient.MC.player.getInventory().getStack(i) != null && HeliosClient.MC.player.getInventory().getStack(i).getItem() == item) {
                 return i;
             }
         }
@@ -128,41 +111,66 @@ public class InventoryUtils {
     }
 
     // Find an item in the hotbar
-    public static int findItemInHotbar(ItemStack itemStack) {
+    public static int findItemInHotbar(Item item) {
+        if (item == null)
+            return -1;
+
         for (int i = 0; i < 9; i++) {
-            if (player.getInventory().getStack(i) == itemStack) {
+            if (HeliosClient.MC.player.getInventory().getStack(i) != null && HeliosClient.MC.player.getInventory().getStack(i).getItem() == item) {
                 return i;
             }
+        }
+        //Offhand
+        if (HeliosClient.MC.player.getInventory().getStack(45) != null && HeliosClient.MC.player.getInventory().getStack(45).getItem() == item) {
+            return 45;
         }
         return -1; // Return -1 if the item was not found
     }
 
-    // Get an empty slot in the inventory
-    public static int getEmptySlot() {
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            if (player.getInventory().getStack(i).isEmpty()) {
+    public static int getEmptySlot(Inventory inv) {
+        for (int i = 0; i < inv.size(); i++) {
+            if (inv.getStack(i).isEmpty()) {
                 return i;
             }
         }
         return -1; // Return -1 if no empty slot was found
     }
 
-    public static ItemStack getFastestTool(BlockState blockState) {
-        ItemStack fastestTool = ItemStack.EMPTY;
+    public static int getFastestTool(BlockState blockState, boolean antibreak) {
+        int bestToolSlot = -1;
         float fastestSpeed = 0.0F;
 
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            ItemStack itemStack = player.getInventory().getStack(i);
-            if (itemStack.getItem() instanceof ToolItem) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack itemStack = HeliosClient.MC.player.getInventory().getStack(i);
+
+            if ((blockState.getBlock() == Blocks.BAMBOO || blockState.getBlock() == Blocks.BAMBOO_SAPLING) && itemStack.getItem() instanceof SwordItem) {
+                return i;
+            }
+            if (itemStack.getItem() instanceof ToolItem || itemStack.getItem() instanceof ShearsItem) {
+
+                //Check if the tool is effective for the block
+                if (!itemStack.isSuitableFor(blockState)) continue;
+
+                //Check if item damage is less than 4
+                if (antibreak && itemStack.getMaxDamage() - itemStack.getDamage() < 4) continue;
+
                 float speed = itemStack.getMiningSpeedMultiplier(blockState);
+
+                //Account for efficiency enchantment
+                if (speed > 1) {
+                    int efficiency = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemStack);
+                    if (efficiency > 0 && !itemStack.isEmpty())
+                        speed += efficiency * efficiency + 1;
+                }
+
                 if (speed > fastestSpeed) {
                     fastestSpeed = speed;
-                    fastestTool = itemStack;
+                    bestToolSlot = i;
                 }
             }
         }
 
-        return fastestTool; // Return the fastest tool, or an empty ItemStack if no tools were found
+        return bestToolSlot; // Return the fastest tool slot, or -1 if no tools were found
     }
 
     public static ArrayList<Option<Item>> getItemNames() {
@@ -172,5 +180,31 @@ public class InventoryUtils {
             options.add(new Option<>(itemName, item, false));
         }
         return options;
+    }
+
+    /**
+     * Moves an item from a slot using quick move.
+     *
+     * @param fromSlot The index of the slot to move the item from.
+     */
+    public static void moveItemQuickMove(int fromSlot) {
+        ClientPlayerEntity player = HeliosClient.MC.player;
+        if (player != null && HeliosClient.MC.currentScreen != null) {
+            HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, fromSlot, 0, SlotActionType.QUICK_MOVE, player);
+        }
+    }
+
+    /**
+     * Moves an item from one slot to another using the specified action
+     *
+     * @param fromSlot The index of the slot to move the item from.
+     * @param toSlot   The index of the slot to move the item to.
+     */
+    public static void moveItem(int fromSlot, int toSlot, SlotActionType action) {
+        ClientPlayerEntity player = HeliosClient.MC.player;
+        if (player != null && HeliosClient.MC.currentScreen != null) {
+            HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, fromSlot, 0, action, player);
+            HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, toSlot, 1, action, player);
+        }
     }
 }

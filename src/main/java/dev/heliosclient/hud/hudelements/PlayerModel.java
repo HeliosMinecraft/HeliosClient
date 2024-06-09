@@ -6,18 +6,14 @@ import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.render.Renderer2D;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
 
 import java.awt.*;
-import java.util.List;
 
 public class PlayerModel extends HudElement {
-  public static HudElementData<PlayerModel> DATA = new HudElementData<>("Player Model", "Shows player model in a small cute way", PlayerModel::new);
-
-public SettingGroup group = new SettingGroup("Size");
+    public SettingGroup group = new SettingGroup("Size");
     public DoubleSetting size = group.add(new DoubleSetting.Builder()
             .name("Size")
             .description("Change the size of the model")
@@ -50,4 +46,8 @@ public SettingGroup group = new SettingGroup("Size");
             Renderer2D.drawEntity(drawContext, x + width / 2, y + height - 6, ((int) (25 * size.value)), player, HeliosClient.MC.getTickDelta());
         }
     }
+
+    public static HudElementData<PlayerModel> DATA = new HudElementData<>("Player Model", "Shows player model in a small cute way", PlayerModel::new);
+
+
 }

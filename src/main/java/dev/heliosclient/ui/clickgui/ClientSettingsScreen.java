@@ -7,7 +7,6 @@ import dev.heliosclient.module.settings.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.gui.Window;
@@ -19,8 +18,6 @@ import net.minecraft.text.Text;
 
 import java.util.AbstractMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 public class ClientSettingsScreen extends AbstractSettingScreen implements IWindowContentRenderer {
@@ -35,20 +32,20 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     }
 
     public void updateSetting() {
-        HeliosExecutor.execute(()-> module.settingGroups.stream()
-                    .filter(SettingGroup::shouldRender)
-                    .flatMap(settingGroup -> settingGroup.getSettings().stream()
-                            .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
-                    .filter(entry -> entry.getValue().shouldRender())
-                    .forEach(entry -> {
-                        SettingGroup settingGroup = entry.getKey();
-                        Setting<?> setting = entry.getValue();
-                        setting.update(settingGroup.getY());
-                        if (!setting.isAnimationDone() && delay.get() <= 0.0f) {
-                            delay.set(delayBetweenSettings);
-                            delay.set(delay.get() - setting.animationSpeed);
-                        }
-                    })
+        HeliosExecutor.execute(() -> module.settingGroups.stream()
+                .filter(SettingGroup::shouldRender)
+                .flatMap(settingGroup -> settingGroup.getSettings().stream()
+                        .map(setting -> new AbstractMap.SimpleEntry<>(settingGroup, setting)))
+                .filter(entry -> entry.getValue().shouldRender())
+                .forEach(entry -> {
+                    SettingGroup settingGroup = entry.getKey();
+                    Setting<?> setting = entry.getValue();
+                    setting.update(settingGroup.getY());
+                    if (!setting.isAnimationDone() && delay.get() <= 0.0f) {
+                        delay.set(delayBetweenSettings);
+                        delay.set(delay.get() - setting.getAnimationSpeed());
+                    }
+                })
         );
     }
 
@@ -67,7 +64,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldRender()) continue;
                 setting.quickSettings = false;
-                windowHeight += setting.height + 1;
+                windowHeight += setting.getHeight() + 1;
             }
             windowHeight += Math.round(groupNameHeight + 4);
         }
@@ -111,10 +108,10 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
                         // Update the y position of the setting based on its animation progress
                         int animatedY = Math.round(setting.getY() + (yOffset - setting.getY()) * setting.getAnimationProgress());
-                        if (animatedY <= yOffset + setting.height + 5 && animatedY >= yOffset - 5) {
+                        if (animatedY <= yOffset + setting.getHeight() + 5 && animatedY >= yOffset - 5) {
                             setting.render(drawContext, x + 16, animatedY + 6, mouseX, mouseY, textRenderer);
                         }
-                        yOffset += setting.height + 1;
+                        yOffset += setting.getHeight() + 1;
                     } else {
                         resetSettingAnimation(setting, settingGroup);
                     }
@@ -134,15 +131,15 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     }
 
     public void resetSettingAnimation(Setting<?> setting, SettingGroup settingGroup) {
-        setting.animationDone = false;
+        setting.setAnimationDone(false);
         setting.setAnimationProgress(0);
-        HeliosExecutor.execute(()-> {
-        delay.set(0);
-                setting.reset(settingGroup.getY());
-                if (setting.isAnimationDone() && delay.get() <= 0) {
-                    delay.set(delayBetweenSettings);
-                    delay.set(delay.get() - setting.animationSpeed);
-                }
+        HeliosExecutor.execute(() -> {
+            delay.set(0);
+            setting.reset(settingGroup.getY());
+            if (setting.isAnimationDone() && delay.get() <= 0) {
+                delay.set(delayBetweenSettings);
+                delay.set(delay.get() - setting.getAnimationSpeed());
+            }
         });
         setting.setAnimationProgress(0.5f);
     }

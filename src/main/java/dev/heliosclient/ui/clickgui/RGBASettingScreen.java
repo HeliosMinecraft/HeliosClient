@@ -39,6 +39,7 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
 
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
     }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         window.setBackButtonTask(() -> {
@@ -66,7 +67,7 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         setting.keyPress(keyCode);
         if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_BACKSPACE) {
-            setting.height = 25;
+            setting.setHeight(25);
             if (setting.getParentScreen() != null && !setting.hexInput.isFocused()) {
                 HeliosClient.MC.setScreen(setting.getParentScreen());
             }

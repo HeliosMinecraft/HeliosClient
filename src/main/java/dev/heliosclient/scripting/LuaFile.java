@@ -19,10 +19,10 @@ public class LuaFile extends File {
     /**
      * Constructs a new LuaFile with the given file and executor.
      *
-     * @param path The path of the file.
+     * @param path        The path of the file.
      * @param luaExecutor The executor to run the Lua script.
      */
-    public LuaFile(String path,LuaExecutor luaExecutor) {
+    public LuaFile(String path, LuaExecutor luaExecutor) {
         super(path);
         this.executor = luaExecutor;
     }
@@ -40,6 +40,7 @@ public class LuaFile extends File {
     public Reader getReader() throws FileNotFoundException {
         return new BufferedReader(new FileReader(this));
     }
+
     /**
      * Retrieves a Buffered reader for the Lua script file.
      *

@@ -10,20 +10,22 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.settings.*;
+import dev.heliosclient.system.UniqueID;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.render.Renderer2D;
-import dev.heliosclient.system.UniqueID;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class for creating HudElements for HUD
@@ -159,9 +161,10 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
                 posY = 2;
             }
 
-            if (drawContext.getScaledWindowWidth() / 3 > x) {
+            // + width is trial
+            if (drawContext.getScaledWindowWidth() / 3 > x + width) {
                 posX = 0;
-            } else if ((drawContext.getScaledWindowWidth() / 3) * 2 > x) {
+            } else if ((drawContext.getScaledWindowWidth() / 3) * 2 > x + width) {
                 posX = 1;
             } else {
                 posX = 2;
@@ -221,8 +224,9 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         // Set the hudBox values after the render element incase any change of width/height occurs
         setHudBox();
     }
-    public void setHudBox(){
-        hudBox.set((float) (x - 1 - (padding.value / 2f)), (float) (y - 1 - (padding.value / 2f)), (float) (width + padding.value + 4f), (float) (height + padding.value +  1));
+
+    public void setHudBox() {
+        hudBox.set((float) (x - 1 - (padding.value / 2f)), (float) (y - 1 - (padding.value / 2f)), (float) (width + padding.value + 4f), (float) (height + padding.value + 1));
     }
 
 
@@ -233,7 +237,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      * @param textRenderer
      */
     public void render(DrawContext drawContext, TextRenderer textRenderer) {
-        //Skip if in F3 menu
+        //Skip if in F3 menu or hud is hidden
         if (HeliosClient.MC.options.hudHidden || HeliosClient.MC.getDebugHud().shouldShowDebugHud()) return;
 
         //Move to proper position
@@ -269,7 +273,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      */
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         setHudBox();
-        
+
         if (renderBg.value) {
             drawContext.getMatrices().push();
             drawContext.getMatrices().translate(0D, 0D, 0D);
@@ -319,6 +323,14 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      */
     public void addSettingGroup(SettingGroup settingGroup) {
         settingGroups.add(settingGroup);
+    }
+    /**
+     * Removes a setting group to the setting groups list
+     *
+     * @param settingGroup setting group to be added
+     */
+    public void removeSettingGroup(SettingGroup settingGroup) {
+        settingGroups.remove(settingGroup);
     }
 
     /**

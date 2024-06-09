@@ -8,7 +8,6 @@ import dev.heliosclient.event.events.input.KeyPressedEvent;
 import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
@@ -16,12 +15,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
@@ -32,6 +31,9 @@ import static dev.heliosclient.util.ColorUtils.reset;
 public class MultiLineInputBox implements Listener {
     protected final InputMode inputMode;
     public int x, y, width, height;
+    public boolean displayLineNos = true;
+    public boolean doSyntaxHighLighting = true;
+    public boolean autoScroll = false;
     protected List<String> lines;
     protected boolean focused = false;
     protected int cursorPosition = 0;
@@ -43,9 +45,7 @@ public class MultiLineInputBox implements Listener {
     protected boolean selecting = false;
     protected boolean selectedAll = false;
     protected Screen screen;
-    public boolean displayLineNos = true;
-    public boolean doSyntaxHighLighting = true;
-    public boolean autoScroll = false;
+    List<String> declaredVariables = new ArrayList<>();
 
     public MultiLineInputBox(int width, int height, String value, long characterLimit, InputMode inputMode) {
         this.width = width;
@@ -75,10 +75,10 @@ public class MultiLineInputBox implements Listener {
                         // Move the cursor to the end of the previous line
                         cursorLine--;
                         cursorPosition = previousLine.length();
-                    }else if (!lines.isEmpty() && cursorPosition >= 0) {
+                    } else if (!lines.isEmpty() && cursorPosition >= 0) {
                         String currentLine = getCurrentLine();
                         if (selecting) {
-                            if(cursorPosition <= currentLine.length()) {
+                            if (cursorPosition <= currentLine.length()) {
                                 currentLine = currentLine.substring(0, selectionStart) + currentLine.substring(selectionEnd);
                                 lines.set(cursorLine, currentLine);
                                 cursorPosition = selectionStart;
@@ -96,7 +96,7 @@ public class MultiLineInputBox implements Listener {
                 case GLFW.GLFW_KEY_DELETE -> {
                     if (selecting) {
                         String currentLine = getCurrentLine();
-                        if(cursorPosition <= currentLine.length()) {
+                        if (cursorPosition <= currentLine.length()) {
                             currentLine = currentLine.substring(0, selectionStart) + currentLine.substring(selectionEnd);
                             lines.set(cursorLine, currentLine);
                             cursorPosition = selectionStart;
@@ -141,7 +141,7 @@ public class MultiLineInputBox implements Listener {
                     selectionStart = 0;
                     selectionEnd = 0;
                 }
-                case GLFW.GLFW_KEY_DOWN ->{
+                case GLFW.GLFW_KEY_DOWN -> {
                     cursorLine = Math.min(lines.size() - 1, cursorLine + 1);
                     selectionStart = 0;
                     selectionEnd = 0;
@@ -150,12 +150,19 @@ public class MultiLineInputBox implements Listener {
         }
     }
 
-
     public void setText(String text) {
         this.lines = new CopyOnWriteArrayList<>(Arrays.asList(text.split("\n")));
     }
-    public void addLine(String text){
+
+    public void addLine(String text) {
         this.lines.addAll(Arrays.asList(text.split("\n")));
+    }
+    public void clearAll(){
+        this.focused = false;
+        this.cursorLine = 0;
+        this.cursorPosition = 0;
+        this.scrollOffset = 0;
+        this.lines.clear();
     }
 
     @SubscribeEvent
@@ -164,15 +171,15 @@ public class MultiLineInputBox implements Listener {
             double mouseX = event.getMouseX();
             double mouseY = event.getMouseY();
             isFocusedHover(mouseX, mouseY);
-            if((mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= y && mouseY <= (y + height)) && isFocused()){
+            if ((mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= y && mouseY <= (y + height)) && isFocused()) {
                 float textHeight = Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer);
 
-                int relativeX = (int) Math.round(mouseX - this.x - (displayLineNos? 20: 5)); // Adjust for the 20 pixel offset
+                int relativeX = (int) Math.round(mouseX - this.x - (displayLineNos ? 20 : 5)); // Adjust for the 20 pixel offset
                 int relativeY = (int) (mouseY - this.y + 5 + scrollOffset * textHeight);
 
                 // Calculate the cursor line as before
                 this.cursorLine = MathHelper.floor(relativeY / textHeight);
-                this.cursorLine = Math.min(this.lines.size() - 1,this.cursorLine);
+                this.cursorLine = Math.min(this.lines.size() - 1, this.cursorLine);
 
                 // Get the text of the current line
                 String lineText = this.lines.get(this.cursorLine);
@@ -192,14 +199,12 @@ public class MultiLineInputBox implements Listener {
         return focused = (mouseX >= x + 1 && mouseX <= x + 3 + width && mouseY >= (y) && mouseY <= (y + height));
     }
 
-
     public void update(int x, int y) {
         this.screen = HeliosClient.MC.currentScreen;
 
         this.x = x;
         this.y = y;
     }
-   List<String> declaredVariables = new ArrayList<>();
 
     //Todo: Buggy asf
     public String addLuaSyntaxHighlighting(String line) {
@@ -416,7 +421,8 @@ public class MultiLineInputBox implements Listener {
     private boolean isKeyword(String word) {
         return Arrays.asList("and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", "in", "local", "not", "or", "repeat", "return", "then", "true", "until", "while").contains(word);
     }
-    private boolean isNil(String word){
+
+    private boolean isNil(String word) {
         return word.contains("nil");
     }
 
@@ -428,6 +434,7 @@ public class MultiLineInputBox implements Listener {
             return false;
         }
     }
+
     private boolean isBoolean(String word) {
         return word.contains("true") || word.contains("false");
     }
@@ -442,16 +449,25 @@ public class MultiLineInputBox implements Listener {
             return '\0';
         }
     }
-    public void displaySegment(DrawContext drawContext, float y,float xOffset, float textHeight) {
+
+    public void displaySegment(DrawContext drawContext, float y, float xOffset, float textHeight) {
         if (!lines.isEmpty()) {
-            float textY = y - scrollOffset * textHeight;
-            for (int i = 0; i < lines.size(); i++) {
+
+            //Only display the lines which should be visible. Helps with lag.
+
+            // Calculate the first and last line indices to display
+            int firstLineIndex = Math.max(0, scrollOffset);
+            int visibleLinesCount = (int) Math.floor(height / textHeight);
+            int lastLineIndex = Math.min(lines.size(), firstLineIndex + visibleLinesCount);
+
+            float textY = y - (scrollOffset - firstLineIndex) * textHeight;
+            for (int i = firstLineIndex; i < lastLineIndex; i++) {
                 String line = lines.get(i);
                 if (displayLineNos) {
                     FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), String.valueOf(i), x + 6, textY, Color.WHITE.getRGB());
                 }
                 // Add syntax highlighting to the line
-                if(doSyntaxHighLighting) {
+                if (doSyntaxHighLighting) {
                     line = addLuaSyntaxHighlighting(line);
                 }
 
@@ -460,7 +476,7 @@ public class MultiLineInputBox implements Listener {
             }
             declaredVariables.clear();
         }
-        displayCursor(drawContext, textHeight,xOffset, 0.5f);
+        displayCursor(drawContext, textHeight, xOffset, 0.5f);
     }
 
     public void displayCursor(DrawContext drawContext, float textHeight, float xOffset, float cursorWidth) {
@@ -487,44 +503,46 @@ public class MultiLineInputBox implements Listener {
     }
 
 
-    public void drawSelectionBox(DrawContext drawContext, float textY,float xOffSet, float textHeight) {
+    public void drawSelectionBox(DrawContext drawContext, float textY, float xOffSet, float textHeight) {
         // Draw selection box
         if (focused && selecting && selectionStart != selectionEnd) {
             String strBeforeStart = lines.get(cursorLine).substring(0, Math.min(selectionStart, lines.get(cursorLine).length()));
             String strBeforeEnd = lines.get(cursorLine).substring(0, Math.min(selectionEnd, lines.get(cursorLine).length()));
-            float startX =  (x + xOffSet + FontRenderers.Small_fxfontRenderer.getStringWidth(strBeforeStart));
-            float endX =  (x + xOffSet  + FontRenderers.Small_fxfontRenderer.getStringWidth(strBeforeEnd));
+            float startX = (x + xOffSet + FontRenderers.Small_fxfontRenderer.getStringWidth(strBeforeStart));
+            float endX = (x + xOffSet + FontRenderers.Small_fxfontRenderer.getStringWidth(strBeforeEnd));
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), startX, textY, endX - startX, textHeight, new Color(0, 166, 255, 64).getRGB());
         }
     }
 
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+
         update(x, y);
 
         renderBackground(drawContext);
 
-        Renderer2D.enableScissor(x,y,width,height);
-        float lineNosWidth = Math.max(15,FontRenderers.Small_fxfontRenderer.getStringWidth(String.valueOf(lines.size() - 1)));
-        if(displayLineNos){
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),x + 2,y,true,false,true,false,lineNosWidth,height,3,Color.GRAY.getRGB());
+        Renderer2D.enableScissor(x, y, width, height);
+        float lineNosWidth = Math.max(15, FontRenderers.Small_fxfontRenderer.getStringWidth(String.valueOf(lines.size())));
+        if (displayLineNos) {
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y, true, false, true, false, lineNosWidth + 2, height, 3, Color.GRAY.getRGB());
         }
         float textHeight = Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer);
 
-        cursorPosition = MathHelper.clamp(cursorPosition,0,getCurrentLine().length());
+        cursorPosition = MathHelper.clamp(cursorPosition, 0, getCurrentLine().length());
         //cursorPosition = Math.max(0, Math.min(cursorPosition, lines.get(cursorLine).length()));
 
-        displaySegment(drawContext, (float) y + 5, displayLineNos? lineNosWidth + 6:5, textHeight);
+        displaySegment(drawContext, (float) y + 5, displayLineNos ? lineNosWidth + 8 : 5, textHeight);
 
-        drawSelectionBox(drawContext, (float) y + 5 + (textHeight*(cursorLine - scrollOffset)) , displayLineNos? 20:5, textHeight);
+        drawSelectionBox(drawContext, (float) y + 5 + (textHeight * (cursorLine - scrollOffset)), displayLineNos ? 20 : 5, textHeight);
 
         Renderer2D.disableScissor();
 
-        if(autoScroll && (lines.size() + 2 - (height/Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer))) - scrollOffset <= 2){
-            scrollOffset = (int) (lines.size() + 2 - (height/Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer)));
+        if (autoScroll && (lines.size() + 2 - (height / Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer))) - scrollOffset <= 2) {
+            scrollOffset = (int) (lines.size() + 2 - (height / Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer)));
         }
     }
-    public void scrollToLast(){
-        scrollOffset = (int) (lines.size() + 2 - (height/Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer)));
+
+    public void scrollToLast() {
+        scrollOffset = (int) (lines.size() + 2 - (height / Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer)));
     }
 
     public void renderBackground(DrawContext drawContext) {
@@ -536,13 +554,23 @@ public class MultiLineInputBox implements Listener {
         setWidth(width);
         setHeight(height);
     }
-    public String getCurrentLine(){
+
+    public String getCurrentLine() {
+        if (lines.isEmpty()) {
+            return "";
+        }
+
         return lines.get(cursorLine);
     }
 
     @SubscribeEvent
     public void keyPressed(KeyPressedEvent event) {
         int keyCode = event.getKey();
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            focused = false;
+            return;
+        }
+
         if (focused && canWrite()) {
             if (Screen.isSelectAll(keyCode)) {
                 selecting = true;
@@ -576,10 +604,14 @@ public class MultiLineInputBox implements Listener {
 
             switch (keyCode) {
                 case GLFW.GLFW_KEY_ENTER,
-                        GLFW.GLFW_KEY_KP_ENTER -> {
+                     GLFW.GLFW_KEY_KP_ENTER -> {
                     // Insert a newline character at the cursor position
                     StringBuilder builder = new StringBuilder(lines.get(cursorLine));
-                    builder.insert(cursorPosition, '\n');
+                    if (builder.length() >= cursorPosition) {
+                        builder.insert(cursorPosition, '\n');
+                    } else if (builder.isEmpty()) {
+                        builder.insert(0, '\n');
+                    }
                     lines.set(cursorLine, builder.toString());
 
                     // Split the current line into two lines
@@ -682,7 +714,7 @@ public class MultiLineInputBox implements Listener {
                 // Replace the selected text with the new character
                 int start = Math.min(selectionStart, selectionEnd);
                 int end = Math.max(selectionStart, selectionEnd);
-                if(start <= end) {
+                if (start <= end) {
                     StringBuilder builder = new StringBuilder(currentLine);
                     builder.replace(start, end, String.valueOf(chr));
                     lines.set(cursorLine, builder.toString());
@@ -703,10 +735,10 @@ public class MultiLineInputBox implements Listener {
 
     public void mouseScrolled(double verticalAmount) {
         if (isFocused()) {
-            verticalAmount *= (HeliosClient.CLICKGUI.ScrollSpeed.value/2.0f);
+            verticalAmount *= (HeliosClient.CLICKGUI.ScrollSpeed.value / 2.0f);
             // Scroll up or down depending on the direction of the scroll and clamp the value so that
             // you cannot scroll beyond the number of lines
-            scrollOffset = (int) MathHelper.clamp(scrollOffset - verticalAmount,0,lines.size() + 2 - (height/Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer)));
+            scrollOffset = (int) MathHelper.clamp(scrollOffset - verticalAmount, 0, lines.size() + 2 - (height / Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer)));
         }
     }
 
@@ -815,6 +847,7 @@ public class MultiLineInputBox implements Listener {
     public void setCharacterLimit(int characterLimit) {
         this.characterLimit = characterLimit;
     }
+
     public boolean isFocused() {
         return focused;
     }
@@ -825,6 +858,10 @@ public class MultiLineInputBox implements Listener {
 
     public InputMode getInputMode() {
         return inputMode;
+    }
+
+    public boolean isEmpty() {
+        return lines.isEmpty() || lines.size() < 2;
     }
 
     public enum InputMode {

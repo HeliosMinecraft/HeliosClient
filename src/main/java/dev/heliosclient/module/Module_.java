@@ -8,6 +8,7 @@ import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.module.settings.BooleanSetting;
@@ -101,9 +102,18 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
         quickSettings = new ObjectArraySet<>();
     }
 
+    /**
+     * Returns a string containing necessary details for the module.
+     * Override in your module to return the data you need to.
+     */
+    public String getInfoString(){
+        return "";
+    }
+
 
     /**
      * Adds a setting group to the main {@link #settingGroups} list
+     *
      * @param settingGroup settingGroup to be added
      */
     public void addSettingGroup(SettingGroup settingGroup) {
@@ -112,6 +122,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
 
     /**
      * Adds a setting to the {@link #quickSettings} list
+     *
      * @param setting setting to be added
      */
     public void addQuickSetting(Setting<?> setting) {
@@ -189,20 +200,18 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
         active.value = !active.value;
         if (active.value) {
             onEnable();
-           sendEnableNotification();
+            sendNotification(true);
         } else {
             onDisable();
-           sendDisableNotification();
+            sendNotification(false);
         }
     }
-    public void sendEnableNotification(){
-        if (NotificationModule.get().moduleNotification.value && HeliosClient.shouldSendNotification()) {
-            NotificationManager.addNotification(new InfoNotification(this.name, "was enabled!", 2000, SoundUtils.TING_SOUNDEVENT, 1f));
-        }
-    }
-    public void sendDisableNotification(){
-        if (NotificationModule.get().moduleNotification.value && HeliosClient.shouldSendNotification()) {
-            NotificationManager.addNotification(new InfoNotification(this.name, "was disabled!", 2000, SoundUtils.TING_SOUNDEVENT, 0.5f));
+
+    public void sendNotification(boolean enabled) {
+        String description = enabled ? "was enabled!" : "was disabled!";
+
+        if (ModuleManager.get(NotificationModule.class).moduleNotification.value && HeliosClient.shouldSendNotification()) {
+            NotificationManager.addNotification(new InfoNotification(this.name, description, 2000, SoundUtils.TING_SOUNDEVENT, enabled ? 1f : 0.5f));
         }
     }
 
@@ -238,10 +247,10 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
         if (setting == active) {
             if (active.value) {
                 onEnable();
-                sendEnableNotification();
+                sendNotification(true);
             } else {
                 onDisable();
-                sendDisableNotification();
+                sendNotification(false);
             }
         }
     }
@@ -250,7 +259,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public Object saveToToml(List<Object> list) {
         Map<String, Object> ModuleConfig = new HashMap<>();
         // Map for storing the values of each module
-        if(this.settingGroups == null) return ModuleConfig;
+        if (this.settingGroups == null) return ModuleConfig;
 
         for (SettingGroup settingGroup : this.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
@@ -269,7 +278,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
         for (SettingGroup settingGroup : this.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
-                if(!setting.shouldSaveAndLoad()) break;
+                if (!setting.shouldSaveAndLoad()) break;
 
 
                 Toml settingTable = toml.getTable(this.name.replace(" ", ""));

@@ -19,6 +19,7 @@ public class StringListSetting extends Setting<String[]> {
 
     private final int characterLimit;
     private final InputBox.InputMode inputMode;
+    public boolean isWriting = false;
     String description;
 
     public StringListSetting(String name, String description, String[] defaultValues, int defaultBoxes, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender) {
@@ -52,6 +53,9 @@ public class StringListSetting extends Setting<String[]> {
         drawContext.drawHorizontalLine(x + 167, x + 173, y + 10, Color.GREEN.getRGB());
         drawContext.drawVerticalLine(x + 170, y + 6, y + 14, Color.GREEN.getRGB());
         int boxOffset = y + 20;
+        value = new String[inputBoxes.size()];
+        int counter = 0;
+        boolean isFocused = false;
         for (InputBox box : inputBoxes) {
             box.render(drawContext, x, boxOffset, mouseX, mouseY, textRenderer);
 
@@ -60,7 +64,14 @@ public class StringListSetting extends Setting<String[]> {
             drawContext.drawHorizontalLine(x + 168, x + 172, boxOffset + 5, Color.RED.getRGB());
             Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, boxOffset, 11, 11, 0.4f, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
             boxOffset += 16;
+            value[counter] = box.getValue();
+            counter++;
+
+            if (box.isFocused()) {
+                isFocused = true;
+            }
         }
+        this.isWriting = isFocused;
     }
 
     @Override
@@ -77,7 +88,6 @@ public class StringListSetting extends Setting<String[]> {
             inputBoxes.add(new InputBox(160, 13, "", characterLimit, inputMode)); // Add a new empty box to the list
         }
         for (int i = 0; i < inputBoxes.size(); i++) {
-            InputBox box = inputBoxes.get(i); // Get the box at the current index
             if (hoveredOverRemove(mouseX, mouseY, boxOffset)) {
                 inputBoxes.remove(i); // Remove the box at the current index
                 i--; // Decrement the index to account for the removal
@@ -97,16 +107,18 @@ public class StringListSetting extends Setting<String[]> {
 
     @Override
     public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP,toml);
-        if(toml.getList(name.replace(" ", "")) == null){
+        super.loadFromToml(MAP, toml);
+        if (toml.getList(getSaveName()) == null) {
             value = defaultValue;
             return;
         }
         int a;
         inputBoxes.clear();
-        List<String> list = toml.getList(name.replace(" ", ""));
+        List<String> list = toml.getList(getSaveName());
+        value = new String[list.size()];
         for (a = 0; a < list.size(); a++) {
             inputBoxes.add(new InputBox(160, 12, list.get(a), characterLimit, inputMode));
+            value[a] = list.get(a);
         }
     }
 
@@ -160,7 +172,11 @@ public class StringListSetting extends Setting<String[]> {
 
         @Override
         public StringListSetting build() {
-            return new StringListSetting(name, description, value, defaultBoxes, characterLimit, inputMode, shouldRender);
+            if (defaultValue == null) {
+                defaultValue = value;
+            }
+
+            return new StringListSetting(name, description, defaultValue, defaultBoxes, characterLimit, inputMode, shouldRender);
         }
     }
 }
