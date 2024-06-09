@@ -90,7 +90,6 @@ public class CategoryPane implements Listener {
 
     public void addModule(List<Module_> moduleS) {
 
-        int prevSize = moduleButtons.size();
         for (Module_ module : moduleS) {
             boolean exists = false;
             for (ModuleButton button : moduleButtons) {
@@ -104,7 +103,6 @@ public class CategoryPane implements Listener {
                 moduleButtons.add(moduleButton);
             }
         }
-        if(moduleButtons.size() != prevSize) {
             height = 4;
             for (ModuleButton button : moduleButtons) {
                 maxWidth = Math.max(maxWidth, button.width);
@@ -113,7 +111,6 @@ public class CategoryPane implements Listener {
                     maxWidth = getWidth();
                 }
             }
-        }
     }
 
     public void update(float delta) {
@@ -238,6 +235,7 @@ public class CategoryPane implements Listener {
             }
             for (ModuleButton moduleButton : moduleButtons) {
                 moduleButton.collapsed = collapsed;
+                moduleButton.mouseClicked(event);
             }
         }
     }

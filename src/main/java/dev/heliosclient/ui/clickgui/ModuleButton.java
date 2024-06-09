@@ -170,7 +170,9 @@ public class ModuleButton implements Listener {
         return buttonYOffset > 2 ? finalHeight : 0;
     }
 
-    @SubscribeEvent
+    /**
+     * Method is called in {@link CategoryPane#mouseClicked(MouseClickEvent)}
+     */
     public boolean mouseClicked(MouseClickEvent event) {
         //Do not accept any clicks if the mouse is over the search bar
         if (ClickGUIScreen.INSTANCE.searchBar.isMouseOverInputBox(event.getMouseX(), event.getMouseY())) return false;
