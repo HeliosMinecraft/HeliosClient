@@ -13,8 +13,10 @@
 <details>
     <summary>Click to show</summary>
     <p>Keep in mind that these images might be outdated as Helios is currently updating frequently!</p>
-    <p>New clickgui as of commit #199 (0758e8c)</p>
-    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/heliosclientgui.png?raw=true" alt="New Click GUI">
+    <p>New clickgui as of commit #235 (a13bf24)</p>
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/Updated_ClickGUI.png?raw=true" alt="New Click GUI">
+    <p>Previous clickgui as of commit #199 (0758e8c)</p>
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/heliosclientgui.png?raw=true" alt="Prev Click GUI">
     <p>Old clickgui</p>
     <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/ClickGUI.png?raw=true" alt="Old Click GUI">
 </details>  
