@@ -61,7 +61,7 @@ dependencies {
 
 	//Renderer 1.20.4 library
 	//TODO: Move to 1.20.6
-	include modImplementation("com.github.0x3C50:Renderer:aa67e1c")
+	include modImplementation("com.github.0x3C50:Renderer:aa67e1c979")
 
 
 	// Baritone API
