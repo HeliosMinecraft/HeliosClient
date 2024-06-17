@@ -281,6 +281,25 @@ public class Renderer2D implements Listener {
     }
 
     /**
+     * Draws a singular rectangle with a shadow on screen with the given parameters
+     *
+     * @param matrices   MatrixStack object to draw the rectangle and shadow
+     * @param x          X position of the rectangle
+     * @param y          Y position of the rectangle
+     * @param width      Width of the rectangle
+     * @param height     Height of the rectangle
+     * @param color      Color of the rectangle
+     * @param blurRadius blur radius of the shadow for gaussian blur algorithm
+     */
+    public static void drawRectangleWithShadow(MatrixStack matrices, float x, float y, float width, float height, int color, Color blurColor, int blurRadius) {
+        //Shadow
+        drawBlurredShadow(matrices, x, y, width, height, blurRadius, blurColor);
+
+        //Rectangle
+        drawRectangle(matrices.peek().getPositionMatrix(), x, y, width, height, color);
+    }
+
+    /**
      * Draws a singular gradient rectangle with a shadow on screen with the given parameters
      *
      * @param matrices   MatrixStack object to draw the gradient

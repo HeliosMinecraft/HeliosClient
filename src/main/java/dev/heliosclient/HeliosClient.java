@@ -172,6 +172,5 @@ public class HeliosClient implements ModInitializer, Listener {
         EventManager.register(TickRate.INSTANCE);
         EventManager.register(DamageUtils.INSTANCE);
         EventManager.register(RotationSimulator.INSTANCE);
-
     }
 }

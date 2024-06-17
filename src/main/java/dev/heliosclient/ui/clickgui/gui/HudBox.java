@@ -1,9 +1,6 @@
 package dev.heliosclient.ui.clickgui.gui;
 
-import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.managers.EventManager;
-
-public class HudBox implements Listener {
+public class HudBox {
     private float x, y, width, height;
     private float left;
     private float top;
@@ -20,8 +17,6 @@ public class HudBox implements Listener {
         this.top = y;
         this.right = x + width;
         this.bottom = y + height;
-
-        EventManager.register(this);
     }
 
     public boolean intersects(HudBox other) {

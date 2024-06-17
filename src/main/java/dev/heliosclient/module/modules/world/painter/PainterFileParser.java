@@ -28,7 +28,7 @@ public class PainterFileParser {
     public static String POSITION_BLOCK_REGEX = "\\[\\d+,\\d+,\\d+\\]\\{[a-zA-Z0-9_]+:[a-zA-Z0-9_]+\\}";
 
 
-    public static HashMap<BlockPos, Block> parseFile(Path filePath) {
+    public static HashMap<BlockPos, Block> parseFilePath(Path filePath) {
         HashMap<BlockPos, Block> result = new HashMap<>();
         try (BufferedReader reader = Files.newBufferedReader(filePath)) {
             String line;
@@ -58,7 +58,7 @@ public class PainterFileParser {
         if (file == null) {
             return null;
         }
-        return PainterFileParser.parseFile(file.toPath());
+        return PainterFileParser.parseFilePath(file.toPath());
     }
 
     private static void readLine(String line, HashMap<BlockPos, Block> result) {

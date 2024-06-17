@@ -15,6 +15,9 @@ import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.animation.Easing;
+import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
@@ -61,7 +64,7 @@ public class CategoryPane implements Listener {
         for (Module_ m : ModuleManager.getModulesByCategory(category)) {
             ModuleButton mb = new ModuleButton(m, parentScreen);
             moduleButtons.add(mb);
-            maxWidth = Math.max(maxWidth, mb.width);
+            maxWidth = Math.max(maxWidth, mb.width - 2);
             height += mb.height + 3;
         }
         if (maxWidth < getWidth()) {
@@ -105,7 +108,7 @@ public class CategoryPane implements Listener {
         }
             height = 4;
             for (ModuleButton button : moduleButtons) {
-                maxWidth = Math.max(maxWidth, button.width);
+                maxWidth = Math.max(maxWidth, button.width - 2);
                 height += button.height + 3;
                 if (maxWidth < getWidth()) {
                     maxWidth = getWidth();
@@ -143,7 +146,7 @@ public class CategoryPane implements Listener {
         maxWidth = 0;
         height = 4;
         for (ModuleButton m : moduleButtons) {
-            maxWidth = Math.max(maxWidth, m.width);
+            maxWidth = Math.max(maxWidth, m.width - 2);
             height += m.height + 3;
         }
         if (maxWidth < getWidth()) {
@@ -154,6 +157,7 @@ public class CategoryPane implements Listener {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
         update((float) (delta * HeliosClient.CLICKGUI.animationSpeed.value));
         this.screen = HeliosClient.MC.currentScreen;
+        
         if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
             MAX_HEIGHT = height;
         } else {
@@ -162,6 +166,7 @@ public class CategoryPane implements Listener {
                 MAX_HEIGHT = height;
             }
         }
+        
         if (dragging) {
             x = mouseX - startX;
             y = mouseY - startY;

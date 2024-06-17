@@ -46,7 +46,7 @@ public class HUDModule extends Module_ implements Listener {
     }
 
     public void updateUIColor() {
-        if (accentColor.value && HeliosClient.CLICKGUI != null) {
+        if ((accentColor.value && HeliosClient.CLICKGUI != null) || ColorManager.SYNC_ACCENT) {
             ColorManager.INSTANCE.hudColor = HeliosClient.CLICKGUI.getAccentColor();
         } else {
             ColorManager.INSTANCE.hudColor = colorSetting.getColor().getRGB();
@@ -64,7 +64,7 @@ public class HUDModule extends Module_ implements Listener {
     }
 
     @SubscribeEvent
-    public void onTickClient(TickEvent event) {
+    public void onTickClient(TickEvent e) {
         updateUIColor();
     }
 

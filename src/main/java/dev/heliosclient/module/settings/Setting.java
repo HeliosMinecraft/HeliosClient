@@ -73,7 +73,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
             animationProgress = Math.min(animationProgress, 1);
 
             // Calculate the eased progress using a linear in-out easing function
-            float easedProgress = Easing.ease(EasingType.LINEAR_IN_OUT, animationProgress);
+            float easedProgress = Easing.ease(EasingType.QUADRATIC_IN_OUT, animationProgress);
             // Update the current Y position by interpolating between the current and target Y positions
             y = Math.round(AnimationUtils.lerp(y, this.targetY, easedProgress));
             // If the animation progress has reached or exceeded 1, mark the animation as done

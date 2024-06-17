@@ -197,8 +197,13 @@ public class Painter extends Module_ {
 
         selectFile.addButton("Select a text file", 0, 0, () -> {
             FileUtils.openTinyFileDialog("canvas.txt", (file -> painterFile = file), false);
+
+            if(painterFile != null) {
+                selectFile.setButtonCategoryText("File Selected: " + painterFile.getName());
+            }
+
             CANVAS_MAP = PainterFileParser.parseFile(painterFile);
-            selectFile.setButtonCategoryText("File Selected: " + painterFile.getName());
+
 
             if (CANVAS_MAP == null) {
                 ChatUtils.sendHeliosMsg(ColorUtils.red + "File selected is empty or is not matching the proper syntax. Please review it.");

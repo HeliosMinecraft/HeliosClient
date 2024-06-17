@@ -49,14 +49,14 @@ public class TimeChanger extends Module_ {
 
     @SubscribeEvent
     private void onPacketReceive(PacketEvent.RECEIVE event) {
-        if (event.packet instanceof WorldTimeUpdateS2CPacket) {
-            prevTime = ((WorldTimeUpdateS2CPacket) event.packet).getTime();
+        if (event.packet instanceof WorldTimeUpdateS2CPacket packet) {
+            prevTime = packet.getTime();
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT e) {
         if (mc.world != null)
             mc.world.setTimeOfDay((long) time.value);
     }

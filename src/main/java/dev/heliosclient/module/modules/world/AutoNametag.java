@@ -80,10 +80,9 @@ public class AutoNametag extends Module_ {
         // Interaction
         if (rotate.get()) {
             RotationUtils.lookAt(nameTagEntity, RotationUtils.LookAtPos.CENTER);
-            interact(slot == 45);
-        } else {
-            interact(slot == 45);
         }
+
+        interact(slot == 45);
     }
 
     private void interact(boolean offHand) {

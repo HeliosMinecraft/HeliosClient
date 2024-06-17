@@ -1,7 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
@@ -129,10 +128,10 @@ public class ModuleButton implements Listener {
     }
 
     public int renderSettings(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        int buttonYOffset = 0;
+        int settingYOffset = 0;
         updateScale(settingsOpen);
         if (scale > 0.0f) {
-            buttonYOffset = y + this.height + 2;
+            settingYOffset = y + this.height + 2;
             Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2, y + this.height + 2, scale);
             for (Setting<?> setting : module.quickSettings) {
                 // Reset the animation if the setting is not visible.
@@ -147,27 +146,27 @@ public class ModuleButton implements Listener {
                 }
 
                 // If offset is more than Y level, render the setting.
-                if (buttonYOffset >= y + 3) {
+                if (settingYOffset >= y + 3) {
                     setting.quickSettings = settingsOpen;
 
-                    setting.renderCompact(drawContext, x, buttonYOffset + 1, mouseX, mouseY, textRenderer);
-                    buttonYOffset += setting.heightCompact + 1;
+                    setting.renderCompact(drawContext, x, settingYOffset + 1, mouseX, mouseY, textRenderer);
+                    settingYOffset += setting.heightCompact + 1;
                 }
             }
             Renderer2D.stopScaling(drawContext.getMatrices());
 
             if (!module.quickSettings.isEmpty()) {
-                buttonYOffset += 2;
+                settingYOffset += 2;
             }
         }
 
         //Multiplying by the scale gives us the "sliding in/out" effect.
 
-        int finalHeight = Math.round((buttonYOffset - y - this.height - 2) * scale);
+        int finalHeight = Math.round((settingYOffset - y - this.height - 2) * scale);
         setBoxHeight(finalHeight);
 
         // Return the total height of the quick settings
-        return buttonYOffset > 2 ? finalHeight : 0;
+        return settingYOffset > 2 ? finalHeight : 0;
     }
 
     /**

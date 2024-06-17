@@ -5,8 +5,6 @@ import net.minecraft.block.StainedGlassPaneBlock;
 import net.minecraft.block.TransparentBlock;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformationMode;

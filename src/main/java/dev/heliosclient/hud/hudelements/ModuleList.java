@@ -8,16 +8,15 @@ import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.CycleSetting;
-import dev.heliosclient.module.settings.DoubleSetting;
-import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.settings.*;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static dev.heliosclient.hud.hudelements.ModuleList.ColorMode.METEOR;
@@ -46,19 +45,65 @@ public class ModuleList extends HudElement implements Listener {
             .build()
     );
     private final BooleanSetting background = sgSettings.add(new BooleanSetting.Builder()
-            .name("Render Background")
-            .description("Renders a gray background behind the text")
+            .name("Render Module Background")
+            .description("Renders a background behind the module name and info")
             .onSettingChange(this)
             .value(true)
             .defaultValue(true)
             .build()
     );
+    public RGBASetting backgroundColor = sgSettings.add(new RGBASetting.Builder()
+            .name("Background Color")
+            .description("Color of the background")
+            .defaultValue(new Color(0x66222222))
+            .onSettingChange(this)
+            .shouldRender(()-> background.value)
+            .build());
+    private final BooleanSetting glow = sgSettings.add(new BooleanSetting.Builder()
+            .name("Render Glow")
+            .description("Renders a glow behind the text depending on the color of text")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .shouldRender(()-> background.value)
+            .build()
+    );
+    private final CycleSetting glowMode = sgSettings.add(new CycleSetting.Builder()
+            .name("Glow Mode")
+            .description("Mode of glow")
+            .value(List.of(GlowMode.values()))
+            .onSettingChange(this)
+            .defaultListOption(GlowMode.LOW_BG_ALPHA)
+            .shouldRender(()-> glow.value && background.value)
+            .build()
+    );
+    private final DoubleSetting glowRadius = sgSettings.add(new DoubleSetting.Builder()
+            .name("Glow Radius")
+            .onSettingChange(this)
+            //For some reason the glowing breaks at radius less than 11
+            .min(5)
+            .max(50)
+            .roundingPlace(0)
+            .defaultValue(4d)
+            .shouldRender(() -> glow.value && background.value )
+            .build()
+    );
+
     private final BooleanSetting sideLines = sgSettings.add(new BooleanSetting.Builder()
             .name("Side Lines")
             .description("Renders a vertical separator line side of the module name")
             .onSettingChange(this)
             .value(true)
             .defaultValue(true)
+            .build()
+    );
+    private final DoubleSetting distance = sgSettings.add(new DoubleSetting.Builder()
+            .name("Distance / Y offset")
+            .description("Distance between each module name (aka y offset")
+            .onSettingChange(this)
+            .min(0)
+            .max(10)
+            .roundingPlace(0)
+            .defaultValue(2d)
             .build()
     );
     private final CycleSetting colorMode = sgSettings.add(new CycleSetting.Builder()
@@ -69,6 +114,7 @@ public class ModuleList extends HudElement implements Listener {
             .defaultListOption(METEOR)
             .build()
     );
+
     private final DoubleSetting rainbowSpeed = sgSettings.add(new DoubleSetting.Builder()
             .name("Rainbow Speed")
             .description("Speed of rainbow")
@@ -76,7 +122,7 @@ public class ModuleList extends HudElement implements Listener {
             .min(0.001d)
             .max(0.2d)
             .roundingPlace(3)
-            .value(0.05d)
+            .value(0.01d)
             .shouldRender(() -> colorMode.getOption() == METEOR)
             .build()
     );
@@ -87,7 +133,8 @@ public class ModuleList extends HudElement implements Listener {
             .min(0.001f)
             .max(0.05f)
             .roundingPlace(3)
-            .defaultValue(0.1d)
+            .defaultValue(0.017d)
+            .value(0.017d)
             .shouldRender(() -> colorMode.getOption() == METEOR)
             .build()
     );
@@ -120,12 +167,18 @@ public class ModuleList extends HudElement implements Listener {
     private double rainbowHue1;
     private double rainbowHue2;
 
+    private Color colorToRenderIn = new Color(-1);
+
     public ModuleList() {
         super(DATA);
         this.width = 50;
         EventManager.register(this);
         addSettingGroup(sgSettings);
-        removeSettingGroup(sgUI);
+
+    }
+
+    @Override
+    public void onLoad() {
     }
 
     @Override
@@ -149,6 +202,7 @@ public class ModuleList extends HudElement implements Listener {
         // Render each module with a different color
         this.width = maxWidth + (sideLines.value ? 4 : 0);
         int yOffset = this.y; // Start rendering from this.y
+
         for (Module_ m : enabledModules) {
             if (!m.showInModulesList.value) continue;
 
@@ -158,25 +212,36 @@ public class ModuleList extends HudElement implements Listener {
             if (colorMode.getOption() == METEOR) {
                 rainbowHue2 += rainbowSpread.value;
                 rainbow = new Color(Color.HSBtoRGB((float) rainbowHue2, (float) rainbowSaturation.value, (float) rainbowBrightness.value));
+                colorToRenderIn = rainbow;
             }
+
             float textX = x - (sideLines.value? 4: 0) + width - nameWidth;
 
-            if (background.value)
+            if (background.value) {
                 // Draw a background rectangle for each module
-                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
-                        textX - 2, yOffset, nameWidth + 4,
-                        Math.round(Renderer2D.getStringHeight()) + 2, 0x66222222);
+                int bgColor = (glowMode.getOption() == GlowMode.LOW_BG_ALPHA) ? ColorUtils.changeAlpha(backgroundColor.getColor(),100).getRGB() : backgroundColor.getColor().getRGB();
+
+                if (glow.value) {
+                    Renderer2D.drawRectangleWithShadow(drawContext.getMatrices(),
+                            textX - 2, yOffset, nameWidth + 4,
+                            Math.round(Renderer2D.getStringHeight()) + 2, bgColor, colorToRenderIn, (int) glowRadius.value);
+                } else {
+                    Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
+                            textX - 2, yOffset, nameWidth + 4,
+                            Math.round(Renderer2D.getStringHeight()) + 2, bgColor);
+                }
+            }
 
             if (sideLines.value)
                 // Draw a vertical separator line
                 Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
-                        x - 2 + width, yOffset, 2,
-                        Math.round(Renderer2D.getStringHeight()) + 3, rainbow.getRGB());
+                        x - 2.3f + width, yOffset, 2,
+                        Math.round(Renderer2D.getStringHeight()) + 3, colorToRenderIn.getRGB());
 
             // Draw the module name
             Renderer2D.drawString(drawContext.getMatrices(), m.name,
                     textX, 1 + yOffset,
-                    rainbow.getRGB());
+                    colorToRenderIn.getRGB());
 
             //Render the module info
             if (moduleInfo.value && !info.isEmpty()) {
@@ -186,7 +251,7 @@ public class ModuleList extends HudElement implements Listener {
             }
 
 
-            yOffset += Math.round(Renderer2D.getStringHeight()) + 2;
+            yOffset += (int) (Math.round(Renderer2D.getStringHeight()) + distance.value);
         }
         this.height = Math.max(yOffset - this.y + 2, 40);
     }
@@ -213,5 +278,9 @@ public class ModuleList extends HudElement implements Listener {
 
     public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
 
+    public enum GlowMode{
+        LOW_BG_ALPHA,
+        NORMAL
+    }
 
 }

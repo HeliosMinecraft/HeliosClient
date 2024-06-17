@@ -21,6 +21,7 @@ public class AddonManager {
 
     public void loadAddons() {
         HeliosClient.LOGGER.info("Loading Addons....");
+
         // Get the current working directory
         String currentWorkingDir = System.getProperty("user.dir");
 

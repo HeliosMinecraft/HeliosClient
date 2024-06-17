@@ -43,6 +43,7 @@ public class ClickGUI extends Module_ {
     public SettingGroup sgTooltip = new SettingGroup("ToolTip");
     public SettingGroup sgGeneral = new SettingGroup("General");
     public SettingGroup sgSound = new SettingGroup("Sound");
+    public SettingGroup sgExpert = new SettingGroup("Expert");
 
 
     public CycleSetting theme = sgMisc.add(new CycleSetting.Builder()
@@ -218,6 +219,13 @@ public class ClickGUI extends Module_ {
             .defaultValue(new Color(ColorManager.INSTANCE.clickGuiSecondary))
             .build()
     );
+    public BooleanSetting syncAccentColor = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Sync Accent color")
+            .description("Syncs accent color for the entire client")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .build()
+    );
     public RGBASetting PaneTextColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Category pane text color")
             .description("Color of pane text.")
@@ -253,6 +261,15 @@ public class ClickGUI extends Module_ {
             .build()
     );
 
+    public BooleanSetting disableEventSystem = sgExpert.add(new BooleanSetting.Builder()
+            .name("Disable Event System")
+            .description("Disables the client's event system. Warning: This will cause ALL modules and features of the client to stop working and may get out of sync. This option will also only be turned off again via the config")
+            .onSettingChange(this)
+            .value(false)
+            .defaultValue(false)
+            .build()
+    );
+
     public ClickGUI() {
         super("ClickGUI", "ClickGui related stuff.", Categories.RENDER);
 
@@ -261,6 +278,8 @@ public class ClickGUI extends Module_ {
         addSettingGroup(sgSound);
         addSettingGroup(sgTooltip);
         addSettingGroup(sgConfig);
+        //addSettingGroup(sgExpert);
+
 
         active.value = true;
 
@@ -342,19 +361,7 @@ public class ClickGUI extends Module_ {
         Tooltip.tooltip.fixedPos = TooltipPos.value;
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
 
-        ColorManager.INSTANCE.clickGuiSecondaryAlpha = AccentColor.getColor().getAlpha();
-        ColorManager.INSTANCE.clickGuiSecondary = getAccentColor();
-        ColorManager.INSTANCE.clickGuiSecondaryRainbow = AccentColor.isRainbow();
-
-        ColorManager.INSTANCE.defaultTextColor = TextColor.getColor().getRGB();
-
-        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getColor().getAlpha();
-        ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.getColor().getRGB();
-        ColorManager.INSTANCE.clickGuiPaneTextRainbow = PaneTextColor.isRainbow();
-
-        ColorManager.INSTANCE.clickGuiPaneTextAlpha = PaneTextColor.getColor().getAlpha();
-        ColorManager.INSTANCE.clickGuiPaneText = PaneTextColor.value.getRGB();
-        ColorManager.INSTANCE.clickGuiPaneTextRainbow = PaneTextColor.isRainbow();
+        ColorManager.INSTANCE.onTick(null);
 
         pause = Pause.value;
         keybinds = Keybinds.value;
@@ -383,10 +390,5 @@ public class ClickGUI extends Module_ {
     public enum ScrollTypes {
         OLD,
         NEW
-    }
-
-    public enum ScriptEditorType {
-        System,
-        Client
     }
 }

@@ -8,53 +8,54 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.scripting.LuaEventManager;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class EventManager {
-    private static final Map<Listener, Map<Class<?>, List<MethodHandle>>> INSTANCE = new ConcurrentHashMap<>();
-    private static final Comparator<MethodHandle> METHOD_COMPARATOR = Comparator.comparingInt(mh -> {
-        SubscribeEvent annotation = mh.type().parameterType(0).getAnnotation(SubscribeEvent.class);
-        return (annotation != null) ? annotation.priority().ordinal() : Integer.MAX_VALUE;
+    private static final Map<Class<?>, List<EventListener>> listeners = new ConcurrentHashMap<>();
+
+    private static final Comparator<EventListener> METHOD_COMPARATOR = Comparator.comparingInt(el -> {
+        SubscribeEvent annotation = el.method.getAnnotation(SubscribeEvent.class);
+        return (annotation != null) ? annotation.priority().ordinal() : Integer.MIN_VALUE;
     });
-    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+
     private static final Map<Class<?>, Long> LAST_POSTED = new ConcurrentHashMap<>();
+
     private static final long TIME_FRAME = TimeUnit.MINUTES.toMillis(1); // 1 minute timeframe
+
     private static final Executor executor = Executors.newFixedThreadPool(10);
 
     public static void register(Listener listener) {
-        Map<Class<?>, List<MethodHandle>> listenerMethods = new HashMap<>();
-
         for (Method method : listener.getClass().getMethods()) {
             if (method.isAnnotationPresent(SubscribeEvent.class) && method.getParameterCount() == 1) {
                 Class<?> eventType = method.getParameterTypes()[0];
-                MethodHandle methodHandle = getMethodHandle(method);
-                List<MethodHandle> methodHandles = listenerMethods.computeIfAbsent(eventType, k -> new ArrayList<>());
-                methodHandles.add(methodHandle);
-                if (methodHandles.size() > 1) {
-                    methodHandles.sort(METHOD_COMPARATOR);
+                EventListener eventListener = new EventListener(listener, method);
+                List<EventListener> eventListeners = getListeners(eventType);
+                synchronized (eventListeners) {
+                    eventListeners.add(eventListener);
+                    if (eventListeners.size() > 1) {
+                        eventListeners.sort(METHOD_COMPARATOR);
+                    }
                 }
             }
         }
-        INSTANCE.put(listener, listenerMethods);
     }
 
-    private static MethodHandle getMethodHandle(Method method) {
-        try {
-            return LOOKUP.unreflect(method);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    private static List<EventListener> getListeners(Class<?> eventClass) {
+        return listeners.computeIfAbsent(eventClass, key -> new ArrayList<>());
     }
+
 
     public static void unregister(Listener listener) {
-        INSTANCE.remove(listener);
+        for (List<EventListener> eventListeners : listeners.values()) {
+            synchronized (eventListeners) {
+                eventListeners.removeIf(el -> el.listener.getClass() == listener.getClass());
+            }
+        }
     }
 
     /**
@@ -62,18 +63,10 @@ public class EventManager {
      * @return Same event returned.
      */
     public static Event postEvent(Event event) {
-        Class<?> eventType = event.getClass();
-        for (Map.Entry<Listener, Map<Class<?>, List<MethodHandle>>> entry : INSTANCE.entrySet()) {
-            List<MethodHandle> methodHandles = entry.getValue().get(eventType);
-            if (methodHandles != null) {
-                for (MethodHandle methodHandle : methodHandles) {
-                    //     System.out.println(methodHandle + ", Event: "+event);
-                    try {
-                        methodHandle.invoke(entry.getKey(), event);
-                    } catch (Throwable e) {
-                        handleException(e, entry.getKey(), event);
-                    }
-                }
+        List<EventListener> eventListeners = listeners.get(event.getClass());
+        if (eventListeners != null && !eventListeners.isEmpty()) {
+            for (EventListener listener : new CopyOnWriteArrayList<>(eventListeners)) {
+                listener.accept(event);
             }
         }
         if (event.getClass().isAnnotationPresent(LuaEvent.class) && LuaEventManager.INSTANCE.hasListeners()) {
@@ -101,24 +94,22 @@ public class EventManager {
 
         LAST_POSTED.put(eventType, currentTime); // Update the last posted time
 
-        for (Map.Entry<Listener, Map<Class<?>, List<MethodHandle>>> entry : INSTANCE.entrySet()) {
-            List<MethodHandle> methodHandles = entry.getValue().get(eventType);
-            if (methodHandles != null) {
-                for (MethodHandle methodHandle : methodHandles) {
-                    try {
-                        methodHandle.invoke(entry.getKey(), event);
-                    } catch (Throwable e) {
-                        handleException(e, entry.getKey(), event);
-                    }
-                }
-            }
-        }
+        postEvent(event);
     }
-
 
     private static void handleException(Throwable e, Listener listener, Event event) {
         HeliosClient.LOGGER.info("Exception occurred while processing event: {} \n Following was the listener: {}", event.getClass().getName(), listener, e);
         HeliosClient.LOGGER.warn("An error occurred while processing an event. Please check the log file for details.");
+    }
+
+    private record EventListener(Listener listener, Method method) {
+        public void accept(Event event) {
+            try {
+                method.invoke(listener, event);
+            } catch (Throwable e) {
+                handleException(e, listener, event);
+            }
+        }
     }
 
 }

@@ -556,7 +556,7 @@ public class MultiLineInputBox implements Listener {
     }
 
     public String getCurrentLine() {
-        if (lines.isEmpty()) {
+        if (lines.isEmpty() || cursorLine < 0 || cursorLine < lines.size()) {
             return "";
         }
 

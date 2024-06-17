@@ -92,7 +92,10 @@ public class Spammer extends Module_ {
 
         selectFile.addButton("Select a text file", 0, 0, () -> {
             FileUtils.openTinyFileDialog("canvas.txt", (file -> spamFile = file), false);
-            selectFile.setButtonCategoryText("File Selected: " + spamFile.getName());
+
+            if(spamFile != null) {
+                selectFile.setButtonCategoryText("File Selected: " + spamFile.getName());
+            }
         });
     }
 

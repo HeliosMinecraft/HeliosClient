@@ -9,6 +9,7 @@ import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
+import jdk.jfr.FlightRecorder;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -102,25 +103,7 @@ public class GUI extends Module_ {
     @Override
     public void onLoad() {
         showInModulesList.value = false;
-        if (ColorMode.value == 0) {
-            ColorManager.INSTANCE.primaryGradientStart = staticColor.getColor();
-            ColorManager.INSTANCE.primaryGradientEnd = staticColor.getColor();
-        }
-        if (ColorMode.value == 1) {
-            switch (GradientType.value) {
-                case 0 -> {
-                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
-                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor2();
-                }
-                case 1, 2, 3 -> {
-                    ColorManager.INSTANCE.primaryGradientStart = ColorUtils.getRainbowColor();
-                    ColorManager.INSTANCE.primaryGradientEnd = ColorUtils.getRainbowColor();
-                }
-                case 4 -> {
-                    ColorManager.INSTANCE.primaryGradientStart = linear2Start.getColor();
-                    ColorManager.INSTANCE.primaryGradientEnd = linear2end.getColor();
-                }
-            }
-        }
+
+        ColorManager.INSTANCE.onTick(null);
     }
 }
