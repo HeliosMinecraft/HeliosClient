@@ -52,6 +52,7 @@
     "KeyboardMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
+    "MixinBackgroundRenderer",
     "MixinBlockEntityRenderDispatcher",
     "MixinBlockModelRenderer",
     "MixinBossBarHud",

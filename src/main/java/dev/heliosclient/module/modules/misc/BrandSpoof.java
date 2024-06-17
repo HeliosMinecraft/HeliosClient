@@ -35,8 +35,8 @@ public class BrandSpoof extends Module_ {
             .onSettingChange(this)
             .inputMode(InputBox.InputMode.ALL)
             .characterLimit(100)
-            .value("vanilla")
-            .defaultValue("vanilla")
+            .value("brand")
+            .defaultValue("brand")
             .shouldRender(() -> spoofBrand.value)
             .build()
     );

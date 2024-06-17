@@ -27,7 +27,7 @@ public abstract class MixinItemRenderer {
             )
     )
     private void modifyEnchant(Args args, ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model) {
-        if (NoRender.get().isActive() && !NoRender.get().noEnchantGlint.value) return;
+        if (!NoRender.get().isActive() && !NoRender.get().noEnchantGlint.value) return;
         boolean bl = (renderMode == ModelTransformationMode.GUI || renderMode.isFirstPerson() || !(stack.getItem() instanceof BlockItem blockItem) || !(blockItem.getBlock() instanceof TransparentBlock) && !(blockItem.getBlock() instanceof StainedGlassPaneBlock));
         args.set(5, vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, bl)));
     }

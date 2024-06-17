@@ -38,6 +38,7 @@ public class KeybindManager implements Listener {
         EventManager.register(this);
     }
 
+
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
     public void keyPressedEvent(KeyPressedEvent event) {
         int key = event.getKey();

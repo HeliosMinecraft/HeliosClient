@@ -71,7 +71,7 @@ public class Tooltip {
         Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x + 5, textY - 2, textWidth + 8, textHeight + 3, 3, 3, Color.BLACK.brighter().brighter().getRGB());
         Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 5, textY - 2, textWidth + 8, textHeight + 3, 3, 0.7f, ColorManager.INSTANCE.getPrimaryGradientStart().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientStart().darker());
 
-        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), text, x + 8, textY, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), text, x + 8 + (Renderer2D.isVanillaRenderer()? 1:0), textY + (Renderer2D.isVanillaRenderer()? 1:0), ColorManager.INSTANCE.defaultTextColor());
 
         Renderer2D.stopScaling(drawContext.getMatrices());
     }

@@ -65,7 +65,7 @@ public class EventManager {
     public static Event postEvent(Event event) {
         List<EventListener> eventListeners = listeners.get(event.getClass());
         if (eventListeners != null && !eventListeners.isEmpty()) {
-            for (EventListener listener : new CopyOnWriteArrayList<>(eventListeners)) {
+            for (EventListener listener : new CopyOnWriteArraySet<>(eventListeners)) {
                 listener.accept(event);
             }
         }

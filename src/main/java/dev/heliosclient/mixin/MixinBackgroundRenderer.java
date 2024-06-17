@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinBackgroundRenderer {
     @Inject(method = "applyFog", at = @At("TAIL"))
     private static void onApplyFog(Camera camera, BackgroundRenderer.FogType fogType, float viewDistance, boolean thickFog, float tickDelta, CallbackInfo ci) {
-        if (NoRender.get().isActive() && NoRender.get().noFog.value || ModuleManager.get(Xray.class).isActive()) {
+        if ((NoRender.get().isActive() && NoRender.get().noFog.value) || ModuleManager.get(Xray.class).isActive()) {
             if (fogType == BackgroundRenderer.FogType.FOG_TERRAIN) {
                 RenderSystem.setShaderFogStart(viewDistance * 4);
                 RenderSystem.setShaderFogEnd(viewDistance * 4.25f);
