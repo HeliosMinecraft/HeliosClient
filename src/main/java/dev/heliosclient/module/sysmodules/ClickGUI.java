@@ -55,7 +55,7 @@ public class ClickGUI extends Module_ {
             .build()
     );
 
-    //Sorry guys, this all aren't camel cased.
+    //Sorry guys, these aren't camel cased.
 
     public CycleSetting ScrollType = sgMisc.add(new CycleSetting.Builder()
             .name("Scrolling System")
@@ -69,7 +69,7 @@ public class ClickGUI extends Module_ {
             .name("CategoryPane Height")
             .description("CategoryPane Height for the ClickGUI")
             .onSettingChange(this)
-            .value(230.0)
+            .defaultValue(230.0)
             .max(1000)
             .min(230.0)
             .roundingPlace(0)
@@ -80,7 +80,7 @@ public class ClickGUI extends Module_ {
             .name("Scroll Speed")
             .description("Change your scroll speed for the ClickGUI")
             .onSettingChange(this)
-            .value(7.0)
+            .defaultValue(7.0)
             .min(1)
             .max(8)
             .roundingPlace(1)
@@ -108,7 +108,7 @@ public class ClickGUI extends Module_ {
             .name("Font Size")
             .description("Change your FontSize")
             .onSettingChange(this)
-            .value(8.0)
+            .defaultValue(8.0)
             .min(1)
             .max(15)
             .roundingPlace(1)

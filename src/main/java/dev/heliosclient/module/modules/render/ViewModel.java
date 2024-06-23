@@ -10,6 +10,8 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.Vector3dSetting;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.SwordItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
@@ -24,10 +26,19 @@ public class ViewModel extends Module_ {
             .build()
     );
     public BooleanSetting oldAnimations = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Old 1_8 Animations")
+            .name("Old 1.8 Animations")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting swordAnimation = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Old Sword Blocking animation")
+            .description("Displays 1.8 sword animations. Only visually, does not affect anything in game")
+            .value(false)
+            .defaultValue(false)
+            .onSettingChange(this)
+            .shouldRender(()->oldAnimations.value)
             .build()
     );
     public DoubleSetting swingSpeed = sgGeneral.add(new DoubleSetting.Builder()
@@ -161,6 +172,18 @@ public class ViewModel extends Module_ {
 
     @SubscribeEvent
     public void onHeldItemRender(HeldItemRendererEvent event) {
+        if(oldAnimations.value && swordAnimation.value && mc.player.getMainHandStack().getItem() instanceof SwordItem && mc.options.useKey.isPressed()) {
+            if (event.getHand() == Hand.MAIN_HAND) {
+                event.getMatrix().multiply(RotationAxis.POSITIVE_X.rotationDegrees(-95));
+                event.getMatrix().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(0));
+                event.getMatrix().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(80));
+                event.getMatrix().translate(-0.050, -0.080, 0.050);
+            }
+            if (event.getHand() == Hand.OFF_HAND && mc.player.getOffHandStack().getItem() == Items.SHIELD) {
+                event.getMatrix().scale(0, 0, 0);
+            }
+        }
+
         if (event.getHand() == Hand.MAIN_HAND) {
             rotate(event.getMatrix(), rotMain.value);
             scale(event.getMatrix(), scaleMain.value);

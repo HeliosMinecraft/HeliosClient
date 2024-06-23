@@ -22,7 +22,6 @@
     "MixinPlayerEntity",
     "MixinPlayerInventory",
     "MixinServerPlayerEntity",
-    "MixinServerPlayerInteractionManager",
     "MixinServerPlayNetworkHandler",
     "MixinSlimeBlock",
     "MixinTridentItem",

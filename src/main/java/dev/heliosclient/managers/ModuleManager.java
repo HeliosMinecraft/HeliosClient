@@ -36,6 +36,7 @@ public class ModuleManager {
         // World
         registerModules(
                 new AntiBookBan(),
+                new SpeedMine(),
                 new PacketMine(),
                 new PacketPlace(),
                 new Timer(),
@@ -47,6 +48,7 @@ public class ModuleManager {
                 new AutoSign(),
                 new Collisions(),
                 new AbortBreaking(),
+                new AntiGhostBlocks(),
                 new ChatHighlight()
         );
         // Misc
@@ -200,8 +202,8 @@ public class ModuleManager {
         }
 
         moduleS.sort((m1, m2) -> {
-            int m1Score = StringUtils.getLevenshteinDistance(m1.name, moduleName);
-            int m2Score = StringUtils.getLevenshteinDistance(m2.name, moduleName);
+            int m1Score = StringUtils.getLevenshteinDistance(m1.name.trim().toLowerCase(), moduleName.trim().toLowerCase());
+            int m2Score = StringUtils.getLevenshteinDistance(m2.name.trim().toLowerCase(), moduleName.trim().toLowerCase());
             return Integer.compare(m2Score, m1Score);
         });
 

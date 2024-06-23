@@ -12,7 +12,7 @@ import java.awt.*;
 
 public class SearchBar extends InputBox {
     public SearchBar() {
-        super(133, 16, "", 25, InputMode.ALL);
+        super(133, 16, "", 50, InputMode.ALL);
     }
 
     @Override

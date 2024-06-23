@@ -9,5 +9,6 @@ public enum EasingType {
     QUADRATIC_IN_OUT,
     CUBIC_IN,
     CUBIC_OUT,
-    CUBIC_IN_OUT
+    CUBIC_IN_OUT,
+    LINEAR_SIGMOID
 }

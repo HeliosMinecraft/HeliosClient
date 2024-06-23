@@ -10,4 +10,8 @@ public interface AccessorClientPlayerInteractionManager {
 
     @Accessor("currentBreakingPos")
     BlockPos getCurrentBreakingBlockPos();
+
+    @Accessor("currentBreakingProgress")
+    void setCurrentBreakingProgress(float currentBlockBreakingProgress);
+
 }

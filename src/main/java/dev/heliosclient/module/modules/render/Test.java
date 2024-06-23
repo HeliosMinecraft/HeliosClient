@@ -17,6 +17,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 
 @Deprecated(forRemoval = true)
@@ -40,6 +41,16 @@ public class Test extends Module_ {
     BooleanSetting TracerLine = sgGeneral.add(new BooleanSetting("TracerLine", "", this, false, () -> true, false));
     BooleanSetting blockOutlineAndFIll = sgGeneral.add(new BooleanSetting("blockOutlineAndFIll", "", this, false, () -> true, false));
     RGBASetting color = sgGeneral.add(new RGBASetting("Color", "color", Color.WHITE, false, this, () -> true));
+
+    ItemListSetting itemListSetting = sgGeneral.add(new ItemListSetting.Builder()
+            .name("Items")
+            .description("Items2")
+            .items(new ArrayList<>())
+            .filter(item->true)
+            .build()
+    );
+
+
 
     public Test() {
         super("Test", "Render Test", Categories.RENDER);

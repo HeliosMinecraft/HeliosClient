@@ -2,6 +2,7 @@ package dev.heliosclient.util.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.VertexSorter;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static dev.heliosclient.util.render.Renderer3D.mc;
 import static me.x150.renderer.render.Renderer2d.renderTexture;
 import static me.x150.renderer.util.RendererUtils.registerBufferedImageTexture;
 
@@ -313,6 +315,24 @@ public class Renderer2D implements Listener {
      */
     public static void drawGradientWithShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, int startColor, int endColor, Direction direction) {
         drawBlurredShadow(matrices, x, y, width, height, blurRadius, new Color(startColor));
+
+        drawGradient(matrices.peek().getPositionMatrix(), x, y, width, height, startColor, endColor, direction);
+    }
+
+    /**
+     * Draws a singular gradient rectangle with a shadow on screen with the given parameters
+     *
+     * @param matrices   MatrixStack object to draw the gradient
+     * @param x          X position of the gradient
+     * @param y          Y position of the gradient
+     * @param width      Width of the gradient
+     * @param height     Height of the gradient
+     * @param blurRadius blur radius of the shadow for gaussian blur algorithm
+     * @param startColor start color of the gradient
+     * @param endColor   end color of the gradient
+     */
+    public static void drawGradientWithShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, int startColor, int endColor,Color shadowColor, Direction direction) {
+        drawBlurredShadow(matrices, x, y, width, height, blurRadius, shadowColor);
 
         drawGradient(matrices.peek().getPositionMatrix(), x, y, width, height, startColor, endColor, direction);
     }
@@ -849,6 +869,12 @@ public class Renderer2D implements Listener {
         float blue = (float) (color & 255) / 255.0F;
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
+        //Draw a single rectangle for radius zero to protect FPS
+        if(radius == 0){
+            drawRectangle(matrix4f, x, y, width, height, color);
+            return;
+        }
+
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
 
@@ -930,6 +956,17 @@ public class Renderer2D implements Listener {
         drawArc(matrix4f, x + width - radius, y + radius, radius, thickness, color2.getRGB(), 90, 180); // Top-right arc
         drawArc(matrix4f, x + width - radius, y + height - radius, radius, thickness, color3.getRGB(), 0, 90); // Bottom-right arc
         drawArc(matrix4f, x + radius, y + height - radius, radius, thickness, color4.getRGB(), 270, 360); // Bottom-left arc
+    }
+
+    public static VertexSorter vertexSorter;
+
+    public static void unscaledProjection() {
+        vertexSorter = RenderSystem.getVertexSorting();
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), 0, 1000, 21000), VertexSorter.BY_Z);
+    }
+
+    public static void scaledProjection() {
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getFramebufferWidth() / mc.getWindow().getScaleFactor()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), vertexSorter);
     }
 
     /**

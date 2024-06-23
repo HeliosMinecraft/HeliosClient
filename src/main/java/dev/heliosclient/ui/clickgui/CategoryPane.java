@@ -44,7 +44,7 @@ public class CategoryPane implements Listener {
     public int height;
     public boolean collapsed;
     public Screen screen;
-    protected float scale = 0.0f;
+    protected double scale = 0.0f;
     int startX, startY;
     boolean dragging = false;
     List<ModuleButton> moduleButtons;
@@ -67,17 +67,11 @@ public class CategoryPane implements Listener {
             maxWidth = Math.max(maxWidth, mb.width - 2);
             height += mb.height + 3;
         }
-        if (maxWidth < getWidth()) {
-            maxWidth = getWidth();
+        if (maxWidth < getWidth() - 2) {
+            maxWidth = getWidth() - 2;
         }
-        if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
-            MAX_HEIGHT = height;
-        } else {
-            MAX_HEIGHT = (int) Math.round(HeliosClient.CLICKGUI.CategoryHeight.value);
-            if (MAX_HEIGHT > height) {
-                MAX_HEIGHT = height;
-            }
-        }
+
+        checkMaxHeightValue();
 
         icon = category.icon;
 
@@ -106,14 +100,31 @@ public class CategoryPane implements Listener {
                 moduleButtons.add(moduleButton);
             }
         }
-            height = 4;
-            for (ModuleButton button : moduleButtons) {
-                maxWidth = Math.max(maxWidth, button.width - 2);
-                height += button.height + 3;
-                if (maxWidth < getWidth()) {
-                    maxWidth = getWidth();
-                }
+
+        calcHeightAndWidth();
+    }
+
+    public void calcHeightAndWidth(){
+        height = 4;
+        for (ModuleButton button : moduleButtons) {
+            maxWidth = Math.max(maxWidth, button.width - 2);
+            height += button.height + 3;
+        }
+
+        if (maxWidth < getWidth() - 2) {
+            maxWidth = getWidth() - 2;
+        }
+    }
+
+    public void checkMaxHeightValue(){
+        if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
+            MAX_HEIGHT = height;
+        } else {
+            MAX_HEIGHT = (int) Math.round(HeliosClient.CLICKGUI.CategoryHeight.value);
+            if (MAX_HEIGHT > height) {
+                MAX_HEIGHT = height;
             }
+        }
     }
 
     public void update(float delta) {
@@ -144,36 +155,23 @@ public class CategoryPane implements Listener {
     public void onFontChange(FontChangeEvent e) {
         categoryNameHeight = Math.round(Renderer2D.getFxStringHeight(category.name));
         maxWidth = 0;
-        height = 4;
-        for (ModuleButton m : moduleButtons) {
-            maxWidth = Math.max(maxWidth, m.width - 2);
-            height += m.height + 3;
-        }
-        if (maxWidth < getWidth()) {
-            maxWidth = getWidth();
-        }
+        calcHeightAndWidth();
     }
 
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
         update((float) (delta * HeliosClient.CLICKGUI.animationSpeed.value));
         this.screen = HeliosClient.MC.currentScreen;
         
-        if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
-            MAX_HEIGHT = height;
-        } else {
-            MAX_HEIGHT = (int) Math.round(HeliosClient.CLICKGUI.CategoryHeight.value);
-            if (MAX_HEIGHT > height) {
-                MAX_HEIGHT = height;
-            }
-        }
+        checkMaxHeightValue();
         
         if (dragging) {
             x = mouseX - startX;
             y = mouseY - startY;
         }
-        Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + (width + 5) / 2.0f, y + categoryNameHeight + 6, scale);
+
+        Renderer2D.scaleAndPosition(drawContext.getMatrices(), (x + (width + 5) / 2.0f), (float) (y + categoryNameHeight + 6), (float) scale);
         if (!collapsed && height >= 10) {
-            Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, width + 5, (int) hudBox.getHeight());
+            Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, (int) ((width + 5)), (int) hudBox.getHeight());
             if (ModuleManager.get(GUI.class).categoryBorder.value) {
                 drawOutlineGradientBox(drawContext.getMatrices().peek().getPositionMatrix(),x,y,width);
             }
@@ -223,24 +221,25 @@ public class CategoryPane implements Listener {
 
 
         if (screen != null && event.getScreen() == screen) {
-            int mouseX = (int) event.getMouseX();
-            int mouseY = (int) event.getMouseY();
+            double mouseX = event.getMouseX();
+            double mouseY = event.getMouseY();
             int button = event.getButton();
 
             if (hovered(mouseX, mouseY) && button == 1) toggleCollapsed();
             else if (hovered(mouseX, mouseY) && button == 0) {
-                startX = mouseX - x;
-                startY = mouseY - y;
+                startX = (int) (mouseX - x);
+                startY = (int) (mouseY - y);
                 dragging = true;
             }
             if (button == 2) {
-                startX = mouseX - x;
-                startY = mouseY - y;
+                startX = (int) (mouseX - x);
+                startY = (int) (mouseY - y);
                 dragging = true;
             }
+
             for (ModuleButton moduleButton : moduleButtons) {
                 moduleButton.collapsed = collapsed;
-                moduleButton.mouseClicked(event);
+                moduleButton.mouseClicked(mouseX,mouseY,button,event.getScreen());
             }
         }
     }

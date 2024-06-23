@@ -88,15 +88,17 @@ public class BreakIndicator extends Module_ {
     }
 
     public void renderIndicator(Box box, int breakingProg) {
-
         if (IndicateType.values()[type.value] == Highlight) {
             Renderer3D.drawBoxFill(box, QuadColor.single(highlightColor.value.getRGB()));
+
         } else if (IndicateType.values()[type.value] == Expand) {
-            Box expandedBox = box.expand(breakingProg / 20.0);
+            Box expandedBox = box.contract(1d,1d,1d).expand(1.0 - (breakingProg / 20.0));
             Renderer3D.drawBoxBoth(expandedBox, QuadColor.single(getColor(breakingProg)), 1f);
+
         } else if (IndicateType.values()[type.value] == Shrink) {
             Box shrunkBox = box.expand(breakingProg / 20.0 - 1.0);
             Renderer3D.drawBoxBoth(shrunkBox, QuadColor.single(getColor(breakingProg)), 1f);
+
         }
     }
 
@@ -110,7 +112,7 @@ public class BreakIndicator extends Module_ {
 
     public enum IndicateType {
         Highlight,
-        Expand,
-        Shrink
+        Shrink,
+        Expand
     }
 }

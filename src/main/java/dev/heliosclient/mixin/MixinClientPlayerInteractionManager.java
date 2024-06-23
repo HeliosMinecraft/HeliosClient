@@ -1,6 +1,7 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.event.events.block.BeginBreakingBlockEvent;
+import dev.heliosclient.event.events.block.BlockBreakEvent;
 import dev.heliosclient.event.events.block.BlockInteractEvent;
 import dev.heliosclient.event.events.block.CancelBlockBreakingEvent;
 import dev.heliosclient.event.events.player.PlayerAttackEntityEvent;
@@ -10,6 +11,7 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.player.NoBreakDelay;
 import dev.heliosclient.module.modules.render.Freecam;
 import dev.heliosclient.util.player.FreeCamEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -87,6 +89,15 @@ public abstract class MixinClientPlayerInteractionManager {
         if (EventManager.postEvent(event).isCanceled()) {
             cir.setReturnValue(ActionResult.PASS);
             cir.cancel();
+        }
+    }
+    @Inject(method = "breakBlock", at = @At(value = "HEAD"), cancellable = true)
+    private void onBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        BlockState state = client.player.getWorld().getBlockState(pos);
+        BlockBreakEvent event = new BlockBreakEvent(pos, state);
+        EventManager.postEvent(event);
+        if (event.isCanceled()) {
+            cir.setReturnValue(event.isCanceled());
         }
     }
 

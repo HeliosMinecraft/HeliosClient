@@ -59,13 +59,27 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public SettingGroup sgUI = new SettingGroup("UI");
     public boolean isInHudEditor = false;
     public UniqueID id;
+    int startX, startY, snapSize = 120;
+
+
     // Default settings
+    // This is a lot of complete customisation.
+    // Todo: Add radius setting for rounded background
+
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
             .description("Render the background for the element")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
+            .build());
+    public BooleanSetting rounded = sgUI.add(new BooleanSetting.Builder()
+            .name("Rounded background")
+            .description("Rounds the background of the element for better visuals")
+            .value(false)
+            .defaultValue(false)
+            .onSettingChange(this)
+            .shouldRender(() -> renderBg.value)
             .build());
     public BooleanSetting clientColorCycle = sgUI.add(new BooleanSetting.Builder()
             .name("Client Color Cycle")
@@ -93,14 +107,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .shouldRender(() -> renderBg.value)
             .onSettingChange(this)
             .build());
-    public BooleanSetting rounded = sgUI.add(new BooleanSetting.Builder()
-            .name("Rounded background")
-            .description("Rounds the background of the element for better visuals")
-            .value(false)
-            .defaultValue(false)
-            .onSettingChange(this)
-            .shouldRender(() -> renderBg.value)
-            .build());
     public BooleanSetting shadow = sgUI.add(new BooleanSetting.Builder()
             .name("Shadow")
             .description("Shadow for the background of the element")
@@ -109,10 +115,34 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .onSettingChange(this)
             .shouldRender(() -> renderBg.value)
             .build());
-    int startX, startY, snapSize = 120;
+    public DoubleSetting shadowRadius = sgUI.add(new DoubleSetting.Builder()
+            .name("Shadow Radius")
+            .description("Radius of the shadow")
+            .min(0)
+            .max(50)
+            .defaultValue(5D)
+            .shouldRender(() -> shadow.value && renderBg.value)
+            .onSettingChange(this)
+            .build());
+
+    public BooleanSetting syncShadowColorAsBackground = sgUI.add(new BooleanSetting.Builder()
+            .name("Sync Background color to shadow")
+            .description("Syncs shadow color with background color")
+            .defaultValue(true)
+            .onSettingChange(this)
+            .shouldRender(() -> shadow.value && renderBg.value)
+            .build());
+    public RGBASetting shadowColor = sgUI.add(new RGBASetting.Builder()
+            .name("Shadow Color")
+            .description("Render the shadow for the element")
+            .value(new Color(4, 3, 3, 157))
+            .defaultValue(new Color(4, 3, 3, 157))
+            .shouldRender(() -> shadow.value && !syncShadowColorAsBackground.value && renderBg.value)
+            .onSettingChange(this)
+            .build());
 
 
-    public HudElement(HudElementData hudElementInfo) {
+    public HudElement(HudElementData<?> hudElementInfo) {
         this.name = hudElementInfo.name();
         this.description = hudElementInfo.description();
         this.id = UniqueID.generate();
@@ -286,21 +316,27 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
                 bgEnd = bgStart;
             }
             Color blended = ColorUtils.blend(bgStart, bgEnd, 1 / 2f);
+            Color finalShadowColor = syncShadowColorAsBackground.value ? blended : shadowColor.value;
 
-            if (rounded.value && !shadow.value) {
-                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), 2);
-            } else if (!shadow.value) {
-                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart.getRGB(), bgEnd.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
-            }
-
-            if (rounded.value && shadow.value) {
-                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, 4, blended);
-            }
-            if (!rounded.value && shadow.value) {
-                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), 4, bgStart.getRGB(), bgEnd.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
-            }
+            drawBackground(drawContext, bgStart, bgEnd, finalShadowColor);
 
             drawContext.getMatrices().pop();
+        }
+    }
+
+    private void drawBackground(DrawContext drawContext, Color bgStart, Color bgEnd, Color finalShadowColor) {
+        if (rounded.value) {
+            if (shadow.value) {
+                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, (int)shadowRadius.value, finalShadowColor);
+            } else {
+                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), 2);
+            }
+        } else {
+            if (shadow.value) {
+                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), (int)shadowRadius.value, bgStart.getRGB(), bgEnd.getRGB(), finalShadowColor, Renderer2D.Direction.LEFT_RIGHT);
+            } else {
+                Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart.getRGB(), bgEnd.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
+            }
         }
     }
 

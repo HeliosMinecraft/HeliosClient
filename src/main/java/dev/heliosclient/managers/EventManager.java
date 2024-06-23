@@ -9,10 +9,7 @@ import dev.heliosclient.scripting.LuaEventManager;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class EventManager {
@@ -34,12 +31,10 @@ public class EventManager {
             if (method.isAnnotationPresent(SubscribeEvent.class) && method.getParameterCount() == 1) {
                 Class<?> eventType = method.getParameterTypes()[0];
                 EventListener eventListener = new EventListener(listener, method);
-                List<EventListener> eventListeners = getListeners(eventType);
-                synchronized (eventListeners) {
-                    eventListeners.add(eventListener);
-                    if (eventListeners.size() > 1) {
-                        eventListeners.sort(METHOD_COMPARATOR);
-                    }
+                List<EventListener> eventListeners =  getListeners(eventType);
+                eventListeners.add(eventListener);
+                if (eventListeners.size() > 1) {
+                    eventListeners.sort(METHOD_COMPARATOR);
                 }
             }
         }
@@ -51,10 +46,8 @@ public class EventManager {
 
 
     public static void unregister(Listener listener) {
-        for (List<EventListener> eventListeners : listeners.values()) {
-            synchronized (eventListeners) {
+        for (List<EventListener> eventListeners : new CopyOnWriteArraySet<>(listeners.values())) {
                 eventListeners.removeIf(el -> el.listener.getClass() == listener.getClass());
-            }
         }
     }
 

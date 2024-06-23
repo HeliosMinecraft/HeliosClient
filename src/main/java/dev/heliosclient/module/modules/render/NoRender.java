@@ -1,6 +1,7 @@
 package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.block.BlockBreakEvent;
 import dev.heliosclient.event.events.world.ParticleEvent;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;

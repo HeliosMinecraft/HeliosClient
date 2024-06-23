@@ -1,7 +1,9 @@
-package dev.heliosclient.ui.clickgui;
+package dev.heliosclient.ui.clickgui.settings.lists;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.module.settings.RGBASetting;
+import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.module.settings.ItemListSetting;
+import dev.heliosclient.ui.clickgui.SearchBar;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -9,35 +11,33 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-public class RGBASettingScreen extends Screen implements IWindowContentRenderer {
+public class ItemListSettingsScreen extends Screen implements IWindowContentRenderer {
     private final Window window;
-    private final RGBASetting setting;
-    int windowWidth = 192, windowHeight = 140;
+    private final ItemListSetting setting;
+    int windowWidth = 258, windowHeight = 140;
+    private final SearchBar searchBar;
 
-    public RGBASettingScreen(RGBASetting setting) {
-        super(Text.literal(setting.name == null ? "NULL" : setting.name));
+    public ItemListSettingsScreen(ItemListSetting setting) {
+        super(Text.of(setting.name));
         this.setting = setting;
         window = new Window(windowHeight, windowWidth, true, this);
+        searchBar = new SearchBar();
+        EventManager.unregister(searchBar);
     }
 
     @Override
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        if (this.client.world == null) {
-            super.renderBackgroundTexture(drawContext);
-        }
+    public void onDisplayed() {
+        super.onDisplayed();
+        EventManager.register(searchBar);
+    }
 
-        if (textRenderer.getWidth(setting.description) > windowWidth) {
-            windowWidth = textRenderer.getWidth(setting.description) + 5;
-        } else if (textRenderer.getWidth(setting.name) > windowWidth) {
-            windowWidth = textRenderer.getWidth(setting.name) + 30;
-        }
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
 
-        window.setWindowHeight(windowHeight);
-        window.setWindowWidth(windowWidth);
-        window.render(drawContext, mouseX, mouseY, setting.name, setting.description, textRenderer);
+        window.render(context,mouseX,mouseY,setting.name,setting.description,textRenderer);
+        setting.setSearchTerm(searchBar.getValue());
 
-
-        Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
     }
 
     @Override
@@ -47,15 +47,12 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
                 HeliosClient.MC.setScreen(setting.getParentScreen());
             }
         });
-        setting.mouse(mouseX, mouseY, button);
+
+        setting.handleMouseClick(mouseX,mouseY,windowWidth);
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        setting.mouse(mouseX, mouseY, button);
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-    }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
@@ -65,10 +62,9 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        setting.keyPress(keyCode);
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_BACKSPACE) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_BACKSPACE && !searchBar.isFocused()) {
             setting.setHeight(25);
-            if (setting.getParentScreen() != null && !setting.hexInput.isFocused()) {
+            if (setting.getParentScreen() != null) {
                 HeliosClient.MC.setScreen(setting.getParentScreen());
             }
         }
@@ -93,9 +89,18 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
     }
 
     @Override
+    public void close() {
+        super.close();
+        EventManager.unregister(searchBar);
+    }
+
+    @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+        searchBar.render(drawContext,x + windowWidth/2 - 66,y,mouseX,mouseY,textRenderer);
+
         if (setting != null) {
-            setting.renderSetting(drawContext, x + 3, y + 2, mouseX, mouseY, textRenderer);
+            windowHeight = setting.handleItemRendering(x + 1, y + 30, mouseX,mouseY, drawContext,windowWidth);
+            window.setWindowHeight(windowHeight + 60);
         }
     }
 }

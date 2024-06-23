@@ -13,6 +13,7 @@ import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
+import dev.heliosclient.ui.clickgui.settings.SettingsScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeycodeToString;
 import dev.heliosclient.util.SoundUtils;
@@ -39,7 +40,7 @@ public class ModuleButton implements Listener {
     public int boxHeight = 0;
     public Screen screen;
     public boolean collapsed = false;
-    protected float scale = 0.0f;
+    protected double scale = 0.0f;
 
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
@@ -97,7 +98,7 @@ public class ModuleButton implements Listener {
             drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y, width, height, 2);
         }
         if (settingsOpen && boxHeight >= 4) {
-            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2.0f, y + this.height + 2, scale);
+            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2.0f, y + this.height + 2, (float)scale);
             drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorStart, 100), x + 1, y + height, width, boxHeight + 2, 2);
             Renderer2D.stopScaling(drawContext.getMatrices());
         }
@@ -131,8 +132,8 @@ public class ModuleButton implements Listener {
         int settingYOffset = 0;
         updateScale(settingsOpen);
         if (scale > 0.0f) {
-            settingYOffset = y + this.height + 2;
-            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2, y + this.height + 2, scale);
+            settingYOffset = this.height + 2;
+            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + (float) width / 2, y + this.height + 2,(float) scale);
             for (Setting<?> setting : module.quickSettings) {
                 // Reset the animation if the setting is not visible.
                 if (!setting.shouldRender()) {
@@ -145,11 +146,11 @@ public class ModuleButton implements Listener {
                     listSetting.setParentScreen(ClickGUIScreen.INSTANCE);
                 }
 
-                // If offset is more than Y level, render the setting.
-                if (settingYOffset >= y + 3) {
+                // If offset is more than 4, render the setting.
+                if (settingYOffset > 4) {
                     setting.quickSettings = settingsOpen;
 
-                    setting.renderCompact(drawContext, x, settingYOffset + 1, mouseX, mouseY, textRenderer);
+                    setting.renderCompact(drawContext, x, y + settingYOffset + 1, mouseX, mouseY, textRenderer);
                     settingYOffset += setting.heightCompact + 1;
                 }
             }
@@ -161,8 +162,7 @@ public class ModuleButton implements Listener {
         }
 
         //Multiplying by the scale gives us the "sliding in/out" effect.
-
-        int finalHeight = Math.round((settingYOffset - y - this.height - 2) * scale);
+        int finalHeight = (int) Math.round((settingYOffset - this.height - 2) * scale);
         setBoxHeight(finalHeight);
 
         // Return the total height of the quick settings
@@ -172,11 +172,8 @@ public class ModuleButton implements Listener {
     /**
      * Method is called in {@link CategoryPane#mouseClicked(MouseClickEvent)}
      */
-    public boolean mouseClicked(MouseClickEvent event) {
-        if (screen != null && event.getScreen() == screen) {
-            double mouseX = event.getMouseX();
-            double mouseY = event.getMouseY();
-            int button = event.getButton();
+    public boolean mouseClicked(double mouseX, double mouseY, int button, Screen eventScreen) {
+        if (screen != null && eventScreen == screen) {
             if (!collapsed) {
                 if (hitBox.contains(mouseX, mouseY)) {
                     if (button == 0) {

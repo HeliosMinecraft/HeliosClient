@@ -1,11 +1,10 @@
-package dev.heliosclient.ui.clickgui;
+package dev.heliosclient.ui.clickgui.settings;
 
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.ListSetting;
-import dev.heliosclient.module.settings.RGBASetting;
-import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.HeliosExecutor;
+import dev.heliosclient.ui.clickgui.ClickGUIScreen;
+import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
@@ -85,10 +84,8 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
                 List<Setting<?>> settings = settingGroup.getSettings();
                 for (Setting<?> setting : settings) {
                     if (setting.shouldRender()) {
-                        if (setting instanceof RGBASetting rgbaSetting) {
-                            rgbaSetting.setParentScreen(this);
-                        } else if (setting instanceof ListSetting listSetting) {
-                            listSetting.setParentScreen(this);
+                        if (setting instanceof ParentScreenSetting<?> pcs) {
+                            pcs.setParentScreen(this);
                         }
 
                         // Update the y position of the setting based on its animation progress

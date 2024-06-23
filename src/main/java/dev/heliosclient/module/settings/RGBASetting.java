@@ -6,7 +6,7 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.ui.clickgui.RGBASettingScreen;
+import dev.heliosclient.ui.clickgui.settings.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.fontutils.FontRenderers;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 
-public class RGBASetting extends Setting<Color> implements Listener {
+public class RGBASetting extends ParentScreenSetting<Color> implements Listener {
 
     private final RGBASettingScreen screen = new RGBASettingScreen(this);
     private final int boxHeight = 70;
@@ -46,7 +46,6 @@ public class RGBASetting extends Setting<Color> implements Listener {
     private int gradientBoxX, gradientBoxY, gradientBoxWidth, gradientBoxHeight;
     private int alphaSliderX, alphaSliderY, alphaSliderWidth, alphaSliderHeight;
     private int brightnessSaturationBoxX, brightnessSaturationBoxY, brightnessSaturationBoxWidth, brightnessSaturationBoxHeight;
-    private Screen parentScreen = null;
 
     public RGBASetting(String name, String description, Color defaultColor, boolean rainbow, ISettingChange ISettingChange, BooleanSupplier shouldRender) {
         super(shouldRender, defaultColor);

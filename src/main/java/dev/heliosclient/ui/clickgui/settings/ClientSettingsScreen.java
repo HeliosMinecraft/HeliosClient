@@ -1,4 +1,4 @@
-package dev.heliosclient.ui.clickgui;
+package dev.heliosclient.ui.clickgui.settings;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.FontManager;
@@ -8,6 +8,7 @@ import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.HeliosExecutor;
+import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;

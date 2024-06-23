@@ -12,6 +12,7 @@ public class Easing {
             case CUBIC_IN -> cubicIn(t);
             case CUBIC_OUT -> cubicOut(t);
             case CUBIC_IN_OUT -> cubicInOut(t);
+            case LINEAR_SIGMOID -> linearSigmoid(t);
             default -> throw new IllegalArgumentException("Invalid easing type: " + type);
         };
     }
@@ -42,6 +43,9 @@ public class Easing {
         } else {
             return -2 * t * t + 4 * t - 1;
         }
+    }
+    public static float linearSigmoid(float t) {
+        return (float) (1 / (1 + Math.exp(-10 * (t - 0.5))));
     }
 
     public static float cubicIn(float t) {

@@ -12,6 +12,7 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.EntityUtils;
+import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.entity.Entity;
@@ -38,14 +39,14 @@ public class AimAssist extends Module_ {
             .defaultListOption(SortMethod.LowestHealth)
             .build()
     );
+
     DoubleSetting range = sgGeneral.add(new DoubleSetting.Builder()
             .name("Range")
             .description("Range of the entity")
             .onSettingChange(this)
-            .value(4d)
-            .defaultValue(3d)
+            .defaultValue(4d)
             .min(0.0)
-            .max(5d)
+            .max(10d)
             .roundingPlace(1)
             .build()
     );
@@ -55,6 +56,14 @@ public class AimAssist extends Module_ {
             .onSettingChange(this)
             .value(List.of(RotationUtils.LookAtPos.values()))
             .defaultListOption(RotationUtils.LookAtPos.CENTER)
+            .build()
+    );
+    BooleanSetting deadCheck = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Dead check")
+            .description("Checks if the entity is dead or not, if yes then it would aim to it")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .value(true)
             .build()
     );
     BooleanSetting pauseInGUI = sgGeneral.add(new BooleanSetting.Builder()
@@ -75,7 +84,7 @@ public class AimAssist extends Module_ {
     );
     BooleanSetting simulateRotation = sgGeneral.add(new BooleanSetting.Builder()
             .name("Simulate Rotation")
-            .description("Simulates your rotation to the enemy instead of blatantly moving")
+            .description("Simulates your rotation to the enemy linearly for more natural human-like movement instead of blatantly moving")
             .onSettingChange(this)
             .defaultValue(true)
             .value(true)
@@ -88,8 +97,17 @@ public class AimAssist extends Module_ {
             .value(60d)
             .defaultValue(60d)
             .min(0.0)
-            .max(240)
+            .max(100)
             .roundingPlace(0)
+            .shouldRender(() -> simulateRotation.value)
+            .build()
+    );
+    DropDownSetting easing = sgGeneral.add(new DropDownSetting.Builder()
+            .name("Easing")
+            .description("Easing method to apply to make the simulated rotations more fluent")
+            .onSettingChange(this)
+            .value(List.of(EasingType.values()))
+            .defaultListOption(EasingType.LINEAR_IN)
             .shouldRender(() -> simulateRotation.value)
             .build()
     );
@@ -152,6 +170,10 @@ public class AimAssist extends Module_ {
         simulator.clearRotations();
     }
 
+    private boolean isDead(Entity entity){
+        return (deadCheck.value && !entity.isAlive());
+    }
+
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
         RotationSimulator.pauseInGUI = pauseInGUI.value;
@@ -177,9 +199,9 @@ public class AimAssist extends Module_ {
             return;
         }
 
-        if (entity != null) {
+        if (entity != null && !isDead(entity)) {
             if (simulateRotation.value) {
-                RotationSimulator.INSTANCE.simulateRotation(entity, false, null, (int) simulateTime.value,(int)randomness.value, (RotationUtils.LookAtPos) lookAt.getOption());
+                simulator.simulateRotation(entity, false, null, (int) simulateTime.value, (int) randomness.value, (RotationUtils.LookAtPos) lookAt.getOption(),(EasingType) easing.getOption());
             } else {
                 RotationUtils.lookAt(entity, (RotationUtils.LookAtPos) lookAt.getOption());
             }

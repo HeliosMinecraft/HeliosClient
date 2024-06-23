@@ -2,7 +2,7 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
-import dev.heliosclient.ui.clickgui.ClientSettingsScreen;
+import dev.heliosclient.ui.clickgui.settings.ClientSettingsScreen;
 import dev.heliosclient.ui.clickgui.ScriptManagerScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import dev.heliosclient.ui.clickgui.navbar.NavBarItem;

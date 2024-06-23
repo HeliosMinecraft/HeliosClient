@@ -119,7 +119,6 @@ public class ChatHighlight extends Module_ {
 
         String originalMessage = event.getMessage().getString();
 
-        //Remove formatting from the message (some servers send formatted message for each character which makes it difficult to find words in it).
         StringBuilder builder = new StringBuilder(originalMessage);
 
 

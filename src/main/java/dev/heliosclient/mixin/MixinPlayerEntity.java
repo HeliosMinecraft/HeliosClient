@@ -1,9 +1,15 @@
 package dev.heliosclient.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.events.player.*;
 import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.modules.world.SpeedMine;
+import dev.heliosclient.util.BlockUtils;
 import dev.heliosclient.util.player.FreeCamEntity;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -11,6 +17,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,6 +42,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
         }
     }
 
+
     @Inject(method = "onDeath", at = @At("HEAD"), cancellable = true)
     private void onDeath(DamageSource damageSource, CallbackInfo ci) {
         PlayerDeathEvent event = new PlayerDeathEvent(HeliosClient.MC.player);
@@ -41,6 +50,27 @@ public abstract class MixinPlayerEntity extends LivingEntity {
         if (event.isCanceled()) {
             ci.cancel();
         }
+    }
+
+    @ModifyReturnValue(method = "getBlockBreakingSpeed", at = @At(value = "RETURN"))
+    public float ongetBlockBreakingSpeed(float ogBreakSpeed, BlockState block) {
+        if (!getWorld().isClient) return ogBreakSpeed;
+
+        SpeedMine speedMine = ModuleManager.get(SpeedMine.class);
+        if (!speedMine.isActive() || speedMine.mode.getOption() != SpeedMine.Mode.Modifier) return ogBreakSpeed;
+
+        float breakSpeedMod = (float) (ogBreakSpeed * speedMine.modifier.value);
+
+        if (HeliosClient.MC.crosshairTarget instanceof BlockHitResult bhr) {
+            BlockPos pos = bhr.getBlockPos();
+            if (speedMine.modifier.value  < 1 || (BlockUtils.canBreakInstantly(block,breakSpeedMod) == BlockUtils.canBreakInstantly(block,ogBreakSpeed) )) {
+                return breakSpeedMod;
+            } else {
+                return (float) (0.9f / BlockUtils.calcBlockBreakingDelta2(HeliosClient.MC.world.getBlockState(pos),1f));
+            }
+        }
+
+        return ogBreakSpeed;
     }
 
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)

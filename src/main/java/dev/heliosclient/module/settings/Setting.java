@@ -359,7 +359,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     }
 
     public String getSaveName() {
-        return this.name.replace(" ", "").replace(".", "_");
+        return this.name.replace(".", "_").replace(" ", "");
     }
 
     /**

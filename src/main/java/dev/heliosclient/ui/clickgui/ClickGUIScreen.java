@@ -94,6 +94,8 @@ public class ClickGUIScreen extends Screen {
             category.y += scrollY * 10;
             category.x += scrollX * 10;
             category.render(drawContext, mouseX, mouseY, delta, textRenderer);
+
+            //Search
             if (category.category == Categories.SEARCH && !category.collapsed) {
                 if (searchBar.getValue().isEmpty()) {
                     category.removeModules();
