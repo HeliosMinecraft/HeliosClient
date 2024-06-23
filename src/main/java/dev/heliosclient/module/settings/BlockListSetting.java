@@ -12,6 +12,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,6 +25,9 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
 public class BlockListSetting extends ParentScreenSetting<List<Block>> {
+    public List<Block> value;
+    public List<Block> defaultValue;
+
     private final Predicate<Block> filter;
     private final List<Block> selectedblocks;
     private final List<Block> defaultSelectedBlocks = new ArrayList<>();
@@ -38,6 +42,7 @@ public class BlockListSetting extends ParentScreenSetting<List<Block>> {
         super(shouldRender, defaultValue);
         this.name = name;
         this.description = description;
+        this.value = defaultValue;
         this.filter = filter;
         this.height = 24;
         this.heightCompact = 24;
@@ -65,6 +70,20 @@ public class BlockListSetting extends ParentScreenSetting<List<Block>> {
             this.height = 24;
         }
     }
+    @Override
+    public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+        super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
+
+        Renderer2D.drawFixedString(drawContext.getMatrices(), FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth), x + 2, y + 4, -1);
+
+        // Draw a '🖋' button next to the text
+        nameWidth = Renderer2D.getFxStringWidth(FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth));
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + nameWidth + 11, y + 3, 11, 11, Color.black.getRGB());
+        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + nameWidth + 11, y + 3, 11, 11, 0.4f, (hoveredOverEdit(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+
+        FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), "\uEAF3", x + nameWidth + 12.4f, y + 4.5f, -1);
+    }
+
     private int renderSelected(DrawContext drawContext, int x, int y, int width) {
         if(selectedblocks.isEmpty()){
             return 0;

@@ -1,6 +1,7 @@
 package dev.heliosclient.module.settings;
 
 import com.moandjiezana.toml.Toml;
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.animation.AnimationUtils;
@@ -41,7 +42,7 @@ public class BooleanSetting extends Setting<Boolean> {
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 175, y + 7, 10, 10, 2, 0.7f, 0xFFFFFFFF);
-        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + 176.7f, y + 8.7f, 6.3f, 6.3f, value ? 0xFF55FFFF : 0xFF222222, true, 2);
+        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + 176.7f, y + 8.7f, 6.3f, 6.3f, value ? HeliosClient.CLICKGUI.getAccentColor() : 0xFF222222, true, 2);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -64,7 +65,7 @@ public class BooleanSetting extends Setting<Boolean> {
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + getWidthCompact() - 12, y + 4, 7, 7, 2, 0.6f, 0xFFFFFFFF);
 
-        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + getWidthCompact() - 11.6f, y + 4.4f, 5f, 5f, value ? 0xAA55FFFF : 0xFF222222, true, 1);
+        CheckBoxAnimation.drawFadingAndPoppingBox(drawContext, x + getWidthCompact() - 11.6f, y + 4.4f, 5f, 5f, value ? HeliosClient.CLICKGUI.getAccentColor() : 0xFF222222, true, 1);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;

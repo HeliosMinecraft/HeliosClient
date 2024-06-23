@@ -16,6 +16,7 @@ import dev.heliosclient.util.ParticleUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleType;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
@@ -122,23 +123,23 @@ public class HitEffect extends Module_ {
             .build()
     );
     //Particle Effect
-    StringSetting particle_effect = sgGeneral.add(new StringSetting.Builder()
+    ParticleListSetting particle_effect = sgGeneral.add(new ParticleListSetting.Builder()
             .name("Particle")
             .description("Particle to spawn")
-            .onSettingChange(this)
-            .characterLimit(200)
-            .inputMode(InputBox.InputMode.ALL)
+            .particles(ParticleTypes.DAMAGE_INDICATOR)
             .shouldRender(() -> type.getOption() == EffectType.PARTICLE_EFFECT)
-            .value("minecraft:damage_indicator")
-            .defaultValue("minecraft:damage_indicator")
             .build()
     );
+
+
     int i = 0;
 
     public HitEffect() {
         super("HitEffect", "Displays particles when you hit", Categories.RENDER);
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
+
+        particle_effect.setMaxSelectable(1);
     }
 
     @Override
@@ -199,8 +200,8 @@ public class HitEffect extends Module_ {
                 case PARTICLE_EFFECT -> {
                     particles.clear();
                     ParticleType<?> particle;
-                    if (!particle_effect.value.isEmpty()) {
-                        particle = ParticleUtils.stringToParticleType(particle_effect.value);
+                    if (!particle_effect.getSelectedParticles().isEmpty()) {
+                        particle = particle_effect.getSelectedParticles().get(0);
                         if (particle != null)
                             mc.world.addParticle((ParticleEffect) particle, position.x, position.y, position.z, 0, 0, 0);
                     }
