@@ -34,6 +34,7 @@ public class InfoNotification extends Notification {
     }
 
     @Override
+    @SuppressWarnings("all")
     public void playSound(SoundEvent soundEvent, float volume, float pitch) {
         if (ModuleManager.get(NotificationModule.class).playSound.value && ModuleManager.get(NotificationModule.class).isActive()) {
             SoundUtils.playSound(soundEvent, (float) (ModuleManager.get(NotificationModule.class).volume.value / 100f), pitch);
@@ -41,12 +42,29 @@ public class InfoNotification extends Notification {
     }
 
     @Override
+    public void update() {
+        super.update();
+        if(IS_FANCY) {
+            this.WIDTH = Math.round(FontRenderers.Small_fxfontRenderer.getStringWidth(title + " " + description) + 6);
+            this.HEIGHT = 18;
+        } else {
+            this.WIDTH = 63;
+            this.HEIGHT = 25;
+        }
+    }
+
+    @Override
     public void render(MatrixStack matrices, int y, fxFontRenderer fontRenderer) {
         this.targetY = y;
-        String titleText = title;
-        if (title.length() > 11) {
-            titleText = title.substring(0, 11) + "..";
+
+        if(IS_FANCY){
+            Renderer2D.drawRoundedGradientRectangle(matrices.peek().getPositionMatrix(), ColorManager.INSTANCE.getPrimaryGradientStart(),ColorManager.INSTANCE.getPrimaryGradientEnd(),ColorManager.INSTANCE.getPrimaryGradientEnd(),ColorManager.INSTANCE.getPrimaryGradientStart(),x, y, WIDTH, HEIGHT, 3);
+            fontRenderer.drawString(matrices, title + " " + description, x + 3, y + 0.2f + HEIGHT/2.0f - fontRenderer.getStringHeight(Renderer2D.TEXT) / 2.0f, -1);
+            return;
         }
+
+        String titleText = fontRenderer.trimToWidth(title,WIDTH - 17);
+
 
         Renderer2D.drawRoundedRectangle(matrices.peek().getPositionMatrix(), x, y, true, true, false, false, WIDTH, HEIGHT, 3, ColorManager.INSTANCE.clickGuiPrimary);
 

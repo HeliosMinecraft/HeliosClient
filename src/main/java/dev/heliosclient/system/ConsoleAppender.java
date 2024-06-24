@@ -23,7 +23,7 @@ public class ConsoleAppender extends AbstractAppender {
      * We need to supply as fewer lines as we can for the multi-input box text list to not cause memory issues.,
      * therefore we are trimming exceptions, and avoiding duplicate messages from being added.
      * The aim of this box is to provide the user with some necessary details of what is going on in the background.
-     * Another way would be to open a stream to the "latest.log" file and read it continously.
+     * Another way would be to open a stream to the "latest.log" file and read it continuously.
      */
     @Override
     public void append(LogEvent event) {

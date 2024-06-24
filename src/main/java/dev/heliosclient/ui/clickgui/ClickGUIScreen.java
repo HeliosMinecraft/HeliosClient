@@ -2,6 +2,7 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CategoryManager;
+import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -50,6 +51,7 @@ public class ClickGUIScreen extends Screen {
             });
         }
         searchBar = new SearchBar();
+        EventManager.register(searchBar);
     }
 
     @Override

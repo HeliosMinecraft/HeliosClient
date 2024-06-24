@@ -18,3 +18,7 @@ accessible field net/minecraft/client/render/entity/EndCrystalEntityRenderer cor
 accessible field net/minecraft/client/model/ModelPart$Cuboid sides [Lnet/minecraft/client/model/ModelPart$Quad;
 accessible field net/minecraft/client/model/ModelPart cuboids Ljava/util/List;
 accessible field net/minecraft/client/model/ModelPart children Ljava/util/Map;
+
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
+accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler
+accessible method net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler getType ()Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType;

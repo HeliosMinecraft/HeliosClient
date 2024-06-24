@@ -7,6 +7,7 @@ import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
+import dev.heliosclient.module.settings.lists.ItemListSetting;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.render.Renderer3D;

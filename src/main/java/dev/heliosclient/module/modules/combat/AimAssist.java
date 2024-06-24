@@ -12,7 +12,9 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.EntityUtils;
+import dev.heliosclient.util.SortMethod;
 import dev.heliosclient.util.animation.EasingType;
+import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.entity.Entity;
@@ -22,7 +24,13 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class AimAssist extends Module_ {
@@ -66,6 +74,14 @@ public class AimAssist extends Module_ {
             .value(true)
             .build()
     );
+    BooleanSetting canSeeEntity = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Raycast check")
+            .description("Checks if the entity is visible to the player or not")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .value(true)
+            .build()
+    );
     BooleanSetting pauseInGUI = sgGeneral.add(new BooleanSetting.Builder()
             .name("Pause In GUI")
             .description("Pauses rotation when you are in GUI")
@@ -102,6 +118,7 @@ public class AimAssist extends Module_ {
             .shouldRender(() -> simulateRotation.value)
             .build()
     );
+
     DropDownSetting easing = sgGeneral.add(new DropDownSetting.Builder()
             .name("Easing")
             .description("Easing method to apply to make the simulated rotations more fluent")
@@ -140,23 +157,6 @@ public class AimAssist extends Module_ {
         addQuickSettings(sgEntities.getSettings());
     }
 
-    private static int sortAngle(Entity e1, Entity e2) {
-        boolean e1l = e1 instanceof LivingEntity;
-        boolean e2l = e2 instanceof LivingEntity;
-
-        if (!e1l && !e2l) return 0;
-        else if (e1l && !e2l) return 1;
-        else if (!e1l) return -1;
-
-        double e1yaw = Math.abs(RotationUtils.getYaw(e1.getPos()) - mc.player.getYaw());
-        double e2yaw = Math.abs(RotationUtils.getYaw(e2.getPos()) - mc.player.getYaw());
-
-        double e1pitch = Math.abs(RotationUtils.getPitch(e1.getPos()) - mc.player.getPitch());
-        double e2pitch = Math.abs(RotationUtils.getPitch(e2.getPos()) - mc.player.getPitch());
-
-        return Double.compare(e1yaw * e1yaw + e1pitch * e1pitch, e2yaw * e2yaw + e2pitch * e2pitch);
-    }
-
     @Override
     public void onEnable() {
         super.onEnable();
@@ -171,8 +171,12 @@ public class AimAssist extends Module_ {
     }
 
     private boolean isDead(Entity entity){
-        return (deadCheck.value && !entity.isAlive());
+        return deadCheck.value && !entity.isAlive();
     }
+    private boolean isEntityVisible(Entity entity){
+        return canSeeEntity.value && PlayerUtils.canSeeEntity(entity);
+    }
+
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
@@ -180,20 +184,8 @@ public class AimAssist extends Module_ {
         Entity entity = EntityUtils.getNearestEntity(
                 mc.world,
                 mc.player, range.value,
-                entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range.value,
-                (entity0, entity1) -> {
-                    return switch ((SortMethod) sort.getOption()) {
-                        case LowestDistance ->
-                                Float.compare(mc.player.distanceTo(entity0), mc.player.distanceTo(entity1));
-                        case FarthestDistance ->
-                                Float.compare(mc.player.distanceTo(entity1), mc.player.distanceTo(entity0));
-                        case LowestHealth ->
-                                Float.compare(((LivingEntity) entity0).getHealth(), ((LivingEntity) entity1).getHealth());
-                        case HighestHealth ->
-                                Float.compare(((LivingEntity) entity1).getHealth(), ((LivingEntity) entity0).getHealth());
-                        case LowestAngle -> sortAngle(entity0, entity1);
-                    };
-                });
+                entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range.value && isEntityVisible(entity1) ,
+                (SortMethod) sort.getOption());
 
         if (ignoreTeammate.value && entity instanceof LivingEntity entity1 && ModuleManager.get(Teams.class).isInMyTeam(entity1)) {
             return;
@@ -219,11 +211,4 @@ public class AimAssist extends Module_ {
                 !others.value;
     }
 
-    public enum SortMethod {
-        LowestDistance,
-        FarthestDistance,
-        LowestHealth,
-        HighestHealth,
-        LowestAngle,
-    }
 }

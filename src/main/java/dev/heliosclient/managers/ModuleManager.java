@@ -44,6 +44,7 @@ public class ModuleManager {
                 new NewChunks(),
                 new AutoNametag(),
                 new BetterPortals(),
+                new LiquidInteract(),
                 new Painter(),
                 new AutoSign(),
                 new Collisions(),

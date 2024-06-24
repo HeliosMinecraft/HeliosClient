@@ -31,17 +31,18 @@ public class NotificationManager implements Listener {
         // Remove expired notifications
         displayedNotifications.removeIf(Notification::isExpired);
 
-        updatePositions();
-
         // Add notifications from the queue until the maximum number is reached
         while (displayedNotifications.size() < MAX_DISPLAYED && !notificationQueue.isEmpty()) {
             Notification notification = notificationQueue.poll();
             if (notification == null) return;
 
             notification.creationTime = System.currentTimeMillis();
-            displayedNotifications.addFirst(notification);
             notification.playSound(notification.soundEvent, notification.volume, notification.pitch);
+            displayedNotifications.addFirst(notification);
+            updatePositions();
         }
+
+        updatePositions();
     }
 
     private static void updatePositions() {

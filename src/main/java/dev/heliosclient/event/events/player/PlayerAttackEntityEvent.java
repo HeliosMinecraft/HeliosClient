@@ -26,6 +26,7 @@ public class PlayerAttackEntityEvent extends Event {
         return target;
     }
 
+    @Cancelable
     public static class PRE extends PlayerAttackEntityEvent {
 
         public PRE(PlayerEntity player, Entity target) {

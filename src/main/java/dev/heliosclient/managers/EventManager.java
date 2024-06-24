@@ -47,7 +47,7 @@ public class EventManager {
 
     public static void unregister(Listener listener) {
         for (List<EventListener> eventListeners : new CopyOnWriteArraySet<>(listeners.values())) {
-                eventListeners.removeIf(el -> el.listener.getClass() == listener.getClass());
+                eventListeners.removeIf(el -> el.listener == listener);
         }
     }
 
@@ -98,6 +98,7 @@ public class EventManager {
     private record EventListener(Listener listener, Method method) {
         public void accept(Event event) {
             try {
+                if(method != null)
                 method.invoke(listener, event);
             } catch (Throwable e) {
                 handleException(e, listener, event);

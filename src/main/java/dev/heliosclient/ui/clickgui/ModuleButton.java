@@ -8,7 +8,7 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.GUI;
-import dev.heliosclient.module.settings.ListSetting;
+import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;

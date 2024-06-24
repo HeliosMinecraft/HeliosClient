@@ -1,14 +1,15 @@
 package dev.heliosclient.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.events.player.*;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.modules.movement.Sprint;
 import dev.heliosclient.module.modules.world.SpeedMine;
 import dev.heliosclient.util.BlockUtils;
 import dev.heliosclient.util.player.FreeCamEntity;
-import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -17,17 +18,23 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stat.Stat;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
 public abstract class MixinPlayerEntity extends LivingEntity {
+    @Shadow public abstract void increaseStat(Stat<?> stat, int amount);
+
     protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
 
@@ -72,6 +79,16 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
         return ogBreakSpeed;
     }
+    @WrapWithCondition(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V"))
+    private boolean keepSprint$setVelocity(PlayerEntity instance, Vec3d vec3d) {
+        return ModuleManager.get(Sprint.class).shouldStopSprinting();
+    }
+
+    @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setSprinting(Z)V"))
+    private void onAttack$setSprinting(PlayerEntity instance, boolean b) {
+        instance.setSprinting(ModuleManager.get(Sprint.class).shouldStopSprinting());
+    }
+
 
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
     private void onPlayerDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {

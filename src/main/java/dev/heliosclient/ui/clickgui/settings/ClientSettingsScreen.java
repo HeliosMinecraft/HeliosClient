@@ -3,7 +3,7 @@ package dev.heliosclient.ui.clickgui.settings;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.ListSetting;
+import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;

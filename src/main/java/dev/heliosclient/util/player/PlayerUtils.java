@@ -2,10 +2,14 @@ package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.mixin.AccessorMinecraftClient;
+import dev.heliosclient.util.MathUtils;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -16,11 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerUtils {
+    static MinecraftClient mc = MinecraftClient.getInstance();
 
-    public static boolean canSeeEntity(PlayerEntity player, Entity entity) {
-        Vec3d playerEyePos = player.getEyePos();
+    public static boolean canSeeEntity(Entity entity) {
+        Vec3d playerEyePos = mc.player.getEyePos();
         Box entityBox = entity.getBoundingBox();
-        return player.getWorld().raycast(new RaycastContext(playerEyePos, entityBox.getCenter(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player)).getType() == HitResult.Type.MISS;
+        return mc.player.getWorld().raycast(new RaycastContext(playerEyePos, entityBox.getCenter(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
+    }
+    public static boolean canSeeEntityMC(PlayerEntity player, Entity entity) {
+       return player.canSee(entity);
     }
 
     public static boolean isInHole(PlayerEntity player) {
@@ -29,38 +37,12 @@ public class PlayerUtils {
     }
 
     public static boolean isMoving(PlayerEntity player) {
-        return player.getVelocity().lengthSquared() > 0 && (player.getX() != player.prevX && player.getY() != player.prevY && player.getZ() != player.prevZ);
+        return MathUtils.length2D(player.getPos()) > 0 && (player.getX() != player.prevX && player.getY() != player.prevY && player.getZ() != player.prevZ);
     }
 
-    public static boolean isPlayerLookingAtEntity(PlayerEntity player, Entity target, float lookRange, int numSegments) {
-        Vec3d playerPos = player.getCameraPosVec(HeliosClient.MC.getTickDelta());
-        Vec3d lookDir = player.getRotationVec(HeliosClient.MC.getTickDelta());
-
-        // Calculate the step size for each segment
-        double stepSize = (HeliosClient.MC.interactionManager.getReachDistance() / numSegments);
-
-        // Perform intersection checks for each segment
-        for (int i = 0; i < numSegments; i++) {
-            Vec3d segmentStart = playerPos.add(lookDir.multiply(i * stepSize));
-            Vec3d segmentEnd = playerPos.add(lookDir.multiply((i + 1) * stepSize));
-
-            // Create a bounding box for the segment
-            Box segmentBox = new Box(
-                    Math.min(segmentStart.x, segmentEnd.x),
-                    Math.min(segmentStart.y, segmentEnd.y),
-                    Math.min(segmentStart.z, segmentEnd.z),
-                    Math.max(segmentStart.x, segmentEnd.x),
-                    Math.max(segmentStart.y, segmentEnd.y),
-                    Math.max(segmentStart.z, segmentEnd.z)
-            );
-
-            // Check if the segment intersects with the target's bounding box
-            if (target.getBoundingBox().expand(lookRange, 0, lookRange).intersects(segmentBox)) {
-                return true;
-            }
-        }
-
-        return false;
+    public static boolean isPlayerLookingAtEntity(PlayerEntity player, Entity target, double maxDistance) {
+        HitResult result = player.raycast(maxDistance, MinecraftClient.getInstance().getTickDelta(), false);
+        return result.getType() == HitResult.Type.ENTITY && ((EntityHitResult) result).getEntity() == target;
     }
 
 

@@ -2,7 +2,7 @@ package dev.heliosclient.ui.clickgui.settings.lists;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.module.settings.ItemListSetting;
+import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.ui.clickgui.SearchBar;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
@@ -11,13 +11,13 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
-public class ItemListSettingsScreen extends Screen implements IWindowContentRenderer {
+public class ListSettingsScreen extends Screen implements IWindowContentRenderer {
     private final Window window;
-    private final ItemListSetting setting;
+    private final ListSetting<?> setting;
     int windowWidth = 258, windowHeight = 140;
     private final SearchBar searchBar;
 
-    public ItemListSettingsScreen(ItemListSetting setting) {
+    public ListSettingsScreen(ListSetting<?> setting) {
         super(Text.of(setting.name));
         this.setting = setting;
         window = new Window(windowHeight, windowWidth, true, this);
@@ -37,7 +37,6 @@ public class ItemListSettingsScreen extends Screen implements IWindowContentRend
 
         window.render(context,mouseX,mouseY,setting.name,setting.description,textRenderer);
         setting.setSearchTerm(searchBar.getValue());
-
     }
 
     @Override
@@ -48,7 +47,7 @@ public class ItemListSettingsScreen extends Screen implements IWindowContentRend
             }
         });
 
-        setting.handleMouseClick(mouseX,mouseY,windowWidth);
+        setting.handleMouseClick(mouseX,mouseY,button,window);
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -99,7 +98,7 @@ public class ItemListSettingsScreen extends Screen implements IWindowContentRend
         searchBar.render(drawContext,x + windowWidth/2 - 66,y,mouseX,mouseY,textRenderer);
 
         if (setting != null) {
-            windowHeight = setting.handleItemRendering(x + 1, y + 30, mouseX,mouseY, drawContext,windowWidth);
+            windowHeight = setting.handleRenderingEntries(drawContext,x + 1, y + 30, mouseX,mouseY,window);
             window.setWindowHeight(windowHeight + 60);
         }
     }

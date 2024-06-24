@@ -15,7 +15,6 @@ public class NotificationModule extends Module_ {
             .name("Module Info")
             .description("Whether to show module state.")
             .onSettingChange(this)
-            .value(true)
             .defaultValue(true)
             .build()
     );
@@ -23,7 +22,6 @@ public class NotificationModule extends Module_ {
             .name("Script Info")
             .description("Whether to show info about script state")
             .onSettingChange(this)
-            .value(true)
             .defaultValue(true)
             .build()
     );
@@ -31,7 +29,6 @@ public class NotificationModule extends Module_ {
             .name("Client Info")
             .description("Whether to show any messages or info of the client as a notification.")
             .onSettingChange(this)
-            .value(true)
             .defaultValue(true)
             .build()
     );
@@ -39,16 +36,21 @@ public class NotificationModule extends Module_ {
             .name("Animation Style")
             .description("Type of animation to be applied to notifications")
             .onSettingChange(this)
-            .value(List.of(Notification.AnimationStyle.values()))
             .defaultValue(List.of(Notification.AnimationStyle.values()))
             .defaultListIndex(0)
+            .build()
+    );
+    public BooleanSetting fancyMode = sgConfig.add(new BooleanSetting.Builder()
+            .name("Fancy Mode")
+            .description("Makes notifications more compact and fancy")
+            .onSettingChange(this)
+            .defaultValue(false)
             .build()
     );
     public DoubleSetting maxNotifications = sgConfig.add(new DoubleSetting.Builder()
             .name("Max Notifications Queue")
             .description("The max no. of notifications to be displayed at a time")
             .onSettingChange(this)
-            .value(5D)
             .defaultValue(5D)
             .min(1D)
             .max(20D)
@@ -59,7 +61,6 @@ public class NotificationModule extends Module_ {
             .name("Play Sound")
             .description("Whether to play a sound when a notification is made")
             .onSettingChange(this)
-            .value(true)
             .defaultValue(true)
             .build()
     );
@@ -67,7 +68,6 @@ public class NotificationModule extends Module_ {
             .name("Notification Volume")
             .description("Volume of notification sound")
             .onSettingChange(this)
-            .value(100.0D)
             .defaultValue(100D)
             .min(0D)
             .max(100D)
@@ -88,6 +88,7 @@ public class NotificationModule extends Module_ {
     @Override
     public void onSettingChange(Setting<?> setting) {
         Notification.ANIMATE = Notification.AnimationStyle.values()[animationStyle.value];
+        Notification.IS_FANCY = fancyMode.value;
         NotificationManager.setMaxDisplayed((int) maxNotifications.value);
     }
 }

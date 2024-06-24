@@ -29,6 +29,7 @@
     "MixinWorld",
     "MixinWorldBorder",
     "MixinWorldRenderer",
+    "PlayerInteractEntityC2SPacketMixin",
     "PlayerManagerMixin"
   ],
   "client": [

@@ -66,7 +66,7 @@ public abstract class MixinClientPlayerInteractionManager {
     @Inject(method = "attackEntity", at = @At(value = "HEAD"), cancellable = true)
     private void onAttackEntityPRE(PlayerEntity player, Entity target, CallbackInfo ci) {
         Freecam freecam = ModuleManager.get(Freecam.class);
-        if(freecam.isActive() && player instanceof FreeCamEntity && target == client.player){
+        if(freecam.isActive() && target == client.player){
             ci.cancel();
         }
 

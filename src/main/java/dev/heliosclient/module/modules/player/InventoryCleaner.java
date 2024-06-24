@@ -4,16 +4,11 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.BlockListSetting;
-import dev.heliosclient.module.settings.ItemListSetting;
+import dev.heliosclient.module.settings.lists.ItemListSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.module.settings.StringListSetting;
-import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.player.InventoryUtils;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 
 public class InventoryCleaner extends Module_ {
     SettingGroup sgGeneral = new SettingGroup("General");
@@ -35,7 +30,7 @@ public class InventoryCleaner extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        for(Item item: items.getSelectedItems()) {
+        for(Item item: items.getSelectedEntries()) {
             InventoryUtils.dropAllItems(item);
         }
     }

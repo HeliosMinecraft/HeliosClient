@@ -11,8 +11,8 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.hiteffect.particles.OrbParticle;
 import dev.heliosclient.module.modules.render.hiteffect.particles.TextParticle;
 import dev.heliosclient.module.settings.*;
+import dev.heliosclient.module.settings.lists.ParticleListSetting;
 import dev.heliosclient.util.InputBox;
-import dev.heliosclient.util.ParticleUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleType;
@@ -127,6 +127,7 @@ public class HitEffect extends Module_ {
             .name("Particle")
             .description("Particle to spawn")
             .particles(ParticleTypes.DAMAGE_INDICATOR)
+            .iSettingChange(this)
             .shouldRender(() -> type.getOption() == EffectType.PARTICLE_EFFECT)
             .build()
     );
@@ -200,8 +201,8 @@ public class HitEffect extends Module_ {
                 case PARTICLE_EFFECT -> {
                     particles.clear();
                     ParticleType<?> particle;
-                    if (!particle_effect.getSelectedParticles().isEmpty()) {
-                        particle = particle_effect.getSelectedParticles().get(0);
+                    if (!particle_effect.getSelectedEntries().isEmpty()) {
+                        particle = particle_effect.getSelectedEntries().get(0);
                         if (particle != null)
                             mc.world.addParticle((ParticleEffect) particle, position.x, position.y, position.z, 0, 0, 0);
                     }

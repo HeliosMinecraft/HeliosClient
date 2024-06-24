@@ -93,7 +93,7 @@ public class ConfigManager {
             } catch (Exception e) {
                 HeliosClient.LOGGER.error("Error occurred while loading config. Loading default config....", e);
 
-                //Save the config,i.e load a new empty config.
+                //Save the config,i.e. load a new empty config.
                 save(name);
                 return false;
             }

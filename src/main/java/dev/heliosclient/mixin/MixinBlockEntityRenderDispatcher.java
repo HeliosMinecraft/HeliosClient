@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinBlockEntityRenderDispatcher {
     @Inject(at = @At("HEAD"), method = "render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V", cancellable = true)
     private <E extends BlockEntity> void render(E blockEntity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (ModuleManager.get(Xray.class).isActive() && !ModuleManager.get(Xray.class).shouldXray(BlockUtils.getBlock(blockEntity.getPos()))) {
+        if (!ModuleManager.get(Xray.class).shouldXray(BlockUtils.getBlock(blockEntity.getPos()))) {
             ci.cancel();
         }
 

@@ -57,8 +57,10 @@ public class BrandSpoof extends Module_ {
     @SubscribeEvent
     public void onPacketSend(PacketEvent.SEND event) {
         if (!(event.packet instanceof CustomPayloadC2SPacket packet)) return;
-        if (spoofBrand.value && packet.payload().id().equals(BrandCustomPayload.ID))
-            event.packet = new CustomPayloadC2SPacket(new BrandCustomPayload(brandToSpoof.value));
+
+        if (spoofBrand.value && packet.payload().id().equals(BrandCustomPayload.ID)) {
+            mc.getNetworkHandler().getConnection().send(new CustomPayloadC2SPacket(new BrandCustomPayload(brandToSpoof.value)));
+        }
     }
 
     @SubscribeEvent
@@ -74,13 +76,13 @@ public class BrandSpoof extends Module_ {
                 msg.append(Text.literal("requires").formatted(Formatting.BOLD, Formatting.RED))
                         .append(Text.literal(" resource packs"));
             } else {
-                msg.append(Text.literal("has").formatted(Formatting.ITALIC, Formatting.BLUE))
-                        .append(Text.literal(" optional resource packs"));
+                msg.append(Text.literal("has optional").formatted(Formatting.ITALIC, Formatting.BLUE))
+                        .append(Text.literal(" resource packs"));
             }
 
             MutableText download = Text.literal("[Download]");
             download.setStyle(download.getStyle()
-                    .withColor(Formatting.DARK_BLUE)
+                    .withColor(Formatting.AQUA)
                     .withUnderline(true)
                     .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, packet.url()))
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("Click to download!")))
@@ -101,8 +103,6 @@ public class BrandSpoof extends Module_ {
             msg.append(spoof);
 
             mc.player.sendMessage(msg);
-
-            //ChatUtils.sendHeliosMsg(msg);
         }
     }
 

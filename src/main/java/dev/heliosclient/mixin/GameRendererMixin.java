@@ -7,10 +7,12 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.player.NoMiningTrace;
 import dev.heliosclient.module.modules.render.NoRender;
 import dev.heliosclient.module.modules.render.Zoom;
+import dev.heliosclient.module.modules.world.LiquidInteract;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.hit.HitResult;
@@ -21,6 +23,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -70,6 +73,18 @@ public abstract class GameRendererMixin {
             info.cancel();
         }
     }
+
+    @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;raycast(DFZ)Lnet/minecraft/util/hit/HitResult;"))
+    private HitResult redirectCrosshairTargetValue(Entity entity, double maxDistance, float tickDelta, boolean includeFluids) {
+        if (ModuleManager.get(LiquidInteract.class).isActive()) {
+            HitResult result = entity.raycast(maxDistance, tickDelta, includeFluids);
+            if (result.getType() != HitResult.Type.MISS) return result;
+
+            return entity.raycast(maxDistance, tickDelta, true);
+        }
+        return entity.raycast(maxDistance, tickDelta, includeFluids);
+    }
+
 
     @ModifyExpressionValue(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F"))
     private float applyCameraTransformationsMathHelperLerpProxy(float original) {
