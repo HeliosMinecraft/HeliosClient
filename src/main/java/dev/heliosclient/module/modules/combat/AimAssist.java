@@ -174,7 +174,11 @@ public class AimAssist extends Module_ {
         return deadCheck.value && !entity.isAlive();
     }
     private boolean isEntityVisible(Entity entity){
-        return canSeeEntity.value && PlayerUtils.canSeeEntity(entity);
+        if(!canSeeEntity.value){
+            return true;
+        }
+
+        return PlayerUtils.canSeeEntity(entity);
     }
 
 

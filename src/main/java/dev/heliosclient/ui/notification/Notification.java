@@ -47,8 +47,9 @@ public abstract class Notification {
                 scale = Easing.ease(EasingType.CUBIC_OUT, (float) timeElapsed / 200);
             }
             if (timeElapsed > endDelay) {
-                scale = (float) MathHelper.clamp( 1.0f - Easing.ease(EasingType.CUBIC_IN, (float) (timeElapsed - endDelay) / 200),0.0,1.0f);
+                scale =  1.0f - Easing.ease(EasingType.CUBIC_IN, (float) (timeElapsed - endDelay) / 200);
                 if (scale < 0.0f) {
+                    scale = 0.0f;
                     expired = true;
                 }
             }

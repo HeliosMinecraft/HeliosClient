@@ -260,9 +260,9 @@ public class ModuleList extends HudElement implements Listener {
     public void update(TickEvent.CLIENT event) {
         enabledModules = ModuleManager.getEnabledModules();
         enabledModules.sort((mod1, mod2) -> switch ((Sort) sort.getOption()) {
-            case Alphabetical -> mod1.name.compareTo(mod2.name);
-            case Biggest -> Double.compare(Renderer2D.getStringWidth(mod2.name), Renderer2D.getStringWidth(mod1.name));
-            case Smallest -> Double.compare(Renderer2D.getStringWidth(mod1.name), Renderer2D.getStringWidth(mod2.name));
+            case Alphabetical -> mod1.getNameWithInfo().compareTo(mod2.getNameWithInfo());
+            case Biggest -> Double.compare(Renderer2D.getStringWidth(mod2.getNameWithInfo()), Renderer2D.getStringWidth(mod1.getNameWithInfo()));
+            case Smallest -> Double.compare(Renderer2D.getStringWidth(mod1.getNameWithInfo()), Renderer2D.getStringWidth(mod2.getNameWithInfo()));
         });
     }
 

@@ -238,6 +238,10 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
         addSettingGroup(sgbind);
     }
 
+    public String getNameWithInfo() {
+        return name + getInfoString();
+    }
+
     /**
      * Called when setting is changed.
      *
