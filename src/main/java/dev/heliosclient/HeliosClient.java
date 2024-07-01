@@ -117,6 +117,8 @@ public class HeliosClient implements ModInitializer, Listener {
 
         LOGGER.info("Initialising Helios Client...");
 
+        CONFIG.init();
+
         EventManager.register(this);
         registerEvents();
 
@@ -161,6 +163,9 @@ public class HeliosClient implements ModInitializer, Listener {
             }
             HeliosClient.CLICKGUI.onLoad();
         });
+
+        if (fonts != null)
+            EventManager.postEvent(new FontChangeEvent(fonts));
     }
 
     public void registerEvents() {

@@ -9,6 +9,7 @@ import net.minecraft.client.util.SkinTextures;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,7 +30,6 @@ public abstract class AbstractClientPlayerEntityMixin {
         if (elytraTexture == null) {
             elytraTexture = SKIN;
         }
-
         //Modify the skin texture
         return new SkinTextures(original.texture(), original.textureUrl(), CapeManager.CURRENT_PLAYER_CAPE, elytraTexture, original.model(), original.secure());
     }
@@ -40,11 +40,13 @@ public abstract class AbstractClientPlayerEntityMixin {
         if (this.equals(HeliosClient.MC.player)) {
             SkinTextures original = cir.getReturnValue();
             //Should not happen
-            if (original == null) return;
+            if (original == null){
+                cir.setReturnValue(cir.getReturnValue());
+                return;
+            }
 
             if (CapeManager.CURRENT_PLAYER_CAPE != null && ModuleManager.get(CapeModule.class).isActive()) {
-
-                //Set elytraTexture if elytra-Setting is enabled
+                //Set elytraTexture if elytra-setting is enabled
                 SkinTextures modified = getModifiedSkinTexture(original);
                 cir.setReturnValue(modified);
             }

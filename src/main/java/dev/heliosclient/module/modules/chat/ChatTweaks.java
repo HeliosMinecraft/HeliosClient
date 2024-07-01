@@ -42,6 +42,13 @@ public class ChatTweaks extends Module_ {
             .defaultValue(true)
             .build()
     );
+    public BooleanSetting noKeyRestriction = sgGeneral.add(new BooleanSetting.Builder()
+            .name("No key restriction")
+            .description("Allows you to write whatever you want into the chat-box")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .build()
+    );
     public BooleanSetting keepHistory = sgGeneral.add(new BooleanSetting.Builder()
             .name("Keep history")
             .description("Keeps your chat history even after disconnecting")
@@ -145,5 +152,9 @@ public class ChatTweaks extends Module_ {
 
         String playerPos = String.format("x= %f,y= %f, z= %f", event.getPlayer().getPos().x, event.getPlayer().getPos().y, event.getPlayer().getPos().z);
         ChatUtils.sendHeliosMsg("You just died at " + playerPos);
+    }
+
+    public boolean noKeyRestriction(){
+        return isActive() && noKeyRestriction.value;
     }
 }

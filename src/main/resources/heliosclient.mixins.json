@@ -23,6 +23,7 @@
     "MixinPlayerInventory",
     "MixinServerPlayerEntity",
     "MixinServerPlayNetworkHandler",
+    "MixinSharedConstants",
     "MixinSlimeBlock",
     "MixinTridentItem",
     "MixinVec3d",

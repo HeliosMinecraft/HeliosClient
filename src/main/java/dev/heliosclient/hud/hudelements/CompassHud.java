@@ -130,5 +130,5 @@ public class CompassHud extends HudElement {
         };
     }
 
-    public static HudElementData<CompassHud> DATA = new HudElementData<>("CompassHud", "Displays an isometric circular compass", CompassHud::new);
+    public static HudElementData<CompassHud> DATA = new HudElementData<>("Compass", "Displays an elliptical compass", CompassHud::new);
 }

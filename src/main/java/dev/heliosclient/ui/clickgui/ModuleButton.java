@@ -39,7 +39,7 @@ public class ModuleButton implements Listener {
     public boolean settingsOpen = false;
     public int boxHeight = 0;
     public Screen screen;
-    public boolean collapsed = false;
+    public boolean collapsed = false, shouldRender = true;
     protected double scale = 0.0f;
 
     public ModuleButton(Module_ module, Screen parentScreen) {
@@ -68,10 +68,12 @@ public class ModuleButton implements Listener {
 
     }
 
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float x, int y, int maxWidth) {
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float x, int y, int maxWidth, boolean shouldRender) {
         this.screen = HeliosClient.MC.currentScreen;
         this.x = x;
         this.y = y;
+
+        if(!shouldRender) return;
 
         if (hitBox.contains(mouseX, mouseY)) {
             hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 20);
@@ -129,6 +131,8 @@ public class ModuleButton implements Listener {
     }
 
     public int renderSettings(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
+        if(!shouldRender) return 0;
+
         int settingYOffset = 0;
         updateScale(settingsOpen);
         if (scale > 0.0f) {
@@ -173,6 +177,8 @@ public class ModuleButton implements Listener {
      * Method is called in {@link CategoryPane#mouseClicked(MouseClickEvent)}
      */
     public boolean mouseClicked(double mouseX, double mouseY, int button, Screen eventScreen) {
+        if(!shouldRender) return false;
+
         if (screen != null && eventScreen == screen) {
             if (!collapsed) {
                 if (hitBox.contains(mouseX, mouseY)) {

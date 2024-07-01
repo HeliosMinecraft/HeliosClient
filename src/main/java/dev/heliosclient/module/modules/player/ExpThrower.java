@@ -21,6 +21,13 @@ public class ExpThrower extends Module_ {
             .defaultValue(false)
             .build()
     );
+    public BooleanSetting swapBack = sgGeneral.add(new BooleanSetting.Builder()
+            .name("SwapBack")
+            .description("Swaps back to previous hotbar slot instantly. Effectively giving you silent xp thrower")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .build()
+    );
 
     public ExpThrower() {
         super("ExpThrower", "Automatically throws xp on activate", Categories.PLAYER);
@@ -28,6 +35,13 @@ public class ExpThrower extends Module_ {
 
         addQuickSetting(feetEXP);
 
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        if(swapBack.value)
+            InventoryUtils.swapBackHotbar();
     }
 
     @SubscribeEvent
@@ -48,9 +62,11 @@ public class ExpThrower extends Module_ {
         if (mc.player.getInventory().selectedSlot == slot) {
             mc.interactionManager.interactItem(mc.player, slot == 45 ? Hand.OFF_HAND : Hand.MAIN_HAND);
         } else {
-            InventoryUtils.swapToSlot(slot, true);
+            InventoryUtils.swapToSlot(slot,swapBack.value);
             mc.interactionManager.interactItem(mc.player, slot == 45 ? Hand.OFF_HAND : Hand.MAIN_HAND);
-            InventoryUtils.swapBackHotbar();
+
+            if(swapBack.value)
+               InventoryUtils.swapBackHotbar();
         }
     }
 }

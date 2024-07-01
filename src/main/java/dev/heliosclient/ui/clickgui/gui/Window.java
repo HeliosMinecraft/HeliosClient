@@ -66,6 +66,8 @@ public class Window implements Listener {
         this.contentRenderer = contentRenderer;
         EventManager.register(this);
     }
+    List<String> wrappedText = new ArrayList<>();
+
 
     public void setCollapsible(boolean collapsible) {
         isCollapsible = collapsible;
@@ -106,7 +108,6 @@ public class Window implements Listener {
 
         if (!isCollapsed && contentRenderer != null) {
             int color = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 180).getRGB();
-            List<String> wrappedText = new ArrayList<>();
             Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 20, windowWidth, windowHeight, 5, color);
             if (!description.isEmpty()) {
                 wrappedText = Renderer2D.wrapText("§o" + description, windowWidth, HeliosClient.MC.textRenderer);

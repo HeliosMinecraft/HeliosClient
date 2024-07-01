@@ -340,7 +340,7 @@ public class Renderer3D {
         RenderSystem.disableBlend();
     }
 
-    public static void drawOutlineCircleAroundPos(MatrixStack matrix, Vec3d pos, float radius, float lineWidth, LineColor color, int points) {
+    public static void drawOutlineCircleAroundPos(Vec3d pos, float radius, float lineWidth, LineColor color, int points) {
         double y = pos.y;
 
         for (int i = 0; i < points; i++) {
@@ -387,6 +387,8 @@ public class Renderer3D {
         drawTriangle(pos1, center, pos3, color);
     }
 
+
+    //To make a china hat, simple make the center higher that the surrounding vertices, i.e. change the y in the pos1,pos2 Vec3d to less than 0.
     public static void drawFlatFilledCircle(float radius, Vec3d center, int segments, QuadColor color) {
         if (!FrustumUtils.isPointVisible(center)) {
             return;
@@ -399,11 +401,16 @@ public class Renderer3D {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
-        RenderSystem.disableDepthTest();
-        RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        // By disabling the depth mask before rendering the circle, we prevent the circle from writing to the depth buffer.
+        // This allows the player to be rendered on top of the circle.
+        RenderSystem.depthMask(false);
 
+        RenderSystem.disableCull();
+
+
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         buffer.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+
         for (int i = 0; i < segments; i++) {
             float angle1 = ((float) i / segments) * 360f;
             float angle2 = ((float) (i + 1) / segments) * 360f;
@@ -415,8 +422,8 @@ public class Renderer3D {
         }
         tessellator.draw();
 
-        RenderSystem.enableCull();
-        RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(true);
+
         cleanup();
     }
 
@@ -464,6 +471,12 @@ public class Renderer3D {
         setup();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+
+
+        // By disabling the depth mask before rendering the sphere, we prevent the sphere from writing to the depth buffer.
+        // This allows the player to be rendered on top of the circle.
+        RenderSystem.depthMask(false);
+
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         for (int i = 0; i <= 20; i++) {
             final float x2 = (float) (Math.sin(((i * 56.548656f) / 180f)) * radius);
@@ -471,6 +484,8 @@ public class Renderer3D {
             bufferBuilder.vertex(matrix, x2, y2, z).color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f).next();
         }
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+
+        RenderSystem.depthMask(true);
         cleanup();
     }
 

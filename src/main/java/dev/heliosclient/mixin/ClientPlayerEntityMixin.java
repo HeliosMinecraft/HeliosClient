@@ -38,7 +38,7 @@ public abstract class ClientPlayerEntityMixin {
     @Shadow
     protected abstract void sendMovementPackets();
 
-    @Inject(method = "move", at = @At(value = "TAIL"), cancellable = true)
+    @Inject(method = "move", at = @At(value = "HEAD"), cancellable = true)
     public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
         PlayerMotionEvent event = new PlayerMotionEvent(type, movement);
         EventManager.postEvent(event);

@@ -7,7 +7,7 @@ import dev.heliosclient.module.settings.SettingGroup;
 
 public class Timer extends Module_ {
 
-    public double RESET = 1;
+    public static double RESET = 1;
     double override = 1;
 
     SettingGroup sgGeneral = new SettingGroup("General");

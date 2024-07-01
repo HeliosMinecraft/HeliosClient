@@ -10,10 +10,14 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class ClientTag extends HudElement {
+
+    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
+
+
     public ClientTag() {
         super(DATA);
         this.width = 20;
-        this.height = 13;
+        this.height = Math.round(Renderer2D.getStringHeight());
         this.draggable = false;
         this.renderOutLineBox = false;
     }
@@ -27,7 +31,4 @@ public class ClientTag extends HudElement {
 
         super.renderElement(drawContext, textRenderer);
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, ColorManager.INSTANCE.hudColor);
-    }
-
-    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
-}
+    }}

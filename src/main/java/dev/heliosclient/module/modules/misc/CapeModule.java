@@ -2,6 +2,7 @@ package dev.heliosclient.module.modules.misc;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CapeManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
@@ -56,6 +57,15 @@ public class CapeModule extends Module_ {
             .onSettingChange(this)
             .build()
     );
+
+    public BooleanSetting everyone = sgCape.add(new BooleanSetting.Builder()
+            .name("Cape for everyone")
+            .description("Puts the same cape for everyone on the flat world")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
+
     public BooleanSetting customPhysics = sgCape.add(new BooleanSetting.Builder()
             .name("Extra Physics")
             .description("Adds extra physics for capes")
@@ -64,6 +74,7 @@ public class CapeModule extends Module_ {
             .onSettingChange(this)
             .build()
     );
+
     public BooleanSetting elytra = sgCape.add(new BooleanSetting.Builder()
             .name("Elytra")
             .description("Cape Texture for elytra (Bad most of times with improper textures)")
@@ -102,14 +113,14 @@ public class CapeModule extends Module_ {
                 capes.iSettingChange.onSettingChange(capes);
 
                 if (mc.player == null) {
-                    AnimationUtils.addInfoToast("Fetched CURRENT_PLAYER_CAPE successfully", false, 1000);
+                    AnimationUtils.addInfoToast("Fetched cape successfully", false, 1000);
                 } else {
-                    ChatUtils.sendHeliosMsg(ColorUtils.green + "Fetched CURRENT_PLAYER_CAPE successfully");
+                    ChatUtils.sendHeliosMsg(ColorUtils.green + "Fetched cape successfully");
                 }
             } catch (Exception e) {
-                HeliosClient.LOGGER.error("An error occurred while fetching CURRENT_PLAYER_CAPE. ", e);
+                HeliosClient.LOGGER.error("An error occurred while fetching cape. ", e);
                 if (mc.player == null) {
-                    AnimationUtils.addErrorToast("Failed to fetch CURRENT_PLAYER_CAPE. Check logs", false, 1000);
+                    AnimationUtils.addErrorToast("Failed to fetch cape. Check logs", false, 1000);
                     AnimationUtils.addErrorToast("Reason: " + e.getMessage().trim(), false, 1000);
                 } else {
                     ChatUtils.sendHeliosMsg("Failed to fetch CURRENT_PLAYER_CAPE. Check logs");
@@ -138,6 +149,8 @@ public class CapeModule extends Module_ {
 
     @Override
     public void onSettingChange(Setting<?> setting) {
+        super.onSettingChange(setting);
+
         setCape();
     }
 
@@ -158,5 +171,9 @@ public class CapeModule extends Module_ {
         if (capes.value < CapeManager.capeIdentifiers.size()) {
             CapeManager.CURRENT_PLAYER_CAPE = CapeManager.capeIdentifiers.get(capes.value);
         }
+    }
+
+    public static boolean forEveryone(){
+        return ModuleManager.get(CapeModule.class).everyone.value;
     }
 }

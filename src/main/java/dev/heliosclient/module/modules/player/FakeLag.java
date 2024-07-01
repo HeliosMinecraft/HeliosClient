@@ -15,10 +15,14 @@ import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static org.lwjgl.opengl.GL11C.*;
 
 public class FakeLag extends Module_ {
     private final List<PlayerMoveC2SPacket> storedPackets = new CopyOnWriteArrayList<>();
@@ -108,7 +112,7 @@ public class FakeLag extends Module_ {
 
     @SubscribeEvent
     public void onRender3D(Render3DEvent event) {
-        Renderer3D.drawFlatFilledCircle(1f, lagPos, 350, QuadColor.gradient(ColorUtils.changeAlpha(Color.CYAN, 255).getRGB(), ColorUtils.changeAlpha(Color.WHITE, 255).getRGB(), QuadColor.CardinalDirection.SOUTH));
+        Renderer3D.drawFlatFilledCircle(1f, lagPos, 320, QuadColor.gradient(ColorUtils.changeAlpha(Color.CYAN, 255).getRGB(), ColorUtils.changeAlpha(Color.WHITE, 255).getRGB(), QuadColor.CardinalDirection.SOUTH));
     }
 
     public void sendPackets() {

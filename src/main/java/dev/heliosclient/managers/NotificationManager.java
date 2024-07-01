@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class NotificationManager implements Listener {
-    private static final int HEIGHT = 25;
     private static final Queue<Notification> notificationQueue = new LinkedList<>(); // Queue to hold notifications
     private static final Deque<Notification> displayedNotifications = new ArrayDeque<>(); // Deque to hold currently displayed notifications
     public static NotificationManager INSTANCE = new NotificationManager();
@@ -47,11 +46,12 @@ public class NotificationManager implements Listener {
 
     private static void updatePositions() {
         int screenHeight = HeliosClient.MC.getWindow().getScaledHeight();
-        int y = screenHeight - HEIGHT - 5;
+        int y = screenHeight - 5;
 
         for (Notification notification : displayedNotifications) {
-            notification.moveY(y - notification.targetY);
-            y -= HEIGHT + 5;
+            int notificationHeight = notification.HEIGHT;
+            notification.moveY(y - notificationHeight - notification.targetY);
+            y -= notificationHeight + 5;
         }
     }
 

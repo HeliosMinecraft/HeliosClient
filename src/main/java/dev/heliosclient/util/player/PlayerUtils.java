@@ -13,6 +13,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
@@ -94,6 +95,7 @@ public class PlayerUtils {
         return blocks;
     }
 
+
     public static Vec3d getHorizontalVelocity(double bps) {
         if (HeliosClient.MC.player == null) return Vec3d.ZERO;
         bps = bps / 10.0;
@@ -106,32 +108,6 @@ public class PlayerUtils {
         double velZ = bps * (sidewardInput * Math.sin(yawRadians) + forwardInput * Math.cos(yawRadians));
 
         return new Vec3d(velX, 0.0, velZ);
-    }
-
-
-    /**
-     * Interacts with an entity.
-     *
-     * @param entity The entity to interact with.
-     * @param hand   The hand to use.
-     */
-    public static void interactEntity(Entity entity, Hand hand) {
-        ClientPlayerInteractionManager interactionManager = HeliosClient.MC.interactionManager;
-        if (interactionManager != null) {
-            interactionManager.interactEntity(HeliosClient.MC.player, entity, hand);
-        }
-    }
-
-    /**
-     * Attacks an entity.
-     *
-     * @param entity The entity to attack.
-     */
-    public static void attackEntity(Entity entity) {
-        ClientPlayerInteractionManager interactionManager = HeliosClient.MC.interactionManager;
-        if (interactionManager != null) {
-            interactionManager.attackEntity(HeliosClient.MC.player, entity);
-        }
     }
 
     public static void doLeftClick() {

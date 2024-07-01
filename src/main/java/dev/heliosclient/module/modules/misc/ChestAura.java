@@ -86,8 +86,10 @@ public class ChestAura extends Module_ {
         if (result == ActionResult.SUCCESS) {
             containersOpened.add(blockEntity);
             if (!autoSteal.value) {
-                mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                if(mc.currentScreen != null)
+                    mc.currentScreen.close();
 
+                mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
             }
         }
     }
@@ -102,6 +104,7 @@ public class ChestAura extends Module_ {
                 for (int i = 0; i < (genericContainerScreenHandler.getRows()) * 9; i++) {
                     if (!genericContainerScreenHandler.getSlot(i).hasStack()) continue;
 
+                    //Hard coded. Sorry
                     try {
                         Thread.sleep(300);
                     } catch (InterruptedException e) {
@@ -109,9 +112,8 @@ public class ChestAura extends Module_ {
                     }
                     moveItemQuickMove(i);
                 }
-                genericContainerScreenHandler.onClosed(mc.player);
-                genericContainerScreenHandler.updateToClient();
-                mc.setScreen(null);
+
+                mc.currentScreen.close();
                 mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(genericContainerScreenHandler.syncId));
                 isStealing = false;
             });

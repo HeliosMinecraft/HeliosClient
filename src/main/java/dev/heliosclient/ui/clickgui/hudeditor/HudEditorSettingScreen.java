@@ -1,6 +1,7 @@
 package dev.heliosclient.ui.clickgui.hudeditor;
 
 import dev.heliosclient.hud.HudElement;
+import dev.heliosclient.module.settings.ParentScreenSetting;
 import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
@@ -74,10 +75,8 @@ public class HudEditorSettingScreen extends AbstractSettingScreen implements IWi
                 List<Setting<?>> settings = settingGroup.getSettings();
                 for (Setting<?> setting : settings) {
                     if (setting.shouldRender()) {
-                        if (setting instanceof RGBASetting rgbaSetting) {
-                            rgbaSetting.setParentScreen(this);
-                        } else if (setting instanceof ListSetting listSetting) {
-                            listSetting.setParentScreen(this);
+                        if (setting instanceof ParentScreenSetting<?> parentScreenSetting) {
+                            parentScreenSetting.setParentScreen(this);
                         }
                         setting.render(drawContext, x + 16, yOffset + 6, mouseX, mouseY, textRenderer);
                         yOffset += setting.getHeight() + 1;

@@ -170,6 +170,7 @@ public class CategoryPane implements Listener {
         }
 
         Renderer2D.scaleAndPosition(drawContext.getMatrices(), (x + (width + 5) / 2.0f), (float) (y + categoryNameHeight + 6), (float) scale);
+
         if (!collapsed && height >= 10) {
             Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, (int) ((width + 5)), (int) hudBox.getHeight());
             if (ModuleManager.get(GUI.class).categoryBorder.value) {
@@ -183,7 +184,9 @@ public class CategoryPane implements Listener {
         } else {
             int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
             for (ModuleButton m : moduleButtons) {
-                m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth);
+                boolean shouldModuleRender = buttonYOffset > y + 5;
+
+                m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth, shouldModuleRender);
 
                 int settingsHeight = m.renderSettings(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                 buttonYOffset += settingsHeight;
@@ -201,7 +204,6 @@ public class CategoryPane implements Listener {
         hudBox.set(x, y, width, MAX_HEIGHT);
 
         FontRenderers.iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), -1);
-
     }
 
     public boolean hovered(double mouseX, double mouseY) {
@@ -237,9 +239,11 @@ public class CategoryPane implements Listener {
                 dragging = true;
             }
 
-            for (ModuleButton moduleButton : moduleButtons) {
-                moduleButton.collapsed = collapsed;
-                moduleButton.mouseClicked(mouseX,mouseY,button,event.getScreen());
+            if(!hovered(mouseX,mouseY)) {
+                for (ModuleButton moduleButton : moduleButtons) {
+                    moduleButton.collapsed = collapsed;
+                    moduleButton.mouseClicked(mouseX, mouseY, button, event.getScreen());
+                }
             }
         }
     }

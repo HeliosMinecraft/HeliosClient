@@ -239,7 +239,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     }
 
     public String getNameWithInfo() {
-        return name + getInfoString();
+        return name + "[" + getInfoString() + "]";
     }
 
     /**
@@ -287,7 +287,14 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
 
                 Toml settingTable = toml.getTable(this.name.replace(" ", ""));
                 if (settingTable != null) {
-                    setting.loadFromToml(settingTable.toMap(), settingTable);
+
+                    //Any error caught should not cause the whole config system to fail to load.
+
+                    try {
+                        setting.loadFromToml(settingTable.toMap(), settingTable);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
                 if (setting == this.active && this.isActive()) {
                     this.onEnable();

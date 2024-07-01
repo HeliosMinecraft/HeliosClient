@@ -85,7 +85,7 @@ public class CapeManager {
                     if (inputStream == null) {
                         HeliosClient.LOGGER.error("Failed to load open inputStream to default cape resource");
                     } else {
-                        HeliosClient.LOGGER.info("Copying default CURRENT_PLAYER_CAPE in directory");
+                        HeliosClient.LOGGER.info("Copying default cape file in directory");
                         Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         HeliosClient.LOGGER.info("Copying completed");
                     }

@@ -43,7 +43,6 @@ public class Criticals extends Module_ {
             .build()
     );
 
-    private boolean ignoreNextPacket = false;
     private PlayerInteractEntityC2SPacket attackPacket = null;
     private HandSwingC2SPacket swingPacket = null;
 

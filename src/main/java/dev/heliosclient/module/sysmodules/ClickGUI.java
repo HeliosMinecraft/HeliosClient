@@ -82,7 +82,7 @@ public class ClickGUI extends Module_ {
             .onSettingChange(this)
             .defaultValue(7.0)
             .min(1)
-            .max(8)
+            .max(20)
             .roundingPlace(1)
             .build()
     );
@@ -293,10 +293,16 @@ public class ClickGUI extends Module_ {
         });
 
         config.addButton("Reload All Configs", 0, 0, () -> {
+            HeliosClient.saveConfigHook();
+
             HeliosClient.CONFIG.init();
+
             switchConfigs.options = HeliosClient.CONFIG.MODULE_CONFIGS;
+
             int var = switchConfigs.value;
+
             HeliosClient.loadConfig();
+
             switchConfigs.value = var;
         });
         config.addButton("Save Config", 1, 0, () -> {

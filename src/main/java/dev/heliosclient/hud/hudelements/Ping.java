@@ -11,11 +11,14 @@ import net.minecraft.client.network.PlayerListEntry;
 
 public class Ping extends HudElement {
 
+    public static HudElementData<Ping> DATA = new HudElementData<>("Ping", "Shows current player ping", Ping::new);
+
+
     public Ping() {
         super(DATA);
 
         this.width = 20;
-        this.height = 10;
+        this.height = Math.round(Renderer2D.getStringHeight());
     }
 
     public static int getPing() {
@@ -36,8 +39,5 @@ public class Ping extends HudElement {
         this.width = Math.round(Renderer2D.getStringWidth(text) + 1);
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, ColorManager.INSTANCE.hudColor);
     }
-
-    public static HudElementData<Ping> DATA = new HudElementData<>("Ping", "Shows current player ping", Ping::new);
-
 
 }

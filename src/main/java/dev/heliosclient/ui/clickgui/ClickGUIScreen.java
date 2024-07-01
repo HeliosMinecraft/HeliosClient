@@ -25,18 +25,22 @@ public class ClickGUIScreen extends Screen {
     public static ClickGUIScreen INSTANCE = new ClickGUIScreen();
     static int scrollX = 0;
     static int scrollY = 0;
-    public ArrayList<CategoryPane> categoryPanes;
+    public final ArrayList<CategoryPane> categoryPanes;
     public SearchBar searchBar;
 
     public ClickGUIScreen() {
         super(Text.literal("ClickGUI"));
+
+        categoryPanes = new ArrayList<>();
+
         reset();
     }
 
     public void reset() {
         scrollX = 0;
         scrollY = 0;
-        categoryPanes = new ArrayList<>();
+
+        categoryPanes.clear();
 
         Object panesObject = HeliosClient.CONFIG.modulesManager.getConfigMaps().get(Config.MODULES).get("panes");
         if (panesObject instanceof Map<?, ?> panePos) {

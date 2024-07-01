@@ -53,6 +53,9 @@ public class Config {
         this.configManager.registerConfig(HUD, new HashMap<>());
 
         init();
+
+        //Initialise ModuleManager to register back the modules
+        ModuleManager.init();
     }
 
     public void init() {
@@ -69,9 +72,6 @@ public class Config {
         for (String string : MODULE_CONFIGS) {
             modulesManager.registerConfig(string.replace(".toml", ""), new HashMap<>());
         }
-
-        //Initialise ModuleManager again to register back the modules
-        ModuleManager.init();
     }
 
     // Generates the default configuration for the modules.
@@ -252,6 +252,11 @@ public class Config {
 
         if (modulesManager.load()) {
             this.getModuleConfig();
+            if (ClickGUIScreen.INSTANCE == null) {
+                ClickGUIScreen.INSTANCE = new ClickGUIScreen();
+            } else {
+                ClickGUIScreen.INSTANCE.reset();
+            }
         } else {
             LOGGER.info("Loading default modules config...");
             this.getDefaultModuleConfig();
@@ -261,11 +266,6 @@ public class Config {
         if (configManager.load()) {
             this.getClientConfig();
             this.getHudConfig();
-            if (ClickGUIScreen.INSTANCE == null) {
-                ClickGUIScreen.INSTANCE = new ClickGUIScreen();
-            } else {
-                ClickGUIScreen.INSTANCE.reset();
-            }
         } else {
             LOGGER.info("Loading default config...");
             configManager.save();
@@ -289,6 +289,8 @@ public class Config {
         //       |                    //
         // module settings            // - 2 loops
 
+        LOGGER.info("Loading Modules... ");
+
         CategoryManager.getCategories().forEach((s, category) -> {
             if (category == Categories.SEARCH) return;
 
@@ -310,6 +312,8 @@ public class Config {
         }
         Toml toml = configManager.getTomls().get(CLIENT);
         CommandManager.prefix = toml.getString("prefix");
+
+        LOGGER.info("Loading Client Settings... ");
 
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {

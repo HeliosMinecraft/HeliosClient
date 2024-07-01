@@ -63,6 +63,8 @@ public class TimeChanger extends Module_ {
 
     @Override
     public void onSettingChange(Setting<?> setting) {
+        super.onSettingChange(setting);
+
         if (mc.world != null)
             mc.world.setTimeOfDay((long) time.value);
     }

@@ -13,7 +13,7 @@ public class Fps extends HudElement {
     public Fps() {
         super(DATA);
         this.width = 20;
-        this.height = 10;
+        this.height = Math.round(Renderer2D.getStringHeight());
     }
 
     @Override

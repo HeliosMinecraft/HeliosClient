@@ -1,6 +1,7 @@
 package dev.heliosclient.ui.notification;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
@@ -30,17 +31,17 @@ public abstract class Notification {
     }
 
     protected void initialise() {
-        int screenWidth = HeliosClient.MC.getWindow().getScaledWidth();
-        this.y = targetY + HEIGHT;
-        this.x = screenWidth - WIDTH - 5;
+        if(ANIMATE != AnimationStyle.SLIDE) {
+            int screenWidth = HeliosClient.MC.getWindow().getScaledWidth();
+            this.y = targetY + HEIGHT;
+            this.x = screenWidth - WIDTH - 5;
+        }
     }
 
     public void update() {
         timeElapsed = System.currentTimeMillis() - creationTime;
 
         int screenWidth = HeliosClient.MC.getWindow().getScaledWidth();
-        this.x = screenWidth - WIDTH - 5;
-
 
         if (ANIMATE == AnimationStyle.POP) {
             if (timeElapsed < 200) {
@@ -53,19 +54,31 @@ public abstract class Notification {
                     expired = true;
                 }
             }
+            this.x = screenWidth - WIDTH - 5;
         }
         if (ANIMATE == AnimationStyle.SLIDE) {
+            if (y > targetY) {
+                y -= (int) (HEIGHT * MathHelper.clamp(timeElapsed / 2500.0f, 0.0f, 1.0f));
+            }
+
+            int targetX =  screenWidth - WIDTH - 5;
+
             if (timeElapsed > endDelay) {
                 float time = (timeElapsed - endDelay) / 1000.0f;
                 int deltaX = (int) (WIDTH * Easing.ease(EasingType.CUBIC_IN, time));
                 x += deltaX;
+
+                // + 5 is the buffer zone (aka hopefully no visual bugs)
                 if (x > HeliosClient.MC.getWindow().getScaledWidth() + 5) {
                     expired = true;
                 }
+
+            }else if (timeElapsed < endDelay * 0.2) {
+                // 20% of end delay should be put for sliding in
+                float time = timeElapsed / (endDelay * 0.2f);
+                x = screenWidth - MathHelper.floor(WIDTH * Easing.ease(EasingType.CUBIC_IN, time));
             } else {
-                if (y > targetY) {
-                    y -= (int) (HEIGHT * MathHelper.clamp(timeElapsed/2500.0f,0.0f,1.0f));
-                }
+                x = targetX;
             }
         }
     }

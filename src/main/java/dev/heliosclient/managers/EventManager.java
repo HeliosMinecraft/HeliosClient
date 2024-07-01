@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class EventManager {
-    private static final Map<Class<?>, List<EventListener>> listeners = new ConcurrentHashMap<>();
+    private static final WeakHashMap<Class<?>, LinkedList<EventListener>> listeners = new WeakHashMap<>();
 
     private static final Comparator<EventListener> METHOD_COMPARATOR = Comparator.comparingInt(el -> {
         SubscribeEvent annotation = el.method.getAnnotation(SubscribeEvent.class);
@@ -41,13 +41,13 @@ public class EventManager {
     }
 
     private static List<EventListener> getListeners(Class<?> eventClass) {
-        return listeners.computeIfAbsent(eventClass, key -> new ArrayList<>());
+        return listeners.computeIfAbsent(eventClass, key -> new LinkedList<>());
     }
 
 
     public static void unregister(Listener listener) {
-        for (List<EventListener> eventListeners : new CopyOnWriteArraySet<>(listeners.values())) {
-                eventListeners.removeIf(el -> el.listener == listener);
+        for (List<EventListener> eventListeners :  new CopyOnWriteArraySet<>(listeners.values())) {
+                eventListeners.removeIf(el -> el.listener == listener || el.listener == null);
         }
     }
 
@@ -59,6 +59,10 @@ public class EventManager {
         List<EventListener> eventListeners = listeners.get(event.getClass());
         if (eventListeners != null && !eventListeners.isEmpty()) {
             for (EventListener listener : new CopyOnWriteArraySet<>(eventListeners)) {
+                if(listener == null){
+                    eventListeners.remove(listener);
+                    continue;
+                }
                 listener.accept(event);
             }
         }
@@ -98,7 +102,6 @@ public class EventManager {
     private record EventListener(Listener listener, Method method) {
         public void accept(Event event) {
             try {
-                if(method != null)
                 method.invoke(listener, event);
             } catch (Throwable e) {
                 handleException(e, listener, event);

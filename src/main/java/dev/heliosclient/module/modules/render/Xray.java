@@ -75,6 +75,8 @@ public class Xray extends Module_ {
 
     @Override
     public void onSettingChange(Setting<?> setting) {
+        super.onSettingChange(setting);
+
         if (setting == xrayBlocks && isActive()) {
             mc.worldRenderer.reload();
         }

@@ -49,7 +49,9 @@ public class ConfigManager {
      * @param hashmap The configuration map.
      */
     public void registerConfig(String name, Map<String, Object> hashmap) {
-        if (configMaps.containsKey(name) || tomls.containsKey(name) || configFiles.containsKey(name)) return;
+        if (configMaps.containsKey(name) || tomls.containsKey(name) || configFiles.containsKey(name)) {
+          return;
+        }
         configMaps.put(name, hashmap);
         tomls.put(name, new Toml());
         configFiles.put(name, new File(configDir, name + ".toml"));

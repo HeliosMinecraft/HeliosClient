@@ -45,6 +45,10 @@ public class Teams extends Module_ {
     }
 
     public boolean isInMyTeam(LivingEntity livingEntity) {
+        if(livingEntity == null){
+            return false;
+        }
+
         if (scoreBoardTeam.value && mc.player.getScoreboardTeam() != null && livingEntity.getScoreboardTeam() != null
                 && (mc.player.getScoreboardTeam().isEqual(livingEntity.getScoreboardTeam()) || mc.player.getScoreboardTeam().getPlayerList().contains(livingEntity.getName().getString()))) {
             return true;

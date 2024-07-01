@@ -450,7 +450,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
 
     @SubscribeEvent
     public void onFontChange(FontChangeEvent event) {
-        this.height = (int) Renderer2D.getStringHeight();
+        this.height = Math.round(Renderer2D.getStringHeight());
     }
 
     @Override
@@ -467,7 +467,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         map.put("positions", objects);
 
         for (SettingGroup settingGroup : settingGroups) {
-            for (Setting setting : settingGroup.getSettings()) {
+            for (Setting<?> setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
                     map.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
                 }

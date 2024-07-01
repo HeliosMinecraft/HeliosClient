@@ -87,6 +87,8 @@ public class NotificationModule extends Module_ {
 
     @Override
     public void onSettingChange(Setting<?> setting) {
+        super.onSettingChange(setting);
+
         Notification.ANIMATE = Notification.AnimationStyle.values()[animationStyle.value];
         Notification.IS_FANCY = fancyMode.value;
         NotificationManager.setMaxDisplayed((int) maxNotifications.value);

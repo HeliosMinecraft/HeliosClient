@@ -30,6 +30,8 @@ public class WelcomeHud extends HudElement {
     public WelcomeHud() {
         super(DATA);
         addSettingGroup(sgGeneral);
+
+        this.height = Math.round(Renderer2D.getStringHeight());
     }
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {

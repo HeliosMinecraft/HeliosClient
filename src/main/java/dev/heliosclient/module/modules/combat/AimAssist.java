@@ -149,7 +149,7 @@ public class AimAssist extends Module_ {
     BooleanSetting others = sgEntities.add(new BooleanSetting("Other", "Aim at others", this, false, () -> true, true));
 
     public AimAssist() {
-        super("AimAssist", "Helps you aim better to your enemy (currently meele only)", Categories.COMBAT);
+        super("AimAssist", "Helps you aim better to your enemy (currently melee only)", Categories.COMBAT);
         addSettingGroup(sgGeneral);
         addSettingGroup(sgEntities);
 
@@ -185,21 +185,28 @@ public class AimAssist extends Module_ {
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
         RotationSimulator.pauseInGUI = pauseInGUI.value;
-        Entity entity = EntityUtils.getNearestEntity(
-                mc.world,
-                mc.player, range.value,
-                entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range.value && isEntityVisible(entity1) ,
-                (SortMethod) sort.getOption());
+        simulateRotationLook(range.value,ignoreTeammate.value, null);
+    }
 
-        if (ignoreTeammate.value && entity instanceof LivingEntity entity1 && ModuleManager.get(Teams.class).isInMyTeam(entity1)) {
+    public void simulateRotationLook(double range, boolean ignoreTeammate, LivingEntity entity){
+        LivingEntity targetEntity = entity;
+
+        if(targetEntity == null) {
+            targetEntity = (LivingEntity) EntityUtils.getNearestEntity(
+                    mc.world,
+                    mc.player, range,
+                    entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range && isEntityVisible(entity1),
+                    (SortMethod) sort.getOption());
+        }
+        if (ignoreTeammate && ModuleManager.get(Teams.class).isInMyTeam(targetEntity)) {
             return;
         }
 
-        if (entity != null && !isDead(entity)) {
+        if (targetEntity != null && !isDead(targetEntity)) {
             if (simulateRotation.value) {
-                simulator.simulateRotation(entity, false, null, (int) simulateTime.value, (int) randomness.value, (RotationUtils.LookAtPos) lookAt.getOption(),(EasingType) easing.getOption());
-            } else {
-                RotationUtils.lookAt(entity, (RotationUtils.LookAtPos) lookAt.getOption());
+                simulator.simulateRotation(targetEntity, false, null, (int) simulateTime.value, (int) randomness.value, (RotationUtils.LookAtPos) lookAt.getOption(),(EasingType) easing.getOption());
+            } else if(!pauseInGUI.value && mc.currentScreen == null){
+                RotationUtils.lookAt(targetEntity, (RotationUtils.LookAtPos) lookAt.getOption());
             }
         } else {
             simulator.clearRotations();

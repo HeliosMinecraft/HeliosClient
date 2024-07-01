@@ -8,6 +8,7 @@ import dev.heliosclient.module.modules.chat.ChatHighlight;
 import dev.heliosclient.module.modules.chat.ChatTweaks;
 import dev.heliosclient.module.modules.chat.Spammer;
 import dev.heliosclient.module.modules.combat.AimAssist;
+import dev.heliosclient.module.modules.combat.BowSpam;
 import dev.heliosclient.module.modules.combat.Criticals;
 import dev.heliosclient.module.modules.misc.*;
 import dev.heliosclient.module.modules.movement.*;
@@ -30,6 +31,7 @@ public class ModuleManager {
         //Combat
         registerModules(
                 new AimAssist(),
+                new BowSpam(),
                 new Criticals()
         );
 
@@ -95,6 +97,7 @@ public class ModuleManager {
                 new Speed(),
                 new Step(),
                 new Velocity(),
+                new TargetStrafe(),
                 new TridentTweaker(),
                 new TickShift()
         );

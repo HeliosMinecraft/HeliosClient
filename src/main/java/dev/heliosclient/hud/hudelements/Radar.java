@@ -24,6 +24,9 @@ public class Radar extends HudElement {
     private static int MAX_DISTANCE = 25; // Maximum entity distance
     public SettingGroup sgRadarSettings = new SettingGroup("General");
     public SettingGroup sgRadarColors = new SettingGroup("Colors");
+
+    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
+
     public DoubleSetting distance = sgRadarSettings.add(new DoubleSetting.Builder()
             .name("Distance To Scale")
             .description("Max Entity distance to be included in the radar")
@@ -34,7 +37,7 @@ public class Radar extends HudElement {
             .value(25.0D)
             .onSettingChange(this)
             .build()
-    );    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
+    );
     public DoubleSetting size = sgRadarSettings.add(new DoubleSetting.Builder()
             .name("Size")
             .description("Radar size")

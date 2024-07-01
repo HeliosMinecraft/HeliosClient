@@ -1,5 +1,6 @@
 package dev.heliosclient.mixin;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.misc.CapeModule;
@@ -13,6 +14,7 @@ import net.minecraft.client.render.entity.feature.CapeFeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
+import net.minecraft.client.util.SkinTextures;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -29,7 +31,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CapeFeatureRenderer.class)
 public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> {
-    private final float prevYaw = 0.0F;
 
     public CapeFeatureRendererMixin(FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> context) {
         super(context);
@@ -38,9 +39,17 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/network/AbstractClientPlayerEntity;FFFFFF)V", at = @At("HEAD"), cancellable = true)
     public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, AbstractClientPlayerEntity abstractClientPlayerEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
         if (!abstractClientPlayerEntity.isInvisible() && abstractClientPlayerEntity.isPartVisible(PlayerModelPart.CAPE) && ModuleManager.get(CapeModule.class).isActive()) {
-            if (CapeManager.shouldPlayerHaveCape(abstractClientPlayerEntity)) {
-                Identifier capeTexture = CapeManager.getCapeTexture(abstractClientPlayerEntity);
+
+            if (!CapeModule.forEveryone() && abstractClientPlayerEntity != HeliosClient.MC.player)
+                return;
+
+                Identifier capeTexture = CapeManager.CURRENT_PLAYER_CAPE;
                 ItemStack itemStack = abstractClientPlayerEntity.getEquippedStack(EquipmentSlot.CHEST);
+
+                if(capeTexture == null){
+                    capeTexture = abstractClientPlayerEntity.getSkinTextures().capeTexture();
+                }
+
                 if (!itemStack.isOf(Items.ELYTRA)) {
                     matrixStack.push();
                     matrixStack.translate(0.0F, 0.0F, 0.125F);
@@ -106,9 +115,8 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
                     this.getContextModel().renderCape(matrixStack, vertexConsumer, i, OverlayTexture.DEFAULT_UV);
                     matrixStack.pop();
                 }
-            }
-            ci.cancel();
         }
+            ci.cancel();
     }
 }
 

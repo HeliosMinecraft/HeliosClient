@@ -21,8 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinBlock {
     @ModifyReturnValue(method = "shouldDrawSide", at = @At("RETURN"))
     private static boolean modifyDrawSide(boolean original, BlockState state, BlockView world, BlockPos pos, Direction side, BlockPos blockPos) {
-
-        if (ModuleManager.get(Xray.class) != null && ModuleManager.get(Xray.class).isActive()) {
+        if (ModuleManager.get(Xray.class).isActive()) {
             return ModuleManager.get(Xray.class).shouldXray(state.getBlock());
         }
 

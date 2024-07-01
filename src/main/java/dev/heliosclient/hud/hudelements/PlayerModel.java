@@ -9,6 +9,7 @@ import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
 
@@ -35,15 +36,15 @@ public class PlayerModel extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
-        this.width = 30;
-        this.height = 55;
+        this.width = 30 + (int) (size.value * size.value);
+        this.height = Math.round((float) (55 * size.value));
         super.renderElement(drawContext, textRenderer);
         ClientPlayerEntity player = HeliosClient.MC.player;
         if (player == null && !renderBg.value) {
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, this.y, width - 1, height - 1, Color.BLACK.getRGB());
         }
         if (player != null) {
-            Renderer2D.drawEntity(drawContext, x + width / 2, y + height - 6, ((int) (25 * size.value)), player, HeliosClient.MC.getTickDelta());
+            Renderer2D.drawEntity(drawContext, x + width / 2, (int) (y + height - (6 * size.value)), ((int) (25 * size.value)), player, HeliosClient.MC.getTickDelta());
         }
     }
 
