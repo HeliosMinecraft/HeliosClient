@@ -65,21 +65,20 @@ public class StringSetting extends Setting<String> {
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
         return shouldSaveOrLoad ? value : "";
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
+    public void loadFromFile(Map<String, Object> MAP) {
         if (!shouldSaveOrLoad) {
             return;
         }
-        if (toml.getString(getSaveName()) == null) {
+        if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;
         }
-        value = toml.getString(getSaveName());
+        value = (String) MAP.get(getSaveName());
         inputBox.setValue(value);
     }
 

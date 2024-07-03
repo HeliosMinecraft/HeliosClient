@@ -48,7 +48,7 @@ public class TimerUtils {
 
     // Resets the timer
     public void resetTimer() {
-        startTime = System.currentTimeMillis();
+        startTime = 0;
         hasTimerStarted = false;
     }
 

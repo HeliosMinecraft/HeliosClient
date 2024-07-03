@@ -5,15 +5,11 @@ import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
-import dev.heliosclient.managers.NavBarManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
-import dev.heliosclient.system.Config;
-import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.InputBox;
@@ -136,37 +132,6 @@ public class ClickGUI extends Module_ {
             .roundingPlace(2)
             .build()
     );
-    public KeyBind clickGUIKeyBind = sgConfig.add(new KeyBind.Builder()
-            .name("ClickGUI bind")
-            .description("The key to open the ClickGUI screen")
-            .value(GLFW.GLFW_KEY_RIGHT_SHIFT)
-            .defaultValue(GLFW.GLFW_KEY_RIGHT_SHIFT)
-            .onSettingChange(this)
-            .build()
-    );
-    public StringSetting configPath = sgConfig.add(new StringSetting.Builder()
-            .name("Save Config Path")
-            .description("Saves current config to that path. It only saves there for temporary purposes, otherwise it selects the default HeliosClient directory")
-            .value(HeliosClient.CONFIG.configManager.getConfigDir().getAbsolutePath())
-            .inputMode(InputBox.InputMode.ALL)
-            .characterLimit(300)
-            .defaultValue(HeliosClient.CONFIG.configManager.getConfigDir().getAbsolutePath())
-            .build()
-    );
-    public DropDownSetting switchConfigs = sgConfig.add(new DropDownSetting.Builder()
-            .name("Switch Module Config")
-            .defaultListIndex(0)
-            .description("Switch Module Configs")
-            .value(HeliosClient.CONFIG.MODULE_CONFIGS)
-            .onSettingChange(this)
-            .build()
-
-    );
-    public ButtonSetting config = sgConfig.add(new ButtonSetting.Builder()
-            .name("Configs")
-            .description("Reload or save Configs")
-            .build()
-    );
     public BooleanSetting clickGUISound = sgSound.add(new BooleanSetting.Builder()
             .name("Play module toggle sound")
             .description("Play ClickGUI button sound on toggling modules")
@@ -260,6 +225,38 @@ public class ClickGUI extends Module_ {
             .value(true)
             .build()
     );
+    public KeyBind clickGUIKeyBind = sgConfig.add(new KeyBind.Builder()
+            .name("ClickGUI bind")
+            .description("The key to open the ClickGUI screen")
+            .value(GLFW.GLFW_KEY_RIGHT_SHIFT)
+            .defaultValue(GLFW.GLFW_KEY_RIGHT_SHIFT)
+            .onSettingChange(this)
+            .build()
+    );
+    public StringSetting configPath = sgConfig.add(new StringSetting.Builder()
+            .name("Save Config Path")
+            .description("Saves current config to that path. It only saves there for temporary purposes, otherwise it selects the default HeliosClient directory")
+            .value(HeliosClient.CONFIG.otherConfigManager.getCurrentConfig().getConfigFile().getParent())
+            .defaultValue(HeliosClient.CONFIG.otherConfigManager.getCurrentConfig().getConfigFile().getParent())
+            .inputMode(InputBox.InputMode.ALL)
+            .shouldSaveAndLoad(false)
+            .characterLimit(300)
+            .build()
+    );
+    public CycleSetting switchConfigs = sgConfig.add(new CycleSetting.Builder()
+            .name("Switch Module Config")
+            .description("Switch Module Configs")
+            .value(HeliosClient.CONFIG.moduleConfigManager.getConfigNames())
+            .defaultListIndex(0)
+            .onSettingChange(this)
+            .build()
+
+    );
+    public ButtonSetting config = sgConfig.add(new ButtonSetting.Builder()
+            .name("Configs")
+            .description("Reload or save Configs")
+            .build()
+    );
 
     public BooleanSetting disableEventSystem = sgExpert.add(new BooleanSetting.Builder()
             .name("Disable Event System")
@@ -293,17 +290,9 @@ public class ClickGUI extends Module_ {
         });
 
         config.addButton("Reload All Configs", 0, 0, () -> {
-            HeliosClient.saveConfigHook();
+            HeliosClient.CONFIG.getModuleConfigManager().checkDirectoryAgain();
 
-            HeliosClient.CONFIG.init();
-
-            switchConfigs.options = HeliosClient.CONFIG.MODULE_CONFIGS;
-
-            int var = switchConfigs.value;
-
-            HeliosClient.loadConfig();
-
-            switchConfigs.value = var;
+            switchConfigs.options = HeliosClient.CONFIG.getModuleConfigManager().getConfigNames();
         });
         config.addButton("Save Config", 1, 0, () -> {
             File pathFile = new File(configPath.value);
@@ -311,16 +300,33 @@ public class ClickGUI extends Module_ {
                 AnimationUtils.addErrorToast(ColorUtils.red + "Invalid Save Path. Path should be a valid directory", true, 2000);
                 return;
             }
-            HeliosClient.CONFIG.configManager.setConfigDir(pathFile);
-            HeliosClient.saveConfig();
+            pathFile = new File(configPath.value + "/" + switchConfigs.getOption().toString() + ".json");
+
+            //So basically what we are doing here is storing the previous config file before.
+            //Then we call the save method so all our module data gets written in the Map
+            //And then we are changing the SubConfig target file to the new path
+            //lastly we call the ConfigManager#save method to save the current config at the target location.
+            File prevConfigFile = HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().getConfigFile();
+            HeliosClient.CONFIG.writeConfigData();
+
+            HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().setConfigFile(pathFile);
+            boolean saveSuccessful = HeliosClient.CONFIG.moduleConfigManager.save(false);
+            HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().setConfigFile(prevConfigFile);
+
+            if(saveSuccessful) {
+                AnimationUtils.addInfoToast(ColorUtils.green + "Config was saved successfully", true, 2000);
+            }else{
+                AnimationUtils.addErrorToast(ColorUtils.red + "Config could not be saved: ", true, 2000);
+            }
+
         });
-        config.addButton("Load Config", 1, 1, HeliosClient::loadConfig);
+        config.addButton("Load Config", 1, 1, HeliosClient::loadModulesOnly);
 
         EventManager.register(this);
     }
 
     @Override
-    public void onSettingChange(Setting setting) {
+    public void onSettingChange(Setting<?> setting) {
         super.onSettingChange(setting);
 
         Tooltip.tooltip.mode = TooltipMode.value;
@@ -347,15 +353,9 @@ public class ClickGUI extends Module_ {
         //Config changes
         if (setting == switchConfigs) {
             //Todo: Replace with cleaner config manager
-            if (!HeliosClient.CONFIG.MODULE_CONFIGS.isEmpty()) {
-                //Save current config
-                HeliosClient.saveConfig();
-
+            if (!HeliosClient.CONFIG.moduleConfigManager.getConfigNames().isEmpty()) {
                 //Change the file name we want to load
-                Config.MODULES = HeliosClient.CONFIG.MODULE_CONFIGS.get(switchConfigs.value).replace(".toml", "");
-
-                //Load the new config
-                HeliosClient.loadConfig();
+                HeliosClient.CONFIG.moduleConfigManager.switchConfig(switchConfigs.getOption().toString(),true);
             }
         }
     }

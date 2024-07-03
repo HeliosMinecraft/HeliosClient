@@ -7,7 +7,6 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.sysmodules.ClickGUI;
-import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
@@ -40,9 +39,11 @@ public class ClickGUIScreen extends Screen {
         scrollX = 0;
         scrollY = 0;
 
+        categoryPanes.forEach(EventManager::unregister);
+
         categoryPanes.clear();
 
-        Object panesObject = HeliosClient.CONFIG.modulesManager.getConfigMaps().get(Config.MODULES).get("panes");
+        Object panesObject = HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().getReadData().get("panes");
         if (panesObject instanceof Map<?, ?> panePos) {
             CategoryManager.getCategories().forEach((s, category) -> {
                 Object categoryObject = panePos.get(category.name);

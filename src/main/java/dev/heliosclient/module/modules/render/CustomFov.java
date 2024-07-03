@@ -16,7 +16,7 @@ public class CustomFov extends Module_ {
             .onSettingChange(this)
             .value(140.0)
             .defaultValue(140.0)
-            .min(1)
+            .min(20)
             .max(240)
             .roundingPlace(0)
             .build()
@@ -42,7 +42,7 @@ public class CustomFov extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-        if (mc.options == null && mc.options.getFov().getValue() <= 110) return;
+        if (mc.options == null || mc.options.getFov().getValue() <= 110) return;
 
         previousFov = mc.options.getFov().getValue();
     }

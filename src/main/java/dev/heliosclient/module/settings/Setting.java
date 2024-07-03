@@ -324,13 +324,14 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
         return objectList;
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+    public void loadFromFile(Map<String, Object> MAP) {
         if (!shouldSaveOrLoad) {
+            return;
         }
     }
 

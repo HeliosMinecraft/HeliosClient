@@ -130,15 +130,14 @@ public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
-        if (toml.getList(getSaveName()) == null) {
+    public void loadFromFile(Map<String, Object> MAP) {
+        if (MAP.get(getSaveName()) == null) {
             this.xSet.setValue(defaultValue.x);
             this.ySet.setValue(defaultValue.y);
             this.zSet.setValue(defaultValue.z);
             value = defaultValue;
         } else {
-            List<Double> vec3 = toml.getList(getSaveName());
+            List<Double> vec3 = (List<Double>) MAP.get(getSaveName());
             this.xSet.setValue(vec3.get(0));
             this.ySet.setValue(vec3.get(1));
             this.zSet.setValue(vec3.get(2));
@@ -147,7 +146,7 @@ public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
         objectList.add(xSet.value);
         objectList.add(ySet.value);
         objectList.add(zSet.value);

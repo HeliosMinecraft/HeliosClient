@@ -17,6 +17,7 @@ import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.player.RotationUtils;
+import dev.heliosclient.util.player.TargetUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -192,12 +193,10 @@ public class AimAssist extends Module_ {
         LivingEntity targetEntity = entity;
 
         if(targetEntity == null) {
-            targetEntity = (LivingEntity) EntityUtils.getNearestEntity(
-                    mc.world,
-                    mc.player, range,
-                    entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range && isEntityVisible(entity1),
-                    (SortMethod) sort.getOption());
+            TargetUtils.getInstance().setRange(range);
+            targetEntity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range && isEntityVisible(entity1),true);
         }
+
         if (ignoreTeammate && ModuleManager.get(Teams.class).isInMyTeam(targetEntity)) {
             return;
         }

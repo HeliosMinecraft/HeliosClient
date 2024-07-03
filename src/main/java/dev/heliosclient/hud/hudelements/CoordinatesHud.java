@@ -26,7 +26,7 @@ public class CoordinatesHud extends HudElement {
     );
     private final BooleanSetting cameraEntity = sgSettings.add(new BooleanSetting.Builder()
             .name("Camera Coords")
-            .description("Shows the coordinates of camera instead of player")
+            .description("Shows the coordinates of camera instead of player. Works with Freecam and other camera manipulating modules")
             .onSettingChange(this)
             .defaultValue(false)
             .build()

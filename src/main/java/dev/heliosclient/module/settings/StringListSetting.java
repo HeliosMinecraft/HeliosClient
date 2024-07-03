@@ -97,7 +97,7 @@ public class StringListSetting extends Setting<String[]> {
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
         for (InputBox inputBox :
                 inputBoxes) {
             objectList.add(inputBox.getValue());
@@ -106,15 +106,15 @@ public class StringListSetting extends Setting<String[]> {
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
-        if (toml.getList(getSaveName()) == null) {
+    public void loadFromFile(Map<String, Object> MAP) {
+        super.loadFromFile(MAP);
+        if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;
         }
         int a;
         inputBoxes.clear();
-        List<String> list = toml.getList(getSaveName());
+        List<String> list = (List<String>) MAP.get(getSaveName());
         value = new String[list.size()];
         for (a = 0; a < list.size(); a++) {
             inputBoxes.add(new InputBox(160, 12, list.get(a), characterLimit, inputMode));

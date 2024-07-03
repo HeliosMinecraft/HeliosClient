@@ -20,6 +20,7 @@ import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.player.RotationUtils;
+import dev.heliosclient.util.player.TargetUtils;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
@@ -154,11 +155,8 @@ public class TargetStrafe extends Module_ {
 
     @SubscribeEvent
     public void onTicks(TickEvent.PLAYER event) {
-        LivingEntity entity = (LivingEntity) EntityUtils.getNearestEntity(
-                mc.world,
-                mc.player, range.value,
-                entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range.value && isEntityVisible(entity1) ,
-                (SortMethod) sort.getOption());
+        TargetUtils.getInstance().setRange(range.value);
+        LivingEntity entity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(true);
 
         if (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam(entity)) {
             return;

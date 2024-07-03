@@ -42,6 +42,7 @@ public class DiscordRPC {
             File tempJNIDir = new File(System.getProperty("java.io.tmpdir") + "/java", "jni-"+System.nanoTime());
             if(!(tempJNIDir.exists() && tempJNIDir.isDirectory()) && !tempJNIDir.mkdir())
                 throw new RuntimeException(new IOException("Cannot create temporary JNI directory"));
+
             tempJNIDir.deleteOnExit();
 
             Core.init(sdkFile,tempJNIDir);

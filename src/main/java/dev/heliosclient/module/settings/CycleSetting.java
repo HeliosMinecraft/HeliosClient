@@ -1,8 +1,7 @@
 package dev.heliosclient.module.settings;
 
-import com.moandjiezana.toml.Toml;
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
@@ -11,10 +10,8 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
@@ -128,16 +125,21 @@ public class CycleSetting extends Setting<Integer> {
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
-        if (options.isEmpty() || options.size() - 1 < value) {
-            return null;
+    public Object saveToFile(List<Object> objectList) {
+        if (options.isEmpty() || options.size() - 1 < value || !shouldSaveOrLoad) {
+            return "";
         }
         return options.get(value);
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
+    public void loadFromFile(Map<String, Object> MAP) {
+        if(this.name.contains("switch")){
+            System.out.println(MAP);
+        }
+        if(!shouldSaveOrLoad){
+            return;
+        }
         if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;
@@ -151,7 +153,7 @@ public class CycleSetting extends Setting<Integer> {
                 return;
             }
         }
-        LOGGER.error("Option not found for: {}, {} Setting during loading config: {}", mapGet, name, Config.MODULES);
+        LOGGER.error("Option not found for: {}, {} Setting during loading config: {}", mapGet, name, HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().getName());
     }
 
     public Object getOption() {

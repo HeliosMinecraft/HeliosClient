@@ -454,7 +454,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     }
 
     @Override
-    public Object saveToToml(List<Object> objects) {
+    public Object saveToFile(List<Object> objects) {
         Map<String, Object> map = new HashMap<>();
 
         map.put("name", name);
@@ -469,7 +469,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         for (SettingGroup settingGroup : settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
-                    map.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
+                    map.put(setting.name.replace(" ", ""), setting.saveToFile(new ArrayList<>()));
                 }
             }
         }
@@ -478,8 +478,8 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> map, Toml toml) {
-        List<Object> obj = toml.getList("positions");
+    public void loadFromFile(Map<String, Object> MAP) {
+        List<Object> obj = (List<Object>)  MAP.get("positions");
         this.x = Integer.parseInt(obj.get(0).toString());
         this.y = Integer.parseInt(obj.get(1).toString());
         this.width = Integer.parseInt(obj.get(2).toString());

@@ -240,13 +240,4 @@ public class Radar extends HudElement {
         }
         return color;
     }
-
-    @Override
-    public void loadFromToml(Map<String, Object> map, Toml toml) {
-        super.loadFromToml(map, toml);
-    }
-
-
-
-
 }

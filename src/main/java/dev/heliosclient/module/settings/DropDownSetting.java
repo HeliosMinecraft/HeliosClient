@@ -1,8 +1,7 @@
 package dev.heliosclient.module.settings;
 
-import com.moandjiezana.toml.Toml;
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.system.Config;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
@@ -223,7 +222,7 @@ public class DropDownSetting extends Setting<Integer> {
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
         if (options.isEmpty() || options.size() - 1 < value) {
             return null;
         }
@@ -231,8 +230,7 @@ public class DropDownSetting extends Setting<Integer> {
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
+    public void loadFromFile(Map<String, Object> MAP) {
         if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;
@@ -246,7 +244,7 @@ public class DropDownSetting extends Setting<Integer> {
                 return;
             }
         }
-        LOGGER.error("List option not found for: {}, {} Setting during loading config: {}", mapGet, name, Config.MODULES);
+        LOGGER.error("List option not found for: {}, {} Setting during loading config: {}", mapGet, name, HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().getName());
     }
 
     public Object getOption() {

@@ -94,13 +94,12 @@ public class BooleanSetting extends Setting<Boolean> {
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
         return value;
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
+    public void loadFromFile(Map<String, Object> MAP) {
         if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;

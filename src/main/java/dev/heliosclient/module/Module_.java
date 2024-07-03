@@ -260,7 +260,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     }
 
     @Override
-    public Object saveToToml(List<Object> list) {
+    public Object saveToFile(List<Object> list) {
         Map<String, Object> ModuleConfig = new HashMap<>();
         // Map for storing the values of each module
         if (this.settingGroups == null) return ModuleConfig;
@@ -270,8 +270,8 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
                 if (!setting.shouldSaveAndLoad()) continue;
 
                 if (setting.name != null) {
-                    // Put the value of each setting into the map. Call the setting saveToToml method to get the value of the setting.
-                    ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToToml(new ArrayList<>()));
+                    // Put the value of each setting into the map. Call the setting saveToFile method to get the value of the setting.
+                    ModuleConfig.put(setting.name.replace(" ", ""), setting.saveToFile(new ArrayList<>()));
                 }
             }
         }
@@ -279,19 +279,19 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
+    public void loadFromFile(Map<String, Object> MAP) {
         for (SettingGroup settingGroup : this.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldSaveAndLoad()) break;
 
 
-                Toml settingTable = toml.getTable(this.name.replace(" ", ""));
+                Map<String ,Object> settingTable = HeliosClient.CONFIG.cast(MAP.get(this.name.replace(" ", "")));
                 if (settingTable != null) {
 
                     //Any error caught should not cause the whole config system to fail to load.
-
+                    //Hopefully
                     try {
-                        setting.loadFromToml(settingTable.toMap(), settingTable);
+                        setting.loadFromFile(settingTable);
                     }catch (Exception e){
                         e.printStackTrace();
                     }

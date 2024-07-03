@@ -5,6 +5,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.settings.ParentScreenSetting;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.ui.clickgui.settings.lists.ListSettingsScreen;
+import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import dev.heliosclient.util.render.Renderer2D;
@@ -156,7 +157,7 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
         }
     }
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
         for (T entry : selectedEntries) {
             objectList.add(registry.getRawId(entry));
         }
@@ -164,13 +165,12 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
-        List<Long> tomlSelectedItem = toml.getList(getSaveName());
+    public void loadFromFile(Map<String, Object> MAP) {
+        List<Double> tomlSelectedItem = (List<Double>) MAP.get(getSaveName());
         selectedEntries.clear();
         if (tomlSelectedItem != null) {
-            for (Long entryID : tomlSelectedItem) {
-                T retrievedEntry = registry.getEntry(Math.toIntExact(entryID)).get().value();
+            for (Double entryID : tomlSelectedItem) {
+                T retrievedEntry = registry.getEntry(MathUtils.d2iSafe(entryID)).get().value();
                 if (retrievedEntry != null) {
                     selectedEntries.add(retrievedEntry);
                 } else {

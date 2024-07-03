@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ISaveAndLoad {
-    Object saveToToml(List<Object> list);
+    Object saveToFile(List<Object> list);
 
-    void loadFromToml(Map<String, Object> MAP, Toml toml);
+    void loadFromFile(Map<String, Object> MAP);
 }

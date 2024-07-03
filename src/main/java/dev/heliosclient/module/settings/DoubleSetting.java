@@ -150,17 +150,16 @@ public class DoubleSetting extends Setting<Double> {
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
         return value;
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
-        if (toml.getDouble(getSaveName()) == null) {
+    public void loadFromFile(Map<String, Object> MAP) {
+        if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
         } else {
-            value = toml.getDouble(getSaveName());
+            value = (double) MAP.get(getSaveName());
         }
         onSettingChange();
     }

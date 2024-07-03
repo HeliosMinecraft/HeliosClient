@@ -5,11 +5,13 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.KeycodeToString;
+import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -132,21 +134,19 @@ public class KeyBind extends Setting<Integer> {
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
 
         //The actual key code.
-        objectList.add(value);
-        return objectList;
+        return value;
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
-        if (toml.getList(this.getSaveName()) == null) {
+    public void loadFromFile(Map<String, Object> MAP) {
+        if (MAP.get(this.getSaveName()) == null) {
             value = defaultValue;
             return;
         }
-        value = Integer.parseInt(toml.getList(this.getSaveName()).get(0).toString());
+        value = MathUtils.d2iSafe(MAP.get(this.getSaveName()));
     }
 
     @Override

@@ -9,6 +9,7 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.settings.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import dev.heliosclient.util.render.Renderer2D;
@@ -362,23 +363,25 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
     }
 
     @Override
-    public Object saveToToml(List<Object> objectList) {
+    public Object saveToFile(List<Object> objectList) {
         objectList.add(value.getRGB());
         objectList.add(rainbow ? 1 : 0);
         return objectList;
     }
 
     @Override
-    public void loadFromToml(Map<String, Object> MAP, Toml toml) {
-        super.loadFromToml(MAP, toml);
-        if (toml.getList(this.getSaveName()) == null) {
+    public void loadFromFile(Map<String, Object> MAP) {
+        if (MAP.get(this.getSaveName()) == null) {
             value = defaultValue;
             rainbow = defaultRainbow;
-            HeliosClient.LOGGER.error(this.getSaveName() + " is null, Setting loaded to default");
+            HeliosClient.LOGGER.error("{} is null, Setting loaded to default", this.getSaveName());
             return;
         }
-        value = ColorUtils.intToColor(Integer.parseInt(toml.getList(this.getSaveName()).get(0).toString()));
-        rainbow = Integer.parseInt(toml.getList(this.getSaveName()).get(1).toString()) == 1;
+
+        List<?> list = (List<?>) MAP.get(this.getSaveName());
+
+        value = ColorUtils.intToColor(MathUtils.d2iSafe(list.get(0)));
+        rainbow = MathUtils.d2iSafe(list.get(0)) == 1;
         updateHandles();
     }
 

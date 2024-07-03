@@ -32,7 +32,8 @@ public class ConsoleAppender extends AbstractAppender {
 
         String message = event.getMessage().getFormattedMessage();
         if (message.contains("Exception") || event.getLevel() == Level.TRACE || message.length() > 200) {
-            message = message.split("\n")[0] + ".. Check Log file for more details!"; // Only get the first line, to prevent stack trace spam.
+            // Only get the first line.
+            message = message.split("\n")[0] + ".. Check Log file for more details!";
         }
 
         if (event.getLevel() == Level.ERROR) {
@@ -43,21 +44,18 @@ public class ConsoleAppender extends AbstractAppender {
             message = ColorUtils.darkRed + message + ColorUtils.reset;
         }
 
-        if (event.getLoggerName().equalsIgnoreCase("HeliosClient")) {
-            message = ColorUtils.yellow + "[HeliosClient] " + ColorUtils.reset + message;
-        }
         if (event.getLoggerName().contains("net.minecraft") || event.getLoggerName().contains("com.mojang")) {
             message = ColorUtils.darkGreen + "[Minecraft] " + ColorUtils.reset + message;
-        }
-        if (event.getLoggerName().contains("Fabric")) {
+        }else if (event.getLoggerName().equalsIgnoreCase("HeliosClient")) {
+            message = ColorUtils.yellow + "[HeliosClient] " + ColorUtils.reset + message;
+        }else if (event.getLoggerName().contains("Fabric")) {
             message = ColorUtils.darkAqua + "[Fabric] " + ColorUtils.reset + message;
-        }
-        if (event.getLoggerName().contains("ModMenu")) {
+        }else if (event.getLoggerName().contains("ModMenu")) {
             message = ColorUtils.darkBlue + "[ModMenu] " + ColorUtils.reset + message;
         }
 
         // Does not log same messages again to prevent console spam.
-        if (!Objects.equals(message, previousMessage)) {
+        if (!message.equals(previousMessage)) {
             // Display messages in console
             screen.consoleBox.addLine(message);
         }
