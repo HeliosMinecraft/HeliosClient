@@ -57,13 +57,17 @@ public class BlockUtils {
         if (state.getHardness(mc.world, blockPos) < 0) return false;
         return state.getOutlineShape(mc.world, blockPos) != VoxelShapes.empty();
     }
+
     public static boolean canBreakInstantly(BlockState state, float speed) {
-      return mc.player.isCreative() || calcBlockBreakingDelta2(state,speed) >= 1;
+        return mc.player.isCreative() || calcBlockBreakingDelta2(state, speed) >= 1;
     }
+
     public static boolean canPlace(BlockPos pos, BlockState state) {
-        if (pos == null || mc.world == null || !World.isValid(pos) || !mc.world.getBlockState(pos).isReplaceable()) return false;
+        if (pos == null || mc.world == null || !World.isValid(pos) || !mc.world.getBlockState(pos).isReplaceable())
+            return false;
         return mc.world.getWorldBorder().contains(pos) && mc.world.canPlace(state, pos, ShapeContext.absent());
     }
+
     public static boolean breakBlock(BlockPos pos, boolean swing) {
         if (!canBreak(pos, mc.world.getBlockState(pos))) return false;
         BlockPos bp = pos instanceof BlockPos.Mutable ? new BlockPos(pos) : pos;
@@ -83,18 +87,13 @@ public class BlockUtils {
      * @see AbstractBlock#calcBlockBreakingDelta(BlockState, PlayerEntity, BlockView, BlockPos)
      */
     public static double calcBlockBreakingDelta(BlockState state, ItemStack stack) {
-        float f = state.getHardness(null, null);
-        if (f == -1.0F) {
-            return 0.0F;
-        } else {
-            int i = HeliosClient.MC.player.canHarvest(state) ? 30 : 100;
-            return getMiningSpeedForBlockState(state, stack) / f / (double) i;
-        }
+       return calcBlockBreakingDelta2(state, getMiningSpeedForBlockState(state, stack) );
     }
+
     /**
      * @see AbstractBlock#calcBlockBreakingDelta(BlockState, PlayerEntity, BlockView, BlockPos)
      */
-    public static double calcBlockBreakingDelta2(BlockState state, float speed) {
+    public static double calcBlockBreakingDelta2(BlockState state, double speed) {
         float f = state.getHardness(null, null);
         if (f == -1.0F) {
             return 0.0F;

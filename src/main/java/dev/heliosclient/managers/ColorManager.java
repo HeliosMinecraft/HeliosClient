@@ -5,7 +5,6 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.module.modules.render.GUI;
-import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.ColorUtils;
 
@@ -61,7 +60,7 @@ public class ColorManager implements Listener {
         }
     }
 
-    public int hudColor(){
+    public int hudColor() {
         return hudColor;
     }
 
@@ -88,19 +87,17 @@ public class ColorManager implements Listener {
         ColorManager.SYNC_ACCENT = HeliosClient.CLICKGUI.syncAccentColor.value;
 
 
-
         Tooltip.tooltip.mode = HeliosClient.CLICKGUI.TooltipMode.value;
         Tooltip.tooltip.fixedPos = HeliosClient.CLICKGUI.TooltipPos.value;
 
         //Sync accent color with the rest of the client.
         //Hud color is synced in HUDModule.java
-        if(SYNC_ACCENT){
+        if (SYNC_ACCENT) {
             updateClickGuiSecondary(HeliosClient.CLICKGUI.AccentColor.getColor(), HeliosClient.CLICKGUI.AccentColor.isRainbow());
 
-            updatePrimaryGradients(HeliosClient.CLICKGUI.AccentColor.getColor(),HeliosClient.CLICKGUI.AccentColor.getColor());
+            updatePrimaryGradients(HeliosClient.CLICKGUI.AccentColor.getColor(), HeliosClient.CLICKGUI.AccentColor.getColor());
             return;
         }
-
 
 
         float hue = (System.currentTimeMillis() % 10000) / 10000f;
@@ -109,24 +106,24 @@ public class ColorManager implements Listener {
 
 
         if (gui.ColorMode.value == 0) {
-            updatePrimaryGradients(gui.staticColor.getColor(),gui.staticColor.getColor());
+            updatePrimaryGradients(gui.staticColor.getColor(), gui.staticColor.getColor());
         }
         if (gui.ColorMode.value == 1) {
             switch (gui.GradientType.value) {
                 case 0 -> {
-                    updatePrimaryGradients(ColorUtils.getRainbowColor(),ColorUtils.getRainbowColor2());
+                    updatePrimaryGradients(ColorUtils.getRainbowColor(), ColorUtils.getRainbowColor2());
                 }
                 case 1 -> {
-                    updatePrimaryGradients(ColorUtils.getDaySkyColors(hue)[0],ColorUtils.getDaySkyColors(hue)[1]);
+                    updatePrimaryGradients(ColorUtils.getDaySkyColors(hue)[0], ColorUtils.getDaySkyColors(hue)[1]);
                 }
                 case 2 -> {
-                    updatePrimaryGradients(ColorUtils.getEveningSkyColors(hue)[0],ColorUtils.getEveningSkyColors(hue)[1]);
+                    updatePrimaryGradients(ColorUtils.getEveningSkyColors(hue)[0], ColorUtils.getEveningSkyColors(hue)[1]);
                 }
                 case 3 -> {
-                    updatePrimaryGradients(ColorUtils.getNightSkyColors(hue)[0],ColorUtils.getNightSkyColors(hue)[1]);
+                    updatePrimaryGradients(ColorUtils.getNightSkyColors(hue)[0], ColorUtils.getNightSkyColors(hue)[1]);
                 }
                 case 4 -> {
-                    updatePrimaryGradients(gui.linear2Start.getColor(),gui.linear2end.getColor());
+                    updatePrimaryGradients(gui.linear2Start.getColor(), gui.linear2end.getColor());
                 }
             }
         }
@@ -139,17 +136,18 @@ public class ColorManager implements Listener {
         updateClickGuiPaneText(HeliosClient.CLICKGUI.PaneTextColor.getColor(), HeliosClient.CLICKGUI.PaneTextColor.isRainbow());
     }
 
-    public void updatePrimaryGradients(Color start, Color end){
+    public void updatePrimaryGradients(Color start, Color end) {
         this.primaryGradientStart = start;
         this.primaryGradientEnd = end;
     }
 
-    public void updateClickGuiSecondary(Color color, boolean rainbow){
+    public void updateClickGuiSecondary(Color color, boolean rainbow) {
         this.clickGuiSecondaryAlpha = color.getAlpha();
         this.clickGuiSecondary = color.getRGB();
         this.clickGuiSecondaryRainbow = rainbow;
     }
-    public void updateClickGuiPaneText(Color color, boolean rainbow){
+
+    public void updateClickGuiPaneText(Color color, boolean rainbow) {
         this.clickGuiPaneTextAlpha = color.getAlpha();
         this.clickGuiPaneText = color.getRGB();
         this.clickGuiPaneTextRainbow = rainbow;

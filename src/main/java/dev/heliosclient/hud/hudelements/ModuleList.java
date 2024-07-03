@@ -16,7 +16,6 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static dev.heliosclient.hud.hudelements.ModuleList.ColorMode.METEOR;
@@ -57,14 +56,14 @@ public class ModuleList extends HudElement implements Listener {
             .description("Color of the background")
             .defaultValue(new Color(0x66222222))
             .onSettingChange(this)
-            .shouldRender(()-> background.value)
+            .shouldRender(() -> background.value)
             .build());
     private final BooleanSetting glow = sgSettings.add(new BooleanSetting.Builder()
             .name("Render Glow")
             .description("Renders a glow behind the text depending on the color of text")
             .onSettingChange(this)
             .defaultValue(false)
-            .shouldRender(()-> background.value)
+            .shouldRender(() -> background.value)
             .build()
     );
     private final CycleSetting glowMode = sgSettings.add(new CycleSetting.Builder()
@@ -73,7 +72,7 @@ public class ModuleList extends HudElement implements Listener {
             .value(List.of(GlowMode.values()))
             .onSettingChange(this)
             .defaultListOption(GlowMode.LOW_BG_ALPHA)
-            .shouldRender(()-> glow.value && background.value)
+            .shouldRender(() -> glow.value && background.value)
             .build()
     );
     private final DoubleSetting glowRadius = sgSettings.add(new DoubleSetting.Builder()
@@ -84,7 +83,7 @@ public class ModuleList extends HudElement implements Listener {
             .max(50)
             .roundingPlace(0)
             .defaultValue(4d)
-            .shouldRender(() -> glow.value && background.value )
+            .shouldRender(() -> glow.value && background.value)
             .build()
     );
 
@@ -215,11 +214,11 @@ public class ModuleList extends HudElement implements Listener {
                 colorToRenderIn = rainbow;
             }
 
-            float textX = x - (sideLines.value? 4: 0) + width - nameWidth;
+            float textX = x - (sideLines.value ? 4 : 0) + width - nameWidth;
 
             if (background.value) {
                 // Draw a background rectangle for each module
-                int bgColor = (glowMode.getOption() == GlowMode.LOW_BG_ALPHA) ? ColorUtils.changeAlpha(backgroundColor.getColor(),100).getRGB() : backgroundColor.getColor().getRGB();
+                int bgColor = (glowMode.getOption() == GlowMode.LOW_BG_ALPHA) ? ColorUtils.changeAlpha(backgroundColor.getColor(), 100).getRGB() : backgroundColor.getColor().getRGB();
 
                 if (glow.value) {
                     Renderer2D.drawRectangleWithShadow(drawContext.getMatrices(),
@@ -261,8 +260,10 @@ public class ModuleList extends HudElement implements Listener {
         enabledModules = ModuleManager.getEnabledModules();
         enabledModules.sort((mod1, mod2) -> switch ((Sort) sort.getOption()) {
             case Alphabetical -> mod1.getNameWithInfo().compareTo(mod2.getNameWithInfo());
-            case Biggest -> Double.compare(Renderer2D.getStringWidth(mod2.getNameWithInfo()), Renderer2D.getStringWidth(mod1.getNameWithInfo()));
-            case Smallest -> Double.compare(Renderer2D.getStringWidth(mod1.getNameWithInfo()), Renderer2D.getStringWidth(mod2.getNameWithInfo()));
+            case Biggest ->
+                    Double.compare(Renderer2D.getStringWidth(mod2.getNameWithInfo()), Renderer2D.getStringWidth(mod1.getNameWithInfo()));
+            case Smallest ->
+                    Double.compare(Renderer2D.getStringWidth(mod1.getNameWithInfo()), Renderer2D.getStringWidth(mod2.getNameWithInfo()));
         });
     }
 
@@ -276,11 +277,11 @@ public class ModuleList extends HudElement implements Listener {
         METEOR
     }
 
-    public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
-
-    public enum GlowMode{
+    public enum GlowMode {
         LOW_BG_ALPHA,
         NORMAL
-    }
+    }    public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
+
+
 
 }

@@ -5,7 +5,10 @@ import dev.heliosclient.event.events.player.ChatMessageEvent;
 import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.*;
+import dev.heliosclient.module.settings.BooleanSetting;
+import dev.heliosclient.module.settings.CycleSetting;
+import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.settings.StringListSetting;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
@@ -85,7 +88,7 @@ public class ChatHighlight extends Module_ {
         this.highlightList.add("tanishisherewith");
     }
 
-    public void checkForHighlights(){
+    public void checkForHighlights() {
         //StringList setting does not have a iSettingChange invoke, so we have to deal with it here.
         this.highlightList.clear();
         for (String word : wordsToHighlight.value) {

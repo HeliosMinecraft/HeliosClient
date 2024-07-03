@@ -44,6 +44,7 @@ public class Easing {
             return -2 * t * t + 4 * t - 1;
         }
     }
+
     public static float linearSigmoid(float t) {
         return (float) (1 / (1 + Math.exp(-10 * (t - 0.5))));
     }

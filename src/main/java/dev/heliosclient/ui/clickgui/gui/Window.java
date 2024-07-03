@@ -29,6 +29,7 @@ public class Window implements Listener {
     public TextButton collapseButton = new TextButton("+/-");
     public Screen screen;
     int offsetY;
+    List<String> wrappedText = new ArrayList<>();
     private int x, y, windowHeight, windowWidth;
     private boolean isCollapsible;
     private boolean isCollapsed = false;
@@ -66,8 +67,6 @@ public class Window implements Listener {
         this.contentRenderer = contentRenderer;
         EventManager.register(this);
     }
-    List<String> wrappedText = new ArrayList<>();
-
 
     public void setCollapsible(boolean collapsible) {
         isCollapsible = collapsible;

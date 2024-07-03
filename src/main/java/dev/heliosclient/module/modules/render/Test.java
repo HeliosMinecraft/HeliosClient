@@ -47,10 +47,9 @@ public class Test extends Module_ {
             .name("Items")
             .description("Items2")
             .items(new ArrayList<>())
-            .filter(item->true)
+            .filter(item -> true)
             .build()
     );
-
 
 
     public Test() {

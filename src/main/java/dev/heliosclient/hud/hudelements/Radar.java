@@ -1,6 +1,5 @@
 package dev.heliosclient.hud.hudelements;
 
-import com.moandjiezana.toml.Toml;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.module.settings.*;
@@ -17,16 +16,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
-import java.util.Map;
 
 public class Radar extends HudElement {
     private static int RADAR_SIZE = 100; // Size of the radar in pixels
     private static int MAX_DISTANCE = 25; // Maximum entity distance
     public SettingGroup sgRadarSettings = new SettingGroup("General");
     public SettingGroup sgRadarColors = new SettingGroup("Colors");
-
-    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
-
     public DoubleSetting distance = sgRadarSettings.add(new DoubleSetting.Builder()
             .name("Distance To Scale")
             .description("Max Entity distance to be included in the radar")
@@ -37,7 +32,7 @@ public class Radar extends HudElement {
             .value(25.0D)
             .onSettingChange(this)
             .build()
-    );
+    );    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
     public DoubleSetting size = sgRadarSettings.add(new DoubleSetting.Builder()
             .name("Size")
             .description("Radar size")
@@ -240,4 +235,6 @@ public class Radar extends HudElement {
         }
         return color;
     }
+
+
 }

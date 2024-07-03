@@ -63,8 +63,8 @@ public class ClickGUIScreen extends Screen {
     public void onDisplayed() {
         super.onDisplayed();
         //Rerun for any missed font changes.
-        if(categoryPanes != null && !categoryPanes.isEmpty()){
-            for(CategoryPane pane: categoryPanes){
+        if (categoryPanes != null && !categoryPanes.isEmpty()) {
+            for (CategoryPane pane : categoryPanes) {
                 pane.onFontChange(null);
             }
         }

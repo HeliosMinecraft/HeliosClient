@@ -45,7 +45,7 @@ public class Teams extends Module_ {
     }
 
     public boolean isInMyTeam(LivingEntity livingEntity) {
-        if(livingEntity == null){
+        if (livingEntity == null) {
             return false;
         }
 

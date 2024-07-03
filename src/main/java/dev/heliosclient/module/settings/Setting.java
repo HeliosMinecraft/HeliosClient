@@ -1,6 +1,5 @@
 package dev.heliosclient.module.settings;
 
-import com.moandjiezana.toml.Toml;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.CategoryPane;
@@ -330,9 +329,6 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
 
     @Override
     public void loadFromFile(Map<String, Object> MAP) {
-        if (!shouldSaveOrLoad) {
-            return;
-        }
     }
 
     public int getWidthCompact() {

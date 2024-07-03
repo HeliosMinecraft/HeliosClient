@@ -1,8 +1,8 @@
 package dev.heliosclient.hud.hudelements;
 
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ColorUtils;
@@ -59,9 +59,9 @@ public class CoordinatesHud extends HudElement {
             coordY = 0;
             coordZ = 0;
         } else {
-            coordX = (int) MathUtils.round(entityForCoords.getX() / (netherCoords.value? 8 : 1), 0);
-            coordY = (int) MathUtils.round(entityForCoords.getY() / (netherCoords.value? 8 : 1), 0);
-            coordZ = (int) MathUtils.round(entityForCoords.getZ() / (netherCoords.value? 8 : 1), 0);
+            coordX = (int) MathUtils.round(entityForCoords.getX() / (netherCoords.value ? 8 : 1), 0);
+            coordY = (int) MathUtils.round(entityForCoords.getY() / (netherCoords.value ? 8 : 1), 0);
+            coordZ = (int) MathUtils.round(entityForCoords.getZ() / (netherCoords.value ? 8 : 1), 0);
         }
 
         String x = ColorUtils.gray + coordX + ColorUtils.reset;
@@ -69,9 +69,9 @@ public class CoordinatesHud extends HudElement {
         String z = ColorUtils.gray + coordZ;
 
 
-        String text = (!noXYZ.value? "X: ": "") +  x +
-                (!noXYZ.value? " Y: ": ", ")+ y +
-                (!noXYZ.value? " Z: ": ", ") + z;
+        String text = (!noXYZ.value ? "X: " : "") + x +
+                (!noXYZ.value ? " Y: " : ", ") + y +
+                (!noXYZ.value ? " Z: " : ", ") + z;
 
         this.width = Math.round(Renderer2D.getStringWidth(text));
 

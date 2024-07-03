@@ -7,16 +7,13 @@ import dev.heliosclient.event.events.input.KeyReleasedEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.misc.NoNarrator;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -27,19 +24,19 @@ public abstract class KeyboardMixin {
 
     @Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
-        if(key >= 0 && window == MinecraftClient.getInstance().getWindow().getHandle() && InputUtil.isKeyPressed(window,key)) {
+        if (key >= 0 && window == MinecraftClient.getInstance().getWindow().getHandle() && InputUtil.isKeyPressed(window, key)) {
             if (action != GLFW.GLFW_RELEASE) {
                 KeyHeldEvent event = new KeyHeldEvent(window, key, scancode, action, modifiers);
                 EventManager.postEvent(event);
                 if (event.isCanceled()) {
-                   info.cancel();
+                    info.cancel();
                 }
             }
             if (action == GLFW.GLFW_PRESS) {
                 KeyPressedEvent event = new KeyPressedEvent(window, key, scancode, action, modifiers);
                 EventManager.postEvent(event);
                 if (event.isCanceled()) {
-                  info.cancel();
+                    info.cancel();
                 }
             }
             if (action == GLFW.GLFW_RELEASE) {

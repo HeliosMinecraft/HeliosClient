@@ -1,15 +1,17 @@
 package dev.heliosclient.system.config;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.system.HeliosExecutor;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -27,11 +29,10 @@ import java.util.concurrent.Future;
  * @see Config
  */
 public class SubConfig {
-    File configFile;
     private final Gson gson;
-
+    File configFile;
     private Map<String, Object> readData;
-    private Map<String, Object> writeData;
+    private final Map<String, Object> writeData;
 
     private boolean loaded;
 
@@ -60,12 +61,15 @@ public class SubConfig {
         return configFile;
     }
 
-    public String getName() {
-        return configFile.getName();
-    }
-
     public void setConfigFile(File configFile) {
         this.configFile = configFile;
+    }
+
+    public String getName() {
+        if(configFile == null){
+            return "";
+        }
+        return configFile.getName();
     }
 
     public void load() {
@@ -77,21 +81,26 @@ public class SubConfig {
                 }
             }
         } catch (IOException e) {
-            HeliosClient.LOGGER.error("Error saving config \"{}\"",configFile.getAbsolutePath(),e);
+            HeliosClient.LOGGER.error("Error saving config \"{}\"", configFile.getAbsolutePath(), e);
         }
     }
 
     public boolean save(boolean fixReadData) {
-        Future<Boolean> task =  HeliosExecutor.submit(() -> {
+        Future<Boolean> task = HeliosExecutor.submit(() -> {
+            if(writeData.isEmpty()) {
+                HeliosClient.LOGGER.error("Write data was empty!, Saving interrupted. File Path \"{}\"",configFile.getAbsolutePath());
+                return false;
+            }
+
             try (FileWriter writer = new FileWriter(configFile)) {
                 gson.toJson(writeData, writer);
             } catch (IOException e) {
-                HeliosClient.LOGGER.error("Error saving config \"{}\"",configFile.getAbsolutePath(),e);
+                HeliosClient.LOGGER.error("Error saving config \"{}\"", configFile.getAbsolutePath(), e);
                 return false;
             }
 
             //Syncs read data with write data, helps with the hassle of loading again.
-            if(fixReadData) {
+            if (fixReadData) {
                 readData.clear();
                 readData.putAll(writeData);
             }
@@ -102,7 +111,7 @@ public class SubConfig {
         try {
             //safe
             return task.get();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

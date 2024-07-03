@@ -15,14 +15,10 @@ import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 import net.minecraft.util.math.Vec3d;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import static org.lwjgl.opengl.GL11C.*;
 
 public class FakeLag extends Module_ {
     private final List<PlayerMoveC2SPacket> storedPackets = new CopyOnWriteArrayList<>();

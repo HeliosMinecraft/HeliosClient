@@ -8,9 +8,9 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.GUI;
-import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.settings.SettingsScreen;
@@ -73,7 +73,7 @@ public class ModuleButton implements Listener {
         this.x = x;
         this.y = y;
 
-        if(!shouldRender) return;
+        if (!shouldRender) return;
 
         if (hitBox.contains(mouseX, mouseY)) {
             hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 20);
@@ -95,12 +95,12 @@ public class ModuleButton implements Listener {
 
         if (hitBox.contains(mouseX, mouseY)) {
             textY = textY - 1;
-            drawGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y - 1, fillColorStart, fillColorEnd, fillColorEnd, fillColorStart,width, height, 2, 5, blendedColor);
+            drawGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y - 1, fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, width, height, 2, 5, blendedColor);
         } else {
             drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y, width, height, 2);
         }
         if (settingsOpen && boxHeight >= 4) {
-            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2.0f, y + this.height + 2, (float)scale);
+            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2.0f, y + this.height + 2, (float) scale);
             drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorStart, 100), x + 1, y + height, width, boxHeight + 2, 2);
             Renderer2D.stopScaling(drawContext.getMatrices());
         }
@@ -115,29 +115,31 @@ public class ModuleButton implements Listener {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getCustomStringWidth(keyName, FontRenderers.Small_fxfontRenderer)), textY, ColorManager.INSTANCE.defaultTextColor);
         }
     }
-    private void drawGradientRectangle(Matrix4f matrix4f, Color color1, Color color2, Color color3, Color color4,float x, float y, float width, float height, float radius){
-        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
-            Renderer2D.drawRoundedGradientRectangle(matrix4f,color1,color2,color3,color4,x, y,width, height, radius);
-        }else{
-            Renderer2D.drawGradient(matrix4f,x,y,width,height,color1.getRGB(),color3.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
+
+    private void drawGradientRectangle(Matrix4f matrix4f, Color color1, Color color2, Color color3, Color color4, float x, float y, float width, float height, float radius) {
+        if (HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded) {
+            Renderer2D.drawRoundedGradientRectangle(matrix4f, color1, color2, color3, color4, x, y, width, height, radius);
+        } else {
+            Renderer2D.drawGradient(matrix4f, x, y, width, height, color1.getRGB(), color3.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
         }
     }
-    private void drawGradientRectangleWithShadow(MatrixStack stack, float x, float y,Color color1, Color color2, Color color3, Color color4,float width, float height, float radius, int blurRadius, Color blurColor){
-        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
-            Renderer2D.drawRoundedGradientRectangleWithShadow(stack, x, y, width, height,color1,color2,color3,color4, radius,blurRadius,blurColor);
-        }else{
-            Renderer2D.drawGradientWithShadow(stack,x,y,width,height,blurRadius,color1.getRGB(),color3.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
+
+    private void drawGradientRectangleWithShadow(MatrixStack stack, float x, float y, Color color1, Color color2, Color color3, Color color4, float width, float height, float radius, int blurRadius, Color blurColor) {
+        if (HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded) {
+            Renderer2D.drawRoundedGradientRectangleWithShadow(stack, x, y, width, height, color1, color2, color3, color4, radius, blurRadius, blurColor);
+        } else {
+            Renderer2D.drawGradientWithShadow(stack, x, y, width, height, blurRadius, color1.getRGB(), color3.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
         }
     }
 
     public int renderSettings(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        if(!shouldRender) return 0;
+        if (!shouldRender) return 0;
 
         int settingYOffset = 0;
         updateScale(settingsOpen);
         if (scale > 0.0f) {
             settingYOffset = this.height + 2;
-            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + (float) width / 2, y + this.height + 2,(float) scale);
+            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + (float) width / 2, y + this.height + 2, (float) scale);
             for (Setting<?> setting : module.quickSettings) {
                 // Reset the animation if the setting is not visible.
                 if (!setting.shouldRender()) {
@@ -177,7 +179,7 @@ public class ModuleButton implements Listener {
      * Method is called in {@link CategoryPane#mouseClicked(MouseClickEvent)}
      */
     public boolean mouseClicked(double mouseX, double mouseY, int button, Screen eventScreen) {
-        if(!shouldRender) return false;
+        if (!shouldRender) return false;
 
         if (screen != null && eventScreen == screen) {
             if (!collapsed) {

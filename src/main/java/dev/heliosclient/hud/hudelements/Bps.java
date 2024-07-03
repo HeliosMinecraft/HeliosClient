@@ -12,13 +12,11 @@ import net.minecraft.util.math.Vec3d;
 
 
 public class Bps extends HudElement {
-    public static HudElementData<Bps> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second", Bps::new);
-
     public Bps() {
         super(DATA);
         this.width = 40;
         this.height = Math.round(Renderer2D.getStringHeight());
-    }
+    }    public static HudElementData<Bps> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second", Bps::new);
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
@@ -37,7 +35,6 @@ public class Bps extends HudElement {
 
         return Math.abs(MathUtils.length2D(move));
     }
-
 
 
 

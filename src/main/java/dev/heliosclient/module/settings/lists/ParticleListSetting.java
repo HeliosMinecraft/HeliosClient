@@ -27,7 +27,7 @@ public class ParticleListSetting extends ListSetting<ParticleType<?>> {
                                List<ParticleType<?>> defaultSelectedParticles,
                                Predicate<ParticleType<?>> filter,
                                ISettingChange iSettingChange) {
-        super(name,description,shouldRender, defaultValue,defaultSelectedParticles,filter,iSettingChange,Registries.PARTICLE_TYPE);
+        super(name, description, shouldRender, defaultValue, defaultSelectedParticles, filter, iSettingChange, Registries.PARTICLE_TYPE);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ParticleListSetting extends ListSetting<ParticleType<?>> {
                     // Handle click on the Particles
                     if (selectedEntries.contains(particleType)) {
                         selectedEntries.remove(particleType);
-                    } else if(selectedEntries.size() < maxSelectable){
+                    } else if (selectedEntries.size() < maxSelectable) {
                         selectedEntries.add(particleType);
                     }
                     postSettingChange();
@@ -67,10 +67,10 @@ public class ParticleListSetting extends ListSetting<ParticleType<?>> {
         for (ParticleType<?> particleType : getDisplayableEntries()) {
             if (filter.test(particleType)) {
                 String text = getEntryName(particleType);
-                Renderer2D.drawFixedString(drawContext.getMatrices(),text,x + 3,y + offsetY,-1);
+                Renderer2D.drawFixedString(drawContext.getMatrices(), text, x + 3, y + offsetY, -1);
 
                 Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + window.getWindowWidth() - 15, y + offsetY, 10, 10, 2, 0.7f, 0xFFFFFFFF);
-                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),  x + window.getWindowWidth() - 13.3f, y + 1.7f + offsetY, 6.3f, 6.3f,2, selectedEntries.contains(particleType) ? HeliosClient.CLICKGUI.getAccentColor() : 0xFF222222);
+                Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + window.getWindowWidth() - 13.3f, y + 1.7f + offsetY, 6.3f, 6.3f, 2, selectedEntries.contains(particleType) ? HeliosClient.CLICKGUI.getAccentColor() : 0xFF222222);
 
 
                 offsetY += Renderer2D.getFxStringHeight(text) + 5;
@@ -81,8 +81,8 @@ public class ParticleListSetting extends ListSetting<ParticleType<?>> {
 
 
     public static class Builder extends Setting.SettingBuilder<Builder, List<ParticleType<?>>, ParticleListSetting> {
-        private Predicate<ParticleType<?>> filter = Particles -> true; // default filter: always true
         List<ParticleType<?>> defaultSelectedParticles = new ArrayList<>();
+        private Predicate<ParticleType<?>> filter = Particles -> true; // default filter: always true
         private ISettingChange iSettingChange;
 
         public Builder() {
@@ -93,11 +93,13 @@ public class ParticleListSetting extends ListSetting<ParticleType<?>> {
             this.defaultSelectedParticles = defaultSelectedParticles;
             return this;
         }
+
         public Builder particles(ParticleType<?>... defaultSelectedParticles) {
-            if(defaultSelectedParticles != null)
+            if (defaultSelectedParticles != null)
                 Collections.addAll(this.defaultSelectedParticles, defaultSelectedParticles);
             return this;
         }
+
         public Builder iSettingChange(ISettingChange change) {
             this.iSettingChange = change;
             return this;
@@ -110,7 +112,7 @@ public class ParticleListSetting extends ListSetting<ParticleType<?>> {
 
         @Override
         public ParticleListSetting build() {
-            return new ParticleListSetting(name,description,shouldRender, defaultValue,defaultSelectedParticles, filter,iSettingChange);
+            return new ParticleListSetting(name, description, shouldRender, defaultValue, defaultSelectedParticles, filter, iSettingChange);
         }
     }
 }

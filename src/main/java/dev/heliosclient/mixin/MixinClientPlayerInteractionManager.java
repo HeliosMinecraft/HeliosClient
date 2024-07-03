@@ -10,7 +10,6 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.player.NoBreakDelay;
 import dev.heliosclient.module.modules.render.Freecam;
-import dev.heliosclient.util.player.FreeCamEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -36,9 +35,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinClientPlayerInteractionManager {
 
     @Shadow
-    public abstract float getReachDistance();
+    @Final
+    private MinecraftClient client;
 
-    @Shadow @Final private MinecraftClient client;
+    @Shadow
+    public abstract float getReachDistance();
 
     @Inject(method = "getReachDistance()F", at = @At(value = "HEAD"), cancellable = true)
     private void getReach(CallbackInfoReturnable<Float> cir) {
@@ -66,7 +67,7 @@ public abstract class MixinClientPlayerInteractionManager {
     @Inject(method = "attackEntity", at = @At(value = "HEAD"), cancellable = true)
     private void onAttackEntityPRE(PlayerEntity player, Entity target, CallbackInfo ci) {
         Freecam freecam = ModuleManager.get(Freecam.class);
-        if(freecam.isActive() && target == client.player){
+        if (freecam.isActive() && target == client.player) {
             ci.cancel();
         }
 
@@ -83,6 +84,7 @@ public abstract class MixinClientPlayerInteractionManager {
             cir.cancel();
         }
     }
+
     @Inject(method = "interactBlock", at = @At(value = "HEAD"), cancellable = true)
     private void onInteractBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
         BlockInteractEvent event = new BlockInteractEvent(hitResult, hand);
@@ -91,6 +93,7 @@ public abstract class MixinClientPlayerInteractionManager {
             cir.cancel();
         }
     }
+
     @Inject(method = "breakBlock", at = @At(value = "HEAD"), cancellable = true)
     private void onBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         BlockState state = client.player.getWorld().getBlockState(pos);

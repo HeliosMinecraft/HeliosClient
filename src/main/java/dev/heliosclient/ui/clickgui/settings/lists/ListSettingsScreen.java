@@ -14,8 +14,8 @@ import org.lwjgl.glfw.GLFW;
 public class ListSettingsScreen extends Screen implements IWindowContentRenderer {
     private final Window window;
     private final ListSetting<?> setting;
-    int windowWidth = 258, windowHeight = 140;
     private final SearchBar searchBar;
+    int windowWidth = 258, windowHeight = 140;
 
     public ListSettingsScreen(ListSetting<?> setting) {
         super(Text.of(setting.name));
@@ -35,7 +35,7 @@ public class ListSettingsScreen extends Screen implements IWindowContentRenderer
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        window.render(context,mouseX,mouseY,setting.name,setting.description,textRenderer);
+        window.render(context, mouseX, mouseY, setting.name, setting.description, textRenderer);
         setting.setSearchTerm(searchBar.getValue());
     }
 
@@ -47,7 +47,7 @@ public class ListSettingsScreen extends Screen implements IWindowContentRenderer
             }
         });
 
-        setting.handleMouseClick(mouseX,mouseY,button,window);
+        setting.handleMouseClick(mouseX, mouseY, button, window);
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -95,10 +95,10 @@ public class ListSettingsScreen extends Screen implements IWindowContentRenderer
 
     @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
-        searchBar.render(drawContext,x + windowWidth/2 - 66,y,mouseX,mouseY,textRenderer);
+        searchBar.render(drawContext, x + windowWidth / 2 - 66, y, mouseX, mouseY, textRenderer);
 
         if (setting != null) {
-            windowHeight = setting.handleRenderingEntries(drawContext,x + 1, y + 30, mouseX,mouseY,window);
+            windowHeight = setting.handleRenderingEntries(drawContext, x + 1, y + 30, mouseX, mouseY, window);
             window.setWindowHeight(windowHeight + 60);
         }
     }

@@ -4,8 +4,8 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.lists.ItemListSetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.settings.lists.ItemListSetting;
 import dev.heliosclient.util.player.InventoryUtils;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -16,7 +16,7 @@ public class InventoryCleaner extends Module_ {
     ItemListSetting items = sgGeneral.add(new ItemListSetting.Builder()
             .name("Items")
             .description("The items to drop from inventory")
-            .items(Items.STRING,Items.ROTTEN_FLESH,Items.SPIDER_EYE,Items.BONE)
+            .items(Items.STRING, Items.ROTTEN_FLESH, Items.SPIDER_EYE, Items.BONE)
             .build()
     );
 
@@ -30,7 +30,7 @@ public class InventoryCleaner extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        for(Item item: items.getSelectedEntries()) {
+        for (Item item : items.getSelectedEntries()) {
             InventoryUtils.dropAllItems(item);
         }
     }

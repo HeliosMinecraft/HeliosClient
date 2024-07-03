@@ -10,8 +10,10 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
@@ -126,7 +128,7 @@ public class CycleSetting extends Setting<Integer> {
 
     @Override
     public Object saveToFile(List<Object> objectList) {
-        if (options.isEmpty() || options.size() - 1 < value || !shouldSaveOrLoad) {
+        if (options.isEmpty() || options.size() - 1 < value) {
             return "";
         }
         return options.get(value);
@@ -134,10 +136,7 @@ public class CycleSetting extends Setting<Integer> {
 
     @Override
     public void loadFromFile(Map<String, Object> MAP) {
-        if(this.name.contains("switch")){
-            System.out.println(MAP);
-        }
-        if(!shouldSaveOrLoad){
+        if (!shouldSaveOrLoad) {
             return;
         }
         if (MAP.get(getSaveName()) == null) {
@@ -157,7 +156,11 @@ public class CycleSetting extends Setting<Integer> {
     }
 
     public Object getOption() {
-        return options.get(value);
+        if(value >= 0 && value < options.size()) {
+            return options.get(value);
+        }
+
+        return null;
     }
 
     public static class Builder extends SettingBuilder<Builder, List<?>, CycleSetting> {

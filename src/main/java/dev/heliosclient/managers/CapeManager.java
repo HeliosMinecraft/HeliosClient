@@ -33,28 +33,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class CapeManager {
-    public static CapeManager INSTANCE = new CapeManager();
-
     //Where we store and get our capes.
     private static final File CAPE_DIRECTORY = new File(HeliosClient.MC.runDirectory, "heliosclient/capes");
-
-
     private static final String DEFAULT_CAPE = "helioscape.png";
     //The default CURRENT_PLAYER_CAPE texture of heliosclient.
     public static final Identifier DEFAULT_CAPE_TEXTURE = new Identifier("heliosclient", "capes/" + DEFAULT_CAPE);
     //All the capes which are registered in the dynamic texture manager
     private static final Set<String> registeredTextures = new HashSet<>();
-
-    //These maps are supposed to be used when we need to check for heliosclient users to apply capes to them
-    // (this will be moved to somewhere else probably)
-
     //A map of all CURRENT_PLAYER_CAPE textures keyed with the UUID
     private static final Map<UUID, Identifier> CAPES = new HashMap<>();
 
+    //These maps are supposed to be used when we need to check for heliosclient users to apply capes to them
+    // (this will be moved to somewhere else probably)
     //A map of all elytra textures keyed with the UUID
     private static final Map<UUID, Identifier> ELYTRAS = new HashMap<>();
-
-
+    public static CapeManager INSTANCE = new CapeManager();
     //A string of the names of the CURRENT_PLAYER_CAPE. Used in CapeModule
     public static String[] CAPE_NAMES = new String[]{};
 

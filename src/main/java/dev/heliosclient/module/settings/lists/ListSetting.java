@@ -1,6 +1,5 @@
 package dev.heliosclient.module.settings.lists;
 
-import com.moandjiezana.toml.Toml;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.settings.ParentScreenSetting;
 import dev.heliosclient.ui.clickgui.gui.Window;
@@ -22,29 +21,28 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
 public abstract class ListSetting<T extends Object> extends ParentScreenSetting<List<T>> {
-    public List<T> value;
-    public List<T> defaultValue;
-
     protected final Predicate<T> filter;
     protected final List<T> selectedEntries = new ArrayList<>();
     protected final List<T> defaultSelectedEntries = new ArrayList<>();
     protected final List<T> searchRelevantEntries = new ArrayList<>();
+    public List<T> value;
+    public List<T> defaultValue;
     public int maxSelectable = Integer.MAX_VALUE;
     public boolean showSelected = true;
+    public ISettingChange iSettingChange;
     protected float nameWidth = 10;
     protected String searchTerm = ""; // added search term field
     protected Registry<T> registry;
-    public ISettingChange iSettingChange;
 
 
-    public ListSetting(String name, String description, BooleanSupplier shouldRender, List<T> defaultValue, List<T> defaultSelected, Predicate<T> filter, ISettingChange iSettingChange,Registry<T> registry) {
+    public ListSetting(String name, String description, BooleanSupplier shouldRender, List<T> defaultValue, List<T> defaultSelected, Predicate<T> filter, ISettingChange iSettingChange, Registry<T> registry) {
         super(shouldRender, defaultValue);
         this.value = defaultValue;
         this.name = name;
         this.description = description;
         this.filter = filter;
         this.height = 24;
-        this.heightCompact = 24;
+        this.heightCompact = 20;
         this.selectedEntries.addAll(defaultSelected);
         this.defaultSelectedEntries.addAll(defaultSelected);
         this.registry = registry;
@@ -61,17 +59,19 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
         // Draw a '🖋' button next to the text
         nameWidth = Renderer2D.getFxStringWidth(name);
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + nameWidth + 11, y + 3, 11, 11, Color.BLACK.getRGB());
-        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + nameWidth + 11, y + 3, 11, 11, 0.4f, (hoveredOverEdit(mouseX, mouseY))? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + nameWidth + 11, y + 3, 11, 11, 0.4f, (hoveredOverEdit(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
 
         FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), "\uEAF3", x + nameWidth + 12.4f, y + 4.5f, -1);
     }
 
     public abstract String getEntryName(T e);
+
     public abstract void handleMouseClick(double mouseX, double mouseY, int button, Window window);
+
     public abstract int handleRenderingEntries(DrawContext drawContext, int x, int y, int mouseX, int mouseY, Window window);
 
-    public List<T> getDisplayableEntries(){
-        return checkForSearchRelevancy()? searchRelevantEntries : value;
+    public List<T> getDisplayableEntries() {
+        return checkForSearchRelevancy() ? searchRelevantEntries : value;
     }
 
     public boolean checkForSearchRelevancy() {
@@ -103,7 +103,7 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
         // Draw a '🖋' button next to the text
         nameWidth = Renderer2D.getFxStringWidth(FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth));
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + nameWidth + 11, y + 3, 11, 11, Color.black.getRGB());
-        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + nameWidth + 11, y + 3, 11, 11, 0.4f, (hoveredOverEdit(mouseX, mouseY))? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + nameWidth + 11, y + 3, 11, 11, 0.4f, (hoveredOverEdit(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
 
         FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), "\uEAF3", x + nameWidth + 12.4f, y + 4.5f, -1);
     }
@@ -129,9 +129,9 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
         }
     }
 
-    protected void postSettingChange(){
-        if(iSettingChange != null){
-            iSettingChange.onSettingChange(this );
+    protected void postSettingChange() {
+        if (iSettingChange != null) {
+            iSettingChange.onSettingChange(this);
         }
     }
 
@@ -147,6 +147,7 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
     public List<T> getSelectedEntries() {
         return selectedEntries;
     }
+
     @Override
     public void setValue(List<T> value) {
         this.value.clear();
@@ -156,6 +157,7 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
             }
         }
     }
+
     @Override
     public Object saveToFile(List<Object> objectList) {
         for (T entry : selectedEntries) {
@@ -166,18 +168,20 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
 
     @Override
     public void loadFromFile(Map<String, Object> MAP) {
-        List<Double> tomlSelectedItem = (List<Double>) MAP.get(getSaveName());
+        List<Object> tomlSelectedItem = (List<Object>) MAP.get(getSaveName());
+
         selectedEntries.clear();
         if (tomlSelectedItem != null) {
-            for (Double entryID : tomlSelectedItem) {
-                T retrievedEntry = registry.getEntry(MathUtils.d2iSafe(entryID)).get().value();
+            for (Object objectEntryID : tomlSelectedItem) {
+                int entryID = MathUtils.o2iSafe(objectEntryID);
+                T retrievedEntry = registry.getEntry(entryID).get().value();
                 if (retrievedEntry != null) {
                     selectedEntries.add(retrievedEntry);
                 } else {
                     HeliosClient.LOGGER.error("Entry of id {} was not found in setting {}", entryID, this.name);
                 }
             }
-        }else{
+        } else {
             selectedEntries.addAll(defaultSelectedEntries);
         }
     }

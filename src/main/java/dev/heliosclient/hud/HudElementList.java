@@ -2,7 +2,6 @@ package dev.heliosclient.hud;
 
 import dev.heliosclient.hud.hudelements.*;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
-import net.minecraft.screen.GenericContainerScreenHandler;
 
 import java.util.Map;
 import java.util.TreeMap;

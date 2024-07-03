@@ -38,7 +38,7 @@ public class ViewModel extends Module_ {
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
-            .shouldRender(()->oldAnimations.value)
+            .shouldRender(() -> oldAnimations.value)
             .build()
     );
     public DoubleSetting swingSpeed = sgGeneral.add(new DoubleSetting.Builder()
@@ -172,7 +172,7 @@ public class ViewModel extends Module_ {
 
     @SubscribeEvent
     public void onHeldItemRender(HeldItemRendererEvent event) {
-        if(oldAnimations.value && swordAnimation.value && mc.player.getMainHandStack().getItem() instanceof SwordItem && mc.options.useKey.isPressed()) {
+        if (oldAnimations.value && swordAnimation.value && mc.player.getMainHandStack().getItem() instanceof SwordItem && mc.options.useKey.isPressed()) {
             if (event.getHand() == Hand.MAIN_HAND) {
                 event.getMatrix().multiply(RotationAxis.POSITIVE_X.rotationDegrees(-95));
                 event.getMatrix().multiply(RotationAxis.POSITIVE_Y.rotationDegrees(0));

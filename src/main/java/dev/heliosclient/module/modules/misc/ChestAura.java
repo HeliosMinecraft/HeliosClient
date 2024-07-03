@@ -56,7 +56,7 @@ public class ChestAura extends Module_ {
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER e) {
         if (isStealing || mc.player == null || mc.interactionManager == null)
-             return;
+            return;
 
         ChunkUtils.getBlockEntityStreamInChunks().forEach(blockEntity -> {
             if (!containersOpened.contains(blockEntity) && mc.player.getBlockPos().isWithinDistance(blockEntity.getPos(), mc.interactionManager.getReachDistance() - 0.5)) {
@@ -67,7 +67,7 @@ public class ChestAura extends Module_ {
 
                     if (rotate.value) {
                         Vec3d pos = blockEntity.getPos().toCenterPos();
-                        RotationSimulator.INSTANCE.simulateRotation(RotationUtils.getYaw(pos), RotationUtils.getPitch(pos), false, () -> interact(blockEntity), 4,0);
+                        RotationSimulator.INSTANCE.simulateRotation(RotationUtils.getYaw(pos), RotationUtils.getPitch(pos), false, () -> interact(blockEntity), 4, 0);
                     } else {
                         interact(blockEntity);
                     }
@@ -86,7 +86,7 @@ public class ChestAura extends Module_ {
         if (result == ActionResult.SUCCESS) {
             containersOpened.add(blockEntity);
             if (!autoSteal.value) {
-                if(mc.currentScreen != null)
+                if (mc.currentScreen != null)
                     mc.currentScreen.close();
 
                 mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));

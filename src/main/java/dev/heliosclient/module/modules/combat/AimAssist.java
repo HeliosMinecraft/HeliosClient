@@ -11,7 +11,6 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.EntityUtils;
 import dev.heliosclient.util.SortMethod;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.player.PlayerUtils;
@@ -25,13 +24,7 @@ import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class AimAssist extends Module_ {
@@ -171,11 +164,12 @@ public class AimAssist extends Module_ {
         simulator.clearRotations();
     }
 
-    private boolean isDead(Entity entity){
+    private boolean isDead(Entity entity) {
         return deadCheck.value && !entity.isAlive();
     }
-    private boolean isEntityVisible(Entity entity){
-        if(!canSeeEntity.value){
+
+    private boolean isEntityVisible(Entity entity) {
+        if (!canSeeEntity.value) {
             return true;
         }
 
@@ -186,15 +180,15 @@ public class AimAssist extends Module_ {
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
         RotationSimulator.pauseInGUI = pauseInGUI.value;
-        simulateRotationLook(range.value,ignoreTeammate.value, null);
+        simulateRotationLook(range.value, ignoreTeammate.value, null);
     }
 
-    public void simulateRotationLook(double range, boolean ignoreTeammate, LivingEntity entity){
+    public void simulateRotationLook(double range, boolean ignoreTeammate, LivingEntity entity) {
         LivingEntity targetEntity = entity;
 
-        if(targetEntity == null) {
+        if (targetEntity == null) {
             TargetUtils.getInstance().setRange(range);
-            targetEntity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range && isEntityVisible(entity1),true);
+            targetEntity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range && isEntityVisible(entity1), true);
         }
 
         if (ignoreTeammate && ModuleManager.get(Teams.class).isInMyTeam(targetEntity)) {
@@ -203,8 +197,8 @@ public class AimAssist extends Module_ {
 
         if (targetEntity != null && !isDead(targetEntity)) {
             if (simulateRotation.value) {
-                simulator.simulateRotation(targetEntity, false, null, (int) simulateTime.value, (int) randomness.value, (RotationUtils.LookAtPos) lookAt.getOption(),(EasingType) easing.getOption());
-            } else if(!pauseInGUI.value && mc.currentScreen == null){
+                simulator.simulateRotation(targetEntity, false, null, (int) simulateTime.value, (int) randomness.value, (RotationUtils.LookAtPos) lookAt.getOption(), (EasingType) easing.getOption());
+            } else if (!pauseInGUI.value && mc.currentScreen == null) {
                 RotationUtils.lookAt(targetEntity, (RotationUtils.LookAtPos) lookAt.getOption());
             }
         } else {

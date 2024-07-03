@@ -43,7 +43,7 @@ public class TickEvent extends Event {
 
         private PlayerEntity player;
 
-        public static PLAYER get(PlayerEntity player){
+        public static PLAYER get(PlayerEntity player) {
             INSTANCE.player = player;
             return INSTANCE;
         }

@@ -40,6 +40,24 @@ public class MathUtils {
         }
         return out;
     }
+    public static int o2iSafe(Object obj) {
+        int result;
+        try {
+            if (obj instanceof Double db) {
+                result = ((Double) obj).intValue();
+            } else if (obj instanceof Float) {
+                result = ((Float) obj).intValue();
+            } else if (obj instanceof Integer) {
+                result = (Integer) obj;
+            } else {
+                throw new IllegalArgumentException("Object is not an instance of Double, Float or Integer");
+            }
+        } catch (ClassCastException e) {
+            // This should never happen if we've checked the instance correctly
+            throw new RuntimeException("Unexpected ClassCastException", e);
+        }
+        return result;
+    }
 
     public static double length2D(Vec3d vec3d) {
         return MathHelper.sqrt((float) (vec3d.x * vec3d.x + vec3d.z * vec3d.z));

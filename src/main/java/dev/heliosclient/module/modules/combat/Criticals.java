@@ -4,12 +4,12 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.player.PacketEvent;
 import dev.heliosclient.event.events.player.PlayerAttackEntityEvent;
-import dev.heliosclient.system.mixininterface.IPlayerInteractEntityC2SPacket;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.system.mixininterface.IPlayerInteractEntityC2SPacket;
 import dev.heliosclient.system.mixininterface.IVec3d;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
@@ -98,16 +98,16 @@ public class Criticals extends Module_ {
 
     @SubscribeEvent
     public void onPacketSend(PacketEvent.SEND event) {
-        if(mc.player == null || skipCrit()) return;
+        if (mc.player == null || skipCrit()) return;
 
         if (event.packet instanceof IPlayerInteractEntityC2SPacket packet && packet.getType() == PlayerInteractEntityC2SPacket.InteractType.ATTACK) {
             if (attackPacket != null) return;
 
             boolean isJumpMode = mode.getOption() == Mode.Jump;
-            if(isJumpMode || mode.getOption() == Mode.MiniJump)  {
-                if(isJumpMode) {
+            if (isJumpMode || mode.getOption() == Mode.MiniJump) {
+                if (isJumpMode) {
                     mc.player.jump();
-                }else{
+                } else {
                     ((IVec3d) mc.player.getVelocity()).heliosClient$set(mc.player.getVelocity().x, 0.27, mc.player.getVelocity().z);
                 }
 
@@ -128,14 +128,14 @@ public class Criticals extends Module_ {
     public void onTick(TickEvent.PLAYER event) {
         tickTimer++;
 
-        if(sendTimer <= 0) {
+        if (sendTimer <= 0) {
             if (mode.getOption() == Mode.Jump && attackPacket != null && swingPacket != null) {
                 sendPacketNoEvent(attackPacket);
                 sendPacketNoEvent(swingPacket);
                 attackPacket = null;
                 swingPacket = null;
             }
-        }else{
+        } else {
             sendTimer--;
         }
     }
@@ -144,7 +144,7 @@ public class Criticals extends Module_ {
         return !mc.player.isOnGround() || mc.player.isSubmergedInWater() || mc.player.isInLava() || mc.player.isClimbing();
     }
 
-    public void sendPacketNoEvent(Packet<?> p){
+    public void sendPacketNoEvent(Packet<?> p) {
         mc.getNetworkHandler().getConnection().send(p);
     }
 

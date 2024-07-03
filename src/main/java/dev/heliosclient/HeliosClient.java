@@ -58,6 +58,12 @@ public class HeliosClient implements ModInitializer, Listener {
         load(config -> {
             CONFIG.loadEverything();
             LOGGER.info("Loading Config complete in: {}s", configTimer.getElapsedTime());
+
+            String configSelectedbefore = (String) CONFIG.otherConfigManager.getCurrentConfig().getReadData().get(CLICKGUI.switchConfigs.getSaveName());
+            if (configSelectedbefore != null) {
+                CONFIG.getModuleConfigManager().switchConfig(configSelectedbefore, false);
+                loadModulesOnly();
+            }
         });
     }
 
@@ -80,7 +86,7 @@ public class HeliosClient implements ModInitializer, Listener {
     public static void loadModulesOnly() {
         load(config -> {
             CONFIG.getModuleConfigManager().load();
-            CONFIG.load();
+            CONFIG.loadModules();
 
             LOGGER.info("Loading Module config complete in: {}s", configTimer.getElapsedTime());
         });
@@ -166,6 +172,8 @@ public class HeliosClient implements ModInitializer, Listener {
                 DiscordRPC.INSTANCE.stopPresence();
             }
         });
+        //Saving is also handled in MixinCrashReport and ClickGUI.java
+
 
         MC.execute(() -> {
             while (MC.getWindow() == null) {

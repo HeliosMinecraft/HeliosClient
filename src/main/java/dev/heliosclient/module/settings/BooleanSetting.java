@@ -1,6 +1,5 @@
 package dev.heliosclient.module.settings;
 
-import com.moandjiezana.toml.Toml;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;

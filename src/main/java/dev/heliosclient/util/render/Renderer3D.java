@@ -16,10 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.*;
-
-import static org.lwjgl.opengl.GL32C.*;
-
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.function.Consumer;

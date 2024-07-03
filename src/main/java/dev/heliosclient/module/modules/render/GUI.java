@@ -7,9 +7,7 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
-import jdk.jfr.FlightRecorder;
 
 import java.awt.*;
 import java.util.ArrayList;

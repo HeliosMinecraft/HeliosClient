@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
+import static dev.heliosclient.HeliosClient.LOGGER;
 
 /**
  * This is the actual class that manages every config of HeliosClient
@@ -38,40 +38,41 @@ public class Config {
     public Config() {
     }
 
-    public void init(){
+    public void init() {
         ModuleManager.init();
 
         //Assume that client config file has a key saved with name "config" which represents the config name we were using
         //String defaultFileName = otherConfigManager.getReadData().get("config");
-        moduleConfigManager = new ConfigManager(HeliosClient.SAVE_FOLDER.getAbsolutePath() + "/modules","modules");
+        moduleConfigManager = new ConfigManager(HeliosClient.SAVE_FOLDER.getAbsolutePath() + "/modules", "modules");
 
-        otherConfigManager = new ConfigManager(HeliosClient.SAVE_FOLDER.getAbsolutePath(),"config");
+        otherConfigManager = new ConfigManager(HeliosClient.SAVE_FOLDER.getAbsolutePath(), "config");
         otherConfigManager.createAndAdd("hud");
 
 
-     //  loadConfigManagers();
+        //  loadConfigManagers();
     }
 
-    public void loadEverything(){
+    public void loadEverything() {
         loadConfigManagers();
 
         load();
     }
-    public void saveEverything(){
-        writeConfigData();
 
-        moduleConfigManager.save(true);
+    public void saveEverything() {
+        writeConfigData();
 
         otherConfigManager.save(true);
         otherConfigManager.getSubConfig("hud").save(true);
-    }
-    public void writeConfigData(){
-        writeClientConfig();
-        writeModuleConfig();
-        writeHudConfig();
+        moduleConfigManager.save(true);
     }
 
-    public void load(){
+    public void writeConfigData() {
+        writeClientConfig();
+        writeHudConfig();
+        writeModuleConfig();
+    }
+
+    public void load() {
         loadClientConfigModules();
         loadHudElements();
         loadModules();
@@ -84,33 +85,37 @@ public class Config {
     }
 
 
-    public void loadConfigManagers(){
+    public void loadConfigManagers() {
         //Loads default config if any of the files are empty
 
-        if(otherConfigManager.checkIfEmpty()){
+        if (otherConfigManager.checkIfEmpty()) {
+            LOGGER.warn("Client config is empty!");
             writeClientConfig();
             otherConfigManager.save(true);
-        }else{
+        } else {
             otherConfigManager.load();
         }
 
-        if(moduleConfigManager.checkIfEmpty()){
+        if (moduleConfigManager.checkIfEmpty()) {
+            LOGGER.warn("Module config is empty!");
             writeDefaultModuleConfig();
             moduleConfigManager.save(true);
-        }else{
+        } else {
+            LOGGER.info("Loading Module Config \"{}\"",moduleConfigManager.getCurrentConfig().getName());
             moduleConfigManager.load();
         }
 
-        if(otherConfigManager.checkIfEmpty("hud")){
+        if (otherConfigManager.checkIfEmpty("hud")) {
+            LOGGER.warn("HUD config is empty!");
             writeHudConfig();
             otherConfigManager.getSubConfig("hud").save(true);
-        }else{
+        } else {
             otherConfigManager.getSubConfig("hud").load();
         }
     }
 
     public void loadModules() {
-        Map<String, Object> panesMap = cast( moduleConfigManager.getCurrentConfig().getReadData().get("panes"));
+        Map<String, Object> panesMap = cast(moduleConfigManager.getCurrentConfig().getReadData().get("panes"));
         // This is the file structure //
         //     panes                  //
         //       |                    //
@@ -139,7 +144,7 @@ public class Config {
         LOGGER.info("Loading Modules Complete");
     }
 
-    public Map<String, Object> cast(Object e){
+    public Map<String, Object> cast(Object e) {
         return (Map<String, Object>) e;
     }
 
@@ -153,10 +158,9 @@ public class Config {
 
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
-                if (!setting.shouldSaveAndLoad()) break;
+                if (!setting.shouldSaveAndLoad()) continue;
 
                 if (setting.name != null) {
-
                     if (settingsMap != null)
                         setting.loadFromFile(settingsMap);
 
@@ -173,7 +177,7 @@ public class Config {
         Map<String, Object> ModuleConfig = new HashMap<>();
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
-                if (!setting.shouldSaveAndLoad()) break;
+                if (!setting.shouldSaveAndLoad()) continue;
 
                 if (setting.name != null) {
                     ModuleConfig.put(setting.getSaveName(), setting.saveToFile(new ArrayList<>()));
@@ -181,7 +185,7 @@ public class Config {
             }
         }
         otherConfigManager.put("settings", ModuleConfig);
-        
+
         otherConfigManager.put("prefix", ".");
     }
 
@@ -258,9 +262,14 @@ public class Config {
             HudElementData<?> hudElementData = HudElementList.INSTANCE.elementDataMap.get((String) elementMap.get("name"));
             HudElement hudElement = hudElementData.create();
             if (hudElement != null) {
-                hudElement.loadFromFile(elementMap);
-                hudElement.id.setUniqueID(string);
-                HudManager.INSTANCE.addHudElement(hudElement);
+
+                try {
+                    hudElement.loadFromFile(elementMap);
+                    hudElement.id.setUniqueID(string);
+                    HudManager.INSTANCE.addHudElement(hudElement);
+                }catch (Exception e){
+                    LOGGER.error("An error occurred while loading hud element {}",hudElement.name);
+                }
             }
         }
     }
@@ -281,7 +290,7 @@ public class Config {
             if (string.equals(element.id.uniqueID)) {
                 for (SettingGroup settingGroup : element.settingGroups) {
                     for (Setting<?> setting : settingGroup.getSettings()) {
-                        if (!setting.shouldSaveAndLoad()) break;
+                        if (!setting.shouldSaveAndLoad()) continue;
 
                         setting.loadFromFile(elementMap);
                     }

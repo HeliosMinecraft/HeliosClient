@@ -18,7 +18,7 @@ public class SafeWalk extends Module_ {
     @SubscribeEvent
     public void onClip(ClipAtLedgeEvent event) {
 
-         event.setCanceled(true);
+        event.setCanceled(true);
 
     }
 }

@@ -1,6 +1,5 @@
 package dev.heliosclient.module.settings;
 
-import com.moandjiezana.toml.Toml;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;

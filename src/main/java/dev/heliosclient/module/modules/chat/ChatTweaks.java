@@ -154,7 +154,7 @@ public class ChatTweaks extends Module_ {
         ChatUtils.sendHeliosMsg("You just died at " + playerPos);
     }
 
-    public boolean noKeyRestriction(){
+    public boolean noKeyRestriction() {
         return isActive() && noKeyRestriction.value;
     }
 }

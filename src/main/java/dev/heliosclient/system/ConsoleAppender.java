@@ -6,8 +6,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 
-import java.util.Objects;
-
 
 public class ConsoleAppender extends AbstractAppender {
     ConsoleScreen screen;
@@ -46,11 +44,11 @@ public class ConsoleAppender extends AbstractAppender {
 
         if (event.getLoggerName().contains("net.minecraft") || event.getLoggerName().contains("com.mojang")) {
             message = ColorUtils.darkGreen + "[Minecraft] " + ColorUtils.reset + message;
-        }else if (event.getLoggerName().equalsIgnoreCase("HeliosClient")) {
+        } else if (event.getLoggerName().equalsIgnoreCase("HeliosClient")) {
             message = ColorUtils.yellow + "[HeliosClient] " + ColorUtils.reset + message;
-        }else if (event.getLoggerName().contains("Fabric")) {
+        } else if (event.getLoggerName().contains("Fabric")) {
             message = ColorUtils.darkAqua + "[Fabric] " + ColorUtils.reset + message;
-        }else if (event.getLoggerName().contains("ModMenu")) {
+        } else if (event.getLoggerName().contains("ModMenu")) {
             message = ColorUtils.darkBlue + "[ModMenu] " + ColorUtils.reset + message;
         }
 

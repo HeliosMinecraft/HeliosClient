@@ -1,7 +1,9 @@
 package dev.heliosclient.ui.clickgui.settings;
 
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.*;
+import dev.heliosclient.module.settings.ParentScreenSetting;
+import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.Tooltip;

@@ -157,7 +157,8 @@ public class MultiLineInputBox implements Listener {
     public void addLine(String text) {
         this.lines.addAll(Arrays.asList(text.split("\n")));
     }
-    public void clearAll(){
+
+    public void clearAll() {
         this.focused = false;
         this.cursorLine = 0;
         this.cursorPosition = 0;

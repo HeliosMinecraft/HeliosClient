@@ -1,7 +1,6 @@
 package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.managers.ColorManager;
@@ -11,16 +10,13 @@ import net.minecraft.client.gui.DrawContext;
 
 public class ClientTag extends HudElement {
 
-    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
-
-
     public ClientTag() {
         super(DATA);
         this.width = 20;
         this.height = Math.round(Renderer2D.getStringHeight());
         this.draggable = false;
         this.renderOutLineBox = false;
-    }
+    }    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
@@ -31,4 +27,7 @@ public class ClientTag extends HudElement {
 
         super.renderElement(drawContext, textRenderer);
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, ColorManager.INSTANCE.hudColor);
-    }}
+    }
+
+
+}

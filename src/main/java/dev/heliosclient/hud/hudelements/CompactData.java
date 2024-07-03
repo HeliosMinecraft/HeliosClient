@@ -1,8 +1,8 @@
 package dev.heliosclient.hud.hudelements;
 
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.system.TickRate;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
@@ -97,8 +97,6 @@ public class CompactData extends HudElement {
 
     }
 
-    public static HudElementData<CompactData> DATA = new HudElementData<>("CompactData", "Displays data in compact manner", CompactData::new);
-
     private double moveSpeed() {
         if (mc.player == null) {
             return 0;
@@ -106,6 +104,8 @@ public class CompactData extends HudElement {
         Vec3d move = new Vec3d(mc.player.getX() - mc.player.prevX, 0, mc.player.getZ() - mc.player.prevZ).multiply(20);
 
         return Math.abs(MathUtils.length2D(move));
-    }
+    }    public static HudElementData<CompactData> DATA = new HudElementData<>("CompactData", "Displays data in compact manner", CompactData::new);
+
+
 
 }

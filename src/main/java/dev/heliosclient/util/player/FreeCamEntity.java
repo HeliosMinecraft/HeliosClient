@@ -44,11 +44,6 @@ public class FreeCamEntity extends OtherClientPlayerEntity {
         camEntity = this;
     }
 
-    @Override
-    public void attack(Entity target) {
-
-    }
-
     public static void movementTick() {
         FreeCamEntity camera = getCamEntity();
 
@@ -125,6 +120,11 @@ public class FreeCamEntity extends OtherClientPlayerEntity {
 
     public static FreeCamEntity getCamEntity() {
         return camEntity;
+    }
+
+    @Override
+    public void attack(Entity target) {
+
     }
 
     private void handleMotion(float forward, float up, float strafe) {

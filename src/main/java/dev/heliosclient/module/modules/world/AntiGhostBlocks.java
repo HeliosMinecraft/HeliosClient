@@ -10,7 +10,7 @@ import net.minecraft.block.BlockState;
 
 public class AntiGhostBlocks extends Module_ {
 
-    private final SettingGroup sgGeneral =new SettingGroup("General");
+    private final SettingGroup sgGeneral = new SettingGroup("General");
 
     private final BooleanSetting breaking = sgGeneral.add(new BooleanSetting.Builder()
             .name("Breaking Check")
@@ -20,7 +20,7 @@ public class AntiGhostBlocks extends Module_ {
     );
 
     public AntiGhostBlocks() {
-        super("AntiGhostBlocks","Attempts to prevent ghost blocks", Categories.WORLD);
+        super("AntiGhostBlocks", "Attempts to prevent ghost blocks", Categories.WORLD);
 
         addSettingGroup(sgGeneral);
     }

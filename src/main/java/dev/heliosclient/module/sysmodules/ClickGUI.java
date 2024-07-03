@@ -207,6 +207,46 @@ public class ClickGUI extends Module_ {
             .defaultValue(new Color(ColorManager.INSTANCE.defaultTextColor))
             .build()
     );
+    public KeyBind clickGUIKeyBind = sgConfig.add(new KeyBind.Builder()
+            .name("ClickGUI bind")
+            .description("The key to open the ClickGUI screen")
+            .value(GLFW.GLFW_KEY_RIGHT_SHIFT)
+            .defaultValue(GLFW.GLFW_KEY_RIGHT_SHIFT)
+            .onSettingChange(this)
+            .build()
+    );
+    public CycleSetting switchConfigs = sgConfig.add(new CycleSetting.Builder()
+            .name("Switch Module Config")
+            .description("Change your module config")
+            .value(HeliosClient.CONFIG.moduleConfigManager.getConfigNames())
+            .defaultListIndex(0)
+            .shouldSaveAndLoad(true)
+            .onSettingChange(this)
+            .build()
+    );
+    public StringSetting configPath = sgConfig.add(new StringSetting.Builder()
+            .name("Save Config Path")
+            .description("Saves current config to that path. It only saves there for temporary purposes, otherwise it selects the default HeliosClient directory")
+            .value(HeliosClient.CONFIG.otherConfigManager.getCurrentConfig().getConfigFile().getParent())
+            .defaultValue(HeliosClient.CONFIG.otherConfigManager.getCurrentConfig().getConfigFile().getParent())
+            .inputMode(InputBox.InputMode.ALL)
+            .shouldSaveAndLoad(false)
+            .characterLimit(300)
+            .build()
+    );
+    public ButtonSetting config = sgConfig.add(new ButtonSetting.Builder()
+            .name("Configs")
+            .description("Reload, save or load configs")
+            .build()
+    );
+    public BooleanSetting disableEventSystem = sgExpert.add(new BooleanSetting.Builder()
+            .name("Disable Event System")
+            .description("Disables the client's event system. Warning: This will cause ALL modules and features of the client to stop working and may get out of sync. This option will also only be turned off again via the config")
+            .onSettingChange(this)
+            .value(false)
+            .defaultValue(false)
+            .build()
+    );
     ButtonSetting loadFonts = sgGeneral.add(new ButtonSetting.Builder()
             .name("Font")
             .build()
@@ -223,47 +263,6 @@ public class ClickGUI extends Module_ {
             .description("Show keybinds in the Module Button.")
             .onSettingChange(this)
             .value(true)
-            .build()
-    );
-    public KeyBind clickGUIKeyBind = sgConfig.add(new KeyBind.Builder()
-            .name("ClickGUI bind")
-            .description("The key to open the ClickGUI screen")
-            .value(GLFW.GLFW_KEY_RIGHT_SHIFT)
-            .defaultValue(GLFW.GLFW_KEY_RIGHT_SHIFT)
-            .onSettingChange(this)
-            .build()
-    );
-    public StringSetting configPath = sgConfig.add(new StringSetting.Builder()
-            .name("Save Config Path")
-            .description("Saves current config to that path. It only saves there for temporary purposes, otherwise it selects the default HeliosClient directory")
-            .value(HeliosClient.CONFIG.otherConfigManager.getCurrentConfig().getConfigFile().getParent())
-            .defaultValue(HeliosClient.CONFIG.otherConfigManager.getCurrentConfig().getConfigFile().getParent())
-            .inputMode(InputBox.InputMode.ALL)
-            .shouldSaveAndLoad(false)
-            .characterLimit(300)
-            .build()
-    );
-    public CycleSetting switchConfigs = sgConfig.add(new CycleSetting.Builder()
-            .name("Switch Module Config")
-            .description("Switch Module Configs")
-            .value(HeliosClient.CONFIG.moduleConfigManager.getConfigNames())
-            .defaultListIndex(0)
-            .onSettingChange(this)
-            .build()
-
-    );
-    public ButtonSetting config = sgConfig.add(new ButtonSetting.Builder()
-            .name("Configs")
-            .description("Reload or save Configs")
-            .build()
-    );
-
-    public BooleanSetting disableEventSystem = sgExpert.add(new BooleanSetting.Builder()
-            .name("Disable Event System")
-            .description("Disables the client's event system. Warning: This will cause ALL modules and features of the client to stop working and may get out of sync. This option will also only be turned off again via the config")
-            .onSettingChange(this)
-            .value(false)
-            .defaultValue(false)
             .build()
     );
 
@@ -310,12 +309,13 @@ public class ClickGUI extends Module_ {
             HeliosClient.CONFIG.writeConfigData();
 
             HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().setConfigFile(pathFile);
+            HeliosClient.CONFIG.writeModuleConfig();
             boolean saveSuccessful = HeliosClient.CONFIG.moduleConfigManager.save(false);
             HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().setConfigFile(prevConfigFile);
 
-            if(saveSuccessful) {
+            if (saveSuccessful) {
                 AnimationUtils.addInfoToast(ColorUtils.green + "Config was saved successfully", true, 2000);
-            }else{
+            } else {
                 AnimationUtils.addErrorToast(ColorUtils.red + "Config could not be saved: ", true, 2000);
             }
 
@@ -353,10 +353,10 @@ public class ClickGUI extends Module_ {
         //Config changes
         if (setting == switchConfigs) {
             //Todo: Replace with cleaner config manager
-            if (!HeliosClient.CONFIG.moduleConfigManager.getConfigNames().isEmpty()) {
-                //Change the file name we want to load
-                HeliosClient.CONFIG.moduleConfigManager.switchConfig(switchConfigs.getOption().toString(),true);
-            }
+
+            // Change the file name we want to load
+            HeliosClient.CONFIG.writeModuleConfig();
+            HeliosClient.CONFIG.moduleConfigManager.switchConfig(switchConfigs.getOption().toString(), true);
         }
     }
 
@@ -377,18 +377,20 @@ public class ClickGUI extends Module_ {
 
         FontManager.INSTANCE.registerFonts();
     }
-    public int getAccentColor(){
+
+    public int getAccentColor() {
         return AccentColor.getColor().getRGB();
     }
 
     @Override
     public void toggle() {
     }
-    public Theme getTheme(){
+
+    public Theme getTheme() {
         return (Theme) theme.getOption();
     }
 
-    public enum Theme{
+    public enum Theme {
         Rounded,
         Rectangle
     }

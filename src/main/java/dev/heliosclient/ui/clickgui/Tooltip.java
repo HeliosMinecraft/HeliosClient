@@ -74,13 +74,13 @@ public class Tooltip {
         DrawContext prevDrawContext = Renderer2D.drawContext;
 
         //Apply scaling to vanilla renderer
-        if(Renderer2D.isVanillaRenderer()) {
+        if (Renderer2D.isVanillaRenderer()) {
             Renderer2D.setDrawContext(drawContext);
         }
 
-        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), text, x + 8 + (Renderer2D.isVanillaRenderer()? 1:0), textY + (Renderer2D.isVanillaRenderer()? 1:0), ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), text, x + 8 + (Renderer2D.isVanillaRenderer() ? 1 : 0), textY + (Renderer2D.isVanillaRenderer() ? 1 : 0), ColorManager.INSTANCE.defaultTextColor());
 
-        if(Renderer2D.isVanillaRenderer()) {
+        if (Renderer2D.isVanillaRenderer()) {
             Renderer2D.setDrawContext(prevDrawContext);
         }
 

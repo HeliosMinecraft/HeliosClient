@@ -1,7 +1,6 @@
 package dev.heliosclient.ui.notification;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
@@ -11,6 +10,7 @@ import net.minecraft.util.math.MathHelper;
 
 public abstract class Notification {
     public static AnimationStyle ANIMATE = AnimationStyle.SLIDE;
+    public static boolean IS_FANCY = false;
     public int HEIGHT = 25;
     public long creationTime;
     public int WIDTH = 60;
@@ -24,14 +24,13 @@ public abstract class Notification {
     protected boolean expired;
     protected long endDelay = 5000;
     protected float endDelayInS = 5.0f;
-    public static boolean IS_FANCY = false;
 
     public Notification() {
         initialise();
     }
 
     protected void initialise() {
-        if(ANIMATE != AnimationStyle.SLIDE) {
+        if (ANIMATE != AnimationStyle.SLIDE) {
             int screenWidth = HeliosClient.MC.getWindow().getScaledWidth();
             this.y = targetY + HEIGHT;
             this.x = screenWidth - WIDTH - 5;
@@ -48,7 +47,7 @@ public abstract class Notification {
                 scale = Easing.ease(EasingType.CUBIC_OUT, (float) timeElapsed / 200);
             }
             if (timeElapsed > endDelay) {
-                scale =  1.0f - Easing.ease(EasingType.CUBIC_IN, (float) (timeElapsed - endDelay) / 200);
+                scale = 1.0f - Easing.ease(EasingType.CUBIC_IN, (float) (timeElapsed - endDelay) / 200);
                 if (scale < 0.0f) {
                     scale = 0.0f;
                     expired = true;
@@ -61,7 +60,7 @@ public abstract class Notification {
                 y -= (int) (HEIGHT * MathHelper.clamp(timeElapsed / 2500.0f, 0.0f, 1.0f));
             }
 
-            int targetX =  screenWidth - WIDTH - 5;
+            int targetX = screenWidth - WIDTH - 5;
 
             if (timeElapsed > endDelay) {
                 float time = (timeElapsed - endDelay) / 1000.0f;
@@ -73,7 +72,7 @@ public abstract class Notification {
                     expired = true;
                 }
 
-            }else if (timeElapsed < endDelay * 0.2) {
+            } else if (timeElapsed < endDelay * 0.2) {
                 // 20% of end delay should be put for sliding in
                 float time = timeElapsed / (endDelay * 0.2f);
                 x = screenWidth - MathHelper.floor(WIDTH * Easing.ease(EasingType.CUBIC_IN, time));

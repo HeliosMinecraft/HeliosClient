@@ -23,8 +23,8 @@ public class ItemListSetting extends ListSetting<Item> {
     public List<Item> value;
     public List<Item> defaultValue;
 
-    public ItemListSetting(String name, String description, BooleanSupplier shouldRender, List<Item> defaultValue, List<Item> defaultSelected , Predicate<Item> filter, ISettingChange iSettingChange) {
-        super(name,description,shouldRender, defaultValue,defaultSelected,filter,iSettingChange,Registries.ITEM);
+    public ItemListSetting(String name, String description, BooleanSupplier shouldRender, List<Item> defaultValue, List<Item> defaultSelected, Predicate<Item> filter, ISettingChange iSettingChange) {
+        super(name, description, shouldRender, defaultValue, defaultSelected, filter, iSettingChange, Registries.ITEM);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ItemListSetting extends ListSetting<Item> {
     }
 
     private int renderSelected(DrawContext drawContext, int x, int y, int width) {
-        if(selectedEntries.isEmpty()){
+        if (selectedEntries.isEmpty()) {
             return 0;
         }
 
@@ -164,6 +164,7 @@ public class ItemListSetting extends ListSetting<Item> {
                 Collections.addAll(this.defaultSelectedItems, defaultSelectedItems);
             return this;
         }
+
         public Builder iSettingChange(ISettingChange change) {
             this.iSettingChange = change;
             return this;
@@ -177,7 +178,7 @@ public class ItemListSetting extends ListSetting<Item> {
 
         @Override
         public ItemListSetting build() {
-            return new ItemListSetting(name, description, shouldRender, defaultValue,defaultSelectedItems, filter, iSettingChange);
+            return new ItemListSetting(name, description, shouldRender, defaultValue, defaultSelectedItems, filter, iSettingChange);
         }
     }
 }

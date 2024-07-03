@@ -1,6 +1,5 @@
 package dev.heliosclient.hud;
 
-import com.moandjiezana.toml.Toml;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
@@ -14,6 +13,7 @@ import dev.heliosclient.system.UniqueID;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import dev.heliosclient.util.render.Renderer2D;
@@ -59,13 +59,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public SettingGroup sgUI = new SettingGroup("UI");
     public boolean isInHudEditor = false;
     public UniqueID id;
-    int startX, startY, snapSize = 120;
-
-
-    // Default settings
-    // This is a lot of complete customisation.
-    // Todo: Add radius setting for rounded background
-
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
             .description("Render the background for the element")
@@ -73,6 +66,11 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .defaultValue(false)
             .onSettingChange(this)
             .build());
+
+
+    // Default settings
+    // This is a lot of complete customisation.
+    // Todo: Add radius setting for rounded background
     public BooleanSetting rounded = sgUI.add(new BooleanSetting.Builder()
             .name("Rounded background")
             .description("Rounds the background of the element for better visuals")
@@ -124,7 +122,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .shouldRender(() -> shadow.value && renderBg.value)
             .onSettingChange(this)
             .build());
-
     public BooleanSetting syncShadowColorAsBackground = sgUI.add(new BooleanSetting.Builder()
             .name("Sync Background color to shadow")
             .description("Syncs shadow color with background color")
@@ -140,6 +137,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .shouldRender(() -> shadow.value && !syncShadowColorAsBackground.value && renderBg.value)
             .onSettingChange(this)
             .build());
+    int startX, startY, snapSize = 120;
 
 
     public HudElement(HudElementData<?> hudElementInfo) {
@@ -327,13 +325,13 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     private void drawBackground(DrawContext drawContext, Color bgStart, Color bgEnd, Color finalShadowColor) {
         if (rounded.value) {
             if (shadow.value) {
-                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, (int)shadowRadius.value, finalShadowColor);
+                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, (int) shadowRadius.value, finalShadowColor);
             } else {
                 Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), 2);
             }
         } else {
             if (shadow.value) {
-                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), (int)shadowRadius.value, bgStart.getRGB(), bgEnd.getRGB(), finalShadowColor, Renderer2D.Direction.LEFT_RIGHT);
+                Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), (int) shadowRadius.value, bgStart.getRGB(), bgEnd.getRGB(), finalShadowColor, Renderer2D.Direction.LEFT_RIGHT);
             } else {
                 Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart.getRGB(), bgEnd.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
             }
@@ -360,6 +358,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public void addSettingGroup(SettingGroup settingGroup) {
         settingGroups.add(settingGroup);
     }
+
     /**
      * Removes a setting group to the setting groups list
      *
@@ -464,12 +463,12 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         objects.add(width);
         objects.add(height);
 
-        map.put("positions", objects);
+        map.put("dimensions", objects);
 
         for (SettingGroup settingGroup : settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
-                    map.put(setting.name.replace(" ", ""), setting.saveToFile(new ArrayList<>()));
+                    map.put(setting.getSaveName(), setting.saveToFile(new ArrayList<>()));
                 }
             }
         }
@@ -479,11 +478,11 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
 
     @Override
     public void loadFromFile(Map<String, Object> MAP) {
-        List<Object> obj = (List<Object>)  MAP.get("positions");
-        this.x = Integer.parseInt(obj.get(0).toString());
-        this.y = Integer.parseInt(obj.get(1).toString());
-        this.width = Integer.parseInt(obj.get(2).toString());
-        this.height = Integer.parseInt(obj.get(3).toString());
+        List<Double> obj = (List<Double>) MAP.get("dimensions");
+        this.x = MathUtils.d2iSafe(obj.get(0));
+        this.y = MathUtils.d2iSafe(obj.get(1));
+        this.width = MathUtils.d2iSafe(obj.get(2));
+        this.height = MathUtils.d2iSafe(obj.get(3));
         this.distanceX = x;
         this.distanceY = y;
     }

@@ -15,9 +15,6 @@ import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.animation.AnimationUtils;
-import dev.heliosclient.util.animation.Easing;
-import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
@@ -26,7 +23,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
 
-import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -104,7 +100,7 @@ public class CategoryPane implements Listener {
         calcHeightAndWidth();
     }
 
-    public void calcHeightAndWidth(){
+    public void calcHeightAndWidth() {
         height = 4;
         for (ModuleButton button : moduleButtons) {
             maxWidth = Math.max(maxWidth, button.width - 2);
@@ -116,7 +112,7 @@ public class CategoryPane implements Listener {
         }
     }
 
-    public void checkMaxHeightValue(){
+    public void checkMaxHeightValue() {
         if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
             MAX_HEIGHT = height;
         } else {
@@ -161,9 +157,9 @@ public class CategoryPane implements Listener {
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
         update((float) (delta * HeliosClient.CLICKGUI.animationSpeed.value));
         this.screen = HeliosClient.MC.currentScreen;
-        
+
         checkMaxHeightValue();
-        
+
         if (dragging) {
             x = mouseX - startX;
             y = mouseY - startY;
@@ -172,9 +168,9 @@ public class CategoryPane implements Listener {
         Renderer2D.scaleAndPosition(drawContext.getMatrices(), (x + (width + 5) / 2.0f), (float) (y + categoryNameHeight + 6), (float) scale);
 
         if (!collapsed && height >= 10) {
-            Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, (int) ((width + 5)), (int) hudBox.getHeight());
+            Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, (width + 5), (int) hudBox.getHeight());
             if (ModuleManager.get(GUI.class).categoryBorder.value) {
-                drawOutlineGradientBox(drawContext.getMatrices().peek().getPositionMatrix(),x,y,width);
+                drawOutlineGradientBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width);
             }
             drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary(), 100).getRGB());
         }
@@ -198,7 +194,7 @@ public class CategoryPane implements Listener {
         }
         Renderer2D.stopScaling(drawContext.getMatrices());
 
-        drawRectangleWithShadow(drawContext.getMatrices(), x - 2, y,true,true,true,true, width + 4.5f, categoryNameHeight + 8, 3, 2, ColorUtils.changeAlpha(ModuleManager.get(GUI.class).categoryPaneColors.getColor(), 255).getRGB());
+        drawRectangleWithShadow(drawContext.getMatrices(), x - 2, y, true, true, true, true, width + 4.5f, categoryNameHeight + 8, 3, 2, ColorUtils.changeAlpha(ModuleManager.get(GUI.class).categoryPaneColors.getColor(), 255).getRGB());
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
         hudBox.set(x, y, width, MAX_HEIGHT);
@@ -234,38 +230,42 @@ public class CategoryPane implements Listener {
                 dragging = true;
             }
             if (button == 2) {
-                startX = (int) (mouseX - x);
-                startY = (int) (mouseY - y);
+                startX = (int)mouseX - x;
+                startY = (int)mouseY - y;
                 dragging = true;
             }
 
-            if(!hovered(mouseX,mouseY)) {
+            if (!hovered(mouseX, mouseY)) {
                 for (ModuleButton moduleButton : moduleButtons) {
                     moduleButton.collapsed = collapsed;
-                    moduleButton.mouseClicked(mouseX, mouseY, button, event.getScreen());
+                     moduleButton.mouseClicked(mouseX, mouseY, button, event.getScreen());
                 }
             }
+
         }
     }
-    private void drawOutlineGradientBox(Matrix4f matrix4f, float x, float y, float width){
-        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
+
+    private void drawOutlineGradientBox(Matrix4f matrix4f, float x, float y, float width) {
+        if (HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded) {
             Renderer2D.drawOutlineGradientRoundedBox(matrix4f, x - 1, y + categoryNameHeight, width + 2f, hudBox.getHeight() + 6, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
-        }else{
-            Renderer2D.drawOutlineGradientBox(matrix4f,x-1,y + categoryNameHeight,width + 2f, hudBox.getHeight() + 6,1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
+        } else {
+            Renderer2D.drawOutlineGradientBox(matrix4f, x - 1, y + categoryNameHeight, width + 2f, hudBox.getHeight() + 6, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
         }
     }
-    private void drawRectangle(Matrix4f matrix4f, float x, float y,boolean TL, boolean TR, boolean BL, boolean BR, float width, float height,float radius, int color){
-        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
-            Renderer2D.drawRoundedRectangle(matrix4f, x, y,TL,TR,BL,BR, width, height, radius, color);
-        }else{
-            Renderer2D.drawRectangle(matrix4f,x,y,width,height,color);
+
+    private void drawRectangle(Matrix4f matrix4f, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
+        if (HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded) {
+            Renderer2D.drawRoundedRectangle(matrix4f, x, y, TL, TR, BL, BR, width, height, radius, color);
+        } else {
+            Renderer2D.drawRectangle(matrix4f, x, y, width, height, color);
         }
     }
-    private void drawRectangleWithShadow(MatrixStack stack, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int blurRadius, int color){
-        if(HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded){
-            Renderer2D.drawRoundedRectangleWithShadow(stack, x, y, width, height, radius,blurRadius, color,TL,TR,BL,BR);
-        }else{
-            Renderer2D.drawRectangleWithShadow(stack,x,y,width,height,color,blurRadius);
+
+    private void drawRectangleWithShadow(MatrixStack stack, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int blurRadius, int color) {
+        if (HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded) {
+            Renderer2D.drawRoundedRectangleWithShadow(stack, x, y, width, height, radius, blurRadius, color, TL, TR, BL, BR);
+        } else {
+            Renderer2D.drawRectangleWithShadow(stack, x, y, width, height, color, blurRadius);
         }
     }
 

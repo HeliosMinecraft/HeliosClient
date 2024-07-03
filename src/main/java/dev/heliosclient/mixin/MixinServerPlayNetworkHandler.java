@@ -2,11 +2,8 @@ package dev.heliosclient.mixin;
 
 import com.mojang.brigadier.ParseResults;
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.events.block.BlockInteractEvent;
 import dev.heliosclient.event.events.player.PlayerLeaveEvent;
 import dev.heliosclient.managers.EventManager;
-import net.minecraft.block.BlockState;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.text.Text;

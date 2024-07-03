@@ -27,7 +27,7 @@ public class LoadScript extends Command {
                         }
                     }
 
-                    ChatUtils.sendHeliosMsg(ColorUtils.red + "Script of name {"+ scriptname +"} not found");
+                    ChatUtils.sendHeliosMsg(ColorUtils.red + "Script of name {" + scriptname + "} not found");
                     return SINGLE_SUCCESS;
                 }));
     }

@@ -1,8 +1,8 @@
 package dev.heliosclient.hud.hudelements;
 
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;

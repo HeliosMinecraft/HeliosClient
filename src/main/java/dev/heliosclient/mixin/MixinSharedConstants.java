@@ -12,7 +12,7 @@ public abstract class MixinSharedConstants {
 
     @ModifyReturnValue(method = "isValidChar", at = @At("RETURN"))
     private static boolean isValidChar(boolean original) {
-        if(ModuleManager.get(ChatTweaks.class).noKeyRestriction()) return true;
+        if (ModuleManager.get(ChatTweaks.class).noKeyRestriction()) return true;
         return original;
     }
 }

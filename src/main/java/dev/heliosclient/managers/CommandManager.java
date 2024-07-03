@@ -88,7 +88,7 @@ public class CommandManager {
     }
 
     public String getPrefix() {
-        return prefix == null? prefix = "." : prefix;
+        return prefix == null ? prefix = "." : prefix;
     }
 
     private final static class ChatCommandSource extends ClientCommandSource {

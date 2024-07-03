@@ -1,6 +1,5 @@
 package dev.heliosclient.module.settings;
 
-import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.system.mixininterface.IVec3d;
 import dev.heliosclient.util.interfaces.ISettingChange;

@@ -20,20 +20,22 @@ public class RotationSimulator implements Listener {
 
     public void simulateRotation(double yaw, double pitch, boolean clientSide, Runnable task, int tickTiming, int randomness, EasingType easingType) {
         if (currentRotation == null) {
-            currentRotation = new Rotation(yaw, pitch, clientSide, task, tickTiming,randomness,easingType);
+            currentRotation = new Rotation(yaw, pitch, clientSide, task, tickTiming, randomness, easingType);
         } else {
-            currentRotation.setTarget(yaw, pitch, clientSide, task, tickTiming,randomness,easingType);
+            currentRotation.setTarget(yaw, pitch, clientSide, task, tickTiming, randomness, easingType);
         }
     }
+
     public void simulateRotation(double yaw, double pitch, boolean clientSide, Runnable task, int tickTiming, int randomness) {
-       simulateRotation(yaw,pitch,clientSide,task,tickTiming,randomness,EasingType.LINEAR_IN);
+        simulateRotation(yaw, pitch, clientSide, task, tickTiming, randomness, EasingType.LINEAR_IN);
     }
 
-    public void simulateRotation(Entity entity, boolean clientSide, Runnable task, int tickTiming, int randomness, RotationUtils.LookAtPos lookAtPos,EasingType type) {
-        simulateRotation(RotationUtils.getYaw(lookAtPos.getPosition(entity)), RotationUtils.getPitch(lookAtPos.getPosition(entity)), clientSide, task, tickTiming,randomness,type);
+    public void simulateRotation(Entity entity, boolean clientSide, Runnable task, int tickTiming, int randomness, RotationUtils.LookAtPos lookAtPos, EasingType type) {
+        simulateRotation(RotationUtils.getYaw(lookAtPos.getPosition(entity)), RotationUtils.getPitch(lookAtPos.getPosition(entity)), clientSide, task, tickTiming, randomness, type);
     }
+
     public void simulateRotation(Entity entity, boolean clientSide, Runnable task, int tickTiming, int randomness, RotationUtils.LookAtPos lookAtPos) {
-        simulateRotation(RotationUtils.getYaw(lookAtPos.getPosition(entity)), RotationUtils.getPitch(lookAtPos.getPosition(entity)), clientSide, task, tickTiming,randomness,EasingType.LINEAR_IN);
+        simulateRotation(RotationUtils.getYaw(lookAtPos.getPosition(entity)), RotationUtils.getPitch(lookAtPos.getPosition(entity)), clientSide, task, tickTiming, randomness, EasingType.LINEAR_IN);
     }
 
 
@@ -55,34 +57,34 @@ public class RotationSimulator implements Listener {
         currentRotation = null;
     }
 
-    public int getTicksPassed(){
-        if(currentRotation != null){
+    public int getTicksPassed() {
+        if (currentRotation != null) {
             return Rotation.ticksPassed;
         }
         return -1;
     }
 
     private static class Rotation {
-        private double targetYaw;
+        private static int ticksPassed;
         private final double startYaw;
         private final double startPitch;
+        private final Random rand = Random.create(System.currentTimeMillis());
+        private double targetYaw;
         private double targetPitch;
         private boolean clientSide;
         private Runnable task;
         private int tickTiming;
-        private static int ticksPassed;
         private int randomness;
-        private final Random rand = Random.create(System.currentTimeMillis());
         private EasingType type;
 
-        public Rotation(double yaw, double pitch, boolean clientSide, Runnable task, int tickTiming, int randomness,EasingType type) {
-            this.setTarget(yaw, pitch, clientSide, task, tickTiming,randomness,type);
+        public Rotation(double yaw, double pitch, boolean clientSide, Runnable task, int tickTiming, int randomness, EasingType type) {
+            this.setTarget(yaw, pitch, clientSide, task, tickTiming, randomness, type);
             ticksPassed = 0;
             this.startYaw = mc.player.getYaw(mc.getTickDelta());
             this.startPitch = mc.player.getPitch(mc.getTickDelta());
         }
 
-        public void setTarget(double yaw, double pitch, boolean clientSide, Runnable task, int tickTiming, int randomness,EasingType type) {
+        public void setTarget(double yaw, double pitch, boolean clientSide, Runnable task, int tickTiming, int randomness, EasingType type) {
             this.targetYaw = yaw;
             this.targetPitch = pitch;
             this.clientSide = clientSide;
@@ -114,10 +116,10 @@ public class RotationSimulator implements Listener {
 
 
             double interpolatedYaw = MathHelper.lerpAngleDegrees((float) progress, startYaw, targetYaw);
-            double interpolatedPitch = MathHelper.lerpAngleDegrees((float) progress,startPitch, targetPitch);
+            double interpolatedPitch = MathHelper.lerpAngleDegrees((float) progress, startPitch, targetPitch);
 
             // Add randomness to the target yaw and pitch
-            if(randomness != 0.0 && progress < 0.97f && rand.nextBetween(0,20) > 18) {
+            if (randomness != 0.0 && progress < 0.97f && rand.nextBetween(0, 20) > 18) {
                 interpolatedYaw += (rand.nextGaussian() - 1) * randomness;
                 interpolatedPitch += (rand.nextGaussian() - 1) * randomness;
             }

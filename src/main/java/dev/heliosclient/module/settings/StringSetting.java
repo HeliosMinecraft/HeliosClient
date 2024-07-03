@@ -1,6 +1,5 @@
 package dev.heliosclient.module.settings;
 
-import com.moandjiezana.toml.Toml;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.fontutils.FontRenderers;
@@ -66,14 +65,11 @@ public class StringSetting extends Setting<String> {
 
     @Override
     public Object saveToFile(List<Object> objectList) {
-        return shouldSaveOrLoad ? value : "";
+        return value;
     }
 
     @Override
     public void loadFromFile(Map<String, Object> MAP) {
-        if (!shouldSaveOrLoad) {
-            return;
-        }
         if (MAP.get(getSaveName()) == null) {
             value = defaultValue;
             return;

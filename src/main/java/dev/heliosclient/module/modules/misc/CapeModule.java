@@ -133,6 +133,10 @@ public class CapeModule extends Module_ {
         loadCapes.addButton("Reload Capes", 0, 1, CapeManager::loadCapes);
     }
 
+    public static boolean forEveryone() {
+        return ModuleManager.get(CapeModule.class).everyone.value;
+    }
+
     public boolean shouldUseUUID() {
         return !UUID.value.isEmpty() && UUID.value.length() > 31;
     }
@@ -164,16 +168,11 @@ public class CapeModule extends Module_ {
         }
     }
 
-
     @Override
     public void onLoad() {
         super.onLoad();
         if (capes.value < CapeManager.capeIdentifiers.size()) {
             CapeManager.CURRENT_PLAYER_CAPE = CapeManager.capeIdentifiers.get(capes.value);
         }
-    }
-
-    public static boolean forEveryone(){
-        return ModuleManager.get(CapeModule.class).everyone.value;
     }
 }

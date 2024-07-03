@@ -14,7 +14,6 @@ import dev.heliosclient.util.render.color.QuadColor;
 import dev.heliosclient.util.render.textures.Texture;
 import ladysnake.satin.api.managed.ShaderEffectManager;
 import me.x150.renderer.font.FontRenderer;
-import me.x150.renderer.render.Renderer2d;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
@@ -49,6 +48,7 @@ public class Renderer2D implements Listener {
     public static Renderers renderer = Renderers.CUSTOM;
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
     public static ShaderEffectManager shaderManager = ShaderEffectManager.getInstance();
+    public static VertexSorter vertexSorter;
 
     /**
      * Draws a singular gradient rectangle  on screen with the given parameters
@@ -160,11 +160,11 @@ public class Renderer2D implements Listener {
         matrices.translate(-(x + width / 2.0f), -(y + height / 2.0f), 0);
     }
 
+    /* ==== Drawing Rectangles ==== */
+
     public static void stopScaling(MatrixStack matrices) {
         matrices.pop(); // Restore the previous transformation state
     }
-
-    /* ==== Drawing Rectangles ==== */
 
     /**
      * Draws a singular rectangle on screen with the given parameters
@@ -219,6 +219,7 @@ public class Renderer2D implements Listener {
         drawRectangle(matrix4f, x, y + thickness, thickness, height - thickness * 2, color);
         drawRectangle(matrix4f, x + width - thickness, y + thickness, thickness, height - thickness * 2, color);
     }
+
     /**
      * Draws a outline rounded gradient rectangle
      *
@@ -331,7 +332,7 @@ public class Renderer2D implements Listener {
      * @param startColor start color of the gradient
      * @param endColor   end color of the gradient
      */
-    public static void drawGradientWithShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, int startColor, int endColor,Color shadowColor, Direction direction) {
+    public static void drawGradientWithShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, int startColor, int endColor, Color shadowColor, Direction direction) {
         drawBlurredShadow(matrices, x, y, width, height, blurRadius, shadowColor);
 
         drawGradient(matrices.peek().getPositionMatrix(), x, y, width, height, startColor, endColor, direction);
@@ -421,6 +422,8 @@ public class Renderer2D implements Listener {
         RenderSystem.defaultBlendFunc();
     }
 
+    /* ==== Drawing Blurred Shadow ==== */
+
     /**
      * Draws a singular blurred shadow using the GaussianBlur algorithm on screen with the given parameters
      * Credits:  <a href="https://github.com/Pan4ur/ThunderHack-Recode/blob/main/src/main/java/thunder/hack/utility/render/Render2DEngine.java#L187">Thunderhack</a>
@@ -463,8 +466,6 @@ public class Renderer2D implements Listener {
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
-    /* ==== Drawing Blurred Shadow ==== */
-
     /**
      * Draws a circular blurred shadow using the GaussianBlur algorithm on screen with the given parameters
      *
@@ -504,6 +505,9 @@ public class Renderer2D implements Listener {
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
 
+
+    /* ====  Drawing filled and outline circles  ==== */
+
     /**
      * Draws an outline of a circle
      *
@@ -536,9 +540,6 @@ public class Renderer2D implements Listener {
 
         tessellator.draw();
     }
-
-
-    /* ====  Drawing filled and outline circles  ==== */
 
     /**
      * Draws a filled circle
@@ -613,6 +614,8 @@ public class Renderer2D implements Listener {
         drawFilledCircle(matrices.peek().getPositionMatrix(), xCenter, yCenter, radius, color);
     }
 
+    /* ====  Drawing Quadrants, Arcs, and Triangles  ==== */
+
     /**
      * Not Tested
      *
@@ -651,8 +654,6 @@ public class Renderer2D implements Listener {
         tessellator.draw();
         RenderSystem.disableBlend();
     }
-
-    /* ====  Drawing Quadrants, Arcs, and Triangles  ==== */
 
     /**
      * Draws a filled Gradient quadrant
@@ -840,13 +841,12 @@ public class Renderer2D implements Listener {
         drawRoundedRectangle(matrix4f, x, y, true, true, true, true, width, height, radius, color);
     }
 
-    public static void drawRectangleInternal(Matrix4f matrix4f,BufferBuilder bufferBuilder,  float x, float y, float width, float height, float red, float green, float blue, float alpha) {
+    public static void drawRectangleInternal(Matrix4f matrix4f, BufferBuilder bufferBuilder, float x, float y, float width, float height, float red, float green, float blue, float alpha) {
         bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(red, green, blue, alpha).next();
         bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(red, green, blue, alpha).next();
         bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(red, green, blue, alpha).next();
         bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(red, green, blue, alpha).next();
     }
-
 
     /**
      * Draws a filled rounded rectangle by drawing 1 main rectangle, 4 side rectangles, and specified filled quadrants
@@ -870,7 +870,7 @@ public class Renderer2D implements Listener {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         //Draw a single rectangle for radius zero to protect FPS
-        if(radius == 0){
+        if (radius == 0) {
             drawRectangle(matrix4f, x, y, width, height, color);
             return;
         }
@@ -886,26 +886,26 @@ public class Renderer2D implements Listener {
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         // Draw the main rectangle
-        drawRectangleInternal(matrix4f,bufferBuilder, x + radius, y + radius, width - 2 * radius, height - 2* radius, red,green,blue,alpha);
+        drawRectangleInternal(matrix4f, bufferBuilder, x + radius, y + radius, width - 2 * radius, height - 2 * radius, red, green, blue, alpha);
 
         // Draw rectangles at the sides
-        drawRectangleInternal(matrix4f,bufferBuilder, x + radius, y, width - 2 * radius, radius, red,green,blue,alpha); // top
-        drawRectangleInternal(matrix4f,bufferBuilder, x + radius, y + height - radius, width - 2 * radius, radius, red,green,blue,alpha); // bottom
-        drawRectangleInternal(matrix4f,bufferBuilder, x, y + radius, radius, height - 2 * radius, red,green,blue,alpha); // left
-        drawRectangleInternal(matrix4f,bufferBuilder, x + width - radius, y + radius, radius, height - 2 * radius, red,green,blue,alpha); //right
+        drawRectangleInternal(matrix4f, bufferBuilder, x + radius, y, width - 2 * radius, radius, red, green, blue, alpha); // top
+        drawRectangleInternal(matrix4f, bufferBuilder, x + radius, y + height - radius, width - 2 * radius, radius, red, green, blue, alpha); // bottom
+        drawRectangleInternal(matrix4f, bufferBuilder, x, y + radius, radius, height - 2 * radius, red, green, blue, alpha); // left
+        drawRectangleInternal(matrix4f, bufferBuilder, x + width - radius, y + radius, radius, height - 2 * radius, red, green, blue, alpha); //right
 
 
-        if(!TL || radius < 0){
-            drawRectangleInternal(matrix4f,bufferBuilder, x, y, radius, radius, red,green,blue,alpha);
+        if (!TL || radius < 0) {
+            drawRectangleInternal(matrix4f, bufferBuilder, x, y, radius, radius, red, green, blue, alpha);
         }
-        if(!TR || radius < 0){
-            drawRectangleInternal(matrix4f,bufferBuilder, x + width - radius, y, radius, radius, red,green,blue,alpha);
+        if (!TR || radius < 0) {
+            drawRectangleInternal(matrix4f, bufferBuilder, x + width - radius, y, radius, radius, red, green, blue, alpha);
         }
-        if(!BL || radius < 0){
-            drawRectangleInternal(matrix4f,bufferBuilder,  x, y + height - radius, radius, radius, red,green,blue,alpha);
+        if (!BL || radius < 0) {
+            drawRectangleInternal(matrix4f, bufferBuilder, x, y + height - radius, radius, radius, red, green, blue, alpha);
         }
-        if(!BR || radius < 0){
-            drawRectangleInternal(matrix4f,bufferBuilder,  x + width - radius, y + height - radius, radius, radius, red,green,blue,alpha);
+        if (!BR || radius < 0) {
+            drawRectangleInternal(matrix4f, bufferBuilder, x + width - radius, y + height - radius, radius, radius, red, green, blue, alpha);
         }
 
         tessellator.draw();
@@ -957,8 +957,6 @@ public class Renderer2D implements Listener {
         drawArc(matrix4f, x + width - radius, y + height - radius, radius, thickness, color3.getRGB(), 0, 90); // Bottom-right arc
         drawArc(matrix4f, x + radius, y + height - radius, radius, thickness, color4.getRGB(), 270, 360); // Bottom-left arc
     }
-
-    public static VertexSorter vertexSorter;
 
     public static void unscaledProjection() {
         vertexSorter = RenderSystem.getVertexSorting();

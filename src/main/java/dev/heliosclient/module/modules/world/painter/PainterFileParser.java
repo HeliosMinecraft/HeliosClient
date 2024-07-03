@@ -4,7 +4,6 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.BlockUtils;
 import net.minecraft.block.Block;
 import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.math.BlockPos;
 
 import java.io.BufferedReader;
@@ -74,7 +73,7 @@ public class PainterFileParser {
 
             Block block = BlockUtils.getBlockFromString(blockString);
             result.put(pos, block);
-        }else{
+        } else {
             throw new NumberFormatException("Incorrect formatting of block coordinates in painter file");
         }
     }

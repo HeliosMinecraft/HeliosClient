@@ -1,6 +1,5 @@
 package dev.heliosclient.module;
 
-import com.moandjiezana.toml.Toml;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
@@ -106,7 +105,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
      * Returns a string containing necessary details for the module.
      * Override in your module to return the data you need to.
      */
-    public String getInfoString(){
+    public String getInfoString() {
         return "";
     }
 
@@ -282,17 +281,17 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public void loadFromFile(Map<String, Object> MAP) {
         for (SettingGroup settingGroup : this.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
-                if (!setting.shouldSaveAndLoad()) break;
+                if (!setting.shouldSaveAndLoad()) continue;
 
 
-                Map<String ,Object> settingTable = HeliosClient.CONFIG.cast(MAP.get(this.name.replace(" ", "")));
+                Map<String, Object> settingTable = HeliosClient.CONFIG.cast(MAP.get(this.name.replace(" ", "")));
                 if (settingTable != null) {
 
                     //Any error caught should not cause the whole config system to fail to load.
                     //Hopefully
                     try {
                         setting.loadFromFile(settingTable);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

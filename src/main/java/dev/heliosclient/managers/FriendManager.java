@@ -22,6 +22,7 @@ public class FriendManager {
     public static boolean isFriend(Friend friend) {
         return friends.contains(friend);
     }
+
     public static boolean isFriend(String userName) {
         return friends.contains(new Friend(userName));
     }

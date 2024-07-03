@@ -92,7 +92,7 @@ public class BreakIndicator extends Module_ {
             Renderer3D.drawBoxFill(box, QuadColor.single(highlightColor.value.getRGB()));
 
         } else if (IndicateType.values()[type.value] == Expand) {
-            Box expandedBox = box.contract(1d,1d,1d).expand(1.0 - (breakingProg / 20.0));
+            Box expandedBox = box.contract(1d, 1d, 1d).expand(1.0 - (breakingProg / 20.0));
             Renderer3D.drawBoxBoth(expandedBox, QuadColor.single(getColor(breakingProg)), 1f);
 
         } else if (IndicateType.values()[type.value] == Shrink) {

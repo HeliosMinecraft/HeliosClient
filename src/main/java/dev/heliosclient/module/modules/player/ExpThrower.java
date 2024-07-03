@@ -40,7 +40,7 @@ public class ExpThrower extends Module_ {
     @Override
     public void onDisable() {
         super.onDisable();
-        if(swapBack.value)
+        if (swapBack.value)
             InventoryUtils.swapBackHotbar();
     }
 
@@ -62,11 +62,11 @@ public class ExpThrower extends Module_ {
         if (mc.player.getInventory().selectedSlot == slot) {
             mc.interactionManager.interactItem(mc.player, slot == 45 ? Hand.OFF_HAND : Hand.MAIN_HAND);
         } else {
-            InventoryUtils.swapToSlot(slot,swapBack.value);
+            InventoryUtils.swapToSlot(slot, swapBack.value);
             mc.interactionManager.interactItem(mc.player, slot == 45 ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
-            if(swapBack.value)
-               InventoryUtils.swapBackHotbar();
+            if (swapBack.value)
+                InventoryUtils.swapBackHotbar();
         }
     }
 }

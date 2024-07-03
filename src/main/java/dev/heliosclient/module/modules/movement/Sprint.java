@@ -6,7 +6,6 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.player.PlayerUtils;
 
 public class Sprint extends Module_ {
 
@@ -33,12 +32,13 @@ public class Sprint extends Module_ {
         if (mc.player.getHungerManager().getFoodLevel() <= 6)
             return;
 
-        if(strictMode.value && mc.player.forwardSpeed > 0.00f) {
+        if (strictMode.value && mc.player.forwardSpeed > 0.00f) {
             mc.player.setSprinting(true);
-        }else if(!strictMode.value){
+        } else if (!strictMode.value) {
             mc.player.setSprinting(true);
         }
     }
+
     public boolean shouldStopSprinting() {
         return !isActive() || !keepSprint.value;
     }

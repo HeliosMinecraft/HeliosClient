@@ -1,8 +1,8 @@
 package dev.heliosclient.hud.hudelements;
 
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.system.TickRate;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;

@@ -33,12 +33,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
 public abstract class MixinPlayerEntity extends LivingEntity {
-    @Shadow public abstract void increaseStat(Stat<?> stat, int amount);
-
     protected MixinPlayerEntity(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
 
     }
+
+    @Shadow
+    public abstract void increaseStat(Stat<?> stat, int amount);
 
     @Inject(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", at = @At("HEAD"))
     private void dropItem(ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
@@ -70,15 +71,16 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
         if (HeliosClient.MC.crosshairTarget instanceof BlockHitResult bhr) {
             BlockPos pos = bhr.getBlockPos();
-            if (speedMine.modifier.value  < 1 || (BlockUtils.canBreakInstantly(block,breakSpeedMod) == BlockUtils.canBreakInstantly(block,ogBreakSpeed) )) {
+            if (speedMine.modifier.value < 1 || (BlockUtils.canBreakInstantly(block, breakSpeedMod) == BlockUtils.canBreakInstantly(block, ogBreakSpeed))) {
                 return breakSpeedMod;
             } else {
-                return (float) (0.9f / BlockUtils.calcBlockBreakingDelta2(HeliosClient.MC.world.getBlockState(pos),1f));
+                return (float) (0.9f / BlockUtils.calcBlockBreakingDelta2(HeliosClient.MC.world.getBlockState(pos), 1f));
             }
         }
 
         return ogBreakSpeed;
     }
+
     @WrapWithCondition(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setVelocity(Lnet/minecraft/util/math/Vec3d;)V"))
     private boolean keepSprint$setVelocity(PlayerEntity instance, Vec3d vec3d) {
         return ModuleManager.get(Sprint.class).shouldStopSprinting();

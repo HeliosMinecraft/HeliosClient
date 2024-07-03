@@ -198,7 +198,7 @@ public class Painter extends Module_ {
         selectFile.addButton("Select a text file", 0, 0, () -> {
             FileUtils.openTinyFileDialog("canvas.txt", (file -> painterFile = file), false);
 
-            if(painterFile != null) {
+            if (painterFile != null) {
                 selectFile.setButtonCategoryText("File Selected: " + painterFile.getName());
             }
 

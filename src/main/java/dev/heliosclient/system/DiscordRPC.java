@@ -25,13 +25,12 @@ import static dev.heliosclient.HeliosClient.MC;
 
 public class DiscordRPC {
     public static DiscordRPC INSTANCE = new DiscordRPC();
+    static File tempDir = new File(System.getProperty("java.io.tmpdir"), "java");
     public GameState currentGameState = GameState.MAINMENU;
     public boolean isRunning = false;
     private Thread callbackThread;
     private Core discordCore;
     private Activity activity;
-    static File tempDir = new File(System.getProperty("java.io.tmpdir"), "java");
-
 
     public void init() {
         try {
@@ -39,13 +38,13 @@ public class DiscordRPC {
 
             // Initialize the Core with the existing or downloaded file
 
-            File tempJNIDir = new File(System.getProperty("java.io.tmpdir") + "/java", "jni-"+System.nanoTime());
-            if(!(tempJNIDir.exists() && tempJNIDir.isDirectory()) && !tempJNIDir.mkdir())
+            File tempJNIDir = new File(System.getProperty("java.io.tmpdir") + "/java", "jni-" + System.nanoTime());
+            if (!(tempJNIDir.exists() && tempJNIDir.isDirectory()) && !tempJNIDir.mkdir())
                 throw new RuntimeException(new IOException("Cannot create temporary JNI directory"));
 
             tempJNIDir.deleteOnExit();
 
-            Core.init(sdkFile,tempJNIDir);
+            Core.init(sdkFile, tempJNIDir);
 
         } catch (IOException | RuntimeException e) {
             AnimationUtils.addErrorToast("Discord Core init failed. Check logs for details.", false, 1500);

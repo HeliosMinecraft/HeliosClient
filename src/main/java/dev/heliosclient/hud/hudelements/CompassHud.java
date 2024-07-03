@@ -1,8 +1,8 @@
 package dev.heliosclient.hud.hudelements;
 
-import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
@@ -62,7 +62,7 @@ public class CompassHud extends HudElement {
             .roundingPlace(1)
             .defaultValue(0.7d)
             .onSettingChange(this)
-            .shouldRender(()->renderEllipse.value)
+            .shouldRender(() -> renderEllipse.value)
             .build()
     );
     public RGBASetting compassColor = sgGeneral.add(new RGBASetting.Builder()
@@ -71,7 +71,7 @@ public class CompassHud extends HudElement {
             .defaultValue(Color.WHITE)
             .value(Color.WHITE)
             .onSettingChange(this)
-            .shouldRender(()->renderEllipse.value)
+            .shouldRender(() -> renderEllipse.value)
             .build()
     );
 
@@ -88,16 +88,16 @@ public class CompassHud extends HudElement {
         this.width = (int) (xRad.value * 2 + Renderer2D.getStringHeight());
         this.height = (int) (yRad.value * 2 + Renderer2D.getStringHeight() + 1);
 
-        if(snapToCrosshair.value){
-            this.x = mc.getWindow().getScaledWidth()/2 - this.width/2;
-            this.y = mc.getWindow().getScaledHeight()/2 - this.height/2 ;
+        if (snapToCrosshair.value) {
+            this.x = mc.getWindow().getScaledWidth() / 2 - this.width / 2;
+            this.y = mc.getWindow().getScaledHeight() / 2 - this.height / 2;
         }
 
         super.renderElement(drawContext, textRenderer);
 
         // Calculate player orientation (yaw) in radians
         double yawRadians = Math.toRadians(90);
-        if(mc.player != null){
+        if (mc.player != null) {
             yawRadians = Math.toRadians(mc.player.getYaw(mc.getTickDelta()));
         }
 
@@ -105,11 +105,11 @@ public class CompassHud extends HudElement {
         int centerY = this.y + this.height / 2;
 
         // Draw a circular radar around the cross-hair
-        if(renderEllipse.value)
-           Renderer2d.renderEllipseOutline(drawContext.getMatrices(), compassColor.value,centerX,centerY,xRad.value,yRad.value,outlineWidth.value,outlineWidth.value,360);
+        if (renderEllipse.value)
+            Renderer2d.renderEllipseOutline(drawContext.getMatrices(), compassColor.value, centerX, centerY, xRad.value, yRad.value, outlineWidth.value, outlineWidth.value, 360);
 
         // Draw cardinal direction indicators
-        double quarterPI =  Math.PI / 2.0;
+        double quarterPI = Math.PI / 2.0;
         for (int i = 0; i < 4; i++) {
             double angle = yawRadians + i * quarterPI; // Rotate by 90 degrees
             float x = (float) (centerX + xRad.value * Math.cos(angle)) - 3;
@@ -121,11 +121,11 @@ public class CompassHud extends HudElement {
     }
 
     private String getCardinalDirection(int i) {
-        return switch (i){
-            case 0-> "E";
-            case 1-> "N";
-            case 2-> "W";
-            case 3-> "S";
+        return switch (i) {
+            case 0 -> "E";
+            case 1 -> "N";
+            case 2 -> "W";
+            case 3 -> "S";
             default -> "N";
         };
     }

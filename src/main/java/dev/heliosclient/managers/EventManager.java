@@ -31,7 +31,7 @@ public class EventManager {
             if (method.isAnnotationPresent(SubscribeEvent.class) && method.getParameterCount() == 1) {
                 Class<?> eventType = method.getParameterTypes()[0];
                 EventListener eventListener = new EventListener(listener, method);
-                List<EventListener> eventListeners =  getListeners(eventType);
+                List<EventListener> eventListeners = getListeners(eventType);
                 eventListeners.add(eventListener);
                 if (eventListeners.size() > 1) {
                     eventListeners.sort(METHOD_COMPARATOR);
@@ -46,8 +46,8 @@ public class EventManager {
 
 
     public static void unregister(Listener listener) {
-        for (List<EventListener> eventListeners :  new CopyOnWriteArraySet<>(listeners.values())) {
-                eventListeners.removeIf(el -> el.listener == listener || el.listener == null);
+        for (List<EventListener> eventListeners : new CopyOnWriteArraySet<>(listeners.values())) {
+            eventListeners.removeIf(el -> el.listener == listener || el.listener == null);
         }
     }
 
@@ -59,7 +59,7 @@ public class EventManager {
         List<EventListener> eventListeners = listeners.get(event.getClass());
         if (eventListeners != null && !eventListeners.isEmpty()) {
             for (EventListener listener : new CopyOnWriteArraySet<>(eventListeners)) {
-                if(listener == null){
+                if (listener == null) {
                     eventListeners.remove(listener);
                     continue;
                 }

@@ -14,11 +14,11 @@ import java.util.Objects;
  * It also provides some null-safe methods
  */
 public class ConfigManager {
-    private List<SubConfig> subConfigs;
-    private List<String> configNames = new ArrayList<>();
+    private final List<SubConfig> subConfigs;
+    private final List<String> configNames = new ArrayList<>();
 
     private SubConfig currentConfig;
-    private File configDir;
+    private final File configDir;
 
     public ConfigManager(String configDir, String defaultFileName) {
         this(new File(configDir), defaultFileName);
@@ -29,7 +29,7 @@ public class ConfigManager {
         this.configDir = dir;
 
         if (!dir.exists()) {
-            HeliosClient.LOGGER.warn("File directory not found, \"{}\" . Creating a new directory",dir.getAbsolutePath());
+            HeliosClient.LOGGER.warn("File directory not found, \"{}\" . Creating a new directory", dir.getAbsolutePath());
             dir.mkdirs();
         }
 
@@ -39,9 +39,9 @@ public class ConfigManager {
     /**
      * Puts the key and value in the current config if not null
      */
-    public void put(String key, Object value){
-        if(currentConfig != null){
-            currentConfig.getWriteData().put(key,value);
+    public void put(String key, Object value) {
+        if (currentConfig != null) {
+            currentConfig.getWriteData().put(key, value);
         }
     }
 
@@ -49,8 +49,8 @@ public class ConfigManager {
     /**
      * Checks if the current config is empty
      */
-    public boolean checkIfEmpty(){
-        if(currentConfig != null){
+    public boolean checkIfEmpty() {
+        if (currentConfig != null) {
             return FileUtils.isFileEmpty(currentConfig.configFile);
         }
 
@@ -60,8 +60,8 @@ public class ConfigManager {
     /**
      * Checks if the given config is empty
      */
-    public boolean checkIfEmpty(SubConfig config){
-        if(config != null){
+    public boolean checkIfEmpty(SubConfig config) {
+        if (config != null) {
             return FileUtils.isFileEmpty(config.configFile);
         }
 
@@ -71,9 +71,9 @@ public class ConfigManager {
     /**
      * Checks if the given config is empty
      */
-    public boolean checkIfEmpty(String fileName){
-        for(SubConfig config: subConfigs){
-            if(config.configFile.getName().replace(".json","").equals(fileName)){
+    public boolean checkIfEmpty(String fileName) {
+        for (SubConfig config : subConfigs) {
+            if (config.configFile.getName().replace(".json", "").equals(fileName)) {
                 return checkIfEmpty(config);
             }
         }
@@ -82,12 +82,13 @@ public class ConfigManager {
     }
 
     /**
-     * Calls the save method of the current config if it is not null
+     * Calls the save method of the current config if it is not null.
+     * Remember to write data before saving else it won't save!
      *
      * @return whether it has been saved or not
      */
-    public boolean save(boolean fixReadData){
-        if(currentConfig != null){
+    public boolean save(boolean fixReadData) {
+        if (currentConfig != null) {
             return currentConfig.save(fixReadData);
         }
 
@@ -97,9 +98,9 @@ public class ConfigManager {
     /**
      * Calls the load method of the current config if it is not null
      */
-    public void load(){
-        if(currentConfig != null){
-           currentConfig.load();
+    public void load() {
+        if (currentConfig != null) {
+            currentConfig.load();
         }
     }
 
@@ -112,7 +113,7 @@ public class ConfigManager {
         for (File file : Objects.requireNonNull(configDir.listFiles((dir1, name) -> name.endsWith(".json")))) {
             String fileName = file.getName().replace(".json", "");
             SubConfig subConfig = new SubConfig(file.getAbsolutePath().replace(".json", ""));
-            HeliosClient.LOGGER.info("SubConfig found, \"{}\"",file.getAbsolutePath());
+            HeliosClient.LOGGER.info("SubConfig found, \"{}\"", file.getAbsolutePath());
             subConfigs.add(subConfig);
             configNames.add(fileName);
 
@@ -125,7 +126,7 @@ public class ConfigManager {
             File file = new File(configDir, defaultFileName + ".json");
             try {
                 file.createNewFile();
-                currentConfig = new SubConfig(file.getAbsolutePath().replace(".json",""));
+                currentConfig = new SubConfig(file.getAbsolutePath().replace(".json", ""));
                 subConfigs.add(currentConfig);
             } catch (IOException e) {
                 HeliosClient.LOGGER.error("Error while creating new default file: \"{}\"", defaultFileName, e);
@@ -138,26 +139,27 @@ public class ConfigManager {
      */
     public void switchConfig(String configName, boolean saveCurrent) {
         SubConfig newConfig = getSubConfig(configName);
-        if (newConfig != null) {
+        if (newConfig != null && currentConfig != newConfig) {
             if (saveCurrent && currentConfig != null) {
                 if (currentConfig.save(false)) {
 
                     //Free our precious memory. We can read it again anyway. And we have stored what we wanted
                     currentConfig.getReadData().clear();
-                    currentConfig.getWriteData().clear();
 
                     newConfig.load();
                     currentConfig = newConfig;
                 }
             } else {
                 //We will probably read it again so why not clear it now
-                if(currentConfig != null) {
+                if (currentConfig != null) {
                     currentConfig.getReadData().clear();
                 }
 
                 newConfig.load();
                 currentConfig = newConfig;
             }
+        }else if(currentConfig != newConfig){
+            HeliosClient.LOGGER.error("Config with name \"{}\" was not found while switching",configName);
         }
     }
 
@@ -174,7 +176,7 @@ public class ConfigManager {
     public void createAndAdd(String fileName) {
         SubConfig subConfig = new SubConfig(configDir.getAbsolutePath() + "/" + fileName);
 
-        if(!subConfig.configFile.exists()){
+        if (!subConfig.configFile.exists()) {
             try {
                 subConfig.configFile.createNewFile();
                 HeliosClient.LOGGER.info("Created file successfully \"{}\"", subConfig.configFile.getAbsolutePath());

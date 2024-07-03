@@ -30,7 +30,7 @@ public class BlockListSetting extends ListSetting<Block> {
                             List<Block> defaultSelectedBlocks,
                             Predicate<Block> filter,
                             ISettingChange iSettingChange) {
-        super(name,description,shouldRender, defaultValue,defaultSelectedBlocks,filter,iSettingChange,Registries.BLOCK);
+        super(name, description, shouldRender, defaultValue, defaultSelectedBlocks, filter, iSettingChange, Registries.BLOCK);
     }
 
     @Override
@@ -58,22 +58,22 @@ public class BlockListSetting extends ListSetting<Block> {
 
         for (Block block : getDisplayableEntries()) {
 
-            if(block.getName().getString().contains("Potted")) continue;
+            if (block.getName().getString().contains("Potted")) continue;
 
             if (filter.test(block)) {
                 if (mouseX >= x + offsetX && mouseX <= x + 16 + offsetX && mouseY >= y + offsetY && mouseY <= y + offsetY + 16) {
                     // Handle click on the blocks
                     if (selectedEntries.contains(block)) {
                         selectedEntries.remove(block);
-                    } else if(selectedEntries.size() < maxSelectable){
+                    } else if (selectedEntries.size() < maxSelectable) {
                         selectedEntries.add(block);
                     }
                     postSettingChange();
                 }
-                if(offsetX > window.getWindowWidth() - 20) {
+                if (offsetX > window.getWindowWidth() - 20) {
                     offsetY += 16;
                     offsetX = 0;
-                }else {
+                } else {
                     offsetX += 16;
                 }
             }
@@ -90,36 +90,36 @@ public class BlockListSetting extends ListSetting<Block> {
         int offsetX = 0;
         for (Block block : getDisplayableEntries()) {
             //Fuck potted plants
-            if(block.getName().getString().contains("Potted")) continue;
+            if (block.getName().getString().contains("Potted")) continue;
 
             if (filter.test(block)) {
                 if (selectedEntries.contains(block) && y + offsetY > 8) {
                     // Render a selection indicator for selected blocks
                     Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + offsetX, y + offsetY, 16, 16, Color.GREEN.getRGB());
                 }
-                if(block.getName().getString().contains("Air")){
-                    FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(),block.getName().getString(),x + offsetX + FontRenderers.Small_fxfontRenderer.getStringWidth(block.getName().getString())/2.0f,y + offsetY + 3,-1);
+                if (block.getName().getString().contains("Air")) {
+                    FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), block.getName().getString(), x + offsetX + FontRenderers.Small_fxfontRenderer.getStringWidth(block.getName().getString()) / 2.0f, y + offsetY + 3, -1);
                 }
 
                 int anyOffset = 0;
-                if(mouseX >= x + offsetX && mouseX <= x + 16 + offsetX && mouseY >= y + offsetY && mouseY <= y + offsetY + 16){
+                if (mouseX >= x + offsetX && mouseX <= x + 16 + offsetX && mouseY >= y + offsetY && mouseY <= y + offsetY + 16) {
                     anyOffset = -1;
                     drawContext.getMatrices().push();
-                    drawContext.getMatrices().translate(0,0,160);
+                    drawContext.getMatrices().translate(0, 0, 160);
                     Tooltip.tooltip.changeText(block.getName().getString());
-                    Tooltip.tooltip.render(drawContext,HeliosClient.MC.textRenderer, x + window.getWindowWidth() + 2,y + offsetY + 5);
+                    Tooltip.tooltip.render(drawContext, HeliosClient.MC.textRenderer, x + window.getWindowWidth() + 2, y + offsetY + 5);
                     drawContext.getMatrices().pop();
                 }
 
-                if(y + offsetY > 8) {
+                if (y + offsetY > 8) {
                     drawContext.drawItem(getItemForBlock(block).getDefaultStack(), x + offsetX, y + offsetY + anyOffset);
                 }
 
 
-                if(offsetX > window.getWindowWidth() - 20) {
+                if (offsetX > window.getWindowWidth() - 20) {
                     offsetY += 16;
                     offsetX = 0;
-                }else {
+                } else {
                     offsetX += 16;
                 }
             }
@@ -127,7 +127,7 @@ public class BlockListSetting extends ListSetting<Block> {
         return offsetY + 32;
     }
 
-    public Item getItemForBlock(Block b){
+    public Item getItemForBlock(Block b) {
         if (b.equals(Blocks.LAVA)) {
             return Items.LAVA_BUCKET;
         } else if (b.equals(Blocks.WATER)) {
@@ -140,7 +140,7 @@ public class BlockListSetting extends ListSetting<Block> {
     }
 
     private int renderSelected(DrawContext drawContext, int x, int y, int width) {
-        if(selectedEntries.isEmpty()){
+        if (selectedEntries.isEmpty()) {
             return 0;
         }
 
@@ -152,8 +152,8 @@ public class BlockListSetting extends ListSetting<Block> {
         for (Block block : selectedEntries) {
 
             String blockName = block.getName().getString();
-            if(blockName.contains("Air")){
-                FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(),blockName,x + offsetX + FontRenderers.Small_fxfontRenderer.getStringWidth(blockName)/2.0f,y + offsetY + 3,-1);
+            if (blockName.contains("Air")) {
+                FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), blockName, x + offsetX + FontRenderers.Small_fxfontRenderer.getStringWidth(blockName) / 2.0f, y + offsetY + 3, -1);
             }
 
             if (y + offsetY > 8) {
@@ -172,8 +172,8 @@ public class BlockListSetting extends ListSetting<Block> {
     }
 
     public static class Builder extends SettingBuilder<Builder, List<Block>, BlockListSetting> {
-        private Predicate<Block> filter = blocks -> true; // default filter: always true
         List<Block> defaultSelectedBlocks = new ArrayList<>();
+        private Predicate<Block> filter = blocks -> true; // default filter: always true
         private ISettingChange iSettingChange;
 
         public Builder() {
@@ -184,11 +184,13 @@ public class BlockListSetting extends ListSetting<Block> {
             this.defaultSelectedBlocks = defaultSelectedBlocks;
             return this;
         }
+
         public Builder blocks(Block... defaultSelectedBlocks) {
-            if(defaultSelectedBlocks != null)
+            if (defaultSelectedBlocks != null)
                 Collections.addAll(this.defaultSelectedBlocks, defaultSelectedBlocks);
             return this;
         }
+
         public Builder iSettingChange(ISettingChange change) {
             this.iSettingChange = change;
             return this;
@@ -201,7 +203,7 @@ public class BlockListSetting extends ListSetting<Block> {
 
         @Override
         public BlockListSetting build() {
-            return new BlockListSetting(name,description,shouldRender, defaultValue,defaultSelectedBlocks, filter,iSettingChange);
+            return new BlockListSetting(name, description, shouldRender, defaultValue, defaultSelectedBlocks, filter, iSettingChange);
         }
     }
 }

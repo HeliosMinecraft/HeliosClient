@@ -55,9 +55,11 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+	//Should we remove this?
+	//I mean we do use it for saving configs but it can be easily replaced
+
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
 
 	//Renderer 1.20.4 library
 	//TODO: Move to 1.20.6
@@ -70,17 +72,12 @@ dependencies {
 	// LuaJ library
 	modInclude("org.luaj:luaj-jse:3.0.1")
 
-	// TOML parser
-	modInclude('com.moandjiezana.toml:toml4j:0.7.2')
-
 	// ModMenu
 	modApi "com.terraformersmc:modmenu:${project.modmenu_version}"
 
 	// Discord GameSDK
 	modInclude('com.github.JnCrMx:discord-game-sdk4j:v0.5.5')
 
-//	shadow project(":launch")
-//	library "de.florianmichael:WaybackAuthLib:1.0.0"
 	// Uncomment the following line to enable the deprecated Fabric API modules.
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 

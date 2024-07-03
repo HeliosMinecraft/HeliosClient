@@ -2,8 +2,6 @@ package dev.heliosclient.ui.clickgui.hudeditor;
 
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.module.settings.ParentScreenSetting;
-import dev.heliosclient.module.settings.lists.ListSetting;
-import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.clickgui.Tooltip;
