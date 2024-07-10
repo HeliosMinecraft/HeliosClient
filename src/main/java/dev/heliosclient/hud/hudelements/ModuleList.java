@@ -29,9 +29,6 @@ public class ModuleList extends HudElement implements Listener {
 
     public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
 
-    //Managing a structure of sorted Modules to prevent resorting them every time unless the enabled modules change.
-    private List<Module_> sortedModules = new ArrayList<>();
-
     public SettingGroup sgSettings = new SettingGroup("Settings");
     private final CycleSetting sort = sgSettings.add(new CycleSetting.Builder()
             .name("Sort")
@@ -49,6 +46,13 @@ public class ModuleList extends HudElement implements Listener {
             .defaultValue(true)
             .build()
     );
+    public RGBASetting moduleInfoColor = sgSettings.add(new RGBASetting.Builder()
+            .name("ModuleInfo Color")
+            .description("Color of the ModuleInfo text")
+            .defaultValue(Color.DARK_GRAY)
+            .onSettingChange(this)
+            .shouldRender(() -> moduleInfo.value)
+            .build());
     private final BooleanSetting background = sgSettings.add(new BooleanSetting.Builder()
             .name("Render Module Background")
             .description("Renders a background behind the module name and info")
@@ -168,6 +172,10 @@ public class ModuleList extends HudElement implements Listener {
             .build()
     );
     private ArrayList<Module_> enabledModules = ModuleManager.getEnabledModules();
+
+    //Managing a structure of sorted Modules to prevent resorting them every time unless the enabled modules change.
+    private List<Module_> sortedModules = new ArrayList<>();
+
     private Color rainbow = new Color(255, 255, 255);
     private double rainbowHue1;
     private double rainbowHue2;
@@ -179,17 +187,11 @@ public class ModuleList extends HudElement implements Listener {
         this.width = 50;
         EventManager.register(this);
         addSettingGroup(sgSettings);
-
     }
 
     @Override
     public void onLoad() {
-    }
-
-    @Override
-    public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         int maxWidth = 0;
-
         // Calculate the maximum width of the module names for enabled modules only
         for (Module_ m : enabledModules) {
             if (!m.showInModulesList.value) continue;
@@ -197,6 +199,11 @@ public class ModuleList extends HudElement implements Listener {
             int nameWidth = Math.round(Renderer2D.getStringWidth(name));
             maxWidth = Math.max(maxWidth, nameWidth);
         }
+        this.width = maxWidth + (sideLines.value ? 4 : 0);
+    }
+
+    @Override
+    public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         if (colorMode.getOption() == METEOR) {
             rainbowHue1 += rainbowSpeed.value * mc.getTickDelta();
             if (rainbowHue1 > 1) rainbowHue1 -= 1;
@@ -206,7 +213,6 @@ public class ModuleList extends HudElement implements Listener {
         }
 
         // Render each module with a different color
-        this.width = maxWidth + (sideLines.value ? 4 : 0);
         int yOffset = this.y; // Start rendering from this.y
 
         for (Module_ m : enabledModules) {
@@ -214,7 +220,7 @@ public class ModuleList extends HudElement implements Listener {
 
             String info = m.getInfoString();
 
-            float nameWidth = Renderer2D.getStringWidth(m.name) + ((info.isEmpty() || !moduleInfo.value) ? 0 : Renderer2D.getStringWidth(" [" + info + "]"));
+            float nameWidth = Renderer2D.getStringWidth(m.name) + getInfoStringWidth(info);
             if (colorMode.getOption() == METEOR) {
                 rainbowHue2 += rainbowSpread.value;
                 rainbow = new Color(Color.HSBtoRGB((float) rainbowHue2, (float) rainbowSaturation.value, (float) rainbowBrightness.value));
@@ -253,7 +259,7 @@ public class ModuleList extends HudElement implements Listener {
             if (moduleInfo.value && !info.isEmpty()) {
                 Renderer2D.drawString(drawContext.getMatrices(), "[" + info + "]",
                         textX + Renderer2D.getStringWidth(m.name + " "), 1 + yOffset,
-                        Color.DARK_GRAY.getRGB());
+                        moduleInfoColor.getColor().getRGB());
             }
 
 
@@ -263,8 +269,8 @@ public class ModuleList extends HudElement implements Listener {
     }
     private Comparator<Module_> getComparator() {
         return (m1, m2) -> {
-            float name1Width = Renderer2D.getStringWidth(m1.name) + ((m1.getInfoString().isEmpty() || !moduleInfo.value) ? 0 : Renderer2D.getStringWidth(" [" + m1.getInfoString() + "]"));
-            float name2Width = Renderer2D.getStringWidth(m2.name) + ((m2.getInfoString().isEmpty() || !moduleInfo.value) ? 0 : Renderer2D.getStringWidth(" [" + m2.getInfoString() + "]"));
+            float name1Width = Renderer2D.getStringWidth(m1.name) + getInfoStringWidth(m1.getInfoString());
+            float name2Width = Renderer2D.getStringWidth(m2.name) + getInfoStringWidth(m2.getInfoString());
             return switch ((Sort) sort.getOption()) {
                 case Alphabetical -> m1.name.compareTo(m2.name);
                 case Biggest -> Float.compare(name2Width, name1Width);
@@ -272,12 +278,27 @@ public class ModuleList extends HudElement implements Listener {
             };
         };
     }
+
+    private float getInfoStringWidth(String infoString){
+        return (infoString.isEmpty() || !moduleInfo.value) ? 0 : Renderer2D.getStringWidth(" [" + infoString + "]");
+    }
+
     @SubscribeEvent
     public void update(TickEvent.CLIENT event) {
         enabledModules = ModuleManager.getEnabledModules();
         if (!enabledModules.equals(sortedModules)) {
             enabledModules.sort(getComparator());
             sortedModules = new ArrayList<>(enabledModules);
+
+            int maxWidth = 0;
+            // Calculate the maximum width of the module names for enabled modules only
+            for (Module_ m : enabledModules) {
+                if (!m.showInModulesList.value) continue;
+                String name = moduleInfo.value ? m.getNameWithInfo() : m.name;
+                int nameWidth = Math.round(Renderer2D.getStringWidth(name));
+                maxWidth = Math.max(maxWidth, nameWidth);
+            }
+            this.width = maxWidth + (sideLines.value ? 4 : 0);
         }
     }
 
@@ -295,7 +316,4 @@ public class ModuleList extends HudElement implements Listener {
         LOW_BG_ALPHA,
         NORMAL
     }
-
-
-
 }

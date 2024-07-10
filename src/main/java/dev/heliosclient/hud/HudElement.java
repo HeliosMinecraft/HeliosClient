@@ -482,6 +482,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
 
     @Override
     public void loadFromFile(Map<String, Object> MAP) {
+        //Hope it saves as double and not any other.
         List<Double> obj = (List<Double>) MAP.get("dimensions");
         this.x = MathUtils.d2iSafe(obj.get(0));
         this.y = MathUtils.d2iSafe(obj.get(1));

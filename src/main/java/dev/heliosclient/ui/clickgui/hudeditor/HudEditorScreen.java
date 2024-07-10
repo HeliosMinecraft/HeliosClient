@@ -57,6 +57,7 @@ public class HudEditorScreen extends Screen implements Listener {
 
         if (HeliosClient.CLICKGUI.ScreenHelp.value) {
             float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Ctrl- C/V - To Copy/Paste HudElement properties", 2, drawContext.getScaledWindowHeight() - (5 * fontHeight) - 5 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Select Element", 2, drawContext.getScaledWindowHeight() - (4 * fontHeight) - 4 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (3 * fontHeight) - 3 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Delete / Backspace - Remove Element", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
