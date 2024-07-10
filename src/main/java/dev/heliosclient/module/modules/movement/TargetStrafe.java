@@ -155,13 +155,13 @@ public class TargetStrafe extends Module_ {
     @SubscribeEvent
     public void onTicks(TickEvent.PLAYER event) {
         TargetUtils.getInstance().setRange(range.value);
-        LivingEntity entity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(true);
+        LivingEntity entity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(e-> !isBlackListed(e),true);
 
         if (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam(entity)) {
             return;
         }
 
-        if (entity != null) {
+        if (entity != null && entity.distanceTo(mc.player) <= range.value) {
             if (mc.player == null || !entity.isAlive()) return;
 
             Vec3d targetPos = entity.getPos();
@@ -204,7 +204,7 @@ public class TargetStrafe extends Module_ {
                 }
 
             } else {
-                doStrafe(playerPos, entity, targetPos);
+                doMotionStrafe(playerPos, entity, targetPos);
             }
             // jump while strafing
             if (jump.value && mc.player.isOnGround()) {
@@ -235,7 +235,7 @@ public class TargetStrafe extends Module_ {
         }
     }
 
-    public void doStrafe(Vec3d playerPos, Entity entity, Vec3d targetPos) {
+    public void doMotionStrafe(Vec3d playerPos, Entity entity, Vec3d targetPos) {
         double dx = targetPos.x - playerPos.x;
         double dz = targetPos.z - playerPos.z;
 

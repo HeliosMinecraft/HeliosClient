@@ -7,6 +7,8 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.HudManager;
+import dev.heliosclient.module.settings.Setting;
+import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
@@ -19,7 +21,9 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HudEditorScreen extends Screen implements Listener {
     public static HudEditorScreen INSTANCE = new HudEditorScreen();
@@ -29,6 +33,7 @@ public class HudEditorScreen extends Screen implements Listener {
     // Variables to track the drag state and initial position
     private boolean isDragging = false;
     private HudBox dragBox = null;
+    private final Map<String, Object> copiedSettings = new HashMap<>();
 
 
     private HudEditorScreen() {
@@ -221,13 +226,32 @@ public class HudEditorScreen extends Screen implements Listener {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
-            for (HudElement element : HudManager.INSTANCE.hudElements) {
+        boolean copied = false;
+        for (HudElement element : HudManager.INSTANCE.hudElements) {
+            if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
                 element.shiftDown = true;
             }
+
+            if (element.selected && isCopy(keyCode) && !copied) {
+                element.saveSettingsToMap(copiedSettings);
+                copied = true;
+                continue;
+            }
+
+            if (element.selected && isPaste(keyCode) && copiedSettings != null && !copiedSettings.isEmpty()) {
+                for (SettingGroup settingGroup : element.settingGroups) {
+                    for (Setting<?> setting : settingGroup.getSettings()) {
+                        if (!setting.shouldSaveAndLoad()) continue;
+
+                        setting.loadFromFile(copiedSettings);
+                    }
+                }
+            }
         }
+
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
+
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {

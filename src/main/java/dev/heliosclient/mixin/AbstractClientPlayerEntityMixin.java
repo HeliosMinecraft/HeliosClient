@@ -29,8 +29,9 @@ public abstract class AbstractClientPlayerEntityMixin {
         if (elytraTexture == null) {
             elytraTexture = SKIN;
         }
+
         //Modify the skin texture
-        return new SkinTextures(original.texture(), original.textureUrl(), CapeManager.CURRENT_PLAYER_CAPE, elytraTexture, original.model(), original.secure());
+        return new SkinTextures(original.texture(), original.textureUrl(), CapeManager.CURRENT_PLAYER_CAPE == null? original.capeTexture() : CapeManager.CURRENT_PLAYER_CAPE, elytraTexture, original.model(), original.secure());
     }
 
     @Inject(method = "getSkinTextures", at = @At("RETURN"), cancellable = true)

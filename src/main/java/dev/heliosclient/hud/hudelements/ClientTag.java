@@ -16,7 +16,9 @@ public class ClientTag extends HudElement {
         this.height = Math.round(Renderer2D.getStringHeight());
         this.draggable = false;
         this.renderOutLineBox = false;
-    }    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
+    }
+
+    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {

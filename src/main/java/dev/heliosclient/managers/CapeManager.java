@@ -37,11 +37,11 @@ public class CapeManager {
     //Where we store and get our capes.
     private static final File CAPE_DIRECTORY = new File(HeliosClient.MC.runDirectory, "heliosclient/capes");
     private static final String DEFAULT_CAPE = "helioscape.png";
-    //The default CURRENT_PLAYER_CAPE texture of heliosclient.
+    //The default cape texture of heliosclient.
     public static final Identifier DEFAULT_CAPE_TEXTURE = new Identifier("heliosclient", "capes/" + DEFAULT_CAPE);
     //All the capes which are registered in the dynamic texture manager
     private static final Set<String> registeredTextures = new HashSet<>();
-    //A map of all CURRENT_PLAYER_CAPE textures keyed with the UUID
+    //A map of all cape textures keyed with the UUID
     private static final Map<UUID, Identifier> CAPES = new HashMap<>();
 
     //These maps are supposed to be used when we need to check for heliosclient users to apply capes to them
@@ -52,10 +52,10 @@ public class CapeManager {
     //A string of the names of the CURRENT_PLAYER_CAPE. Used in CapeModule
     public static String[] CAPE_NAMES = new String[]{};
 
-    //Current CURRENT_PLAYER_CAPE texture we are applying to the player
+    //Current cape texture we are applying to the player
     public static Identifier CURRENT_PLAYER_CAPE;
 
-    //List of all CURRENT_PLAYER_CAPE and elytra textures.
+    //List of all capes and elytra textures.
     public static List<Identifier> capeIdentifiers = new ArrayList<>();
     public static List<Identifier> elytraIdentifiers = new ArrayList<>();
 

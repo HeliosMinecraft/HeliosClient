@@ -58,27 +58,30 @@ public class HeliosClient implements ModInitializer, Listener {
 
     public static void loadConfig() {
         load(config -> {
-            CONFIG.loadEverything();
+            config.loadEverything();
             LOGGER.info("Loading Config complete in: {}s", configTimer.getElapsedTime());
 
-            String configSelectedbefore = (String) CONFIG.otherConfigManager.getCurrentConfig().getReadData().get(CLICKGUI.switchConfigs.getSaveName());
-            if (configSelectedbefore != null) {
-                CONFIG.getModuleConfigManager().switchConfig(configSelectedbefore, false);
+            String configSelectedAsSaved = (String) config.otherConfigManager.getCurrentConfig().getReadData().get(CLICKGUI.switchConfigs.getSaveName());
+            if (configSelectedAsSaved != null) {
+                //We are loading at the earliest before the user can make changes so no need to save.
+                config.getModuleConfigManager().switchConfig(configSelectedAsSaved, false);
                 loadModulesOnly();
             }
         });
     }
 
     private static void load(Consumer<Config> consumer) {
+        //Record time it took
+
         configTimer.startTimer();
 
         consumer.accept(CONFIG);
 
-        configTimer.resetTimer();
-
         if (shouldSendNotification() && ModuleManager.get(NotificationModule.class).clientNotification.value) {
             NotificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
+
+        configTimer.resetTimer();
 
         // Font event is posted to allow the GUI to reset its calculation for the new font by the config.
         if (fonts != null)

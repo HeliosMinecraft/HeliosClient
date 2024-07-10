@@ -465,15 +465,19 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
 
         map.put("dimensions", objects);
 
+        saveSettingsToMap(map);
+
+        return map;
+    }
+
+    public void saveSettingsToMap(Map<String, Object> MAP){
         for (SettingGroup settingGroup : settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (setting.name != null) {
-                    map.put(setting.getSaveName(), setting.saveToFile(new ArrayList<>()));
+                    MAP.put(setting.getSaveName(), setting.saveToFile(new ArrayList<>()));
                 }
             }
         }
-
-        return map;
     }
 
     @Override
