@@ -1,4 +1,4 @@
-package dev.heliosclient.ui.clickgui.settings.lists;
+package dev.heliosclient.ui.clickgui.settings;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.EventManager;
@@ -47,6 +47,7 @@ public class ListSettingsScreen extends Screen implements IWindowContentRenderer
             }
         });
 
+        setting.handleMouseClickOnSelectAllBox(mouseX,mouseY,window.getX() + windowWidth - 20, searchBar.y);
         setting.handleMouseClick(mouseX, mouseY, button, window);
 
         return super.mouseClicked(mouseX, mouseY, button);
@@ -98,6 +99,8 @@ public class ListSettingsScreen extends Screen implements IWindowContentRenderer
         searchBar.render(drawContext, x + windowWidth / 2 - 66, y, mouseX, mouseY, textRenderer);
 
         if (setting != null) {
+            setting.renderSelectAllBox(drawContext,x + windowWidth - 20, searchBar.y);
+
             windowHeight = setting.handleRenderingEntries(drawContext, x + 1, y + 30, mouseX, mouseY, window);
             window.setWindowHeight(windowHeight + 60);
         }

@@ -1391,7 +1391,7 @@ public class Renderer2D implements Listener {
         StringBuilder line = new StringBuilder();
 
         for (String word : words) {
-            int lineWidth = textRenderer.getWidth(line + word + " ");
+            int lineWidth = textRenderer.getWidth(line.toString() + word + " ");
             if (lineWidth > maxWidth) {
                 lines.add(line.toString());
                 line.setLength(0);

@@ -380,7 +380,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         List<?> list = (List<?>) MAP.get(this.getSaveName());
 
         value = ColorUtils.intToColor(MathUtils.d2iSafe(list.get(0)));
-        rainbow = MathUtils.d2iSafe(list.get(0)) == 1;
+        rainbow = MathUtils.d2iSafe(list.get(1)) == 1;
         updateHandles();
     }
 

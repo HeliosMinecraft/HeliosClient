@@ -3,7 +3,7 @@ package dev.heliosclient.module.settings.lists;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.settings.ParentScreenSetting;
 import dev.heliosclient.ui.clickgui.gui.Window;
-import dev.heliosclient.ui.clickgui.settings.lists.ListSettingsScreen;
+import dev.heliosclient.ui.clickgui.settings.ListSettingsScreen;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
@@ -22,18 +23,17 @@ import java.util.function.Predicate;
 
 public abstract class ListSetting<T extends Object> extends ParentScreenSetting<List<T>> {
     protected final Predicate<T> filter;
-    protected final List<T> selectedEntries = new ArrayList<>();
+    protected List<T> selectedEntries;
     protected final List<T> defaultSelectedEntries = new ArrayList<>();
     protected final List<T> searchRelevantEntries = new ArrayList<>();
     public List<T> value;
     public List<T> defaultValue;
-    public int maxSelectable = Integer.MAX_VALUE;
+    public int maxSelectable;
     public boolean showSelected = true;
     public ISettingChange iSettingChange;
     protected float nameWidth = 10;
     protected String searchTerm = ""; // added search term field
     protected Registry<T> registry;
-
 
     public ListSetting(String name, String description, BooleanSupplier shouldRender, List<T> defaultValue, List<T> defaultSelected, Predicate<T> filter, ISettingChange iSettingChange, Registry<T> registry) {
         super(shouldRender, defaultValue);
@@ -43,6 +43,8 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
         this.filter = filter;
         this.height = 24;
         this.heightCompact = 20;
+        this.maxSelectable = defaultValue.size();
+        this.selectedEntries = new ArrayList<>(maxSelectable);
         this.selectedEntries.addAll(defaultSelected);
         this.defaultSelectedEntries.addAll(defaultSelected);
         this.registry = registry;
@@ -63,6 +65,27 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
 
         FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), "\uEAF3", x + nameWidth + 12.4f, y + 4.5f, -1);
     }
+
+    public void renderSelectAllBox(DrawContext drawContext, int x, int y) {
+        Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, 10, 10, 2f, 0.7f, 0xFFFFFFFF);
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x  + 1.5f, y + 1.7f, 6.5f, 6.5f, 2f, new HashSet<>(selectedEntries).containsAll(value) ? HeliosClient.CLICKGUI.getAccentColor() : 0xFF222222);
+    }
+
+    public void handleMouseClickOnSelectAllBox(double mouseX, double mouseY, int boxX, int boxY){
+        if(isMouseOver(mouseX,mouseY,boxX,boxY,10,10)){
+            if(new HashSet<>(selectedEntries).containsAll(value)){
+                selectedEntries.clear();
+            }else if(selectedEntries.size() < maxSelectable){
+                selectedEntries.clear();
+                selectedEntries.addAll(value);
+            }
+        }
+    }
+
+    public static boolean isMouseOver(double mouseX, double mouseY, float x, float y, float width, float height) {
+        return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+    }
+
 
     public abstract String getEntryName(T e);
 

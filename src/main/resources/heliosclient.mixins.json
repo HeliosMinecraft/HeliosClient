@@ -72,7 +72,6 @@
     "MixinInGameOverlayRenderer",
     "MixinItemRenderer",
     "MixinParticleManager",
-    "MixinRenderLayers",
     "MixinRenderTickCounter",
     "MixinSplashScreen",
     "MouseMixin",

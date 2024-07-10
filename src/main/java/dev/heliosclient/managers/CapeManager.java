@@ -11,6 +11,7 @@ import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.cape.ProfileUtils;
 import dev.heliosclient.util.fontutils.FontLoader;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -253,6 +254,10 @@ public class CapeManager {
             HeliosClient.LOGGER.error("Connection Message: {}, Response Code: {}", connection.getResponseMessage(), connection.getResponseCode());
             throw new HttpResponseException(connection.getResponseCode(), connection.getResponseMessage());
         }
+    }
+
+    public static boolean isETFPresent(){
+        return FabricLoader.getInstance().isModLoaded("entity_texture_features");
     }
 
     public static boolean shouldPlayerHaveCape(PlayerEntity player) {

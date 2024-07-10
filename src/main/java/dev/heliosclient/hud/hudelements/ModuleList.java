@@ -16,6 +16,7 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static dev.heliosclient.hud.hudelements.ModuleList.ColorMode.METEOR;
@@ -25,6 +26,11 @@ import static dev.heliosclient.hud.hudelements.ModuleList.Sort.Biggest;
  * Color credits: <a href="https://github.com/MeteorDevelopment/meteor-client/">Meteor-Client</a>
  */
 public class ModuleList extends HudElement implements Listener {
+
+    public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
+
+    //Managing a structure of sorted Modules to prevent resorting them every time unless the enabled modules change.
+    private List<Module_> sortedModules = new ArrayList<>();
 
     public SettingGroup sgSettings = new SettingGroup("Settings");
     private final CycleSetting sort = sgSettings.add(new CycleSetting.Builder()
@@ -187,7 +193,8 @@ public class ModuleList extends HudElement implements Listener {
         // Calculate the maximum width of the module names for enabled modules only
         for (Module_ m : enabledModules) {
             if (!m.showInModulesList.value) continue;
-            int nameWidth = Math.round(Renderer2D.getStringWidth(m.name));
+            String name = moduleInfo.value ? m.getNameWithInfo() : m.name;
+            int nameWidth = Math.round(Renderer2D.getStringWidth(name));
             maxWidth = Math.max(maxWidth, nameWidth);
         }
         if (colorMode.getOption() == METEOR) {
@@ -254,17 +261,24 @@ public class ModuleList extends HudElement implements Listener {
         }
         this.height = Math.max(yOffset - this.y + 2, 40);
     }
-
+    private Comparator<Module_> getComparator() {
+        return (m1, m2) -> {
+            float name1Width = Renderer2D.getStringWidth(m1.name) + ((m1.getInfoString().isEmpty() || !moduleInfo.value) ? 0 : Renderer2D.getStringWidth(" [" + m1.getInfoString() + "]"));
+            float name2Width = Renderer2D.getStringWidth(m2.name) + ((m2.getInfoString().isEmpty() || !moduleInfo.value) ? 0 : Renderer2D.getStringWidth(" [" + m2.getInfoString() + "]"));
+            return switch ((Sort) sort.getOption()) {
+                case Alphabetical -> m1.name.compareTo(m2.name);
+                case Biggest -> Float.compare(name2Width, name1Width);
+                case Smallest -> Float.compare(name1Width, name2Width);
+            };
+        };
+    }
     @SubscribeEvent
     public void update(TickEvent.CLIENT event) {
         enabledModules = ModuleManager.getEnabledModules();
-        enabledModules.sort((mod1, mod2) -> switch ((Sort) sort.getOption()) {
-            case Alphabetical -> mod1.getNameWithInfo().compareTo(mod2.getNameWithInfo());
-            case Biggest ->
-                    Double.compare(Renderer2D.getStringWidth(mod2.getNameWithInfo()), Renderer2D.getStringWidth(mod1.getNameWithInfo()));
-            case Smallest ->
-                    Double.compare(Renderer2D.getStringWidth(mod1.getNameWithInfo()), Renderer2D.getStringWidth(mod2.getNameWithInfo()));
-        });
+        if (!enabledModules.equals(sortedModules)) {
+            enabledModules.sort(getComparator());
+            sortedModules = new ArrayList<>(enabledModules);
+        }
     }
 
     public enum Sort {
@@ -280,7 +294,7 @@ public class ModuleList extends HudElement implements Listener {
     public enum GlowMode {
         LOW_BG_ALPHA,
         NORMAL
-    }    public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
+    }
 
 
 

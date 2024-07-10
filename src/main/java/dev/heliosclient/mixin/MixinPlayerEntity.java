@@ -38,9 +38,6 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
     }
 
-    @Shadow
-    public abstract void increaseStat(Stat<?> stat, int amount);
-
     @Inject(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", at = @At("HEAD"))
     private void dropItem(ItemStack stack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> cir) {
         ItemDropEvent event = new ItemDropEvent(stack);

@@ -53,7 +53,8 @@ public class Xray extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-        mc.worldRenderer.reload();
+        if(mc.worldRenderer != null)
+         mc.worldRenderer.reload();
     }
 
     @Override

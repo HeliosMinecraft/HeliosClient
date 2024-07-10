@@ -19,7 +19,7 @@ public abstract class MixinWorld {
         if (explosion != null) {
             LivingEntity entity = explosion.getCausingEntity();
             float power = explosion.getPower();
-            EventManager.postEvent(new ExplosionEvent(entity, power));
+            EventManager.postEvent(new ExplosionEvent(entity, power,explosion));
         }
     }
 

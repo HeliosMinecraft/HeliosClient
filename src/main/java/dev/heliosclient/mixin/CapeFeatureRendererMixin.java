@@ -34,7 +34,6 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
     public CapeFeatureRendererMixin(FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> context) {
         super(context);
     }
-
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/network/AbstractClientPlayerEntity;FFFFFF)V", at = @At("HEAD"), cancellable = true)
     public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, AbstractClientPlayerEntity abstractClientPlayerEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
         if (!abstractClientPlayerEntity.isInvisible() && abstractClientPlayerEntity.isPartVisible(PlayerModelPart.CAPE) && ModuleManager.get(CapeModule.class).isActive()) {
@@ -82,25 +81,10 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
                 }
 
                 if (ModuleManager.get(CapeModule.class).customPhysics.value) {
-                    //New custom physics which adds speed modifier along with a small wind simulation
                     double playerSpeed = Math.sqrt(abstractClientPlayerEntity.getVelocity().x * abstractClientPlayerEntity.getVelocity().x + abstractClientPlayerEntity.getVelocity().z * abstractClientPlayerEntity.getVelocity().z);
                     float speedModifier = (float) Math.min(1, playerSpeed / 0.5);
-                    // Environmental factors
-                    Biome biome = abstractClientPlayerEntity.getWorld().getBiome(abstractClientPlayerEntity.getBlockPos()).value();
 
-                    //Random guess 120 blocks
-                    boolean isWindyBiome = biome.getPrecipitation(abstractClientPlayerEntity.getBlockPos()) == Biome.Precipitation.RAIN || abstractClientPlayerEntity.getY() > 120;
-                    boolean isRaining = abstractClientPlayerEntity.getWorld().isRaining();
-
-                    // Directional wind
-                    float windDirection = (float) Math.sin(System.currentTimeMillis() % 20000 / 20000.0 * 2 * Math.PI);
-                    float windStrength = isWindyBiome && isRaining ? 0.2F : 0.1F;
-                    float windEffect = windStrength * windDirection;
-
-                    // Add wind effect to CURRENT_PLAYER_CAPE rotation
-                    matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(6.0F + r / 2.0F + q + speedModifier * 15.0F + windEffect));
-                    matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(s / 2.0F));
-                    matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F - s / 2.0F));
+                    matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(6.0F + r / 2.0F + q + speedModifier * 15.0F ));
                 } else {
                     // Old physics
                     matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(6.0F + r / 2.0F + q));

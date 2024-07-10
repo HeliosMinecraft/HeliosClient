@@ -8,6 +8,7 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.util.player.PlayerUtils;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -60,7 +61,6 @@ public class Speed extends Module_ {
 
         // Strafe Mode
         if (speedMode.getOption() == Modes.Strafe) {
-            if ((mc.player.forwardSpeed != 0 || mc.player.sidewaysSpeed != 0)) {
                 if (!mc.player.isSprinting()) {
                     mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
                 }
@@ -74,7 +74,6 @@ public class Speed extends Module_ {
                     mc.player.updateVelocity(vel >= 0.3 ? 0.0f : 0.15f, new Vec3d(mc.player.sidewaysSpeed, 0, mc.player.forwardSpeed));
                     mc.player.jump();
                 }
-            }
         }
         // OnGround Mode
         else if (speedMode.getOption() == Modes.OnGround) {

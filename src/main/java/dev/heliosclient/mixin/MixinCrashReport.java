@@ -14,12 +14,18 @@ public abstract class MixinCrashReport {
     //Save our config when a crash occurs via the create method.
     @Inject(method = "create", at = @At("HEAD"))
     private static void onCreateCrashReport(Throwable cause, String title, CallbackInfoReturnable<CrashReport> cir) {
-        HeliosClient.saveConfigHook();
+        CrashReport report = cir.getReturnValue();
+
 
         //Display details of HeliosClient
-        CrashReport report = cir.getReturnValue();
-        if(report != null && report.getSystemDetailsSection() != null) {
-            report.getSystemDetailsSection().addSection("HeliosClient", () -> "Version " + HeliosClient.versionTag + " , Active Modules:" + ModuleManager.getEnabledModules());
+        if(report != null) {
+            if(HeliosClient.CONFIG != null && HeliosClient.CONFIG.nullCheck()) {
+                HeliosClient.saveConfigHook();
+            }
+
+            if(report.getSystemDetailsSection() != null) {
+                report.getSystemDetailsSection().addSection("HeliosClient", () -> "Version " + HeliosClient.versionTag + " , Active Modules:" + ModuleManager.getEnabledModules());
+            }
         }
     }
 }

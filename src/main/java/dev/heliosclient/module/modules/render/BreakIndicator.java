@@ -6,16 +6,19 @@ import dev.heliosclient.mixin.AccessorClientPlayerInteractionManager;
 import dev.heliosclient.mixin.AccessorWorldRenderer;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.CycleSetting;
-import dev.heliosclient.module.settings.RGBASetting;
-import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.settings.*;
+import dev.heliosclient.util.BlockUtils;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.BlockBreakingInfo;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.shape.VoxelShape;
 
 import java.awt.*;
@@ -25,6 +28,7 @@ import java.util.Map;
 import static dev.heliosclient.module.modules.render.BreakIndicator.IndicateType.*;
 
 public class BreakIndicator extends Module_ {
+
     SettingGroup sgGeneral = new SettingGroup("General");
 
     CycleSetting type = sgGeneral.add(new CycleSetting.Builder()
@@ -46,6 +50,7 @@ public class BreakIndicator extends Module_ {
             .build()
     );
 
+
     public BreakIndicator() {
         super("Break Indicator", "Indicates block breaking", Categories.RENDER);
         addSettingGroup(sgGeneral);
@@ -61,15 +66,17 @@ public class BreakIndicator extends Module_ {
 
         Map<Integer, BlockBreakingInfo> breakingInfos = ((AccessorWorldRenderer) mc.worldRenderer).getBlockBreakingInfos();
 
-        int selfBreakingProgress = mc.interactionManager.getBlockBreakingProgress();
+        float selfBreakingProgress = mc.interactionManager.getBlockBreakingProgress();
 
         if (selfBreakingProgress > 0 && currentBreakingPos != null) {
+            
             BlockState state = mc.world.getBlockState(currentBreakingPos);
             VoxelShape shape = state.getOutlineShape(mc.world, currentBreakingPos);
             if (shape == null || shape.isEmpty()) return;
 
-            renderIndicator(shape.getBoundingBox().expand(0.005f).offset(currentBreakingPos), selfBreakingProgress + 1);
+            renderIndicator(shape.getBoundingBox().expand(0.005f).offset(currentBreakingPos), selfBreakingProgress);
         }
+
         breakingInfos.forEach((integer, info) -> {
             BlockPos pos = info.getPos();
             if (pos.equals(currentBreakingPos)) return;
@@ -81,25 +88,29 @@ public class BreakIndicator extends Module_ {
 
             if (shape == null || shape.isEmpty()) return;
 
-
             renderIndicator(shape.getBoundingBox().expand(0.005f).offset(pos), breakProgress + 1);
         });
         Renderer3D.stopRenderingThroughWalls();
     }
 
-    public void renderIndicator(Box box, int breakingProg) {
+    public void renderIndicator(Box box, float breakingProg) {
         if (IndicateType.values()[type.value] == Highlight) {
             Renderer3D.drawBoxFill(box, QuadColor.single(highlightColor.value.getRGB()));
 
-        } else if (IndicateType.values()[type.value] == Expand) {
-            Box expandedBox = box.contract(1d, 1d, 1d).expand(1.0 - (breakingProg / 20.0));
-            Renderer3D.drawBoxBoth(expandedBox, QuadColor.single(getColor(breakingProg)), 1f);
+        } else if (IndicateType.values()[type.value] == Stretch) {
+            Box stretchedBox = shrinkBoxExtreme(box).stretch(0,0,breakingProg/10.0);
+            Renderer3D.drawBoxBoth(stretchedBox, QuadColor.single(getColor((int)breakingProg)), 1f);
 
         } else if (IndicateType.values()[type.value] == Shrink) {
             Box shrunkBox = box.expand(breakingProg / 20.0 - 1.0);
-            Renderer3D.drawBoxBoth(shrunkBox, QuadColor.single(getColor(breakingProg)), 1f);
+            Renderer3D.drawBoxBoth(shrunkBox, QuadColor.single(getColor((int)breakingProg)), 1f);
 
         }
+    }
+
+    public Box shrinkBoxExtreme(Box box){
+        //Shrinks box by changing its maxZ to minZ (i.e. its Z will stay at 0)
+        return new Box(box.minX,box.minY,box.minZ,box.maxX,box.maxY,box.minZ);
     }
 
     public int getColor(int breakingPos) {
@@ -113,6 +124,6 @@ public class BreakIndicator extends Module_ {
     public enum IndicateType {
         Highlight,
         Shrink,
-        Expand
+        Stretch
     }
 }

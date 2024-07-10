@@ -30,10 +30,12 @@ public abstract class Notification {
     }
 
     protected void initialise() {
+        int screenWidth = HeliosClient.MC.getWindow().getScaledWidth();
         if (ANIMATE != AnimationStyle.SLIDE) {
-            int screenWidth = HeliosClient.MC.getWindow().getScaledWidth();
             this.y = targetY + HEIGHT;
             this.x = screenWidth - WIDTH - 5;
+        }else {
+            this.x = screenWidth + 5;
         }
     }
 

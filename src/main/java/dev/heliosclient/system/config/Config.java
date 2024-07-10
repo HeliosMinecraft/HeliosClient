@@ -84,6 +84,10 @@ public class Config {
         }
     }
 
+    public boolean nullCheck(){
+        return moduleConfigManager == null || otherConfigManager  == null;
+    }
+
 
     public void loadConfigManagers() {
         //Loads default config if any of the files are empty

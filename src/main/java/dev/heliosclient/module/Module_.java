@@ -238,7 +238,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     }
 
     public String getNameWithInfo() {
-        return name + "[" + getInfoString() + "]";
+        return name + " [" + getInfoString() + "]";
     }
 
     /**

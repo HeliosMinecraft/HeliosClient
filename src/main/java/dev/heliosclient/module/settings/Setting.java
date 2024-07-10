@@ -48,6 +48,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     public Setting(BooleanSupplier shouldRender, T defaultValue) {
         this.shouldRender = shouldRender;
         this.defaultValue = defaultValue;
+        this.value = null; //Generic something idk
         EventManager.register(this);
     }
 
