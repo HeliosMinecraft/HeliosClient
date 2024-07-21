@@ -86,6 +86,7 @@ public class Renderer3D {
         // Fill
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
+
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         Vertexer.vertexBoxQuads(matrices, buffer, moveToZero(box), color, excludeDirs);
         tessellator.draw();
@@ -116,9 +117,14 @@ public class Renderer3D {
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
         RenderSystem.lineWidth(lineWidth);
 
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
         buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
         Vertexer.vertexBoxLines(matrices, buffer, moveToZero(box), color, excludeDirs);
         tessellator.draw();
+
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_FASTEST);
 
         RenderSystem.enableCull();
 
@@ -201,6 +207,9 @@ public class Renderer3D {
         BufferBuilder buffer = tessellator.getBuffer();
 
         // Line
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
+
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
@@ -212,6 +221,10 @@ public class Renderer3D {
 
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();
+
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_FASTEST);
+
         cleanup();
     }
 

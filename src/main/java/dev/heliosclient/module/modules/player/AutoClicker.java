@@ -2,11 +2,14 @@ package dev.heliosclient.module.modules.player;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.input.MouseClickEvent;
+import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.util.KeyboardUtils;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
@@ -80,47 +83,37 @@ public class AutoClicker extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
-        switch ((ClickMode) mode.getOption()) {
-            case LEFT -> {
-                if (leftClickTimer >= delayLeft.value) {
-                    leftClickTimer = 0;
-                    KeyBinding.onKeyPressed(InputUtil.Type.MOUSE.createFromCode(GLFW.GLFW_MOUSE_BUTTON_1));
-                } else {
-                    leftClickTimer++;
-                }
-            }
-            case RIGHT -> {
-                if (rightClickTimer >= delayRight.value) {
-                    rightClickTimer = 0;
-                    KeyBinding.onKeyPressed(InputUtil.Type.MOUSE.createFromCode(GLFW.GLFW_MOUSE_BUTTON_2));
-                } else {
-                    rightClickTimer++;
-                }
-            }
-            case BOTH -> {
-                rightClickTimer++;
+    public void onTick(TickEvent.CLIENT event) {
+
+        if (mode.isOption(ClickMode.LEFT) || mode.isOption(ClickMode.BOTH)) {
+            if (leftClickTimer >= delayLeft.value) {
+                leftClickTimer = 0;
+                setKeyPress(GLFW.GLFW_MOUSE_BUTTON_1);
+            } else {
                 leftClickTimer++;
-                if (leftClickTimer >= delayLeft.value) {
-                    leftClickTimer = 0;
-                    KeyBinding.onKeyPressed(InputUtil.Type.MOUSE.createFromCode(GLFW.GLFW_MOUSE_BUTTON_RIGHT));
-                }
-                if (rightClickTimer >= delayRight.value) {
-                    rightClickTimer = 0;
-                    KeyBinding.onKeyPressed(InputUtil.Type.MOUSE.createFromCode(GLFW.GLFW_MOUSE_BUTTON_LEFT));
-                }
             }
-            case MIDDLE_CLICK -> {
-                if (middleClickTimer >= delayMiddleClick.value) {
-                    middleClickTimer = 0;
-                    KeyBinding.onKeyPressed(InputUtil.Type.MOUSE.createFromCode(GLFW.GLFW_MOUSE_BUTTON_MIDDLE));
-                } else {
-                    middleClickTimer++;
-                }
+        }
+        if (mode.isOption(ClickMode.RIGHT) || mode.isOption(ClickMode.BOTH)) {
+            if (rightClickTimer >= delayRight.value) {
+                rightClickTimer = 0;
+                setKeyPress(GLFW.GLFW_MOUSE_BUTTON_2);
+            } else {
+                rightClickTimer++;
             }
         }
 
+        if (mode.isOption(ClickMode.MIDDLE_CLICK)) {
+            if (middleClickTimer >= delayMiddleClick.value) {
+                middleClickTimer = 0;
+                setKeyPress(GLFW.GLFW_MOUSE_BUTTON_MIDDLE);
+            } else {
+                middleClickTimer++;
+            }
+        }
+    }
 
+    public void setKeyPress(int i) {
+        KeyBinding.onKeyPressed(InputUtil.Type.MOUSE.createFromCode(i));
     }
 
 

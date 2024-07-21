@@ -11,11 +11,15 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.BlockUtils;
+import net.minecraft.item.BlockItem;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.shape.VoxelShape;
 
 public class AirPlace extends Module_ {
     int actionTimer = 0;
-    BlockHitResult hitResult = null;
+    HitResult hitResult = null;
 
     SettingGroup sgGeneral = new SettingGroup("General");
 
@@ -59,22 +63,24 @@ public class AirPlace extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
+        hitResult = mc.getCameraEntity().raycast(mc.interactionManager.getReachDistance(), 0, false);
+
+        if (!mc.options.useKey.isPressed()) return;
+
         actionTimer++;
-        if (mc.crosshairTarget instanceof BlockHitResult hitResult) {
-            this.hitResult = hitResult;
+
+        if (hitResult instanceof BlockHitResult bHitResult && mc.world.getBlockState(bHitResult.getBlockPos()).isReplaceable() && mc.player.getMainHandStack().getItem() instanceof BlockItem) {
             if (actionTimer > delay.value) {
                 actionTimer = 0;
-                if (mc.world.getBlockState(hitResult.getBlockPos()).isReplaceable() && mc.options.useKey.isPressed()) {
-                    BlockUtils.place(hitResult.getBlockPos(), true, false);
-                }
+                BlockUtils.place(bHitResult.getBlockPos(), true, false);
             }
         }
     }
 
     @SubscribeEvent
     public void render3d(Render3DEvent event) {
-        if (blockSelection.value && hitResult != null && mc.world.getBlockState(hitResult.getBlockPos()).isReplaceable()) {
-            ModuleManager.get(BlockSelection.class).renderBlockHitResult(this.hitResult);
+        if (blockSelection.value && hitResult instanceof BlockHitResult bHitResult) {
+            ModuleManager.get(BlockSelection.class).renderBlockHitResult(bHitResult,true);
         }
     }
 }

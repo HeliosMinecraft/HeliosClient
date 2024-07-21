@@ -19,8 +19,8 @@ public class TextParticle extends HitEffectParticle {
     public TimerUtils timer = new TimerUtils();
     private float scale;
 
-    public TextParticle(String text, Vec3d pos, float finalScale, float time_in_seconds) {
-        super((int) (time_in_seconds * 20) + rd.nextInt(11) /* 500 ms or 10 tick additional random delay*/);
+    public TextParticle(String text, Vec3d pos, float finalScale, float time_in_seconds,boolean hasRandomColor) {
+        super((int) (time_in_seconds * 20) + rd.nextInt(11) /* 500 ms or 10 tick additional random delay*/,hasRandomColor);
         this.text = text;
         this.pos = pos;
         this.finalScale = finalScale;
@@ -45,7 +45,9 @@ public class TextParticle extends HitEffectParticle {
 
     @Override
     public void render(MatrixStack stack, Color color) {
-        Renderer3D.drawText(FontRenderers.Large_fxfontRenderer, text, (float) pos.x, (float) pos.y, (float) pos.z, -FontRenderers.Large_fxfontRenderer.getStringWidth(text) / 2.0f, -FontRenderers.Large_fxfontRenderer.getStringHeight(text) / 2.0f, scale, color.getRGB());
+        this.particleColor = hasRandomColor ? particleColor : color;
+
+        Renderer3D.drawText(FontRenderers.Large_fxfontRenderer, text, (float) pos.x, (float) pos.y, (float) pos.z, -FontRenderers.Large_fxfontRenderer.getStringWidth(text) / 2.0f, -FontRenderers.Large_fxfontRenderer.getStringHeight(text) / 2.0f, scale, particleColor.getRGB());
     }
 
     @Override

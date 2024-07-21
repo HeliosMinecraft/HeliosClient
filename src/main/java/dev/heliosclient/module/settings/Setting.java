@@ -29,9 +29,9 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     public ISettingChange iSettingChange;
     protected int height = 24;
     protected int width = 192;
-    protected int widthCompact = CategoryPane.getWidth();
+    protected int widthCompact = CategoryPane.getWidth() - 2;
     protected boolean animationDone = false;
-    protected int moduleWidth = CategoryPane.getWidth();
+    protected int moduleWidth = CategoryPane.getWidth() - 2;
     protected int x = 0;
     protected int y = 0;
     protected BooleanSupplier shouldRender; // Default to true

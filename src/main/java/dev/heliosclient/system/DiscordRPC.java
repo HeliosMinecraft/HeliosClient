@@ -12,6 +12,7 @@ import dev.heliosclient.util.animation.AnimationUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.Instant;
@@ -38,13 +39,14 @@ public class DiscordRPC {
 
             // Initialize the Core with the existing or downloaded file
 
-            File tempJNIDir = new File(System.getProperty("java.io.tmpdir") + "/java", "jni-" + System.nanoTime());
-            if (!(tempJNIDir.exists() && tempJNIDir.isDirectory()) && !tempJNIDir.mkdir())
+            File tempJNIDir = new File(System.getProperty("java.io.tmpdir") + "/java", "jni");
+
+            if (!tempJNIDir.isDirectory() && !tempJNIDir.mkdir())
                 throw new RuntimeException(new IOException("Cannot create temporary JNI directory"));
 
             tempJNIDir.deleteOnExit();
 
-            Core.init(sdkFile, tempJNIDir);
+            initInternal(sdkFile, tempJNIDir);
 
         } catch (IOException | RuntimeException e) {
             AnimationUtils.addErrorToast("Discord Core init failed. Check logs for details.", false, 1500);
@@ -52,6 +54,77 @@ public class DiscordRPC {
         }
     }
 
+    /**
+     * The {@link Core#init(File, File)} is not memory efficient and creates stores new "discord_game_sdk_jni" for every run.
+     * It builds up space really fast and I got to `80mb` in 40 runs.
+     *<p>
+     * So in here, we are returning if the file in the temp directory already exists.
+     */
+    private static void initInternal(File discordLibrary, File tempDir)
+    {
+        String name = "discord_game_sdk_jni";
+        String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+
+        String objectName;
+
+        if(osName.contains("windows"))
+        {
+            osName = "windows";
+            objectName = name + ".dll";
+
+            // the Discord native library needs to be loaded before our JNI library on Windows
+            System.load(discordLibrary.getAbsolutePath());
+        }
+        else if(osName.contains("linux"))
+        {
+            osName = "linux";
+            objectName = "lib" + name + ".so";
+        }
+        else if(osName.contains("mac os"))
+        {
+            osName = "macos";
+            objectName = "lib" + name + ".dylib";
+        }
+        else
+        {
+            throw new RuntimeException("cannot determine OS type: "+osName);
+        }
+
+		/*
+		Some systems (e.g. Mac OS X) might report the architecture as "x86_64" instead of "amd64".
+		While it would be possible to store the MacOS dylib as "x86_x64" instead of "amd64",
+		I personally prefer to keep the system architecture consistent.
+		 */
+        if(arch.equals("x86_64"))
+            arch = "amd64";
+
+        File temp = new File(tempDir, objectName);
+        if(temp.exists()){
+            System.load(temp.getAbsolutePath());
+            Core.initDiscordNative(discordLibrary.getAbsolutePath());
+            LOGGER.info("(DiscordRPC) JNI directory exists");
+            temp.deleteOnExit();
+            return;
+        }
+
+        String path = "/native/"+osName+"/"+arch+"/"+objectName;
+        InputStream in = Core.class.getResourceAsStream(path);
+        if(in == null)
+            throw new RuntimeException(new FileNotFoundException("cannot find native library at "+path));
+
+        try
+        {
+            Files.copy(in, temp.toPath());
+        }
+        catch(IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        System.load(temp.getAbsolutePath());
+        Core.initDiscordNative(discordLibrary.getAbsolutePath());
+    }
     /**
      * This is the modified version of {@link Core#downloadDiscordLibrary()}
      * In this version, it checks if the required file already exists in the Temp folder,

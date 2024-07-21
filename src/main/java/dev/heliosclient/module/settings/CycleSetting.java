@@ -162,6 +162,13 @@ public class CycleSetting extends Setting<Integer> {
 
         return null;
     }
+    public boolean isOption(Object o) {
+        if(value >= 0 && value < options.size()) {
+            return options.get(value) == o;
+        }
+
+        return false;
+    }
 
     public static class Builder extends SettingBuilder<Builder, List<?>, CycleSetting> {
         ISettingChange ISettingChange;

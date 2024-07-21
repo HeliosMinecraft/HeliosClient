@@ -17,7 +17,7 @@ public class ColorManager implements Listener {
     public static boolean SYNC_ACCENT = false;
 
     //ClickGui
-    public final int clickGuiPrimary = new Color(17, 18, 19, 255).getRGB();
+    public int clickGuiPrimary = new Color(17, 18, 19, 100).getRGB();
     //Global
     public int defaultTextColor = 0xFFFFFFFF;
 
@@ -108,6 +108,11 @@ public class ColorManager implements Listener {
         if (gui.ColorMode.value == 0) {
             updatePrimaryGradients(gui.staticColor.getColor(), gui.staticColor.getColor());
         }
+
+        clickGuiPrimary = gui.clickGUIPrimary.value.getRGB();
+        clickGuiPrimaryRainbow = gui.clickGUIPrimary.isRainbow();
+
+
         if (gui.ColorMode.value == 1) {
             switch (gui.GradientType.value) {
                 case 0 -> {

@@ -97,4 +97,8 @@ public class TargetUtils {
 
         return findTarget(run);
     }
+
+    public void setSortMethod(SortMethod sortMethod) {
+        this.sortMethod = sortMethod;
+    }
 }

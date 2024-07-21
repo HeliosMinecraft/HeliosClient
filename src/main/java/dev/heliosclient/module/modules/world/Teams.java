@@ -45,12 +45,12 @@ public class Teams extends Module_ {
     }
 
     public boolean isInMyTeam(LivingEntity livingEntity) {
-        if (livingEntity == null) {
+        if (livingEntity == null || !isActive()) {
             return false;
         }
 
         if (scoreBoardTeam.value && mc.player.getScoreboardTeam() != null && livingEntity.getScoreboardTeam() != null
-                && (mc.player.getScoreboardTeam().isEqual(livingEntity.getScoreboardTeam()) || mc.player.getScoreboardTeam().getPlayerList().contains(livingEntity.getName().getString()))) {
+                && (mc.player.isTeamPlayer(livingEntity.getScoreboardTeam()) || mc.player.getScoreboardTeam().getPlayerList().contains(livingEntity.getName().getString()))) {
             return true;
         }
 
@@ -63,5 +63,23 @@ public class Teams extends Module_ {
             }
         }
         return false;
+    }
+    public int getActualTeamColor(LivingEntity livingEntity) {
+        if (livingEntity == null) {
+            return -1;
+        }
+
+        if (scoreBoardTeam.value && livingEntity.getScoreboardTeam() != null && livingEntity.getScoreboardTeam().getColor() != null) {
+            return livingEntity.getScoreboardTeam().getColor().getColorValue() == null ? -1 :livingEntity.getScoreboardTeam().getColor().getColorValue();
+        }
+
+        if (livingEntity instanceof PlayerEntity player) {
+            ItemStack entityArmorPiece = player.getInventory().armor.get((int) armorIndex.value);
+
+            if (accountArmorColor.value && entityArmorPiece.getItem() instanceof DyeableArmorItem entityArmorItem) {
+                return entityArmorItem.getColor(entityArmorPiece);
+            }
+        }
+        return -1;
     }
 }

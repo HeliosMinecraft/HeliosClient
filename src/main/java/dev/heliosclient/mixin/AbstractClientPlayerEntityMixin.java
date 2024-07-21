@@ -1,5 +1,6 @@
 package dev.heliosclient.mixin;
 
+import com.mojang.blaze3d.platform.TextureUtil;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.managers.ModuleManager;

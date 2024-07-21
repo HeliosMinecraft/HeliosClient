@@ -29,9 +29,10 @@ public abstract class InGameHudMixin {
     public void onRender(DrawContext drawContext, float tickDelta, CallbackInfo info) {
         HeliosClient.MC.getProfiler().push(HeliosClient.MODID + "_render2dEvent");
 
-        RenderEvent event = new RenderEvent(drawContext, tickDelta);
-        EventManager.postEvent(event);
         Renderer2D.setDrawContext(drawContext);
+
+        RenderEvent event = RenderEvent.get(drawContext, tickDelta);
+        EventManager.postEvent(event);
         if (event.isCanceled()) {
             info.cancel();
         }

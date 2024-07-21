@@ -2,7 +2,9 @@ package dev.heliosclient.module.modules.render.hiteffect.particles;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.modules.render.hiteffect.HitEffectParticle;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer3D;
+import dev.heliosclient.util.render.color.LineColor;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
@@ -20,8 +22,8 @@ public class OrbParticle extends HitEffectParticle {
     private Vec3d position;
     private Vec3d velocity;
 
-    public OrbParticle(Vec3d position, Vec3d velocity, float radius, float gravity, float time_in_seconds) {
-        super((int) (time_in_seconds * 20));
+    public OrbParticle(Vec3d position, Vec3d velocity, float radius, float gravity, float time_in_seconds,boolean hasRandomColor) {
+        super((int) (time_in_seconds * 20),hasRandomColor);
         this.position = position;
         this.velocity = velocity;
         this.radius = radius;
@@ -88,6 +90,8 @@ public class OrbParticle extends HitEffectParticle {
 
     @Override
     public void render(MatrixStack matrixStack, Color color) {
+        this.particleColor = hasRandomColor ? particleColor : color;
+
         matrixStack.push();
         final double posX = MathHelper.lerp(mc.getTickDelta(), position.x, position.x + velocity.x) - mc.getEntityRenderDispatcher().camera.getPos().getX();
         final double posY = MathHelper.lerp(mc.getTickDelta(), position.y, position.y + velocity.y) + 0.1 - mc.getEntityRenderDispatcher().camera.getPos().getY();
@@ -104,7 +108,8 @@ public class OrbParticle extends HitEffectParticle {
 
         matrixStack.translate(-3f / 2, -3f / 2, -3f / 2);
 
-        Renderer3D.drawSphere(matrixStack, radius, 1.0f, color);
+
+        Renderer3D.drawSphere(matrixStack, radius, 1.0f, particleColor);
         matrixStack.pop();
     }
 }

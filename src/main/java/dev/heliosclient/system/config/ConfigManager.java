@@ -176,13 +176,8 @@ public class ConfigManager {
     public void createAndAdd(String fileName) {
         SubConfig subConfig = new SubConfig(configDir.getAbsolutePath() + "/" + fileName);
 
-        if (!subConfig.configFile.exists()) {
-            try {
-                subConfig.configFile.createNewFile();
-                HeliosClient.LOGGER.info("Created file successfully \"{}\"", subConfig.configFile.getAbsolutePath());
-            } catch (IOException e) {
-                HeliosClient.LOGGER.error("Error while creating new default file: \"{}\"", subConfig.configFile.getAbsolutePath(), e);
-            }
+        if (!subConfig.configFile.exists() && subConfig.create()) {
+            HeliosClient.LOGGER.info("Created file successfully \"{}\"", subConfig.configFile.getAbsolutePath());
         }
 
         addSubConfig(subConfig);

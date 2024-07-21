@@ -81,15 +81,15 @@ public class RotationUtils {
     }
 
 
-    public static void rotate(float yaw, float pitch, boolean clientSide, @Nullable Runnable task) {
+    public static void rotate(double yaw, double pitch, boolean clientSide, @Nullable Runnable task) {
         prevYaw = mc.player.getYaw(mc.getTickDelta());
         prevPitch = mc.player.getPitch(mc.getTickDelta());
 
-        mc.player.setPitch(pitch);
-        mc.player.setYaw(yaw);
+        mc.player.setPitch((float) pitch);
+        mc.player.setYaw((float) yaw);
 
         if (clientSide) {
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, mc.player.isOnGround()));
+            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) yaw, (float) pitch, mc.player.isOnGround()));
             if (task != null)
                 task.run();
             mc.player.setYaw(prevYaw);

@@ -119,6 +119,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .min(0)
             .max(50)
             .defaultValue(5D)
+            .value(5D)
             .shouldRender(() -> shadow.value && renderBg.value)
             .onSettingChange(this)
             .build());

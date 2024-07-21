@@ -106,8 +106,10 @@ public class Window implements Listener {
         }
 
         if (!isCollapsed && contentRenderer != null) {
-            int color = ColorUtils.changeAlpha(new Color(ColorManager.INSTANCE.clickGuiPrimary), 180).getRGB();
-            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 20, windowWidth, windowHeight, 5, color);
+            int color = ColorUtils.changeAlpha(ColorManager.INSTANCE.clickGuiPrimary, 180).getRGB();
+
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 20,true,true,true,true, windowWidth, windowHeight, 5, color);
+
             if (!description.isEmpty()) {
                 wrappedText = Renderer2D.wrapText("§o" + description, windowWidth, HeliosClient.MC.textRenderer);
 

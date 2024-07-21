@@ -115,7 +115,7 @@ public class AutoLog extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
         if (shouldLog) {
             mc.getNetworkHandler().getConnection().disconnect(Text.literal(logReason));
             shouldLog = false;

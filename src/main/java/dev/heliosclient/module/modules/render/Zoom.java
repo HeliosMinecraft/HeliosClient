@@ -69,7 +69,7 @@ public class Zoom extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
         if (!scrollZoom.value) {
             float t = Math.min(1.0f, (float) timer.getElapsedTime()); // Normalize time to [0, 1]
 

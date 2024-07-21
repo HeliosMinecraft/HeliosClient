@@ -89,7 +89,7 @@ public class FreeLook extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
         if (!scrollDistance.value) {
             distance = (int) distanceFromPlayer.value;
         }

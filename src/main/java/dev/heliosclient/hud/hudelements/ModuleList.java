@@ -27,9 +27,10 @@ import static dev.heliosclient.hud.hudelements.ModuleList.Sort.Biggest;
  */
 public class ModuleList extends HudElement implements Listener {
 
+    public SettingGroup sgSettings = new SettingGroup("Settings");
+
     public static HudElementData<ModuleList> DATA = new HudElementData<>("Module List", "Shows enabled modules", ModuleList::new);
 
-    public SettingGroup sgSettings = new SettingGroup("Settings");
     private final CycleSetting sort = sgSettings.add(new CycleSetting.Builder()
             .name("Sort")
             .description("Sorting method used for displaying modules")
@@ -96,7 +97,6 @@ public class ModuleList extends HudElement implements Listener {
             .shouldRender(() -> glow.value && background.value)
             .build()
     );
-
     private final BooleanSetting sideLines = sgSettings.add(new BooleanSetting.Builder()
             .name("Side Lines")
             .description("Renders a vertical separator line side of the module name")
@@ -123,7 +123,6 @@ public class ModuleList extends HudElement implements Listener {
             .defaultListOption(METEOR)
             .build()
     );
-
     private final DoubleSetting rainbowSpeed = sgSettings.add(new DoubleSetting.Builder()
             .name("Rainbow Speed")
             .description("Speed of rainbow")
@@ -172,14 +171,10 @@ public class ModuleList extends HudElement implements Listener {
             .build()
     );
     private ArrayList<Module_> enabledModules = ModuleManager.getEnabledModules();
-
     //Managing a structure of sorted Modules to prevent resorting them every time unless the enabled modules change.
-    private List<Module_> sortedModules = new ArrayList<>();
-
     private Color rainbow = new Color(255, 255, 255);
     private double rainbowHue1;
     private double rainbowHue2;
-
     private Color colorToRenderIn = new Color(-1);
 
     public ModuleList() {
@@ -267,6 +262,7 @@ public class ModuleList extends HudElement implements Listener {
         }
         this.height = Math.max(yOffset - this.y + 2, 40);
     }
+
     private Comparator<Module_> getComparator() {
         return (m1, m2) -> {
             float name1Width = Renderer2D.getStringWidth(m1.name) + getInfoStringWidth(m1.getInfoString());
@@ -279,27 +275,25 @@ public class ModuleList extends HudElement implements Listener {
         };
     }
 
-    private float getInfoStringWidth(String infoString){
+    private float getInfoStringWidth(String infoString) {
         return (infoString.isEmpty() || !moduleInfo.value) ? 0 : Renderer2D.getStringWidth(" [" + infoString + "]");
     }
 
     @SubscribeEvent
     public void update(TickEvent.CLIENT event) {
         enabledModules = ModuleManager.getEnabledModules();
-        if (!enabledModules.equals(sortedModules)) {
-            enabledModules.sort(getComparator());
-            sortedModules = new ArrayList<>(enabledModules);
+        enabledModules.sort(getComparator());
 
-            int maxWidth = 0;
-            // Calculate the maximum width of the module names for enabled modules only
-            for (Module_ m : enabledModules) {
-                if (!m.showInModulesList.value) continue;
-                String name = moduleInfo.value ? m.getNameWithInfo() : m.name;
-                int nameWidth = Math.round(Renderer2D.getStringWidth(name));
-                maxWidth = Math.max(maxWidth, nameWidth);
-            }
-            this.width = maxWidth + (sideLines.value ? 4 : 0);
+
+        int maxWidth = 0;
+        // Calculate the maximum width of the module names for enabled modules only
+        for (Module_ m : enabledModules) {
+            if (!m.showInModulesList.value) continue;
+            String name = moduleInfo.value ? m.getNameWithInfo() : m.name;
+            int nameWidth = Math.round(Renderer2D.getStringWidth(name));
+            maxWidth = Math.max(maxWidth, nameWidth);
         }
+        this.width = maxWidth + (sideLines.value ? 4 : 0);
     }
 
     public enum Sort {
@@ -316,4 +310,6 @@ public class ModuleList extends HudElement implements Listener {
         LOW_BG_ALPHA,
         NORMAL
     }
+
+
 }

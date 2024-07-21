@@ -54,6 +54,7 @@
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MixinBackgroundRenderer",
+    "MixinBeaconBlockEntityRenderer",
     "MixinBlockEntityRenderDispatcher",
     "MixinBlockModelRenderer",
     "MixinBossBarHud",

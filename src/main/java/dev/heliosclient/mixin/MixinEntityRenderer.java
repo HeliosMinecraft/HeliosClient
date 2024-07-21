@@ -19,7 +19,7 @@ public class MixinEntityRenderer<T extends Entity> {
             method = "renderLabelIfPresent",
             cancellable = true)
     private void onRenderLabelIfPresent(T entity, Text text, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-        if (EventManager.postEvent(new EntityLabelRenderEvent(entity, text, matrixStack, vertexConsumerProvider, i)).isCanceled()) {
+        if (EventManager.postEvent(EntityLabelRenderEvent.get(entity, text, matrixStack, vertexConsumerProvider, i)).isCanceled()) {
             ci.cancel();
         }
     }

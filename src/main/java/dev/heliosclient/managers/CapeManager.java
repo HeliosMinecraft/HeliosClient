@@ -255,11 +255,7 @@ public class CapeManager {
             throw new HttpResponseException(connection.getResponseCode(), connection.getResponseMessage());
         }
     }
-
-    public static boolean isETFPresent(){
-        return FabricLoader.getInstance().isModLoaded("entity_texture_features");
-    }
-
+    
     public static boolean shouldPlayerHaveCape(PlayerEntity player) {
         return CAPES.containsKey(player.getUuid()) || ELYTRAS.containsKey(player.getUuid());
     }

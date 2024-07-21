@@ -247,8 +247,19 @@ public class DropDownSetting extends Setting<Integer> {
         LOGGER.error("List option not found for: {}, {} Setting during loading config: {}", mapGet, name, HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().getName());
     }
 
+    public boolean isOption(Object o) {
+        if(value >= 0 && value < options.size()) {
+            return options.get(value) == o;
+        }
+
+        return false;
+    }
+
     public Object getOption() {
-        return options.get(value);
+        if(value >= 0 && value < options.size()) {
+            return options.get(value);
+        }
+        return null;
     }
 
     public static class Builder extends SettingBuilder<Builder, List<?>, DropDownSetting> {

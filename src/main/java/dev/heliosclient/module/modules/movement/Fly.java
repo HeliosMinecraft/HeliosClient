@@ -89,7 +89,7 @@ public class Fly extends Module_ {
             }
         }
         if (bypassAntiKick.value && mc.player.age % 40 == 0) {
-            mc.player.setVelocity(mc.player.getVelocity().x, -0.04, mc.player.getVelocity().z);
+            mc.player.setVelocity(mc.player.getVelocity().x, -0.0402D, mc.player.getVelocity().z);
         }
     }
 

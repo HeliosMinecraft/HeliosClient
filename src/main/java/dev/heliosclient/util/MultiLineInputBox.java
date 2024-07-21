@@ -183,7 +183,7 @@ public class MultiLineInputBox implements Listener {
                 this.cursorLine = Math.min(this.lines.size() - 1, this.cursorLine);
 
                 // Get the text of the current line
-                String lineText = this.lines.get(this.cursorLine);
+                String lineText = getCurrentLine();
 
                 // Calculate the cursor position based on the width of the text
                 this.cursorPosition = 0;
@@ -557,7 +557,7 @@ public class MultiLineInputBox implements Listener {
     }
 
     public String getCurrentLine() {
-        if (lines.isEmpty() || cursorLine < 0 || cursorLine < lines.size()) {
+        if (lines.isEmpty() || cursorLine < 0 || cursorLine > lines.size()) {
             return "";
         }
 
@@ -715,16 +715,14 @@ public class MultiLineInputBox implements Listener {
                 // Replace the selected text with the new character
                 int start = Math.min(selectionStart, selectionEnd);
                 int end = Math.max(selectionStart, selectionEnd);
-                if (start <= end) {
-                    StringBuilder builder = new StringBuilder(currentLine);
-                    builder.replace(start, end, String.valueOf(chr));
-                    lines.set(cursorLine, builder.toString());
-                    cursorPosition = start + 1;
+                StringBuilder builder = new StringBuilder(currentLine);
+                builder.replace(start, end, String.valueOf(chr));
+                lines.set(cursorLine, builder.toString());
+                cursorPosition = start + 1;
 
-                    // Clear the selection
-                    selecting = false;
-                    selectionStart = selectionEnd = cursorPosition;
-                }
+                // Clear the selection
+                selecting = false;
+                selectionStart = selectionEnd = cursorPosition;
             } else if (cursorPosition >= 0 && cursorPosition <= currentLine.length()) {
                 // Insert the new character at the cursor position
                 currentLine = currentLine.substring(0, cursorPosition) + chr + currentLine.substring(cursorPosition);

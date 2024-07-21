@@ -94,7 +94,9 @@ public class DoubleSetting extends Setting<Double> {
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
         //  inputBox = null;
-        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
+
+        String trimmedName = FontRenderers.Small_fxfontRenderer.trimToWidth(name,moduleWidth - 12);
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), trimmedName, x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
         double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
 
         if (sliding) {
@@ -106,15 +108,19 @@ public class DoubleSetting extends Setting<Double> {
             onSettingChange();
         }
         value = MathHelper.clamp(value, min, max);
+
+        //Draw the value beside the name
         String valueString = "" + MathUtils.round(value, roundingPlace);
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), valueString, (x + moduleWidth - 10) - FontRenderers.Small_fxfontRenderer.getStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
+
+        //Draw the slider itself and the background fill
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, moduleWidth - 8, 2, 1, 0xFFAAAAAA);
         int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 10)) + 2;
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, scaledValue, 2, 1, 0xFF55FFFF);
 
-        // Bar to move
+        //Slider Bar which moves and cartoony shadow
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 14, 2, 6, 1, 0xFFFFFFFF);
-        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY, 105).getRGB());
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY, 155).getRGB());
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {

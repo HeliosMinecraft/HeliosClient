@@ -12,7 +12,7 @@ public class NoNarrator extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
         mc.options.getNarrator().setValue(NarratorMode.OFF);
     }
 }

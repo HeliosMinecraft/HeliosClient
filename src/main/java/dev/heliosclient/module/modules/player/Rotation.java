@@ -61,7 +61,7 @@ public class Rotation extends Module_ {
 
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
         if (yaw.value) {
             mc.player.setYaw((float) yawAngle.value);
             mc.player.setBodyYaw((float) yawAngle.value);

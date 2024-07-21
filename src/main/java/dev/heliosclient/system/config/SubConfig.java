@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -47,6 +48,15 @@ public class SubConfig {
         readData = new HashMap<>();
         writeData = new HashMap<>();
         loaded = false;
+    }
+
+    public boolean create(){
+        try {
+            return configFile.createNewFile();
+        }catch (IOException e){
+            HeliosClient.LOGGER.warn("Error while creating sub config",e);
+            return false;
+        }
     }
 
     public Map<String, Object> getReadData() {

@@ -25,6 +25,14 @@ public class Speed extends Module_ {
             .defaultListOption(Modes.OnGround)
             .build()
     );
+    BooleanSetting alwaysJump = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Always Jump")
+            .description("Jumps always when strafing. Otherwise it will only jump when specific conditions are met")
+            .onSettingChange(this)
+            .value(true)
+            .shouldRender(()->speedMode.getOption() == Modes.Strafe)
+            .build()
+    );
     BooleanSetting whileSneaking = sgGeneral.add(new BooleanSetting.Builder()
             .name("While sneaking")
             .description("To apply speed modifier while sneaking")
@@ -66,9 +74,13 @@ public class Speed extends Module_ {
                 }
 
                 mc.player.setVelocity(new Vec3d(0, mc.player.getVelocity().y, 0));
-                mc.player.updateVelocity((float) speed.value, new Vec3d(mc.player.sidewaysSpeed, 0, mc.player.forwardSpeed));
+                mc.player.updateVelocity((float) speed.value/4f, new Vec3d(mc.player.sidewaysSpeed, 0, mc.player.forwardSpeed));
 
                 double vel = Math.abs(mc.player.getVelocity().getX()) + Math.abs(mc.player.getVelocity().getZ());
+
+                if(alwaysJump.value && mc.player.isOnGround()){
+                    mc.player.jump();
+                }
 
                 if (vel >= 0.12 && mc.player.isOnGround()) {
                     mc.player.updateVelocity(vel >= 0.3 ? 0.0f : 0.15f, new Vec3d(mc.player.sidewaysSpeed, 0, mc.player.forwardSpeed));
@@ -113,16 +125,16 @@ public class Speed extends Module_ {
         else if (speedMode.getOption() == Modes.Leap) {
             if (mc.options.jumpKey.isPressed()) {
                 double currentJumpHeight = mc.player.getVelocity().y;
-                double newJumpHeight = Math.min(currentJumpHeight + 0.05, 0.5);
-                mc.player.setVelocity(mc.player.getVelocity().x, newJumpHeight, mc.player.getVelocity().z);
+                double newJumpHeight = Math.min(currentJumpHeight + 0.0351293, 0.5);
+                mc.player.setVelocity(mc.player.getVelocity().x , newJumpHeight, mc.player.getVelocity().z);
             }
         }
         // SprintBoost Mode aka onGround but a bit different
         else if (speedMode.getOption() == Modes.SprintBoost) {
             if (mc.player.isSprinting()) {
                 float yaw = (float) Math.toRadians(mc.player.getYaw());
-                Vec3d forward = new Vec3d(-MathHelper.sin(yaw) * (speed.value / 10.d), mc.player.getVelocity().y,
-                        MathHelper.cos(yaw) * (speed.value / 10.d));
+                Vec3d forward = new Vec3d(-MathHelper.sin(yaw) * (speed.value / 10d), mc.player.getVelocity().y,
+                        MathHelper.cos(yaw) * (speed.value / 10d));
                 mc.player.setVelocity(forward);
             }
         }

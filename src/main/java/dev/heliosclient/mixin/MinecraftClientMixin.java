@@ -11,11 +11,14 @@ import dev.heliosclient.module.modules.player.FastUse;
 import dev.heliosclient.module.modules.render.ESP;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SystemDetails;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,8 +28,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Objects;
-
-import static net.minecraft.client.MinecraftClient.getInstance;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
@@ -39,14 +40,18 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
     public void onTick(CallbackInfo ci) {
-        TickEvent ClientTick = new TickEvent.CLIENT(getInstance());
-        EventManager.postEvent(ClientTick);
+        TickEvent clientTick = new TickEvent.CLIENT();
+        EventManager.postEvent(clientTick);
 
-        TickEvent DefaultTick = new TickEvent();
-        EventManager.postEvent(DefaultTick);
-
-        if (ClientTick.isCanceled() || DefaultTick.isCanceled()) {
+        if (clientTick.isCanceled()) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "addSystemDetailsToCrashReport(Lnet/minecraft/util/SystemDetails;Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/resource/language/LanguageManager;Ljava/lang/String;Lnet/minecraft/client/option/GameOptions;)Lnet/minecraft/util/SystemDetails;", at = @At(value = "RETURN"))
+    private static void onAddSystemDetails(SystemDetails systemDetails, MinecraftClient client, LanguageManager languageManager, String version, GameOptions options, CallbackInfoReturnable<SystemDetails> cir) {
+        if(systemDetails != null) {
+            systemDetails.addSection("HeliosClient", () -> "Version " + HeliosClient.versionTag + ", \n            Active Modules:" + ModuleManager.getEnabledModules());
         }
     }
 

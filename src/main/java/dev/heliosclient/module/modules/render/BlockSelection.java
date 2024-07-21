@@ -11,6 +11,7 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
@@ -86,11 +87,17 @@ public class BlockSelection extends Module_ {
     public void onRender3d(Render3DEvent event) {
         if (!(mc.crosshairTarget instanceof BlockHitResult result) || result.getType() == HitResult.Type.MISS) return;
 
-        renderBlockHitResult(result);
+        renderBlockHitResult(result,false);
     }
 
-    public void renderBlockHitResult(BlockHitResult result) {
-        VoxelShape shape = mc.world.getBlockState(result.getBlockPos()).getOutlineShape(mc.world, result.getBlockPos());
+    public void renderBlockHitResult(BlockHitResult result, boolean doEmptyRender) {
+        BlockState state =  mc.world.getBlockState(result.getBlockPos());
+        VoxelShape shape = state.getOutlineShape(mc.world, result.getBlockPos());
+
+        if(shape.isEmpty() && doEmptyRender){
+            renderSelection(new Box(result.getBlockPos()).expand(0.005f));
+            return;
+        }
 
         if (shape.isEmpty()) return;
 

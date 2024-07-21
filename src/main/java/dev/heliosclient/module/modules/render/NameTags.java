@@ -5,8 +5,10 @@ import dev.heliosclient.event.events.entity.ItemPhysicsEvent;
 import dev.heliosclient.event.events.render.EntityLabelRenderEvent;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.FriendManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ColorUtils;
@@ -267,8 +269,14 @@ public class NameTags extends Module_ {
         if (entity instanceof PlayerEntity && !players.value) return;
         if (entity instanceof MobEntity && !mobs.value) return;
 
-        if (ignoreArmorStand.value && entity instanceof ArmorStandEntity) return;
-        if (ignoreInvisible.value && entity.isInvisible()) return;
+        if (ignoreArmorStand.value && entity instanceof ArmorStandEntity) {
+            event.setCanceled(false);
+            return;
+        }
+        if (ignoreInvisible.value && entity.isInvisible()) {
+            event.setCanceled(false);
+            return;
+        }
 
         event.setCanceled(true);
 
@@ -341,7 +349,7 @@ public class NameTags extends Module_ {
                     }
                 }
             });
-            int textColor = team.value && entity.getTeamColorValue() != 16777215 ? ColorUtils.changeAlpha(entity.getTeamColorValue(), 255, 10).getRGB() : Color.WHITE.getRGB();
+            int textColor = team.value ? ModuleManager.get(Teams.class).getActualTeamColor(entity) : Color.WHITE.getRGB();
 
             Renderer3D.drawText(FontRenderers.Large_fxfontRenderer, builder.toString(), (float) entityPos.x, (float) (entityPos.y + entity.getHeight() + entityYOff), (float) entityPos.z, -(dataWidth / 2.0f) - 0.9f, 0, adjustedScale, textColor);
         } catch (NullPointerException ignored) {

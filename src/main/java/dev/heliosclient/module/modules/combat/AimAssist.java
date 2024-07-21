@@ -3,6 +3,7 @@ package dev.heliosclient.module.modules.combat;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -92,6 +93,15 @@ public class AimAssist extends Module_ {
             .value(true)
             .build()
     );
+    BooleanSetting ignoreFriends = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Ignore Friends")
+            .description("Does not look at your friends")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .value(true)
+            .build()
+    );
+
     BooleanSetting simulateRotation = sgGeneral.add(new BooleanSetting.Builder()
             .name("Simulate Rotation")
             .description("Simulates your rotation to the enemy linearly for more natural human-like movement instead of blatantly moving")
@@ -147,7 +157,14 @@ public class AimAssist extends Module_ {
         addSettingGroup(sgGeneral);
         addSettingGroup(sgEntities);
 
-        addQuickSettings(sgGeneral.getSettings());
+        addQuickSetting(sort);
+        addQuickSetting(range);
+        addQuickSetting(deadCheck);
+        addQuickSetting(canSeeEntity);
+        addQuickSetting(ignoreTeammate);
+        addQuickSetting(simulateRotation);
+        addQuickSetting(simulateTime);
+
         addQuickSettings(sgEntities.getSettings());
     }
 
@@ -175,6 +192,14 @@ public class AimAssist extends Module_ {
 
         return PlayerUtils.canSeeEntity(entity);
     }
+    private boolean isFriend(LivingEntity entity) {
+        if (!ignoreFriends.value) {
+            return false;
+        }
+
+        return FriendManager.isFriend(entity.getName().getString());
+    }
+
 
 
     @SubscribeEvent
@@ -183,19 +208,27 @@ public class AimAssist extends Module_ {
         simulateRotationLook(range.value, ignoreTeammate.value, null);
     }
 
+
     public void simulateRotationLook(double range, boolean ignoreTeammate, LivingEntity entity) {
         LivingEntity targetEntity = entity;
 
         if (targetEntity == null) {
+            TargetUtils.getInstance().setSortMethod((SortMethod) sort.getOption());
             TargetUtils.getInstance().setRange(range);
-            targetEntity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(entity1 -> entity1 instanceof LivingEntity && !isBlackListed(entity1) && entity1.distanceTo(mc.player) < range && isEntityVisible(entity1), true);
+            targetEntity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(entity1 ->
+                    entity1 instanceof LivingEntity e1 &&
+                    !isBlackListed(e1) &&
+                    e1.distanceTo(mc.player) <= range  &&
+                    !isFriend(e1) &&
+                    isEntityVisible(e1) &&
+                    !isDead(e1), true);
         }
 
         if (ignoreTeammate && ModuleManager.get(Teams.class).isInMyTeam(targetEntity)) {
             return;
         }
 
-        if (targetEntity != null && !isDead(targetEntity)) {
+        if (targetEntity != null) {
             if (simulateRotation.value) {
                 simulator.simulateRotation(targetEntity, false, null, (int) simulateTime.value, (int) randomness.value, (RotationUtils.LookAtPos) lookAt.getOption(), (EasingType) easing.getOption());
             } else if (!pauseInGUI.value && mc.currentScreen == null) {

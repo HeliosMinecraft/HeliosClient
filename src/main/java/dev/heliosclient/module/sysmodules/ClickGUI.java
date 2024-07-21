@@ -44,14 +44,14 @@ public class ClickGUI extends Module_ {
 
     public CycleSetting theme = sgMisc.add(new CycleSetting.Builder()
             .name("GUI Theme")
-            .description("Theme for only the ClickGUI. Rounded GUI may cause frame drops.")
+            .description("Theme for only the ClickGUI. Rounded GUI may cause frame drops. Hardcoded.")
             .onSettingChange(this)
             .value(List.of(Theme.values()))
             .defaultListIndex(0)
             .build()
     );
 
-    //Sorry guys, these aren't camel cased.
+    //Sorry guys, some of these aren't camel cased.
 
     public CycleSetting ScrollType = sgMisc.add(new CycleSetting.Builder()
             .name("Scrolling System")
@@ -66,20 +66,20 @@ public class ClickGUI extends Module_ {
             .description("CategoryPane Height for the ClickGUI")
             .onSettingChange(this)
             .defaultValue(230.0)
-            .max(1000)
+            .max(500)
             .min(230.0)
             .roundingPlace(0)
             .shouldRender(() -> ScrollType.value == 1)
             .build()
     );
     public DoubleSetting ScrollSpeed = sgMisc.add(new DoubleSetting.Builder()
-            .name("Scroll Speed")
-            .description("Change your scroll speed for the ClickGUI")
+            .name("Scroll Sensitivity")
+            .description("Change your scroll speed multiplier for the ClickGUI")
             .onSettingChange(this)
             .defaultValue(7.0)
             .min(1)
             .max(20)
-            .roundingPlace(1)
+            .roundingPlace(2)
             .build()
     );
     public CycleSetting FontRenderer = sgMisc.add(new CycleSetting.Builder()
@@ -128,7 +128,7 @@ public class ClickGUI extends Module_ {
             .onSettingChange(this)
             .max(2)
             .min(0d)
-            .defaultValue(0.5d)
+            .defaultValue(0.25d)
             .roundingPlace(2)
             .build()
     );
@@ -352,8 +352,6 @@ public class ClickGUI extends Module_ {
 
         //Config changes
         if (setting == switchConfigs) {
-            //Todo: Replace with cleaner config manager
-
             // Change the file name we want to load
             HeliosClient.CONFIG.writeModuleConfig();
             HeliosClient.CONFIG.moduleConfigManager.switchConfig(switchConfigs.getOption().toString(), true);
@@ -390,6 +388,7 @@ public class ClickGUI extends Module_ {
         return (Theme) theme.getOption();
     }
 
+    //Hard coded :(
     public enum Theme {
         Rounded,
         Rectangle

@@ -25,6 +25,10 @@ public class NotificationManager implements Listener {
             updateNotifications();
         }
     }
+    public void clear(){
+        notificationQueue.clear();
+        displayedNotifications.clear();
+    }
 
     private static void updateNotifications() {
         // Remove expired notifications

@@ -8,10 +8,12 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.settings.lists.ItemListSetting;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.PlayerUtils;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -62,19 +64,18 @@ public class AutoEat extends Module_ {
             .build()
     );
     BooleanSetting gapplePriority = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Enchanted Golden apple priority")
+            .name("Golden Apple priority")
             .description("Eats enchanted golden apple or regular golden apple first instead of others")
             .onSettingChange(this)
             .defaultValue(true)
             .value(true)
             .build()
     );
-    BooleanSetting avoidPoisonous = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Avoid poisonous")
-            .description("Avoids eating poisonous, chorus fruit or rotted food")
-            .onSettingChange(this)
-            .defaultValue(true)
-            .value(true)
+    ItemListSetting blackListedFood = sgGeneral.add(new ItemListSetting.Builder()
+            .name("BlackListed Food")
+            .iSettingChange(this)
+            .filter(Item::isFood)
+            .items(Items.POISONOUS_POTATO,Items.ROTTEN_FLESH,Items.CHORUS_FRUIT,Items.PUFFERFISH, Items.SPIDER_EYE,Items.SUSPICIOUS_STEW)
             .build()
     );
 
@@ -125,13 +126,7 @@ public class AutoEat extends Module_ {
     }
 
     public boolean shouldAvoid(Item item) {
-        return avoidPoisonous.value && (item == Items.CHORUS_FRUIT ||
-                item == Items.POISONOUS_POTATO ||
-                item == Items.PUFFERFISH ||
-                item == Items.CHICKEN ||
-                item == Items.ROTTEN_FLESH ||
-                item == Items.SPIDER_EYE ||
-                item == Items.SUSPICIOUS_STEW);
+        return blackListedFood.getSelectedEntries().contains(item);
     }
 
     public boolean shouldEat() {
@@ -173,10 +168,10 @@ public class AutoEat extends Module_ {
         }
 
         //Offhand
-        Item item = mc.player.getInventory().getStack(45).getItem();
+        Item item = mc.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT).getItem();
         FoodComponent component = item.getFoodComponent();
         if (component != null && item.getFoodComponent().getHunger() > maxHunger && !shouldAvoid(item)) {
-            return 45;
+            return PlayerInventory.OFF_HAND_SLOT;
         }
 
         return bestSlot;

@@ -8,6 +8,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.ItemListSetting;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.render.Renderer3D;
@@ -77,9 +78,9 @@ public class Test extends Module_ {
         if (rectangle.value)
             Renderer2D.drawRectangleWithShadow(drawContext.getMatrices(), 10, 10, 100, 50, 0xFFFF0000, 10);
 
-        // Draw a 2D rounded rectangle using the CustomRenderer class
         if (rounded.value)
-            Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), 120, 10, 25, 15, 3, 20, Color.YELLOW.getRGB());
+            Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), 10, 10, 200, 100, 0xFFFF0000, 10);
+
 
         // Draw a 2D circle using the CustomRenderer class
         if (Circle.value)

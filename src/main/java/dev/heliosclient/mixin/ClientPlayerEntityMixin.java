@@ -13,6 +13,7 @@ import dev.heliosclient.module.modules.movement.Velocity;
 import dev.heliosclient.module.modules.render.Freecam;
 import dev.heliosclient.module.modules.world.BetterPortals;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
@@ -68,14 +69,9 @@ public abstract class ClientPlayerEntityMixin {
         return constant;
     }
 
-    @Inject(method = "tick", at = @At(value = "TAIL"), cancellable = true)
+    @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
     public void onTick(CallbackInfo ci) {
         if (HeliosClient.MC.player != null) {
-            Freecam freecam = ModuleManager.get(Freecam.class);
-            if (freecam.isActive()) {
-                freecam.onTick(TickEvent.PLAYER.get(HeliosClient.MC.player));
-            }
-
             if (EventManager.postEvent(TickEvent.PLAYER.get(HeliosClient.MC.player)).isCanceled()) {
                 ci.cancel();
             }
@@ -106,6 +102,7 @@ public abstract class ClientPlayerEntityMixin {
                     sendMovementPackets();
                 }
             }
+            event.shiftedTicks = true;
         }
     }
 

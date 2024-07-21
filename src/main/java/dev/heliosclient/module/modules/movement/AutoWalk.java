@@ -57,15 +57,10 @@ public class AutoWalk extends Module_ {
             case Left -> resetAndPress(mc.options.leftKey);
             case Right -> resetAndPress(mc.options.rightKey);
             case Custom -> {
-                resetAndPress(null);
-
-                double yawRadians = -Math.toRadians(yaw.value);
-
-                double velX = mc.player.getMovementSpeed() * Math.sin(yawRadians) * (mc.player.isSprinting() ? 1.5f : 1f);
-                double velZ = mc.player.getMovementSpeed() * Math.cos(yawRadians) * (mc.player.isSprinting() ? 1.5f : 1f);
-
-                mc.player.setVelocity(velX, mc.player.getVelocity().y, velZ);
                 mc.player.setYaw((float) yaw.value);
+
+
+                resetAndPress(mc.options.forwardKey);
             }
         }
     }

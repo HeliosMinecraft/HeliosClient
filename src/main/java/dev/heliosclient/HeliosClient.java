@@ -2,7 +2,6 @@ package dev.heliosclient;
 
 import dev.heliosclient.addon.AddonManager;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
 import dev.heliosclient.event.events.player.PlayerLeaveEvent;
 import dev.heliosclient.event.listener.Listener;
@@ -118,7 +117,7 @@ public class HeliosClient implements ModInitializer, Listener {
     }
 
     public static boolean shouldUpdate() {
-        return MC != null && MC.getWindow() != null && MC.player != null;
+        return MC != null && MC.getWindow() != null && MC.player != null && MC.world != null;
     }
 
     @SubscribeEvent

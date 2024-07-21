@@ -1,5 +1,6 @@
 package dev.heliosclient.ui.clickgui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
@@ -8,6 +9,7 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.GUI;
@@ -17,19 +19,29 @@ import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
+import me.x150.renderer.util.BufferUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CategoryPane implements Listener {
     public static int width = 85;
     public static int MAX_HEIGHT = 150;
-    public static List<HudBox> hudBoxes = new CopyOnWriteArrayList<>();
+
+    //Collection of all CategoryPane's hudBoxes
+    public static List<HudBox> hudBoxes = new ArrayList<>();
     public final char icon;
     private final Screen parentScreen;
     private final HudBox hudBox;
@@ -44,7 +56,7 @@ public class CategoryPane implements Listener {
     int startX, startY;
     boolean dragging = false;
     List<ModuleButton> moduleButtons;
-    int categoryNameHeight = 2;
+    int categoryNameHeight = 2 , categoryNameWidth = 2;
     private int scrollOffset = 0;
 
 
@@ -138,7 +150,7 @@ public class CategoryPane implements Listener {
 
     public void keepOnlyModule(Module_ module) {
         moduleButtons.removeIf(button -> button.module != module);
-        height = 20;
+        height = 22;
     }
 
     public void removeModules() {
@@ -150,12 +162,15 @@ public class CategoryPane implements Listener {
     @SubscribeEvent
     public void onFontChange(FontChangeEvent e) {
         categoryNameHeight = Math.round(Renderer2D.getFxStringHeight(category.name));
+        categoryNameWidth = Math.round(Renderer2D.getFxStringWidth(category.name));
         maxWidth = 0;
         calcHeightAndWidth();
     }
 
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta, TextRenderer textRenderer) {
-        update((float) (delta * HeliosClient.CLICKGUI.animationSpeed.value));
+        update(delta * (float) HeliosClient.CLICKGUI.animationSpeed.value);
+        GUI gui = ModuleManager.get(GUI.class);
+
         this.screen = HeliosClient.MC.currentScreen;
 
         checkMaxHeightValue();
@@ -168,11 +183,11 @@ public class CategoryPane implements Listener {
         Renderer2D.scaleAndPosition(drawContext.getMatrices(), (x + (width + 5) / 2.0f), (float) (y + categoryNameHeight + 6), (float) scale);
 
         if (!collapsed && height >= 10) {
-            Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, (width + 5), (int) hudBox.getHeight());
-            if (ModuleManager.get(GUI.class).categoryBorder.value) {
+            if (gui.categoryBorder.value) {
                 drawOutlineGradientBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width);
             }
-            drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary(), 100).getRGB());
+            drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3, ColorManager.INSTANCE.clickGuiPrimary);
+            Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, width + 5, (int) hudBox.getHeight() - 1);
         }
 
         if (collapsed) {
@@ -186,6 +201,7 @@ public class CategoryPane implements Listener {
 
                 int settingsHeight = m.renderSettings(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                 buttonYOffset += settingsHeight;
+
                 MAX_HEIGHT = settingsHeight + MAX_HEIGHT;
 
                 buttonYOffset += m.height + 3;
@@ -196,10 +212,21 @@ public class CategoryPane implements Listener {
 
         drawRectangleWithShadow(drawContext.getMatrices(), x - 2, y, true, true, true, true, width + 4.5f, categoryNameHeight + 8, 3, 2, ColorUtils.changeAlpha(ModuleManager.get(GUI.class).categoryPaneColors.getColor(), 255).getRGB());
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - Renderer2D.getFxStringWidth(category.name) / 2, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - categoryNameWidth / 2.0f, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
+
+
         hudBox.set(x, y, width, MAX_HEIGHT);
 
-        FontRenderers.iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), -1);
+        if (gui.syncCategoryIconColor.value) {
+            FontRenderers.iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), ColorManager.INSTANCE.getPrimaryGradientStart().getRGB());
+        }else {
+            FontRenderers.iconRenderer.drawString(drawContext.getMatrices(), String.valueOf(icon), x + 1, (float) (y + 3), -1);
+        }
+
+        if(gui.displayModuleCount.value){
+            String modulesAmount = "["+moduleButtons.size()+"]";
+            Renderer2D.drawFixedString(drawContext.getMatrices(), modulesAmount, x + (float) (CategoryPane.getWidth() - 4 - Renderer2D.getFxStringWidth(modulesAmount)), (float) (y + 4), -1);
+        }
     }
 
     public boolean hovered(double mouseX, double mouseY) {
@@ -207,7 +234,6 @@ public class CategoryPane implements Listener {
     }
 
     public boolean hoveredOverModules(double mouseX, double mouseY) {
-        int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
         return mouseX > x + 2 && mouseX < x + (width - 2) && mouseY > y + categoryNameHeight + 14 && mouseY < y + height;
     }
 
@@ -230,18 +256,17 @@ public class CategoryPane implements Listener {
                 dragging = true;
             }
             if (button == 2) {
-                startX = (int)mouseX - x;
-                startY = (int)mouseY - y;
+                startX = (int) mouseX - x;
+                startY = (int) mouseY - y;
                 dragging = true;
             }
 
             if (!hovered(mouseX, mouseY)) {
                 for (ModuleButton moduleButton : moduleButtons) {
                     moduleButton.collapsed = collapsed;
-                     moduleButton.mouseClicked(mouseX, mouseY, button, event.getScreen());
+                    moduleButton.mouseClicked(mouseX, mouseY, button, event.getScreen());
                 }
             }
-
         }
     }
 
@@ -278,13 +303,9 @@ public class CategoryPane implements Listener {
 
     public void mouseScrolled(int mouseX, int mouseY, double amount) {
         if (hoveredOverModules(mouseX, mouseY) && ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.NEW) {
-            int categoryNameHeight = (int) Renderer2D.getFxStringHeight(category.name);
             // Scroll this pane by changing the scroll offset
             scrollOffset += (int) (amount * HeliosClient.CLICKGUI.ScrollSpeed.value);
-
-            // Clamp the scroll offset to prevent scrolling past the start or end of the modules
-            int maxScroll = Math.max(0, moduleButtons.size() * (categoryNameHeight + 10));
-            scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
+            scrollOffset = Math.max(scrollOffset,0);
         }
     }
 

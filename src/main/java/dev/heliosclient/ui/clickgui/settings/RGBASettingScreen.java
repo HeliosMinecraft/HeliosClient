@@ -27,9 +27,7 @@ public class RGBASettingScreen extends Screen implements IWindowContentRenderer 
             super.renderBackgroundTexture(drawContext);
         }
 
-        if (textRenderer.getWidth(setting.description) > windowWidth) {
-            windowWidth = textRenderer.getWidth(setting.description) + 5;
-        } else if (textRenderer.getWidth(setting.name) > windowWidth) {
+        if (textRenderer.getWidth(setting.name) > windowWidth) {
             windowWidth = textRenderer.getWidth(setting.name) + 30;
         }
 

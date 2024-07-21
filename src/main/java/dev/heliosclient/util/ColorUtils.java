@@ -3,6 +3,7 @@ package dev.heliosclient.util;
 import dev.heliosclient.HeliosClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.util.GlAllocationUtils;
+import net.minecraft.util.math.random.Random;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -13,6 +14,7 @@ import java.util.Objects;
  * Utils for working with color and chat formatting.
  */
 public class ColorUtils {
+    static Random rand = Random.create();
 
     //Aliases for chat formatting
     public static String colorChar = "\247";
@@ -40,6 +42,7 @@ public class ColorUtils {
     public static String obfuscated = "\247k";
     public static String reset = "\247r";
 
+
     /**
      * Converts RGBA hex code to integer.
      *
@@ -65,6 +68,20 @@ public class ColorUtils {
         return ((r & 0x0ff) << 16) | ((g & 0x0ff) << 8) | (b & 0x0ff);
     }
 
+    public static Color getRandomColor(){
+        float r = rand.nextFloat(); // Red component
+        float g = rand.nextFloat(); // Green component
+        float b = rand.nextFloat(); // Blue component
+        return new Color(r, g, b);
+    }
+    public static Color getRandomColorWithAlpha(){
+        float r = rand.nextFloat(); // Red component
+        float g = rand.nextFloat(); // Green component
+        float b = rand.nextFloat(); // Blue component
+        float a = rand.nextFloat(); // Alpha component
+
+        return new Color(r, g, b,a);
+    }
     /**
      * Converts integer to color object.
      *

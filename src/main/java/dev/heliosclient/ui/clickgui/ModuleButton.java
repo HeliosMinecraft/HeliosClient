@@ -8,6 +8,7 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.GUI;
+import dev.heliosclient.module.settings.ParentScreenSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.lists.ListSetting;
@@ -15,7 +16,7 @@ import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.settings.SettingsScreen;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.KeycodeToString;
+import dev.heliosclient.util.KeyboardUtils;
 import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
@@ -72,6 +73,7 @@ public class ModuleButton implements Listener {
         this.screen = HeliosClient.MC.currentScreen;
         this.x = x;
         this.y = y;
+        this.shouldRender = shouldRender;
 
         if (!shouldRender) return;
 
@@ -111,7 +113,7 @@ public class ModuleButton implements Listener {
         }
 
         if (module.keyBind.value != -1 && ClickGUI.keybinds) {
-            String keyName = "[" + KeycodeToString.translateShort(module.keyBind.value) + "]";
+            String keyName = "[" + KeyboardUtils.translateShort(module.keyBind.value) + "]";
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), keyName.toUpperCase(), (int) (x + width - 3 - Renderer2D.getCustomStringWidth(keyName, FontRenderers.Small_fxfontRenderer)), textY, ColorManager.INSTANCE.defaultTextColor);
         }
     }
@@ -133,7 +135,11 @@ public class ModuleButton implements Listener {
     }
 
     public int renderSettings(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        if (!shouldRender) return 0;
+
+        if (!shouldRender){
+            updateScale(false);
+            return (int) (boxHeight * scale);
+        }
 
         int settingYOffset = 0;
         updateScale(settingsOpen);
@@ -146,10 +152,8 @@ public class ModuleButton implements Listener {
                     continue;
                 }
                 // Set the screen for the settings
-                if (setting instanceof RGBASetting rgbaSetting) {
-                    rgbaSetting.setParentScreen(ClickGUIScreen.INSTANCE);
-                } else if (setting instanceof ListSetting listSetting) {
-                    listSetting.setParentScreen(ClickGUIScreen.INSTANCE);
+                if (setting instanceof ParentScreenSetting<?> setting1) {
+                    setting1.setParentScreen(ClickGUIScreen.INSTANCE);
                 }
 
                 // If offset is more than 4, render the setting.

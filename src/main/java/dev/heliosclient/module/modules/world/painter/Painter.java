@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules.world.painter;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.input.KeyPressedEvent;
@@ -16,6 +17,9 @@ import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -24,41 +28,48 @@ import net.minecraft.util.math.Vec3i;
 
 import java.awt.*;
 import java.io.File;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Painter extends Module_ {
 
-    private final String FOUR_BY_FOUR_WALL = "[0,0,0]{minecraft:obsidian}\n" +
-            "[1,0,0]{minecraft:obsidian}\n" +
-            "[2,0,0]{minecraft:obsidian}\n" +
-            "[3,0,0]{minecraft:obsidian}\n" +
-            "[0,1,0]{minecraft:obsidian}\n" +
-            "[0,2,0]{minecraft:obsidian}\n" +
-            "[0,3,0]{minecraft:obsidian}\n" +
-            "[1,1,0]{minecraft:obsidian}\n" +
-            "[1,2,0]{minecraft:obsidian}\n" +
-            "[1,3,0]{minecraft:obsidian}\n" +
-            "[2,1,0]{minecraft:obsidian}\n" +
-            "[2,2,0]{minecraft:obsidian}\n" +
-            "[2,3,0]{minecraft:obsidian}\n" +
-            "[3,1,0]{minecraft:obsidian}\n" +
-            "[3,2,0]{minecraft:obsidian}\n" +
-            "[3,3,0]{minecraft:obsidian}";
-    private final String WITHER = "[0,0,0]{minecraft:soul_sand}\n" +
-            "[0,1,-1]{minecraft:soul_sand}\n" +
-            "[0,1,0]{minecraft:soul_sand}\n" +
-            "[0,1,1]{minecraft:soul_sand}\n" +
-            "[0,2,1]{minecraft:wither_skeleton_skull}\n" +
-            "[0,2,0]{minecraft:wither_skeleton_skull}\n" +
-            "[0,2,-1]{minecraft:wither_skeleton_skull}";
+    //Text block
+    private final String FOUR_BY_FOUR_WALL = """
+            [0,0,0]{minecraft:obsidian}
+            [1,0,0]{minecraft:obsidian}
+            [2,0,0]{minecraft:obsidian}
+            [3,0,0]{minecraft:obsidian}
+            [0,1,0]{minecraft:obsidian}
+            [0,2,0]{minecraft:obsidian}
+            [0,3,0]{minecraft:obsidian}
+            [1,1,0]{minecraft:obsidian}
+            [1,2,0]{minecraft:obsidian}
+            [1,3,0]{minecraft:obsidian}
+            [2,1,0]{minecraft:obsidian}
+            [2,2,0]{minecraft:obsidian}
+            [2,3,0]{minecraft:obsidian}
+            [3,1,0]{minecraft:obsidian}
+            [3,2,0]{minecraft:obsidian}
+            [3,3,0]{minecraft:obsidian}""";
+
+    private final String WITHER = """
+            [0,0,0]{minecraft:soul_sand}
+            [0,1,0]{minecraft:soul_sand}
+            [0,1,-1]{minecraft:soul_sand}
+            [0,1,1]{minecraft:soul_sand}
+            [0,2,0]{minecraft:wither_skeleton_skull}
+            [0,2,1]{minecraft:wither_skeleton_skull}
+            [0,2,-1]{minecraft:wither_skeleton_skull}""";
+
     public Direction lockedDirection = null;
     public BlockPos lockedStartPos = null;
     public Direction prevlockedDirection = null;
     public BlockPos prevlockedStartPos = null;
     public File painterFile = null;
     //The canvas is the positional representation of the structure to be built
-    HashMap<BlockPos, Block> CANVAS_MAP = new HashMap<>();
+    LinkedHashMap<BlockPos, Block> CANVAS_MAP = new LinkedHashMap<>();
+
     boolean isLocked = false;
     SettingGroup sgGeneral = new SettingGroup("General");
     SettingGroup sgPlace = new SettingGroup("Place");
@@ -126,6 +137,13 @@ public class Painter extends Module_ {
             .defaultValue(true)
             .build()
     );
+    BooleanSetting forceBreak = sgPlace.add(new BooleanSetting.Builder()
+            .name("Force Break")
+            .description("Automatically breaks blocks where air is supposed to be present (only for air). Force Break will break the block even if we don't have the correct tools")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .build()
+    );
     DoubleSetting ticksEachBlock = sgPlace.add(new DoubleSetting.Builder()
             .name("Ticks / block")
             .description("The ticks per block to be placed, essentially a delay to place each block")
@@ -145,7 +163,7 @@ public class Painter extends Module_ {
     );
     BooleanSetting playerRotate = sgPlace.add(new BooleanSetting.Builder()
             .name("Player Rotate")
-            .description("Rotates the player to look at the block pos when placing. Stops auto rotate while rotating")
+            .description("Rotates the player to look at the block pos when placing. Stops auto-rotate while the player is rotating")
             .onSettingChange(this)
             .defaultValue(false)
             .build()
@@ -241,7 +259,9 @@ public class Painter extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent.PLAYER event) {
+    public void onTick(TickEvent.CLIENT event) {
+        if(!HeliosClient.shouldUpdate()) return;
+
         if (lockCanvas.value && !isLocked) {
             lock();
         } else if (!lockCanvas.value && isLocked) {
@@ -251,25 +271,43 @@ public class Painter extends Module_ {
 
         ticksPassed++;
 
-        CANVAS_MAP.forEach((pos, block) -> {
-            Vec3i offSet = new Vec3i((int) offsetFromPlayer.getVecX(), (int) offsetFromPlayer.getVecY(), (int) offsetFromPlayer.getVecZ());
-            BlockPos changedPos = getPlayerPos().add(rotateBlockPosition(pos, getBlockRotation())).add(offSet);
-            if (ticksPassed > ticksEachBlock.value && !mc.world.getBlockState(changedPos).getBlock().equals(block) && mc.world.getBlockState(changedPos).isReplaceable()) {
-                ticksPassed = 0;
-                Item item = Item.BLOCK_ITEMS.get(block);
-                int slot = InventoryUtils.findItemInHotbar(item);
-                if (slot == -1) {
-                    ChatUtils.sendHeliosMsg(item.getName().getString() + " was NOT found in hot bar");
-                } else {
+        for(Map.Entry<BlockPos, Block> entry: CANVAS_MAP.entrySet()) {
+                BlockPos pos = entry.getKey();
+                Block block = entry.getValue();
+                Vec3i offSet = new Vec3i((int) offsetFromPlayer.getVecX(), (int) offsetFromPlayer.getVecY(), (int) offsetFromPlayer.getVecZ());
+                BlockPos changedPos = getPlayerPos().add(rotateBlockPosition(pos, getBlockRotation())).add(offSet);
+                BlockState state = mc.world.getBlockState(changedPos);
+                if (ticksPassed > ticksEachBlock.value && !state.getBlock().equals(block) && state.isReplaceable()) {
+                    ticksPassed = 0;
 
-                    boolean swapped = InventoryUtils.swapToSlot(slot, false);
 
-                    if (swapped) {
-                        BlockUtils.place(changedPos, playerRotate.value, airPlace.value, slot == 45 ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                    //Experimental, if a block is supposed to be an air, but it is not, then try to break it
+                    if ((block == Blocks.AIR || block == Blocks.CAVE_AIR) && !mc.world.isAir(pos) && BlockUtils.canBreak(pos, state)) {
+                        int fastestTool = InventoryUtils.getFastestTool(state, true);
+                        //Slot may be -1
+                        if (fastestTool != -1 || forceBreak.value) {
+                            InventoryUtils.swapToSlot(fastestTool, false);
+                            BlockUtils.breakBlock(pos, true);
+                        }
+                    }
+
+                    Item item = Item.BLOCK_ITEMS.get(block);
+
+                    if(item == null)continue;
+
+                    int slot = InventoryUtils.findItemInHotbar(item);
+                    if (slot == -1) {
+                        ChatUtils.sendHeliosMsg(item.getName().getString() + " was NOT found in hot bar");
+                    } else {
+
+                        boolean swapped = InventoryUtils.swapToSlot(slot, false);
+
+                        if (swapped) {
+                            BlockUtils.place(changedPos, playerRotate.value, airPlace.value, slot == PlayerInventory.OFF_HAND_SLOT ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                        }
                     }
                 }
-            }
-        });
+        }
     }
 
     private void lock() {

@@ -39,6 +39,10 @@ public class LightLevelESP extends Module_ {
 
     }
 
+    int RED_LOW = ColorUtils.changeAlpha(Color.RED,100).getRGB();
+    int GREEN_LOW = ColorUtils.changeAlpha(Color.GREEN,100).getRGB();
+    int YELLOW_LOW = ColorUtils.changeAlpha(Color.YELLOW,100).getRGB();
+
     @SubscribeEvent
     public void onRender3d(Render3DEvent event) {
         BlockIterator iterator = new BlockIterator(mc.player, (int) range.value, 4);
@@ -52,18 +56,18 @@ public class LightLevelESP extends Module_ {
             int lightLevel = mc.world.getLightLevel(LightType.BLOCK, pos);
 
             if (lightLevel < 4) {
-                renderTop(pos, Color.RED); // Red for very dark
+                renderTop(pos, RED_LOW); // Red for very dark
             } else if (lightLevel < 8) {
-                renderTop(pos, Color.ORANGE); // Orange for moderately dark
+                renderTop(pos, GREEN_LOW); // Orange for moderately dark
             } else if (lightLevel < 12) {
-                renderTop(pos, Color.YELLOW); // Yellow for moderately lit
+                renderTop(pos, YELLOW_LOW); // Yellow for moderately lit
             }
             //Nothing for well lit
         }
     }
 
-    public void renderTop(BlockPos pos, Color color) {
-        QuadColor c = QuadColor.single(ColorUtils.changeAlpha(color, 100).getRGB());
+    public void renderTop(BlockPos pos, int color) {
+        QuadColor c = QuadColor.single(color);
         Renderer3D.drawBoxFill(new Box(pos).offset(0, 0.005f, 0), c, Direction.UP, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.WEST);
     }
 }

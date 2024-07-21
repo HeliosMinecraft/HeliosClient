@@ -17,8 +17,10 @@ import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
+import net.minecraft.client.gui.screen.ingame.AbstractCommandBlockScreen;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.AnvilScreen;
+import net.minecraft.client.gui.screen.ingame.StructureBlockScreen;
 import net.minecraft.client.gui.screen.multiplayer.AddServerScreen;
 import net.minecraft.client.gui.screen.multiplayer.DirectConnectScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
@@ -34,7 +36,7 @@ public class KeybindManager implements Listener {
     private static long lastLeftClick = 0;
     private static long lastRightClick = 0;
 
-    public KeybindManager() {
+    private KeybindManager() {
         EventManager.register(this);
     }
 
@@ -167,6 +169,8 @@ public class KeybindManager implements Listener {
                 !(HeliosClient.MC.currentScreen instanceof CreateWorldScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof EditWorldScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof AbstractSettingScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof StructureBlockScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof AbstractCommandBlockScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof AnvilScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof HudEditorScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof ClickGUIScreen);

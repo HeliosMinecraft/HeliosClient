@@ -5,7 +5,7 @@ import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.KeycodeToString;
+import dev.heliosclient.util.KeyboardUtils;
 import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
@@ -117,7 +117,7 @@ public class ScriptManagerScreen extends Screen {
         calculateTable();
 
         //Draw background and heading bg
-        Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(), startX, 32, scaledWidth - 200, scaledHeight - 80, 3, ColorUtils.changeAlpha(Color.BLACK, 125).getRGB());
+        Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(), startX, 32,true,true,true,true, scaledWidth - 200, scaledHeight - 80, 3, ColorUtils.changeAlpha(Color.BLACK, 125).getRGB());
         Renderer2D.drawRoundedRectangleWithShadow(context.getMatrices(), startX, 32, scaledWidth - 200, 18, 3, 4, Color.BLACK.getRGB(), true, true, false, false);
 
         //Reload all scripts button
@@ -194,7 +194,7 @@ public class ScriptManagerScreen extends Screen {
         FontRenderers.Mid_fxfontRenderer.drawString(drawContext.getMatrices(), file.getScriptName(), x + 30 - FontRenderers.Mid_fxfontRenderer.getStringWidth(file.getScriptName()) / 2.0f, y + 43f, Color.WHITE.getRGB());
 
         //Bind
-        String bindKey = KeycodeToString.translateShort(file.bindKey).toUpperCase();
+        String bindKey = KeyboardUtils.translateShort(file.bindKey).toUpperCase();
         if (file.isListeningForBind) {
             bindKey = "Set";
         }
@@ -265,7 +265,7 @@ public class ScriptManagerScreen extends Screen {
     }
 
     public boolean hoveredOverBind(double mouseX, double mouseY, LuaFile file, int entryX, int entryY) {
-        String bindKeyName = KeycodeToString.translateShort(file.bindKey).toUpperCase();
+        String bindKeyName = KeyboardUtils.translateShort(file.bindKey).toUpperCase();
         return isMouseOver(mouseX, mouseY, entryX + 5f, entryY + 60f, FontRenderers.Small_fxfontRenderer.getStringWidth(bindKeyName) + 3, 7.4f);
     }
 

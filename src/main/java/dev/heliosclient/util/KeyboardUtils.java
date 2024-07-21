@@ -1,5 +1,7 @@
 package dev.heliosclient.util;
 
+import dev.heliosclient.HeliosClient;
+import net.minecraft.client.Keyboard;
 import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
@@ -7,7 +9,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 /**
  * Utils for working with GLFW keycodes.
  */
-public class KeycodeToString {
+public class KeyboardUtils {
 
     /**
      * Translates GLFW keycode to readable string.
@@ -390,5 +392,9 @@ public class KeycodeToString {
             }
         }
         return keyName;
+    }
+
+    public static boolean isMouseKey(int key){
+        return key == GLFW.GLFW_MOUSE_BUTTON_LEFT || key == GLFW.GLFW_MOUSE_BUTTON_RIGHT || key == GLFW.GLFW_MOUSE_BUTTON_MIDDLE;
     }
 }

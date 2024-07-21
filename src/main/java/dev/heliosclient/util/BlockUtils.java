@@ -57,13 +57,18 @@ public class BlockUtils {
         if (state.getHardness(mc.world, blockPos) < 0) return false;
         return state.getOutlineShape(mc.world, blockPos) != VoxelShapes.empty();
     }
+    public static boolean canBreak(BlockPos blockPos) {
+        BlockState state = mc.world.getBlockState(blockPos);
+
+        return canBreak(blockPos,state);
+    }
 
     public static boolean canBreakInstantly(BlockState state, float speed) {
         return mc.player.isCreative() || calcBlockBreakingDelta2(state, speed) >= 1;
     }
 
     public static boolean canPlace(BlockPos pos, BlockState state) {
-        if (pos == null || mc.world == null || !World.isValid(pos) || !mc.world.getBlockState(pos).isReplaceable())
+        if (pos == null || mc.world == null || !World.isValid(pos) || !mc.world.getBlockState(pos).isReplaceable() || !mc.world.isInBuildLimit(pos))
             return false;
         return mc.world.getWorldBorder().contains(pos) && mc.world.canPlace(state, pos, ShapeContext.absent());
     }
@@ -167,6 +172,7 @@ public class BlockUtils {
 
     public static boolean isPlaceable(BlockPos pos, boolean entityCheck) {
         if (!mc.world.getBlockState(pos).isReplaceable()) return false;
+
         for (Entity e : mc.world.getEntitiesByClass(Entity.class, new Box(pos), e -> !(e instanceof ExperienceBottleEntity || e instanceof ItemEntity || e instanceof ExperienceOrbEntity))) {
             if (e instanceof PlayerEntity) return false;
             return !entityCheck;
@@ -175,7 +181,10 @@ public class BlockUtils {
     }
 
     public static boolean place(BlockPos pos, boolean airPlace, boolean rotate) {
-        return place(pos, airPlace, rotate, Hand.MAIN_HAND);
+        return place(pos, rotate, airPlace, Hand.MAIN_HAND);
+    }
+    public static boolean airBreed(Block b) {
+        return b == Blocks.AIR || b == Blocks.CAVE_AIR || b == Blocks.VOID_AIR;
     }
 
     public static boolean isClickable(Block block) {
@@ -196,8 +205,10 @@ public class BlockUtils {
     }
 
     public static boolean place(BlockPos pos, boolean rotate, boolean airPlace, Hand hand) {
-        if (!mc.world.isInBuildLimit(pos) || !mc.world.getBlockState(pos).getCollisionShape(mc.world, pos).isEmpty())
+        if (!mc.world.isInBuildLimit(pos))
             return false;
+
+        Vec3d hitPos = Vec3d.ofCenter(pos);
 
         for (Direction d : Direction.values()) {
             if (!mc.world.isInBuildLimit(pos.offset(d)))
@@ -217,8 +228,11 @@ public class BlockUtils {
                 mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
             }
 
-            ActionResult result = mc.interactionManager.interactBlock(mc.player, hand,
-                    new BlockHitResult(Vec3d.ofCenter(pos), airPlace ? d : d.getOpposite(), airPlace ? pos : pos.offset(d), false));
+            hitPos = hitPos.add(d.getOffsetX() * 0.5, d.getOffsetY() * 0.5, d.getOffsetZ() * 0.5);
+
+            BlockHitResult blockHitResult = new BlockHitResult(hitPos, d.getOpposite(), airPlace ? pos : pos.offset(d), false);
+            ActionResult result = mc.interactionManager.interactBlock(mc.player, hand,blockHitResult);
+
 
             if (result.shouldSwingHand()) {
                 mc.player.swingHand(hand);

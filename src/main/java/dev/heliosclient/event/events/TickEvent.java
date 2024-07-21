@@ -8,36 +8,31 @@ import net.minecraft.entity.player.PlayerEntity;
 
 /**
  * Something really important
+ *
+ * <h1>
+ * Note: The TickEvent class will not be posted by the EventManager. Instead, use the subclass CLIENT.
+ * </h1>
  */
-@Cancelable
-@LuaEvent("TickEvent")
-public class TickEvent extends Event {
+public abstract class TickEvent extends Event {
+    private TickEvent(){}
 
     //Called for every Client tick
     @LuaEvent("ClientTick")
     public static class CLIENT extends TickEvent {
-        private final MinecraftClient client;
-
-        public CLIENT(MinecraftClient client) {
-            this.client = client;
-        }
-
-        public MinecraftClient getClient() {
-            return client;
-        }
     }
 
-    //Called for every world Tick
-    @LuaEvent("WorldTick")
     /**
      * Note only works for single player worlds!!!
      */
+    @LuaEvent("WorldTick")
     public static class WORLD extends TickEvent {
+        //Called for every world Tick
     }
 
-    //Called for every client player alive tick
     @LuaEvent("PlayerTick")
     public static class PLAYER extends TickEvent {
+
+        //Called for every client player alive tick
 
         public static PLAYER INSTANCE = new PLAYER();
 

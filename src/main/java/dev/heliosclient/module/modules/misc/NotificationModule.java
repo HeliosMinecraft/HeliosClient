@@ -86,6 +86,12 @@ public class NotificationModule extends Module_ {
     }
 
     @Override
+    public void onDisable() {
+        super.onDisable();
+        NotificationManager.INSTANCE.clear();
+    }
+
+    @Override
     public void onSettingChange(Setting<?> setting) {
         super.onSettingChange(setting);
 

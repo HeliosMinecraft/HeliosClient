@@ -12,6 +12,7 @@ import dev.heliosclient.module.modules.render.hiteffect.particles.OrbParticle;
 import dev.heliosclient.module.modules.render.hiteffect.particles.TextParticle;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.ParticleListSetting;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
@@ -50,6 +51,13 @@ public class HitEffect extends Module_ {
             .roundingPlace(1)
             .build()
     );
+    BooleanSetting randomColor = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Random Color")
+            .description("Color for each particle will be chosen randomly")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .build()
+    );
     RGBASetting color = sgGeneral.add(new RGBASetting.Builder()
             .name("Color")
             .description("Color of effect")
@@ -58,6 +66,7 @@ public class HitEffect extends Module_ {
             .defaultValue(Color.RED)
             .build()
     );
+
     DropDownSetting type = sgGeneral.add(new DropDownSetting.Builder()
             .name("Type")
             .description("Particle type to display")
@@ -150,7 +159,7 @@ public class HitEffect extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
         if (HeliosClient.MC.world == null) return;
 
         particles.removeIf(hitEffectParticle -> hitEffectParticle.isDiscarded);
@@ -186,13 +195,13 @@ public class HitEffect extends Module_ {
             switch ((EffectType) type.getOption()) {
                 case ORBS -> {
                     Vec3d velocity = new Vec3d(-target.getVelocity().x / 10, 0, -target.getVelocity().z / 10);
-                    particles.add(new OrbParticle(position, velocity, randomRadius.value ? random.nextFloat() + 0.2f : (float) orbsRadius.value, (float) gravityAmount.value, (float) time_in_seconds.value));
+                    particles.add(new OrbParticle(position, velocity, randomRadius.value ? random.nextFloat() + 0.2f : (float) orbsRadius.value, (float) gravityAmount.value, (float) time_in_seconds.value,randomColor.value));
                 }
                 case TEXT -> {
-                    particles.add(new TextParticle(getRandomText(), position, (float) scale.value, (float) time_in_seconds.value));
+                    particles.add(new TextParticle(getRandomText(), position, (float) scale.value, (float) time_in_seconds.value,randomColor.value));
                 }
                 case EZ -> {
-                    particles.add(new TextParticle("EZ!", position, (float) scale.value, (float) time_in_seconds.value));
+                    particles.add(new TextParticle("EZ!", position, (float) scale.value, (float) time_in_seconds.value,randomColor.value));
                 }
                 case CRITS -> {
                     particles.clear();

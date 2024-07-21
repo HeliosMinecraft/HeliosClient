@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class PainterFileParser {
 
@@ -27,8 +28,8 @@ public class PainterFileParser {
     public static String POSITION_BLOCK_REGEX = "\\[\\d+,\\d+,\\d+\\]\\{[a-zA-Z0-9_]+:[a-zA-Z0-9_]+\\}";
 
 
-    public static HashMap<BlockPos, Block> parseFilePath(Path filePath) {
-        HashMap<BlockPos, Block> result = new HashMap<>();
+    public static LinkedHashMap<BlockPos, Block> parseFilePath(Path filePath) {
+        LinkedHashMap<BlockPos, Block> result = new LinkedHashMap<>();
         try (BufferedReader reader = Files.newBufferedReader(filePath)) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -43,8 +44,8 @@ public class PainterFileParser {
         return result;
     }
 
-    public static HashMap<BlockPos, Block> parseString(String string) {
-        HashMap<BlockPos, Block> result = new HashMap<>();
+    public static LinkedHashMap<BlockPos, Block> parseString(String string) {
+        LinkedHashMap<BlockPos, Block> result = new LinkedHashMap<>();
         String[] lines = string.split("\n");
         for (String line : lines) {
             readLine(line, result);
@@ -53,7 +54,7 @@ public class PainterFileParser {
         return result;
     }
 
-    public static HashMap<BlockPos, Block> parseFile(File file) {
+    public static LinkedHashMap<BlockPos, Block> parseFile(File file) {
         if (file == null) {
             return null;
         }

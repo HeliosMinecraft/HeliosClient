@@ -28,8 +28,8 @@ import java.util.Map;
 public class HudEditorScreen extends Screen implements Listener {
     public static HudEditorScreen INSTANCE = new HudEditorScreen();
     private final List<HudElement> selectedElements = new ArrayList<>();
-    float thickness = 0.5f;
-    float threshold = 1;
+    float thickness = 0.5f; // Thickness of the alignment lines
+    float threshold = 1; // Threshold between two HudBoxes for the alignment lines to show.
     // Variables to track the drag state and initial position
     private boolean isDragging = false;
     private HudBox dragBox = null;
@@ -47,6 +47,15 @@ public class HudEditorScreen extends Screen implements Listener {
     public void onDisplayed() {
         super.onDisplayed();
         selectedElements.clear();
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        selectedElements.clear();
+        copiedSettings.clear();
+        isDragging = false;
+        dragBox = null;
     }
 
     @Override

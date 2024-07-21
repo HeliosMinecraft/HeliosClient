@@ -26,7 +26,7 @@ public class ViewModel extends Module_ {
             .build()
     );
     public BooleanSetting oldAnimations = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Old 1.8 Animations")
+            .name("Old 1_8 Animations")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
@@ -165,9 +165,6 @@ public class ViewModel extends Module_ {
         addSettingGroup(sgArm);
 
         addQuickSettings(sgGeneral.getSettings());
-        addQuickSettings(sgMainHand.getSettings());
-        addQuickSettings(sgOffHand.getSettings());
-        addQuickSettings(sgArm.getSettings());
     }
 
     @SubscribeEvent

@@ -10,29 +10,35 @@ import dev.heliosclient.module.modules.chat.Spammer;
 import dev.heliosclient.module.modules.combat.AimAssist;
 import dev.heliosclient.module.modules.combat.BowSpam;
 import dev.heliosclient.module.modules.combat.Criticals;
+import dev.heliosclient.module.modules.combat.TriggerBot;
 import dev.heliosclient.module.modules.misc.*;
 import dev.heliosclient.module.modules.movement.*;
 import dev.heliosclient.module.modules.player.*;
 import dev.heliosclient.module.modules.render.*;
 import dev.heliosclient.module.modules.render.hiteffect.HitEffect;
 import dev.heliosclient.module.modules.world.*;
+import dev.heliosclient.module.modules.world.Timer;
 import dev.heliosclient.module.modules.world.painter.Painter;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ModuleManager {
     static Set<Module_> modules = new ObjectArraySet<>();
+    private static final ConcurrentHashMap<Class<?>, Module_> moduleResultCache = new ConcurrentHashMap<>();
 
     public static void init() {
         modules.clear();
+        moduleResultCache.clear();
+
         //Combat
         registerModules(
                 new AimAssist(),
                 new BowSpam(),
-                new Criticals()
+                new Criticals(),
+                new TriggerBot()
         );
 
         // World
@@ -158,14 +164,16 @@ public class ModuleManager {
     }
 
     public static void registerModule(Module_ module) {
-        modules.add(module);
-        module.onLoad();
+        if(!modules.contains(module)) {
+            modules.add(module);
+            module.onLoad();
+            moduleResultCache.put(module.getClass(),module);
+        }
     }
 
     public static void registerModules(Module_... modules) {
         for (Module_ module : modules) {
-            ModuleManager.modules.add(module);
-            module.onLoad();
+            registerModule(module);
         }
     }
 
@@ -179,8 +187,16 @@ public class ModuleManager {
     }
 
     public static <T extends Module_> T get(Class<T> moduleClazz) {
+        // Check the cache first
+        Module_ cachedModule = moduleResultCache.get(moduleClazz);
+        if (cachedModule != null) {
+            return moduleClazz.cast(cachedModule);
+        }
+
+        // If not in cache, find the module and cache it
         for (Module_ module : modules) {
             if (moduleClazz.isInstance(module)) {
+                moduleResultCache.put(moduleClazz, module);
                 return moduleClazz.cast(module);
             }
         }

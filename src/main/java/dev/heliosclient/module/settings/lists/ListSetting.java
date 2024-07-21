@@ -37,10 +37,10 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
 
     public ListSetting(String name, String description, BooleanSupplier shouldRender, List<T> defaultValue, List<T> defaultSelected, Predicate<T> filter, ISettingChange iSettingChange, Registry<T> registry) {
         super(shouldRender, defaultValue);
-        this.value = defaultValue;
+        this.value = new ArrayList<>();
+        this.filter = filter;
         this.name = name;
         this.description = description;
-        this.filter = filter;
         this.height = 24;
         this.heightCompact = 20;
         this.maxSelectable = defaultValue.size();
@@ -49,6 +49,12 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
         this.defaultSelectedEntries.addAll(defaultSelected);
         this.registry = registry;
         this.iSettingChange = iSettingChange;
+
+        for(T entry : defaultValue){
+            if(filter.test(entry)){
+                value.add(entry);
+            }
+        }
     }
 
 
@@ -119,7 +125,7 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
 
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-        super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
+        super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth), x + 2, y + 4, -1);
 

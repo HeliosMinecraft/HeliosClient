@@ -22,10 +22,6 @@ public abstract class MixinCrashReport {
             if(HeliosClient.CONFIG != null && HeliosClient.CONFIG.nullCheck()) {
                 HeliosClient.saveConfigHook();
             }
-
-            if(report.getSystemDetailsSection() != null) {
-                report.getSystemDetailsSection().addSection("HeliosClient", () -> "Version " + HeliosClient.versionTag + " , Active Modules:" + ModuleManager.getEnabledModules());
-            }
         }
     }
 }

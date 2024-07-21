@@ -39,7 +39,7 @@ public class UnfocusedCPU extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
         if (!mc.isWindowFocused()) {
             mc.options.getMaxFps().setValue((int) fps.value);
         } else {

@@ -159,7 +159,10 @@ public class CapeModule extends Module_ {
     }
 
     public void setCape() {
-        if (CapeManager.capeIdentifiers.isEmpty()) return;
+        if (CapeManager.capeIdentifiers.isEmpty() || capes.value == -1){
+            CapeManager.CURRENT_PLAYER_CAPE = null;
+            return;
+        }
 
         capes.options = List.of(CapeManager.CAPE_NAMES);
 

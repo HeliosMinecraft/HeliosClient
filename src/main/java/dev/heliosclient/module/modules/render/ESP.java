@@ -3,8 +3,10 @@ package dev.heliosclient.module.modules.render;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.render.Render3DEvent;
 import dev.heliosclient.managers.FriendManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ColorUtils;
@@ -193,8 +195,11 @@ public class ESP extends Module_ {
             return passiveColor.getColor().getRGB();
         }
         if (entity instanceof PlayerEntity p) {
-            if (team.value && p.getTeamColorValue() != 16777215) {
-                return ColorUtils.changeAlpha(p.getTeamColorValue(), 255, 10).getRGB();
+            if (team.value) {
+                return ColorUtils.changeAlpha(
+                        ModuleManager.get(Teams.class).getActualTeamColor(p),
+                        playerColor.getColor().getAlpha()
+                ).getRGB();
             }
 
             if (isFriend(p) && friends.value) {

@@ -1,12 +1,14 @@
 package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 
 import java.awt.*;
@@ -73,9 +75,30 @@ public class GUI extends Module_ {
             .onSettingChange(this)
             .build()
     );
+    public RGBASetting clickGUIPrimary = sgColors.add(new RGBASetting.Builder()
+            .name("ClickGUI Primary")
+            .description("Primary color of the click gui followed across the client")
+            .onSettingChange(this)
+            .defaultValue(new Color(17, 18, 19, 255))
+            .build()
+    );
     public BooleanSetting categoryBorder = sgColors.add(new BooleanSetting.Builder()
             .name("Category Border")
             .description("Render the border around category")
+            .value(false)
+            .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting syncCategoryIconColor = sgColors.add(new BooleanSetting.Builder()
+            .name("Apply same to category Icons")
+            .description("Renders the category icons with the same colors as chosen for GUI.")
+            .value(false)
+            .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting displayModuleCount = sgColors.add(new BooleanSetting.Builder()
+            .name("Display Module counts")
+            .description("Displays module count in category pane for each category.")
             .value(false)
             .onSettingChange(this)
             .build()

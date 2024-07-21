@@ -8,13 +8,15 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
+import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.system.mixininterface.IPlayerInteractEntityC2SPacket;
 import dev.heliosclient.util.player.FreeCamEntity;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
+import net.minecraft.util.math.Vec3d;
 
 
 public class Freecam extends Module_ {
@@ -43,6 +45,20 @@ public class Freecam extends Module_ {
             .name("Toggle on event")
             .description("Automatically toggles freecam on certain events like disconnect or death")
             .onSettingChange(this)
+            .value(true)
+            .build()
+    );
+    BooleanSetting blockOutOfRangePackets = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Block Out Of Range Packets")
+            .description("Interaction packets with distance more than reach range may get you kicked, so this will cause them to not be sent.")
+            .onSettingChange(this)
+            .value(true)
+            .build()
+    );
+    BooleanSetting blockAllHandSwing = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Block HandSwing")
+            .description("All HandSwing packets will not be sent while in free cam.")
+            .onSettingChange(this)
             .value(false)
             .build()
     );
@@ -69,7 +85,10 @@ public class Freecam extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-        if (mc.world == null) return;
+        if (mc.world == null || mc.player == null) {
+            toggle();
+            return;
+        }
 
         mc.chunkCullingEnabled = false;
         previousCamEntity = mc.getCameraEntity();
@@ -99,14 +118,60 @@ public class Freecam extends Module_ {
     public void onSendPacket(PacketEvent.SEND event) {
         if (event.getPacket() instanceof ClientCommandC2SPacket || event.getPacket() instanceof PlayerMoveC2SPacket) {
             event.setCanceled(true);
+        }else if (event.getPacket() instanceof PlayerActionC2SPacket p) {
+            PlayerActionC2SPacket.Action action = p.getAction();
+            if(action != PlayerActionC2SPacket.Action.START_DESTROY_BLOCK && action != PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK) return;
+
+            if (blockOutOfRangePackets.value && p.getPos().toCenterPos().distanceTo(mc.player.getEyePos()) >= mc.interactionManager.getReachDistance()) {
+                event.setCanceled(true);
+                return;
+            }
+
+            if (rotateToInteract.value)
+                RotationUtils.lookAt(p.getPos().toCenterPos());
+
+        } else if (event.getPacket() instanceof PlayerInteractBlockC2SPacket p) {
+            Vec3d pos = p.getBlockHitResult().getPos();
+
+            if (blockOutOfRangePackets.value && pos.distanceTo(mc.player.getEyePos()) >= mc.interactionManager.getReachDistance()) {
+                event.setCanceled(true);
+                return;
+            }
+
+            if (rotateToInteract.value)
+                RotationUtils.lookAt(pos);
+        } else if (event.getPacket() instanceof PlayerInteractEntityC2SPacket p) {
+            Entity entity = ((IPlayerInteractEntityC2SPacket)p).getEntity();
+
+            if (entity == null || entity == mc.player) {
+                event.setCanceled(true);
+                return;
+            }
+
+            if (blockOutOfRangePackets.value && entity.getPos().distanceTo(mc.player.getEyePos()) > mc.interactionManager.getReachDistance()) {
+                event.setCanceled(true);
+                return;
+            }
+
+            if (rotateToInteract.value)
+                RotationUtils.lookAt(entity.getPos());
+        }
+        //Todo: Somehow block HandSwing packets sent after the interaction packets
+
+        if (blockAllHandSwing.value && event.getPacket() instanceof HandSwingC2SPacket) {
+            event.setCanceled(true);
         }
     }
 
+    @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        if (rotateToInteract.value && mc.crosshairTarget != null) {
-            RotationUtils.lookAt(mc.crosshairTarget);
-        }
         FreeCamEntity.movementTick();
+        FreeCamEntity.getCamEntity().updateInventory();
+    }
+
+    @Override
+    public void onSettingChange(Setting<?> setting) {
+        super.onSettingChange(setting);
         FreeCamEntity.moveSpeed = (float) speed.value;
     }
 }

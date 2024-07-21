@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
@@ -14,6 +15,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 public class InventoryUtils {
     private static int previousHotbarSlot = -1;
@@ -27,8 +29,9 @@ public class InventoryUtils {
     }
 
 
+
     public static boolean swapToSlot(int hotbarSlot, boolean swapBack) {
-        if (hotbarSlot == 45) return true;
+        if (hotbarSlot == PlayerInventory.OFF_HAND_SLOT) return true;
         if (HeliosClient.MC.player.getInventory().selectedSlot == hotbarSlot) return true;
         if (hotbarSlot < 0 || hotbarSlot > 8) return false;
         if (swapBack) {
@@ -47,9 +50,24 @@ public class InventoryUtils {
         return HeliosClient.MC.player.getInventory().contains(itemStack);
     }
 
-    // Get the count of the specified item in the HeliosClient.MC.player's inventory
+    public static boolean doesAnyHandStackHas(Predicate<ItemStack> stackFil){
+        return stackFil.test(HeliosClient.MC.player.getMainHandStack()) || stackFil.test(HeliosClient.MC.player.getOffHandStack());
+    }
+
+    // Get the count of the specified item in the player's inventory
     public static int getItemCount(ItemStack itemStack) {
+        if(itemStack == null){
+            return 0;
+        }
+
         return HeliosClient.MC.player.getInventory().count(itemStack.getItem());
+    }
+    public static int getItemStackCountSafe(ItemStack itemStack) {
+        if(itemStack == null){
+            return 0;
+        }
+
+        return itemStack.getCount();
     }
 
     // Drop the specified item from the HeliosClient.MC.player's inventory
@@ -121,8 +139,8 @@ public class InventoryUtils {
             }
         }
         //Offhand
-        if (HeliosClient.MC.player.getInventory().getStack(45) != null && HeliosClient.MC.player.getInventory().getStack(45).getItem() == item) {
-            return 45;
+        if (HeliosClient.MC.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT) != null && HeliosClient.MC.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT).getItem() == item) {
+            return PlayerInventory.OFF_HAND_SLOT;
         }
         return -1; // Return -1 if the item was not found
     }

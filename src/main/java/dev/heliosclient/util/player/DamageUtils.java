@@ -17,6 +17,8 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
+import net.minecraft.registry.tag.EntityTypeTags;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
@@ -40,6 +42,24 @@ public class DamageUtils implements Listener {
         return rawDamage;
     }
 
+    /**
+     * Directly taken from:
+     * @see LivingEntity#computeFallDamage(float, float)
+     */
+    public static float calcFallDamage(LivingEntity entity){
+        if (entity.hasStatusEffect(StatusEffects.SLOW_FALLING) || entity.hasStatusEffect(StatusEffects.LEVITATION)) return 0;
+
+        if (entity.getType().isIn(EntityTypeTags.FALL_DAMAGE_IMMUNE)) {
+            return 0;
+        } else {
+            StatusEffectInstance statusEffectInstance = entity.getStatusEffect(StatusEffects.JUMP_BOOST);
+            float f = statusEffectInstance == null ? 0.0F : (float)(statusEffectInstance.getAmplifier() + 1);
+            
+            float fallDamageBeforeRedu = HeliosClient.MC.player.fallDistance - 3.0F - f;
+            
+            return (float) Math.ceil(calculateReductions(fallDamageBeforeRedu,entity,entity.getDamageSources().fall()));
+        }
+    }
     /**
      * Use minecraft's method to calculate damage.
      *

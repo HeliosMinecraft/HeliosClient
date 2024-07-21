@@ -28,4 +28,15 @@ public class MixinVec3d implements IVec3d {
         this.y = y;
         this.z = z;
     }
+
+    @Override
+    public void heliosClient$setY(double y) {
+        this.y = y;
+    }
+
+    @Override
+    public void heliosClient$setXZ(double x, double z) {
+        this.x = x;
+        this.z = z;
+    }
 }

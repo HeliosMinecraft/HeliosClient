@@ -3,7 +3,7 @@ package dev.heliosclient.module.settings;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.KeycodeToString;
+import dev.heliosclient.util.KeyboardUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
@@ -48,7 +48,7 @@ public class KeyBind extends Setting<Integer> {
         } else if (value == -1) {
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": None", x + 2, y + 8, defaultColor);
         } else {
-            String keyName = KeycodeToString.translate(value).toUpperCase(Locale.ROOT);
+            String keyName = KeyboardUtils.translate(value).toUpperCase(Locale.ROOT);
             Renderer2D.drawFixedString(drawContext.getMatrices(), name + ": " + keyName, x + 2, y + 8, defaultColor);
         }
 
@@ -73,7 +73,7 @@ public class KeyBind extends Setting<Integer> {
         } else if (value == -1) {
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": None", x + 2, y + 6, defaultColor);
         } else {
-            String keyName = KeycodeToString.translate(value).toUpperCase(Locale.ROOT);
+            String keyName = KeyboardUtils.translate(value).toUpperCase(Locale.ROOT);
             FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name + ": " + keyName, x + 2, y + 6, defaultColor);
         }
 

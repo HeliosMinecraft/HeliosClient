@@ -43,8 +43,7 @@ public abstract class GameRendererMixin {
     @Inject(method = "renderWorld", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = {"ldc=hand"}), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private void render(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
         camera = client.gameRenderer.getCamera();
-        Render3DEvent event = new Render3DEvent(matrices, tickDelta, camera.getPos().x, camera.getPos().y, camera.getPos().z);
-        EventManager.postEvent(event);
+        EventManager.postEvent(Render3DEvent.get(matrices, tickDelta, camera.getPos().x, camera.getPos().y, camera.getPos().z));
     }
 
     @Inject(method = "bobView", at = @At(value = "HEAD"), cancellable = true)

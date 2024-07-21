@@ -5,7 +5,9 @@ import dev.heliosclient.mixin.AccessorMinecraftClient;
 import dev.heliosclient.util.MathUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -35,12 +37,20 @@ public class PlayerUtils {
     }
 
     public static boolean isMoving(PlayerEntity player) {
-        return MathUtils.length2D(player.getPos()) > 0 && (player.getX() != player.prevX && player.getY() != player.prevY && player.getZ() != player.prevZ);
+        return (player.getVelocity().lengthSquared() > 0 || player.getVelocity().horizontalLengthSquared() > 0) && (player.getX() != player.prevX && player.getY() != player.prevY && player.getZ() != player.prevZ);
     }
 
     public static boolean isPlayerLookingAtEntity(PlayerEntity player, Entity target, double maxDistance) {
-        HitResult result = player.raycast(maxDistance, MinecraftClient.getInstance().getTickDelta(), false);
-        return result.getType() == HitResult.Type.ENTITY && ((EntityHitResult) result).getEntity() == target;
+        Vec3d eyePos = player.getEyePos();
+        double squaredDist = Math.pow(maxDistance, 2);
+        Vec3d rotationVec = player.getRotationVector();
+        Vec3d vec3d3 = eyePos.add(rotationVec.multiply(maxDistance));
+        Box box = player.getBoundingBox().stretch(rotationVec.multiply(maxDistance)).expand(1.0);
+        EntityHitResult entityHitResult = ProjectileUtil.raycast(player, eyePos, vec3d3, box, (entity) -> !entity.isSpectator() && entity.canHit(), squaredDist);
+        if (entityHitResult != null) {
+            return entityHitResult.getEntity() == target;
+        }
+        return false;
     }
 
 

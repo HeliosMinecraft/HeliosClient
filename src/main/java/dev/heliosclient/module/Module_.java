@@ -182,7 +182,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
      * Called on tick.
      */
     @SubscribeEvent
-    public void onTick(TickEvent event) {
+    public void onTick(TickEvent.CLIENT event) {
     }
 
     /**
@@ -300,5 +300,10 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
     }
 }

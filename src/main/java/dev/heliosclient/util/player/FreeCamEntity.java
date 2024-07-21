@@ -8,6 +8,8 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -17,10 +19,8 @@ import java.util.UUID;
 public class FreeCamEntity extends OtherClientPlayerEntity {
     public static float moveSpeed = 1.0f;
     public static FreeCamEntity camEntity;
-    private static float forwardRamped;
-    private static float strafeRamped;
-    private static float verticalRamped;
     private boolean ghost;
+    static MinecraftClient mc = MinecraftClient.getInstance();
 
     public FreeCamEntity() {
         this(HeliosClient.MC.player);
@@ -44,13 +44,20 @@ public class FreeCamEntity extends OtherClientPlayerEntity {
         camEntity = this;
     }
 
+    public void updateInventory() {
+        PlayerInventory freeCamInventory = this.getInventory();
+
+        for (int i = 0; i < 36; i++) {
+            ItemStack playerStack = mc.player.getInventory().getStack(i);
+            freeCamInventory.setStack(i, playerStack.copy());
+        }
+        freeCamInventory.selectedSlot = mc.player.getInventory().selectedSlot;
+    }
+
     public static void movementTick() {
         FreeCamEntity camera = getCamEntity();
-
-        if (camera != null) {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            ClientPlayerEntity player = mc.player;
-
+        ClientPlayerEntity player = mc.player;
+        if (camera!= null && player!= null) {
             float forward = 0;
             float vertical = 0;
             float strafe = 0;
@@ -75,43 +82,19 @@ public class FreeCamEntity extends OtherClientPlayerEntity {
                 vertical--;
             }
 
-            float rampAmount = 0.15f;
-            float speed = strafe * strafe + forward * forward;
+            float speed = (float) getMoveSpeed();
+            float xFactor = (float) Math.sin(camera.getYaw() * Math.PI / 180D);
+            float zFactor = (float) Math.cos(camera.getYaw() * Math.PI / 180D);
 
-            if (forward == 0 || strafe == 0) {
-                speed = 1;
-            } else {
-                speed = (float) Math.sqrt(speed * 0.6);
-            }
+            double x = (strafe * zFactor - forward * xFactor) * speed;
+            double y = (double) vertical * speed;
+            double z = (forward * zFactor + strafe * xFactor) * speed;
 
-            forwardRamped = getRampedMotion(forwardRamped, forward, rampAmount) / speed;
-            verticalRamped = getRampedMotion(verticalRamped, vertical, rampAmount);
-            strafeRamped = getRampedMotion(strafeRamped, strafe, rampAmount) / speed;
-
-            assert player != null;
-            forward = player.isSprinting() ? forwardRamped * 2 : forwardRamped;
-
+            // Update camera position smoothly
             camera.updateLastTickPosition();
-            camera.handleMotion(forward, verticalRamped, strafeRamped);
+            camera.setVelocity(new Vec3d(x,y,z));
+            camera.move(MovementType.SELF, camera.getVelocity());
         }
-    }
-
-    private static float getRampedMotion(float current, float input, float rampAmount) {
-        if (input == 0) {
-            current *= 0.5f;
-        } else {
-            if (input < 0) {
-                rampAmount *= -1f;
-            }
-
-            if ((input < 0) != (current < 0)) {
-                current = 0;
-            }
-
-            current = MathHelper.clamp(current + rampAmount, -1f, 1f);
-        }
-
-        return current;
     }
 
     private static double getMoveSpeed() {
@@ -125,19 +108,6 @@ public class FreeCamEntity extends OtherClientPlayerEntity {
     @Override
     public void attack(Entity target) {
 
-    }
-
-    private void handleMotion(float forward, float up, float strafe) {
-        double xFactor = Math.sin(this.getYaw() * Math.PI / 180D);
-        double zFactor = Math.cos(this.getYaw() * Math.PI / 180D);
-        double scale = getMoveSpeed();
-
-        double x = (strafe * zFactor - forward * xFactor) * scale;
-        double y = (double) up * scale;
-        double z = (forward * zFactor + strafe * xFactor) * scale;
-        this.setVelocity(new Vec3d(x, y, z));
-
-        this.move(MovementType.SELF, this.getVelocity());
     }
 
     private void updateLastTickPosition() {

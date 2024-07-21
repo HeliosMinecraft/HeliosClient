@@ -9,8 +9,10 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 
 public class Step extends Module_ {
-    private final SettingGroup sgGeneral = new SettingGroup("General");
-    DoubleSetting stepHeight = sgGeneral.add(new DoubleSetting.Builder()
+    private final SettingGroup sgStep = new SettingGroup("Step");
+    private final SettingGroup sgReverseStep = new SettingGroup("ReverseStep");
+
+    DoubleSetting stepHeight = sgStep.add(new DoubleSetting.Builder()
             .name("Height")
             .description("Height which step should step up at.")
             .onSettingChange(this)
@@ -21,7 +23,7 @@ public class Step extends Module_ {
             .roundingPlace(1)
             .build()
     );
-    BooleanSetting shiftSuppress = sgGeneral.add(new BooleanSetting.Builder()
+    BooleanSetting shiftSuppress = sgStep.add(new BooleanSetting.Builder()
             .name("Crouch suppress")
             .description("Disables step when crouch key is pressed.")
             .onSettingChange(this)
@@ -29,12 +31,23 @@ public class Step extends Module_ {
             .defaultValue(true)
             .build()
     );
-    BooleanSetting reverseStep = sgGeneral.add(new BooleanSetting.Builder()
+    BooleanSetting reverseStep = sgReverseStep.add(new BooleanSetting.Builder()
             .name("Reverse Step")
             .description("Allows you to step down faster")
             .onSettingChange(this)
             .value(true)
             .defaultValue(true)
+            .build()
+    );
+    DoubleSetting reverseStepMotion = sgReverseStep.add(new DoubleSetting.Builder()
+            .name("Reverse Step Motion")
+            .description("Motion factor of pull down")
+            .onSettingChange(this)
+            .value(0.7)
+            .defaultValue(0.7)
+            .min(0.0)
+            .max(1.5)
+            .roundingPlace(1)
             .build()
     );
 
@@ -43,9 +56,11 @@ public class Step extends Module_ {
     public Step() {
         super("Step", "Allows you to step up full blocks.", Categories.MOVEMENT);
 
-        addSettingGroup(sgGeneral);
+        addSettingGroup(sgStep);
+        addSettingGroup(sgReverseStep);
 
-        addQuickSettings(sgGeneral.getSettings());
+        addQuickSettings(sgStep.getSettings());
+        addQuickSettings(sgReverseStep.getSettings());
     }
 
     @Override
@@ -71,7 +86,7 @@ public class Step extends Module_ {
         if (reverseStep.value) {
             if (mc.player.isInLava() || mc.player.isTouchingWater() || !mc.player.isOnGround() || mc.player.isFallFlying())
                 return;
-            mc.player.addVelocity(0, -1, 0);
+            mc.player.addVelocity(0, -reverseStepMotion.value, 0);
         }
     }
 
