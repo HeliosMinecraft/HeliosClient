@@ -10,16 +10,21 @@
 
 ## Images
 
+<p>Keep in mind that these images might be outdated as Helios is currently updating frequently!</p>
 <details>
-    <summary>Click to show</summary>
-    <p>Keep in mind that these images might be outdated as Helios is currently updating frequently!</p>
-    <p>New clickgui as of commit #235 (a13bf24)</p>
+    <summary>Click to show the new GUI</summary>
+    <p>New clickGui as of commit #235 (a13bf24)</p>
     <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/Updated_ClickGUI.png?raw=true" alt="New Click GUI">
-    <p>Previous clickgui as of commit #199 (0758e8c)</p>
-    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/heliosclientgui.png?raw=true" alt="Prev Click GUI">
-    <p>Old clickgui</p>
-    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/ClickGUI.png?raw=true" alt="Old Click GUI">
 </details>  
+<details>
+ <summary>Click to show the previous GUI</summary>
+  <p>Previous clickgui as of commit #199 (0758e8c)</p>
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/heliosclientgui.png?raw=true" alt="Prev Click GUI">
+</details>
+<details>
+ <summary>Click to show the old GUI</summary>
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/ClickGUI.png?raw=true" alt="Old Click GUI">
+</details>
 
 ## Building
 
@@ -30,16 +35,27 @@
   
 ## Installation
 
-- Install both [Fabric](https://fabricmc.net/use/installer/) and [Fabric API](https://modrinth.com/mod/fabric-api) for Minecraft 1.20.1
+- Install both [Fabric](https://fabricmc.net/use/installer/) and [Fabric API](https://modrinth.com/mod/fabric-api) for Minecraft 1.20.4
 - Put this mod into the `.minecraft/mods` folder
+
+***Note: In future we may require [Satin API](https://modrinth.com/mod/satin-api) for shaders (or it will be packedged together)***
+
 
 ## Submitting a Bug
 
 To submit a bug open an issue in this repository. Before doing so please assure yourself that the issues isn't already listed under [Known issues](#known-issues).
 
 ## Known issues
-
-- Unfinished/placeholder modules.
+- Buggy modules like Tick-Shift, NewChunks.
+- Incomplete modules like Phase.
+- HudElements don't resize to their proper locations sometimes.
+- Scripting System (WIP).
+- Lack of combat and some important utility modules.
+- No Baritone Integration
+- Compatibility with performance mods like sodium (only issue is with X-Ray for now)
+- No AltManager
+- Lack of commands
+- Lack of shaders (Neither of the current contributors know much good about GLSL)
 
 ## Contributing
 
@@ -47,7 +63,7 @@ If you want to contribute to this project, look into the [`CONTRIBUTING.md`](htt
 
 ## Contributors
 
-Thanks to all the people who helped making this project what it is now, especially the main team:
+Thanks to all the people who helped to make this project what it is now, especially the main team:
 
 <p align="center">
     <a href="https://github.com/azedeveloper"><img src="https://github.com/azedeveloper.png" width="24%"></img></a> <a href="https://github.com/ElBe-Plaq"><img src="https://github.com/ElBe-Plaq.png" width="24%"></img></a> <a href="https://github.com/tanishisherewithhh"><img src="https://github.com/tanishisherewithhh.png" width="24%"></img></a> <a href="https://github.com/TomPlaneta"><img src="https://github.com/TomPlaneta.png" width="24%"></img></a>
@@ -56,3 +72,6 @@ Thanks to all the people who helped making this project what it is now, especial
 ## Thanks to
 
 - [MoonlightMeadowns](https://github.com/kawaiizenbo/MoonlightMeadows) made by [KawaiiZenbo](https://github.com/kawaiizenbo) for serving as base project.
+- Many other clients for serving as a base for inspiration. (Like Meteor-Client, BleachHack, TH Recode, Old 3arth4ck, LiquidBounce)
+- [0x3C50](https://github.com/0x3C50/Renderer) for the Renderer library (especially the FontRenderer).
+- [Bleach Hack](https://github.com/BleachDev/BleachHack/tree/1.20.4) for the 3D rendering.

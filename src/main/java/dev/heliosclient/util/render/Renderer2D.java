@@ -41,15 +41,16 @@ import static me.x150.renderer.util.RendererUtils.registerBufferedImageTexture;
 public class Renderer2D implements Listener {
 
     public static final String TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-=_+|{};<>?~`,./;'[] ";
+    //0 to 2pi values of sin and cos
     private static final float[] sina = new float[]{
             0, 0.1736482f, 0.3420201f, 0.5f, 0.6427876f, 0.7660444f, 0.8660254f, 0.9396926f, 0.9848077f, 1, 0.9848078f, 0.9396927f, 0.8660255f, 0.7660446f, 0.6427878f, 0.5000002f, 0.3420205f, 0.1736485f, 3.894144E-07f, -0.1736478f, -0.3420197f, -0.4999996f, -0.6427872f, -0.7660443f, -0.8660252f, -0.9396925f, -0.9848077f, -1, -0.9848078f, -0.9396928f, -0.8660257f, -0.7660449f, -0.6427881f, -0.5000006f, -0.3420208f, -0.1736489f, 0, 0.1736482f, 0.3420201f, 0.5f, 0.6427876f, 0.7660444f, 0.8660254f, 0.9396926f, 0.9848077f
     };
+
     private static final float[] cosa = new float[36];
     public static Renderer2D INSTANCE = new Renderer2D();
     public static DrawContext drawContext;
     public static Renderers renderer = Renderers.CUSTOM;
     public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
-    public static ShaderEffectManager shaderManager = ShaderEffectManager.getInstance();
     public static VertexSorter vertexSorter;
 
     static {
