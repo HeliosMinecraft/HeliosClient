@@ -3,9 +3,9 @@
 </p>
 <div align="center">
     <h3>Fabric anarchy utility mod for the latest Minecraft version.</h3>
-    <img src="https://img.shields.io/github/last-commit/HeliosClient/HeliosClient" alt="GitHub last commit"/>
-    <img src="https://img.shields.io/github/commit-activity/w/HeliosClient/HeliosClient" alt="GitHub commit activity"/>
-    <img src="https://img.shields.io/github/contributors/HeliosClient/HeliosClient" alt="GitHub contributors"/>
+    <img src="https://img.shields.io/github/last-commit/HeliosMinecraft/HeliosClient" alt="GitHub last commit"/>
+    <img src="https://img.shields.io/github/commit-activity/w/HeliosMinecraft/HeliosClient" alt="GitHub commit activity"/>
+    <img src="https://img.shields.io/github/contributors/HeliosMinecraft/HeliosClient" alt="GitHub contributors"/>
 </div>
 
 ## Images
@@ -46,13 +46,13 @@
 To submit a bug open an issue in this repository. Before doing so please assure yourself that the issues isn't already listed under [Known issues](#known-issues).
 
 ## Known issues
-- Buggy modules like Tick-Shift, NewChunks.
+- Buggy modules like Tick-Shift, NewChunks, PacketMine.
 - Incomplete modules like Phase.
 - HudElements don't resize to their proper locations sometimes.
 - Scripting System (WIP).
 - Lack of combat and some important utility modules.
 - No Baritone Integration
-- Compatibility with performance mods like sodium (only issue is with X-Ray for now)
+- Compatibility with performance mods like sodium (for now only XRay has an issue)
 - No AltManager
 - Lack of commands
 - Lack of shaders (Neither of the current contributors know much good about GLSL)
