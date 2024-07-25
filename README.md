@@ -75,3 +75,6 @@ Thanks to all the people who helped to make this project what it is now, especia
 - Many other clients for serving as a base for inspiration. (Like Meteor-Client, BleachHack, TH Recode, Old 3arth4ck, LiquidBounce)
 - [0x3C50](https://github.com/0x3C50/Renderer) for the Renderer library (especially the FontRenderer).
 - [Bleach Hack](https://github.com/BleachDev/BleachHack/tree/1.20.4) for the 3D rendering.
+
+## Support
+**Join our [discord server](https://discord.gg/zNCnP3pCvx) for additional support or create an issue.**

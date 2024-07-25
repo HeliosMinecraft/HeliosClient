@@ -68,12 +68,33 @@ public class ColorUtils {
         return ((r & 0x0ff) << 16) | ((g & 0x0ff) << 8) | (b & 0x0ff);
     }
 
+    public static int argbToRgb(int argb) {
+        // Extract the individual components
+        int red = ColorUtils.getRed(argb);
+        int green = ColorUtils.getGreen(argb);
+        int blue = ColorUtils.getBlue(argb);
+
+        // Combine the RGB components into a single integer
+        return rgbaToInt(red,green,blue,255);
+    }
+
+    public static int colorToRGB(Color color) {
+        int alpha = 255; // Fully opaque
+        int red = color.getRed();
+        int green = color.getGreen();
+        int blue = color.getBlue();
+
+        // Combine the components into a single integer
+        return (alpha << 24) | (red << 16) | (green << 8) | blue;
+    }
+
     public static Color getRandomColor(){
         float r = rand.nextFloat(); // Red component
         float g = rand.nextFloat(); // Green component
         float b = rand.nextFloat(); // Blue component
         return new Color(r, g, b);
     }
+
     public static Color getRandomColorWithAlpha(){
         float r = rand.nextFloat(); // Red component
         float g = rand.nextFloat(); // Green component

@@ -1,5 +1,7 @@
 package dev.heliosclient.hud;
 
+import dev.heliosclient.addon.AddonManager;
+import dev.heliosclient.addon.HeliosAddon;
 import dev.heliosclient.hud.hudelements.*;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
 
@@ -12,6 +14,7 @@ public class HudElementList {
 
     public HudElementList() {
         registerElement(WelcomeHud.DATA);
+        registerElement(LagTimerHud.DATA);
         registerElement(ClientTag.DATA);
         registerElement(ModuleList.DATA);
         registerElement(Radar.DATA);
@@ -23,9 +26,11 @@ public class HudElementList {
         registerElement(Bps.DATA);
         registerElement(Ping.DATA);
         registerElement(Tps.DATA);
+
+        AddonManager.HELIOS_ADDONS.forEach(HeliosAddon::registerHudElementData);
     }
 
-    private void registerElement(HudElementData<?> hudElementData) {
+    public void registerElement(HudElementData<?> hudElementData) {
         elementDataMap.put(hudElementData.name(), hudElementData);
     }
 

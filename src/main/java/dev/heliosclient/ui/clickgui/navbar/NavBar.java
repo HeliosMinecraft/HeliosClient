@@ -17,9 +17,12 @@ public class NavBar {
             width += Math.round(Renderer2D.getFxStringWidth(item.name)) + 4;
         }
         int x = drawContext.getScaledWindowWidth() / 2 - width / 2;
+
         int textX = x + 4;
-        for (NavBarItem item : NavBarManager.INSTANCE.navBarItems) {
-            item.render(drawContext, textX, 0, mouseX, mouseY, NavBarManager.INSTANCE.navBarItems.indexOf(item) == 0, NavBarManager.INSTANCE.navBarItems.size() == NavBarManager.INSTANCE.navBarItems.indexOf(item) + 1);
+        int i;
+        for (i = 0; i < NavBarManager.INSTANCE.navBarItems.size(); i++) {
+            NavBarItem item = NavBarManager.INSTANCE.navBarItems.get(i);
+            item.render(drawContext, textX, 0, mouseX, mouseY, i == 0, NavBarManager.INSTANCE.navBarItems.size() - 1 == i);
             textX += item.width;
         }
     }

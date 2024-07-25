@@ -50,6 +50,8 @@ public class TickRate implements Listener {
                 numTicks++;
             }
         }
+
+        //avg
         return sumTickRates / numTicks;
     }
 

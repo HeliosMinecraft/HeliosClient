@@ -17,14 +17,11 @@ public class ColorManager implements Listener {
     public static boolean SYNC_ACCENT = false;
 
     //ClickGui
-    public int clickGuiPrimary = new Color(17, 18, 19, 100).getRGB();
+    public int clickGuiPrimary = new Color(17, 18, 19, 255).getRGB();
     //Global
     public int defaultTextColor = 0xFFFFFFFF;
 
-    public int clickGuiPrimaryAlpha = 255;
-
     public boolean clickGuiSecondaryRainbow = false;
-    public boolean clickGuiPrimaryRainbow = false;
 
     public int clickGuiSecondary = 0xffff6e78;
     public int clickGuiSecondaryAlpha = 255;
@@ -65,11 +62,7 @@ public class ColorManager implements Listener {
     }
 
     public Color ClickGuiPrimary() {
-        if (clickGuiPrimaryRainbow) {
-            return ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), clickGuiPrimaryAlpha);
-        } else {
-            return new Color(clickGuiPrimary);
-        }
+        return new Color(clickGuiPrimary);
     }
 
     public int clickGuiPaneText() {
@@ -109,8 +102,7 @@ public class ColorManager implements Listener {
             updatePrimaryGradients(gui.staticColor.getColor(), gui.staticColor.getColor());
         }
 
-        clickGuiPrimary = gui.clickGUIPrimary.value.getRGB();
-        clickGuiPrimaryRainbow = gui.clickGUIPrimary.isRainbow();
+        clickGuiPrimary = gui.clickGUIPrimary.getColor().getRGB();
 
 
         if (gui.ColorMode.value == 1) {

@@ -27,4 +27,7 @@ public class NavBarManager {
     public void registerItems(NavBarItem... items) {
         this.navBarItems.addAll(Arrays.asList(items));
     }
+    public void unregisterItem(NavBarItem item) {
+        this.navBarItems.remove(item);
+    }
 }

@@ -23,6 +23,26 @@ jobs:
         with:
           java-version: '17'
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+
+      - name: Install Dependencies
+        run: |
+          if [ ! -d "node_modules" ]; then
+            npm install axios
+          fi
+
       - name: Build File
         run: |
           chmod +x gradlew 
@@ -46,3 +66,25 @@ jobs:
                      "Generated pre-release. Maybe unstable to use"
                  files: |
                       ./build/libs/*.jar
+
+      - name: Build fail Notification
+        if: ${{ failure() }}
+        run: node .github/discordWebhook.js failure
+        env:
+            DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+            GITHUB_SHA: ${{ github.sha }}
+            GITHUB_RUN_NUMBER: ${{ github.run_number }}
+            GITHUB_REPOSITORY: ${{ github.repository }}
+            PUSH_USER: ${{ github.actor }}
+
+
+      - name: Build success Notification
+        if: ${{ success() }}
+        run: node .github/discordWebhook.js success
+        env:
+                DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+                GITHUB_SHA: ${{ github.sha }}
+                GITHUB_RUN_NUMBER: ${{ github.run_number }}
+                GITHUB_REPOSITORY: ${{ github.repository }}
+                PUSH_USER: ${{ github.actor }}
+                RUN_ID: ${{ github.run_id }}

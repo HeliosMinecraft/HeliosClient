@@ -44,6 +44,7 @@ public class LuaExecutor {
     public LuaExecutor(MinecraftClient mc, LuaEventManager eventManager) {
         globals = JsePlatform.standardGlobals();
         globals.load(new DebugLib());
+
         globals.load(new PlayerLib());
         globals.load(new ChatLib());
         globals.load(new PacketLib());

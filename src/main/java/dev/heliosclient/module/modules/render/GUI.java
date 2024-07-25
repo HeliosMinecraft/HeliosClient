@@ -79,7 +79,7 @@ public class GUI extends Module_ {
             .name("ClickGUI Primary")
             .description("Primary color of the click gui followed across the client")
             .onSettingChange(this)
-            .defaultValue(new Color(17, 18, 19, 255))
+            .defaultValue(new Color(17, 18, 19, 100))
             .build()
     );
     public BooleanSetting categoryBorder = sgColors.add(new BooleanSetting.Builder()

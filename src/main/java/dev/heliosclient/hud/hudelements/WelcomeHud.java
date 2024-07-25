@@ -38,11 +38,8 @@ public class WelcomeHud extends HudElement {
             String text = String.format(textValue.value, ColorUtils.gray + mc.getSession().getUsername() + ColorUtils.reset);
             this.width = Math.round(Renderer2D.getStringWidth(text) + 1);
             Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, ColorManager.INSTANCE.hudColor);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
             ChatUtils.sendHeliosMsg("Error while formatting welcome hud");
         }
     }
-
-
-
 }

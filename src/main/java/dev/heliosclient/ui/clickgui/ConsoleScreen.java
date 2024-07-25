@@ -5,6 +5,7 @@ import dev.heliosclient.module.settings.buttonsetting.Button;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MultiLineInputBox;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -32,23 +33,32 @@ public class ConsoleScreen extends Screen {
     }
 
     @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        super.resize(client, width, height);
+        resizeBoxes();
+    }
+
+    @Override
     protected void init() {
         super.init();
+        resizeBoxes();
+    }
+
+    @Override
+    public void onDisplayed() {
+        super.onDisplayed();
+
+        resizeBoxes();
+        consoleBox.scrollToLast();
+    }
+
+    private void resizeBoxes(){
         consoleBox.setSize(HeliosClient.MC.getWindow().getScaledWidth() - 40, HeliosClient.MC.getWindow().getScaledHeight() - 55);
         enterBox.setSize(HeliosClient.MC.getWindow().getScaledWidth() - 82, 13);
         enterButton.setX(HeliosClient.MC.getWindow().getScaledWidth() - 58);
         enterButton.setY(HeliosClient.MC.getWindow().getScaledHeight() - 33);
     }
 
-    @Override
-    public void onDisplayed() {
-        super.onDisplayed();
-        consoleBox.setSize(HeliosClient.MC.getWindow().getScaledWidth() - 40, HeliosClient.MC.getWindow().getScaledHeight() - 55);
-        enterBox.setSize(HeliosClient.MC.getWindow().getScaledWidth() - 82, 13);
-        enterButton.setX(HeliosClient.MC.getWindow().getScaledWidth() - 58);
-        enterButton.setY(HeliosClient.MC.getWindow().getScaledHeight() - 33);
-        consoleBox.scrollToLast();
-    }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

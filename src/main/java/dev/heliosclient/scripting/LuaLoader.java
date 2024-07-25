@@ -42,8 +42,8 @@ public class LuaLoader {
             if (onRunFunction.isfunction()) {
                 onRunFunction.call();
             } else {
-                ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onRun() function not found for " + ColorUtils.blue + luaFile.getAbsolutePath() + ColorUtils.darkRed + " during loading");
-                HeliosClient.LOGGER.error("onRun() function not found for file: {} during loading", luaFile.getName());
+                ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onRun() function not found for " + ColorUtils.blue + luaFile.getAbsolutePath() + ColorUtils.darkRed + " while loading");
+                HeliosClient.LOGGER.error("onRun() function not found for file: {} while loading", luaFile.getName());
             }
             luaFile.isLoaded = true;
             ChatUtils.sendHeliosMsg(ColorUtils.green + "Loaded LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + luaFile.getName() + ColorUtils.gray + "]");
@@ -70,8 +70,8 @@ public class LuaLoader {
             if (onRunFunction.isfunction()) {
                 onRunFunction.call();
             } else {
-                ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onStop() function not found for " + ColorUtils.blue + file.getAbsolutePath() + ColorUtils.darkRed + " during loading");
-                HeliosClient.LOGGER.error("onStop() function not found for file: " + file.getAbsolutePath() + " during loading");
+                ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onStop() function not found for " + ColorUtils.blue + file.getAbsolutePath() + ColorUtils.darkRed + " while closing");
+                HeliosClient.LOGGER.error("onStop() function not found for file: {} while closing", file.getAbsolutePath());
             }
             file.getReader().close();
             file.isLoaded = false;
@@ -108,7 +108,7 @@ public class LuaLoader {
     }
 
     /**
-     * Retrieves a single Lua script from the scripts folder.
+     * Retrieves a single Lua script from the scripts' folder.
      *
      * @return The LuaFile
      */

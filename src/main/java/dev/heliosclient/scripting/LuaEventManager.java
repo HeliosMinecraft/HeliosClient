@@ -16,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class LuaEventManager {
     public static LuaEventManager INSTANCE = new LuaEventManager();
-    private final Map<String, List<org.luaj.vm2.LuaFunction>> listeners = new HashMap<>();
+    private final Map<String, List<LuaFunction>> listeners = new HashMap<>();
 
     /**
      * Registers a Lua event listener.
@@ -25,7 +25,7 @@ public class LuaEventManager {
      * @param listener  The Lua function to call when the event is fired.
      */
     public void register(String eventType, LuaValue listener) {
-        org.luaj.vm2.LuaFunction luaFunction = listener.checkfunction();
+        LuaFunction luaFunction = listener.checkfunction();
         listeners.computeIfAbsent(eventType, k -> new CopyOnWriteArrayList<>()).add(luaFunction);
     }
 
@@ -36,7 +36,7 @@ public class LuaEventManager {
      * @param listener  The Lua function to remove.
      */
     public void unregister(String eventType, LuaValue listener) {
-        org.luaj.vm2.LuaFunction luaFunction = listener.checkfunction();
+        LuaFunction luaFunction = listener.checkfunction();
         List<LuaFunction> eventListeners = listeners.get(eventType);
         if (eventListeners != null) {
             eventListeners.remove(luaFunction);

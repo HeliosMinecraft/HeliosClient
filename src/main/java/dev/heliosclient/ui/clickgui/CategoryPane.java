@@ -186,7 +186,7 @@ public class CategoryPane implements Listener {
             if (gui.categoryBorder.value) {
                 drawOutlineGradientBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width);
             }
-            drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3, ColorManager.INSTANCE.clickGuiPrimary);
+            drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3,ColorManager.INSTANCE.clickGuiPrimary);
             Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, width + 5, (int) hudBox.getHeight() - 1);
         }
 

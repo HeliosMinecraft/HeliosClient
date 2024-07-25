@@ -3,6 +3,8 @@ package dev.heliosclient.managers;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.heliosclient.addon.AddonManager;
+import dev.heliosclient.addon.HeliosAddon;
 import dev.heliosclient.command.Command;
 import dev.heliosclient.command.commands.*;
 import net.minecraft.client.MinecraftClient;
@@ -30,6 +32,8 @@ public class CommandManager {
         add(new Prefix());
         add(new ReloadScripts());
         add(new LoadScript());
+        AddonManager.HELIOS_ADDONS.forEach(HeliosAddon::registerCommand);
+
         commands.sort(Comparator.comparing(Command::getName));
     }
 

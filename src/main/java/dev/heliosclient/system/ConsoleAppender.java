@@ -29,9 +29,9 @@ public class ConsoleAppender extends AbstractAppender {
             return;
 
         String message = event.getMessage().getFormattedMessage();
-        if (message.contains("Exception") || event.getLevel() == Level.TRACE || message.length() > 200) {
+        if (event.getMessage().getThrowable() != null) {
             // Only get the first line.
-            message = message.split("\n")[0] + ".. Check Log file for more details!";
+            message = event.getMessage().getThrowable().getMessage() + "... Check log file for more details!";
         }
 
         if (event.getLevel() == Level.ERROR) {

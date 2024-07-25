@@ -30,4 +30,10 @@ public abstract class Event {
         }
         this.canceled = canceled;
     }
+    /**
+     * This method cancels the event
+     */
+    public void cancel() {
+        this.setCanceled(true);
+    }
 }
