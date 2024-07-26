@@ -6,6 +6,7 @@ import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -21,6 +22,13 @@ public class AutoClicker extends Module_ {
     public int leftClickTimer, rightClickTimer, middleClickTimer;
 
     SettingGroup sgGeneral = new SettingGroup("General");
+    BooleanSetting showNotification = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Show Notification")
+            .description("Whether or not to show notification for this module")
+            .onSettingChange(this)
+            .value(true)
+            .build()
+    );
     CycleSetting mode = sgGeneral.add(new CycleSetting.Builder()
             .name("ClickMode")
             .description("Mode of mouse button to click")
@@ -29,7 +37,6 @@ public class AutoClicker extends Module_ {
             .defaultListOption(ClickMode.LEFT)
             .build()
     );
-
     DoubleSetting delayLeft = sgGeneral.add(new DoubleSetting.Builder()
             .name("Left Click Delay")
             .description("Left Click Delay (in ticks)")
@@ -82,9 +89,15 @@ public class AutoClicker extends Module_ {
         rightClickTimer = 0;
     }
 
+    @Override
+    public void sendNotification(boolean enabled) {
+        if(showNotification.value) {
+            super.sendNotification(enabled);
+        }
+    }
+
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
-
         if (mode.isOption(ClickMode.LEFT) || mode.isOption(ClickMode.BOTH)) {
             if (leftClickTimer >= delayLeft.value) {
                 leftClickTimer = 0;

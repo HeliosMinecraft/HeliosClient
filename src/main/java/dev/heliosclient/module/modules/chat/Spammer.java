@@ -41,8 +41,8 @@ public class Spammer extends Module_ {
             .name("Anti-Anti Spam length")
             .description("Length of the random letters added at the end of the message")
             .onSettingChange(this)
-            .value(10d)
-            .defaultValue(10d)
+            .value(7d)
+            .defaultValue(7d)
             .min(0)
             .max(256)
             .roundingPlace(0)
@@ -139,12 +139,7 @@ public class Spammer extends Module_ {
 
     public String next() {
         if (!randomLine.value) {
-            lineIndex++;
-
-            if (lineIndex > spamLines.length - 1) {
-                lineIndex = 0;
-            }
-
+            lineIndex = (lineIndex + 1) % spamLines.length;
         } else {
             lineIndex = rand.nextBetween(0, spamLines.length - 1);
         }

@@ -30,7 +30,7 @@ public class Button {
         double textX = x + ((width / 2.0) - (Renderer2D.getFxStringWidth(text) / 2.0)) - 0.2;
 
         float textHeight = Renderer2D.getFxStringHeight();
-        float textY = y + (height - textHeight) / 2; // Center the text vertically
+        float textY = y + (14 - textHeight) / 2; // Center the text vertically
         if (Renderer2D.isVanillaRenderer()) {
             textY += 1;
         }

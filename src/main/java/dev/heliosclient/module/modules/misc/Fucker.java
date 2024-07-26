@@ -6,6 +6,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.util.BlockUtils;
 import dev.heliosclient.util.EntityUtils;
+import net.minecraft.server.world.ThreadedAnvilChunkStorage;
 import net.minecraft.util.math.BlockPos;
 
 /**

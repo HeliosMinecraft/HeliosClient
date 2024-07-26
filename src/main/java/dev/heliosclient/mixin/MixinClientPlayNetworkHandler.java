@@ -73,7 +73,7 @@ public abstract class MixinClientPlayNetworkHandler {
 
     @Inject(method = "onChunkData", at = @At("TAIL"))
     private void onChunkData(ChunkDataS2CPacket packet, CallbackInfo ci) {
-        ChunkDataEvent event = new ChunkDataEvent(HeliosClient.MC.world.getChunk(packet.getChunkX(), packet.getChunkZ()));
+        ChunkDataEvent event = new ChunkDataEvent(HeliosClient.MC.world.getChunk(packet.getChunkX(), packet.getChunkZ()),packet);
         EventManager.postEvent(event);
     }
 
