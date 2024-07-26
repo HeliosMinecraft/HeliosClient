@@ -69,13 +69,16 @@ public class ColorUtils {
     }
 
     public static int argbToRgb(int argb) {
+       return argbToRgb(argb,255);
+    }
+    public static int argbToRgb(int argb,int injectAlpha) {
         // Extract the individual components
         int red = ColorUtils.getRed(argb);
         int green = ColorUtils.getGreen(argb);
         int blue = ColorUtils.getBlue(argb);
 
         // Combine the RGB components into a single integer
-        return rgbaToInt(red,green,blue,255);
+        return rgbaToInt(red,green,blue,injectAlpha);
     }
 
     public static int colorToRGB(Color color) {
@@ -188,6 +191,16 @@ public class ColorUtils {
      */
     public static Color changeAlpha(Integer color, int alpha) {
         return changeAlpha(color, alpha, -1);
+    }
+    /**
+     * Changes alpha on integer color.
+     *
+     * @param color Target color.
+     * @param alpha Target alpha.
+     * @return integer color with changed alpha.
+     */
+    public static int changeAlphaGetInt(Integer color, int alpha) {
+        return argbToRgb(color,alpha);
     }
 
     /**

@@ -30,7 +30,7 @@ public class Window implements Listener {
     public Screen screen;
     int offsetY;
     List<String> wrappedText = new ArrayList<>();
-    private int x, y, windowHeight, windowWidth;
+    private int x, y, windowHeight, windowWidth, descriptionHeight;
     private boolean isCollapsible;
     private boolean isCollapsed = false;
     private Runnable backButtonTask;
@@ -83,6 +83,8 @@ public class Window implements Listener {
         this.screen = HeliosClient.MC.currentScreen;
         int screenHeight = drawContext.getScaledWindowHeight();
 
+        windowHeight += descriptionHeight;
+
         if (screenHeight > windowHeight) {
             offsetY = 0;
             y = drawContext.getScaledWindowHeight() / 2 - (windowHeight) / 2;
@@ -117,9 +119,9 @@ public class Window implements Listener {
                 for (String text : wrappedText) {
                     int warpedTextWidth = textRenderer.getWidth(text);
                     drawContext.drawText(textRenderer, text, x + windowWidth / 2 - warpedTextWidth / 2 + 1, y + 26 + textOffsetY, ColorManager.INSTANCE.defaultTextColor(), false);
-                    windowHeight += textRenderer.fontHeight + 4;
                     textOffsetY += textRenderer.fontHeight + 3;
                 }
+                descriptionHeight = textOffsetY;
             }
 
             contentRenderer.renderContent(this, drawContext, x, y + 30 + (wrappedText.size() * (textRenderer.fontHeight + 3)), mouseX, mouseY);

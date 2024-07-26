@@ -16,6 +16,7 @@ import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.c2s.play.AcknowledgeChunksC2SPacket;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
 import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
@@ -128,6 +129,9 @@ public class NewChunks extends Module_ {
     @SubscribeEvent
     public void onPacketReceive(PacketEvent.RECEIVE e) {
         if (mc.world == null) return;
+
+        if (e.packet instanceof AcknowledgeChunksC2SPacket)return;
+
 
         if (e.packet instanceof DisconnectS2CPacket) {
             newChunks.clear();

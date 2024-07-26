@@ -50,6 +50,7 @@ public class ModuleManager {
                 new Timer(),
                 new TNTIgnite(),
                 new NewChunks(),
+                new PaletteExploit(),
                 new AutoNametag(),
                 new BetterPortals(),
                 new LiquidInteract(),
