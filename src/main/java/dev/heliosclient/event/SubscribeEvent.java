@@ -11,11 +11,11 @@ public @interface SubscribeEvent {
     Priority priority() default Priority.NORMAL;
 
     enum Priority {
-        LOWEST,
-        LOW,
-        NORMAL,
+        HIGHEST,
         HIGH,
-        HIGHEST
+        NORMAL,
+        LOW,
+        LOWEST
     }
 }
 

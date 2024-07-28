@@ -18,6 +18,9 @@ public class FontRenderers {
     public static fxFontRenderer Large_iconRenderer;
     public static fxFontRenderer Large_fxfontRenderer;
 
+    public static fxFontRenderer Comical_fxfontRenderer;
+
+
     public static fxFontRenderer Ultra_Large_iconRenderer;
 
 }

@@ -88,6 +88,10 @@ public class BlockUtils {
         return true;
     }
 
+    public static BlockPos toBlockPos(Vec3d pos) {
+        return new BlockPos((int) pos.x, (int) pos.y, (int) pos.z);
+    }
+
     /**
      * @see AbstractBlock#calcBlockBreakingDelta(BlockState, PlayerEntity, BlockView, BlockPos)
      */

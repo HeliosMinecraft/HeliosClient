@@ -14,7 +14,7 @@ function sendBuildStatus(status) {
     description = 'The latest build of the project was successful. Details...';
     color = 3066993; // green
     buildOutput = `https://github.com/HeliosMinecraft/HeliosClient/actions/runs/${runID}`;
-  } else if (status === 'failure') {0 
+  } else if (status === 'failure') {
     title = 'Build Failed';
     description = 'The latest build of the project failed. Details...';
     color = 15158332; // red

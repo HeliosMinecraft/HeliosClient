@@ -18,6 +18,7 @@ import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
+import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;

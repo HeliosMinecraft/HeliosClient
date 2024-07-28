@@ -22,17 +22,15 @@ public class FontUtils {
         // Create a new array with the same length as the original array
         Font[] rearrangedFonts = new Font[fonts.length];
 
-        // Move all the fonts one position forward
-        System.arraycopy(fonts, 0, rearrangedFonts, 1, index);
-
         // Place the fontToMove at index 0
         rearrangedFonts[0] = fontToMove;
 
-        // Move the remaining fonts
-        if (fonts.length - (index + 1) >= 0)
-            System.arraycopy(fonts, index + 1 - 1, rearrangedFonts, index + 1, fonts.length - (index + 1));
+        // Move all the fonts one position forward
+        System.arraycopy(fonts, 0, rearrangedFonts, 1, index);
+        System.arraycopy(fonts, index + 1, rearrangedFonts, index + 1, fonts.length - index - 1);
 
         return rearrangedFonts;
     }
+
 }
 

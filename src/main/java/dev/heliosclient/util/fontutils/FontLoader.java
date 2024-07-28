@@ -9,16 +9,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 public class FontLoader {
     private static final String FONTS_FOLDER = "heliosclient/fonts";
     private static final String ICON_FONTS_FOLDER = "heliosclient/fonts/icons";
-    private static final String[] DEFAULT_FONT = {"Minecraft.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf"};
+    private static final String[] DEFAULT_FONT = {"Minecraft.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf","DComicFont.ttf"};
     private static final String[] DEFAULT_ICON_FONT = {"fontello.ttf", "icons2.ttf", "icons.ttf"};
+    public static Font[] COMICALFONTS = null;
+    private static final String COMICAL_FONT_NAME = "DComicFont.ttf";
 
     /**
      * Loads all the font files (with {@code .ttf and .otf} extension) present in the {@link  #FONTS_FOLDER} directory
@@ -61,19 +61,26 @@ public class FontLoader {
             }
         }
 
-        List<Font> fonts = new ArrayList<>();
+        LinkedList<Font> fonts = new LinkedList<>();
         for (File file : Objects.requireNonNull(fontsDir.listFiles())) {
             if (file.isFile() && (file.getName().toLowerCase().endsWith(".ttf") || file.getName().toLowerCase().endsWith(".otf"))) {
                 try {
                     Font[] fontArray = Font.createFonts(file);
+
+                    if(file.getName().equalsIgnoreCase(COMICAL_FONT_NAME)){
+                        COMICALFONTS = fontArray;
+                        
+                        //Dont add
+                        continue;
+                    }
+
                     Collections.addAll(fonts, fontArray);
                 } catch (FontFormatException | IOException e) {
-                    HeliosClient.LOGGER.error("An error has occured while converting file to font format", e);
+                    HeliosClient.LOGGER.error("An error has occurred while converting file to font format", e);
                 }
             }
         }
 
         return fonts.toArray(new Font[0]);
     }
-
 }

@@ -190,10 +190,9 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
                 posY = 2;
             }
 
-            // + width is trial
-            if (drawContext.getScaledWindowWidth() / 3 > x + width) {
+            if (drawContext.getScaledWindowWidth() / 3 > x) {
                 posX = 0;
-            } else if ((drawContext.getScaledWindowWidth() / 3) * 2 > x + width) {
+            } else if ((drawContext.getScaledWindowWidth() / 3) * 2 > x) {
                 posX = 1;
             } else {
                 posX = 2;

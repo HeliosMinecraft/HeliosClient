@@ -554,6 +554,21 @@ public class Renderer3D {
     }
 
     /**
+     * This method assumes that the x, y, z coords are the origin of the element, i.e. it is scaled from this position.
+     */
+    public static void scaleAndPosition(MatrixStack matrices, double x, double y,double z, float scale) {
+        matrices.push(); // Save the current transformation state
+
+        // Translate the origin back to the desired position
+        matrices.translate(x, y, z);
+
+        // Scale the matrix
+        matrices.scale(scale, scale, scale);
+
+        matrices.translate(-x, -y, -z);
+    }
+
+    /**
      * Creates a Box object from the coordinates of two points in 3D space.
      *
      * @param x1, y1, z1 The coordinates of the first point.

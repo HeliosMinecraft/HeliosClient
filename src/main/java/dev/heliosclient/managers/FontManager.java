@@ -60,6 +60,9 @@ public class FontManager implements Listener {
         FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
         FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
 
+        if(FontLoader.COMICALFONTS != null)
+          FontRenderers.Comical_fxfontRenderer = new fxFontRenderer(FontLoader.COMICALFONTS, 12f);
+
         FontRenderers.Ultra_Large_iconRenderer = new fxFontRenderer(iconFonts, 25f);
 
         //Post the font change event to the EventManager

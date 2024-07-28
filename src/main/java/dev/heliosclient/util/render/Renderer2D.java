@@ -139,7 +139,7 @@ public class Renderer2D implements Listener {
     }
 
     /**
-     * This method assumes that the x, y coords are the origin, i.e it is scaled from this position.
+     * This method assumes that the x, y coords are the origin of the element, i.e. it is scaled from this position.
      */
     public static void scaleAndPosition(MatrixStack matrices, float x, float y, float scale) {
         matrices.push(); // Save the current transformation state

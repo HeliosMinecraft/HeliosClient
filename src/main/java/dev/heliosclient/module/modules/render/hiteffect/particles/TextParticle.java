@@ -4,14 +4,17 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.modules.render.hiteffect.HitEffectParticle;
 import dev.heliosclient.util.TimerUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.Renderer3D;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.Random;
 
 public class TextParticle extends HitEffectParticle {
+    public static Boolean COMICAL = true;
     public static Random rd = new Random();
     private final float finalScale;
     private final String text;
@@ -31,12 +34,12 @@ public class TextParticle extends HitEffectParticle {
     public void tick() {
         current_age++;
         if (current_age >= life) {
-            scale -= HeliosClient.MC.getTickDelta();
-            if (scale <= 0.0f) {
+            scale = Math.max(scale - HeliosClient.MC.getLastFrameDuration(), 0);
+            if (scale == 0.0) {
                 discard();
             }
         } else {
-            scale += HeliosClient.MC.getTickDelta();
+            scale += HeliosClient.MC.getLastFrameDuration();
             if (scale >= finalScale) {
                 scale = finalScale;
             }
@@ -45,9 +48,13 @@ public class TextParticle extends HitEffectParticle {
 
     @Override
     public void render(MatrixStack stack, Color color) {
+        //Random is best for comical fontRenderer
         this.particleColor = hasRandomColor ? particleColor : color;
 
-        Renderer3D.drawText(FontRenderers.Large_fxfontRenderer, text, (float) pos.x, (float) pos.y, (float) pos.z, -FontRenderers.Large_fxfontRenderer.getStringWidth(text) / 2.0f, -FontRenderers.Large_fxfontRenderer.getStringHeight(text) / 2.0f, scale, particleColor.getRGB());
+        fxFontRenderer fontRenderer = COMICAL && FontRenderers.Comical_fxfontRenderer != null? FontRenderers.Comical_fxfontRenderer : FontRenderers.Large_fxfontRenderer;
+
+                                                                    //Levitating effect
+        Renderer3D.drawText(fontRenderer, text, (float) pos.x, (float) pos.y + (current_age/10.0f) * 0.032f, (float) pos.z, -fontRenderer.getStringWidth(text) / 2.0f, -fontRenderer.getStringHeight(text) / 2.0f, scale, particleColor.getRGB());
     }
 
     @Override

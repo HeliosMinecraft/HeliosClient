@@ -14,13 +14,7 @@ import net.minecraft.client.util.math.MatrixStack;
  * Unstable to use now.
  * Todo: Update and optimise
  */
-public class AnimationUtils implements Listener {
-    public float FADE_SPEED = 0.05f;
-    private float alpha = 1.0f;
-    private boolean fading = false;
-    private boolean fadeIn = false;
-    private EasingType easingType = EasingType.LINEAR_IN;
-
+public class AnimationUtils {
     public static void addErrorToast(String message, boolean hasProgressBar, long endDelay) {
         Toast toast = new ErrorToast(message, hasProgressBar, endDelay);
         if (HeliosClient.MC.getToastManager() != null && toast != null) {
@@ -35,45 +29,26 @@ public class AnimationUtils implements Listener {
         }
     }
 
-
     public static float lerp(float point1, float point2, float alpha) {
         return (1 - alpha) * point1 + alpha * point2;
     }
 
-    public void startFading(boolean fadeIn, EasingType easingType) {
-        fading = true;
-        this.fadeIn = fadeIn;
-        this.easingType = easingType;
-        alpha = fadeIn ? 0.0f : 1.0f;
-    }
-
-    public void updateAlpha() {
-        if (fading) {
-            alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
-            if (alpha <= 0.0f || alpha >= 1.0f) {
-                fading = false;
-                alpha = Math.max(0.0f, Math.min(1.0f, alpha));
-            }
-        }
-    }
-
-    public int getFadingColor(int color) {
-        updateAlpha();
-        float t = Easing.ease(easingType, alpha);
-        int a = (int) (t * ColorUtils.getAlpha(color));
+    public static int getFadingColor(int color, float alpha) {
+        int a = (int) (alpha * ColorUtils.getAlpha(color));
         return ColorUtils.changeAlpha(ColorUtils.intToColor(color), a).getRGB();
     }
 
-    public void drawFadingBox(DrawContext context, float x, float y, float width, float height, int color, boolean RoundedBox, float radius) {
-        int newColor = getFadingColor(color);
-        if (!RoundedBox)
+    public static void drawFadingBox(DrawContext context, Animation animation, float x, float y, float width, float height, int color, boolean roundedBox, float radius) {
+        int newColor = getFadingColor(color, animation.getInterpolatedAlpha());
+        if (!roundedBox)
             Renderer2D.drawRectangle(context.getMatrices().peek().getPositionMatrix(), x, y, width, height, newColor);
         else
             Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(), x, y, width, height, radius, newColor);
     }
 
-    public void drawFadingText(MatrixStack matrixStack, String text, float x, float y, int color, boolean fixedSize) {
-        int newColor = getFadingColor(color);
+
+    public static void drawFadingText(MatrixStack matrixStack, Animation animation, String text, float x, float y, int color, boolean fixedSize) {
+        int newColor = getFadingColor(color, animation.getInterpolatedAlpha());
 
         if (fixedSize) {
             Renderer2D.drawFixedString(matrixStack, text, x, y, newColor);
@@ -82,10 +57,10 @@ public class AnimationUtils implements Listener {
         }
     }
 
-    public void drawFadingAndPoppingBox(DrawContext drawContext, float x, float y, float width, float height, int color, boolean RoundedBox, float radius) {
-        int newColor = getFadingColor(color);
+    public static void drawFadingAndPoppingBox(DrawContext drawContext, Animation animation, float x, float y, float width, float height, int color, boolean RoundedBox, float radius) {
+        int newColor = getFadingColor(color, animation.getInterpolatedAlpha());
 
-        float scale = Easing.ease(easingType, alpha);
+        float scale = Easing.ease(animation.getEasingType(), animation.getInterpolatedAlpha());
         drawContext.getMatrices().push();
         drawContext.getMatrices().translate(x + width / 2f, y + height / 2f, 0);
         drawContext.getMatrices().scale(scale, scale, 0);
@@ -96,10 +71,10 @@ public class AnimationUtils implements Listener {
         drawContext.getMatrices().pop();
     }
 
-    public void drawFadingAndPoppingText(DrawContext context, String text, float x, float y, int color, boolean fixedSize) {
-        int newColor = getFadingColor(color);
+    public static void drawFadingAndPoppingText(DrawContext context, Animation animation, String text, float x, float y, int color, boolean fixedSize) {
+        int newColor = getFadingColor(color, animation.getInterpolatedAlpha());
 
-        float scale = Easing.ease(easingType, alpha);
+        float scale = Easing.ease(animation.getEasingType(), animation.getInterpolatedAlpha());
         context.getMatrices().push();
         context.getMatrices().translate(x, y, 0);
         context.getMatrices().scale(scale, scale, 0);
@@ -110,7 +85,4 @@ public class AnimationUtils implements Listener {
         }
         context.getMatrices().pop();
     }
-
-
 }
-

@@ -12,12 +12,15 @@ import dev.heliosclient.module.modules.render.hiteffect.particles.OrbParticle;
 import dev.heliosclient.module.modules.render.hiteffect.particles.TextParticle;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.ParticleListSetting;
+import dev.heliosclient.util.BlockUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
@@ -96,6 +99,14 @@ public class HitEffect extends Module_ {
             .shouldRender(() -> type.getOption() == EffectType.ORBS)
             .build()
     );
+    BooleanSetting coolerPhysics = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Cooler Physics")
+            .description("The orbs will have cooler physics than realistic type")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .shouldRender(() -> type.getOption() == EffectType.ORBS)
+            .build()
+    );
     DoubleSetting orbsRadius = sgGeneral.add(new DoubleSetting.Builder()
             .name("Radius")
             .description("Radius of the orbs, affects newly spawned particles")
@@ -116,6 +127,14 @@ public class HitEffect extends Module_ {
             .defaultBoxes(10)
             .value(new String[]{"Kachow", "EZ", "Hit", "Pow!", "BAM!", "BOOM!", "Zap", "GG", "Owned", "LOL"})
             .defaultValue(new String[]{"Kachow", "EZ", "Hit", "Pow!", "BAM!", "BOOM!", "Zap", "GG", "Owned", "LOL"})
+            .shouldRender(() -> type.getOption() == EffectType.TEXT)
+            .build()
+    );
+    BooleanSetting comicalText = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Comical Test")
+            .description("The text will comical and funny. Random Colors works best with this")
+            .onSettingChange(this)
+            .defaultValue(true)
             .shouldRender(() -> type.getOption() == EffectType.TEXT)
             .build()
     );
@@ -150,6 +169,16 @@ public class HitEffect extends Module_ {
         addQuickSettings(sgGeneral.getSettings());
 
         particle_effect.setMaxSelectable(1);
+        TextParticle.COMICAL = comicalText.value;
+        OrbParticle.COOLER_PHYSICS = coolerPhysics.value;
+    }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+
+        OrbParticle.COOLER_PHYSICS = coolerPhysics.value;
+        TextParticle.COMICAL = comicalText.value;
     }
 
     @Override
@@ -194,13 +223,22 @@ public class HitEffect extends Module_ {
 
             switch ((EffectType) type.getOption()) {
                 case ORBS -> {
-                    Vec3d velocity = new Vec3d(-target.getVelocity().x / 10, 0, -target.getVelocity().z / 10);
-                    particles.add(new OrbParticle(position, velocity, randomRadius.value ? random.nextFloat() + 0.2f : (float) orbsRadius.value, (float) gravityAmount.value, (float) time_in_seconds.value,randomColor.value));
+                    BlockPos blockPos = BlockUtils.toBlockPos(position);
+                    BlockState blockState = mc.world.getBlockState(blockPos);
+                    if (blockState.isAir()) {
+                        Vec3d velocity = new Vec3d(-target.getVelocity().x / 10, 0, -target.getVelocity().z / 10);
+                        particles.add(new OrbParticle(position, velocity, randomRadius.value ? random.nextFloat() + 0.2f : (float) orbsRadius.value, (float) gravityAmount.value, (float) time_in_seconds.value, randomColor.value));
+                    }else{
+                        i--;
+                        continue;
+                    }
                 }
                 case TEXT -> {
+                    TextParticle.COMICAL = comicalText.value;
                     particles.add(new TextParticle(getRandomText(), position, (float) scale.value, (float) time_in_seconds.value,randomColor.value));
                 }
                 case EZ -> {
+                    TextParticle.COMICAL = comicalText.value;
                     particles.add(new TextParticle("EZ!", position, (float) scale.value, (float) time_in_seconds.value,randomColor.value));
                 }
                 case CRITS -> {
@@ -223,6 +261,13 @@ public class HitEffect extends Module_ {
     public String getRandomText() {
         int randomIndex = random.nextInt(texts.value.length);
         return texts.value[randomIndex];
+    }
+
+    @Override
+    public void onSettingChange(Setting<?> setting) {
+        super.onSettingChange(setting);
+        TextParticle.COMICAL = comicalText.value;
+        OrbParticle.COOLER_PHYSICS = coolerPhysics.value;
     }
 
     public enum EffectType {

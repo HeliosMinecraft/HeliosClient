@@ -10,5 +10,14 @@ public enum EasingType {
     CUBIC_IN,
     CUBIC_OUT,
     CUBIC_IN_OUT,
+    QUARTIC_IN,
+    QUARTIC_OUT,
+    QUARTIC_IN_OUT,
+    BOUNCE_IN,
+    BOUNCE_OUT,
+    BOUNCE_IN_OUT,
+    SINE_IN,
+    SINE_OUT,
+    SINE_IN_OUT,
     LINEAR_SIGMOID
 }
