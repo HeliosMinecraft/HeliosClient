@@ -300,7 +300,7 @@ public class NoFall extends Module_ {
 
                 ((IVec3d) mc.player.getVelocity()).heliosClient$setY(0);
 
-                BlockUtils.place(pos, rotate.value, airPlace.value, slot == PlayerInventory.OFF_HAND_SLOT ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                BlockUtils.place(pos, rotate.value,false, airPlace.value, slot == PlayerInventory.OFF_HAND_SLOT ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
                 ((IVec3d) mc.player.getVelocity()).heliosClient$setY(prevY);
 

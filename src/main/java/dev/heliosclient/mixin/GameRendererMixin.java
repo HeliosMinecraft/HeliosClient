@@ -8,6 +8,8 @@ import dev.heliosclient.module.modules.player.NoMiningTrace;
 import dev.heliosclient.module.modules.render.NoRender;
 import dev.heliosclient.module.modules.render.Zoom;
 import dev.heliosclient.module.modules.world.LiquidInteract;
+import dev.heliosclient.util.render.GradientBlockRenderer;
+import me.x150.renderer.util.RenderProfiler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -44,6 +46,8 @@ public abstract class GameRendererMixin {
     private void render(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
         camera = client.gameRenderer.getCamera();
         EventManager.postEvent(Render3DEvent.get(matrices, tickDelta, camera.getPos().x, camera.getPos().y, camera.getPos().z));
+
+        GradientBlockRenderer.renderGradientBlocks();
     }
 
     @Inject(method = "bobView", at = @At(value = "HEAD"), cancellable = true)

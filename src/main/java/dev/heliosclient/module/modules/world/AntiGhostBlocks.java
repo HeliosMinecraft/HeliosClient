@@ -27,7 +27,7 @@ public class AntiGhostBlocks extends Module_ {
 
     @SubscribeEvent
     public void onBreakBlock(BlockBreakEvent event) {
-        if (mc.isInSingleplayer() || !breaking.get()) return;
+        if (mc.isInSingleplayer() || !breaking.value) return;
 
         event.setCanceled(true);
 

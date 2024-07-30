@@ -75,6 +75,10 @@ public class EventManager {
             if (eventListeners == null || eventListeners.isEmpty()) return event;
 
             for (EventListener listener : eventListeners) {
+                if(listener == null){
+                    eventListeners.remove(listener);
+                    continue;
+                }
                 listener.accept(event);
             }
 
@@ -108,15 +112,15 @@ public class EventManager {
     }
 
     private static void handleException(Throwable e, Listener listener, Event event) {
-        HeliosClient.LOGGER.info("Exception occurred while processing event: {} \n Following was the listener: {}", event.getClass().getName(), listener, e);
-        HeliosClient.LOGGER.warn("An error occurred while processing an event. Please check the log file for details.");
+        HeliosClient.LOGGER.error("Exception occurred while processing event: {} \n Following was the listener: {}", event.getClass().getName(), listener, e);
+
     }
 
     private record EventListener(Listener listener, Method method) {
         public void accept(Event event) {
             try {
                 method.invoke(listener, event);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 handleException(e, listener, event);
             }
         }

@@ -8,7 +8,9 @@ import dev.heliosclient.event.events.player.PostMovementUpdatePlayerEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.movement.AutoSneak;
 import dev.heliosclient.module.modules.movement.NoSlow;
+import dev.heliosclient.module.modules.movement.Scaffold;
 import dev.heliosclient.module.modules.movement.Velocity;
 import dev.heliosclient.module.modules.render.Freecam;
 import dev.heliosclient.module.modules.world.BetterPortals;
@@ -53,6 +55,13 @@ public abstract class ClientPlayerEntityMixin {
         if (ModuleManager.get(Freecam.class).isActive() && this.equals(MinecraftClient.getInstance().player)) {
             cir.setReturnValue(true);
         }
+    }
+
+    @Inject(method = "isSneaking", at = @At("HEAD"), cancellable = true)
+    private void onIsSneaking(CallbackInfoReturnable<Boolean> info) {
+        if (ModuleManager.get(Scaffold.class).isActive() && ModuleManager.get(Scaffold.class).down.value) info.setReturnValue(false);
+
+        if (ModuleManager.get(AutoSneak.class).isActive()) info.setReturnValue(true);
     }
 
 

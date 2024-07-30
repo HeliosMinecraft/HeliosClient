@@ -31,8 +31,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class HitEffect extends Module_ {
 
     private static final Random random = Random.create();
+
     List<HitEffectParticle> particles = new CopyOnWriteArrayList<>();
+
+
     SettingGroup sgGeneral = new SettingGroup("General");
+
     DoubleSetting particleAmount = sgGeneral.add(new DoubleSetting.Builder()
             .name("Amount")
             .description("Amount of particles to be spawned")
@@ -176,9 +180,7 @@ public class HitEffect extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-
-        OrbParticle.COOLER_PHYSICS = coolerPhysics.value;
-        TextParticle.COMICAL = comicalText.value;
+        particles.clear();
     }
 
     @Override
@@ -188,7 +190,7 @@ public class HitEffect extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent.CLIENT event) {
+    public void onTick(TickEvent.PLAYER event) {
         if (HeliosClient.MC.world == null) return;
 
         particles.removeIf(hitEffectParticle -> hitEffectParticle.isDiscarded);

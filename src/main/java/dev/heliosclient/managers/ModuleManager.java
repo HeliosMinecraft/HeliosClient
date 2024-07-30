@@ -98,6 +98,7 @@ public class ModuleManager {
                 new Phase(),
                 new NoJumpDelay(),
                 new NoLevitation(),
+                new Scaffold(),
                 new SafeWalk(),
                 new Slippy(),
                 new Spider(),

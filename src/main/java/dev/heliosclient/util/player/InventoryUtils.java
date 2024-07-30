@@ -134,12 +134,36 @@ public class InventoryUtils {
             return -1;
 
         for (int i = 0; i < 9; i++) {
-            if (HeliosClient.MC.player.getInventory().getStack(i) != null && HeliosClient.MC.player.getInventory().getStack(i).getItem() == item) {
+            ItemStack stack = HeliosClient.MC.player.getInventory().getStack(i);
+
+            if (stack != null && stack.getItem() == item) {
                 return i;
             }
         }
         //Offhand
-        if (HeliosClient.MC.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT) != null && HeliosClient.MC.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT).getItem() == item) {
+        ItemStack stack = HeliosClient.MC.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT);
+
+        if (stack != null &&  stack.getItem() == item) {
+            return PlayerInventory.OFF_HAND_SLOT;
+        }
+        return -1; // Return -1 if the item was not found
+    }
+
+    // Find an item in the hotbar
+    public static int findInHotbar(Predicate<Item> predicate) {
+        if (predicate == null)
+            return -1;
+
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = HeliosClient.MC.player.getInventory().getStack(i);
+            if (stack != null && predicate.test(stack.getItem())) {
+                return i;
+            }
+        }
+        //Offhand
+        ItemStack stack = HeliosClient.MC.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT);
+
+        if (stack != null && predicate.test(stack.getItem())) {
             return PlayerInventory.OFF_HAND_SLOT;
         }
         return -1; // Return -1 if the item was not found

@@ -65,6 +65,9 @@ public class PlayerUtils {
     public static double getDistanceToBlockPos(PlayerEntity player, BlockPos pos) {
         return Math.sqrt(player.getBlockPos().getSquaredDistance(pos));
     }
+    public static double getSquaredDistanceToBP(BlockPos pos) {
+        return mc.player.getBlockPos().getSquaredDistance(pos);
+    }
 
     public static double getDistanceToVec3d(PlayerEntity player, Vec3d vec) {
         return Math.sqrt(player.getPos().squaredDistanceTo(vec));

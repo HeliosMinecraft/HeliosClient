@@ -1,6 +1,7 @@
 package dev.heliosclient.util;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
@@ -31,6 +32,8 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import static dev.heliosclient.util.render.Renderer3D.mc;
 
 public class BlockUtils {
@@ -57,10 +60,11 @@ public class BlockUtils {
         if (state.getHardness(mc.world, blockPos) < 0) return false;
         return state.getOutlineShape(mc.world, blockPos) != VoxelShapes.empty();
     }
+
     public static boolean canBreak(BlockPos blockPos) {
         BlockState state = mc.world.getBlockState(blockPos);
 
-        return canBreak(blockPos,state);
+        return canBreak(blockPos, state);
     }
 
     public static boolean canBreakInstantly(BlockState state, float speed) {
@@ -96,7 +100,7 @@ public class BlockUtils {
      * @see AbstractBlock#calcBlockBreakingDelta(BlockState, PlayerEntity, BlockView, BlockPos)
      */
     public static double calcBlockBreakingDelta(BlockState state, ItemStack stack) {
-       return calcBlockBreakingDelta2(state, getMiningSpeedForBlockState(state, stack) );
+        return calcBlockBreakingDelta2(state, getMiningSpeedForBlockState(state, stack));
     }
 
     /**
@@ -185,8 +189,26 @@ public class BlockUtils {
     }
 
     public static boolean place(BlockPos pos, boolean airPlace, boolean rotate) {
-        return place(pos, rotate, airPlace, Hand.MAIN_HAND);
+        return place(pos, rotate, false, airPlace, Hand.MAIN_HAND);
     }
+
+    public static boolean place(BlockPos pos, boolean airPlace, boolean rotate, boolean clientSideRotation) {
+        return place(pos, rotate, clientSideRotation, airPlace, Hand.MAIN_HAND);
+    }
+
+    public static boolean place(BlockPos pos, boolean airPlace, boolean rotate, boolean clientSideRotation, int itemSlotHotbar, boolean silentSwitch) {
+
+        InventoryUtils.swapToSlot(itemSlotHotbar, silentSwitch);
+
+        boolean returnVal = place(pos, rotate, clientSideRotation, airPlace, itemSlotHotbar == 45 ? Hand.OFF_HAND : Hand.MAIN_HAND);
+
+        if (silentSwitch)
+            InventoryUtils.swapBackHotbar();
+
+        return returnVal;
+    }
+
+
     public static boolean airBreed(Block b) {
         return b == Blocks.AIR || b == Blocks.CAVE_AIR || b == Blocks.VOID_AIR;
     }
@@ -208,47 +230,80 @@ public class BlockUtils {
                 || block instanceof TrapdoorBlock;
     }
 
-    public static boolean place(BlockPos pos, boolean rotate, boolean airPlace, Hand hand) {
-        if (!mc.world.isInBuildLimit(pos))
+    public static boolean place(BlockPos pos, boolean rotate, boolean clientSideRotation, boolean airPlace, Hand hand) {
+        if (!canPlace(pos, mc.world.getBlockState(pos)))
+            return false;
+
+        if (!airPlace && !isPlaceable(pos, false))
             return false;
 
         Vec3d hitPos = Vec3d.ofCenter(pos);
 
-        for (Direction d : Direction.values()) {
-            if (!mc.world.isInBuildLimit(pos.offset(d)))
-                continue;
+        Direction d = getPlaceSide(pos);
 
-            Block neighborBlock = mc.world.getBlockState(pos.offset(d)).getBlock();
-
-            if (!airPlace && isPlaceable(pos.offset(d), false))
-                continue;
-
-            if (rotate) {
-                RotationUtils.lookAt(pos.offset(d).toCenterPos());
-            }
-
-
-            if (!isClickable(neighborBlock)) {
-                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
-            }
-
+        if (d == null) {
+            d = Direction.UP;
+        } else {
             hitPos = hitPos.add(d.getOffsetX() * 0.5, d.getOffsetY() * 0.5, d.getOffsetZ() * 0.5);
+        }
 
-            BlockHitResult blockHitResult = new BlockHitResult(hitPos, d.getOpposite(), airPlace ? pos : pos.offset(d), false);
-            ActionResult result = mc.interactionManager.interactBlock(mc.player, hand,blockHitResult);
+        Block neighborBlock = mc.world.getBlockState(pos.offset(d)).getBlock();
 
+        BlockHitResult blockHitResult = new BlockHitResult(hitPos, d.getOpposite(), airPlace ? pos : pos.offset(d), false);
 
-            if (result.shouldSwingHand()) {
-                mc.player.swingHand(hand);
-            }
-
-            if (!isClickable(neighborBlock))
-                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-
-
+        ActionResult result = ActionResult.FAIL;
+        if (rotate) {
+            RotationUtils.rotate(RotationUtils.getYaw(hitPos), RotationUtils.getPitch(hitPos), clientSideRotation,()-> interactBlock(blockHitResult, neighborBlock, hand));
+            //hmm
             return true;
         }
 
-        return false;
+        result = interactBlock(blockHitResult,neighborBlock,hand);
+
+
+        return result == ActionResult.SUCCESS;
+    }
+
+    private static ActionResult interactBlock(BlockHitResult blockHitResult,Block block, Hand hand){
+        if (isClickable(block)) {
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+        }
+
+        ActionResult result = mc.interactionManager.interactBlock(mc.player, hand, blockHitResult);
+
+
+        if (result.shouldSwingHand()) {
+            mc.player.swingHand(hand);
+        }
+
+        if (isClickable(block))
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+
+        return result;
+    }
+
+    public static Direction getPlaceSide(BlockPos blockPos) {
+        Vec3d lookVec = blockPos.toCenterPos().subtract(mc.player.getEyePos());
+        double bestRelevancy = -Double.MAX_VALUE;
+        Direction bestSide = null;
+
+        for (Direction side : Direction.values()) {
+            BlockPos neighbor = blockPos.offset(side);
+            BlockState state = mc.world.getBlockState(neighbor);
+
+            // Check if neighbour isn't empty
+            if (state.isAir() || isClickable(state.getBlock())) continue;
+
+            // Check if neighbour is a fluid
+            if (!state.getFluidState().isEmpty()) continue;
+
+            double relevancy = side.getAxis().choose(lookVec.getX(), lookVec.getY(), lookVec.getZ()) * side.getDirection().offset();
+            if (relevancy > bestRelevancy) {
+                bestRelevancy = relevancy;
+                bestSide = side;
+            }
+        }
+
+        return bestSide;
     }
 }
