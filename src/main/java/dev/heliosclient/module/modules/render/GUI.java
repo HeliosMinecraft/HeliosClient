@@ -1,6 +1,7 @@
 package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.GradientManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -38,7 +39,7 @@ public class GUI extends Module_ {
             .name("Gradient Type")
             .description("Gradient type for the gradient color mode")
             .onSettingChange(this)
-            .value(new ArrayList<>(List.of("Rainbow", "DaySky", "EveningSky", "NightSky", "Linear2D")))
+            .value(GradientManager.getAllGradientsNames().stream().toList())
             .defaultListIndex(0)
             .shouldRender(() -> ColorMode.value == 1)
             .build()
@@ -126,5 +127,8 @@ public class GUI extends Module_ {
         showInModulesList.value = false;
 
         ColorManager.INSTANCE.onTick(null);
+
+        GradientType.options = GradientManager.getAllGradientsNames().stream().toList();
+
     }
 }

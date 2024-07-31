@@ -135,11 +135,13 @@ public class ModuleManager {
         registerModules(
                 new GUI(),
                 new HUDModule(),
+                new AspectRatio(),
                 new TimeChanger(),
                 new Fullbright(),
                 new CustomFov(),
                 new BlockSelection(),
                 new BreakIndicator(),
+                new CustomCrosshair(),
                 new Freecam(),
                 new FreeLook(),
                 new HitEffect(),

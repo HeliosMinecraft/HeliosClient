@@ -17,7 +17,6 @@ import me.x150.renderer.render.Renderer3d;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
@@ -32,13 +31,6 @@ public class Scaffold extends Module_ {
     private final SettingGroup sgSwitch = new SettingGroup("Switch");
     private final SettingGroup sgRender = new SettingGroup("Render");
     private final BlockPos.Mutable blockPos = new BlockPos.Mutable();
-    public BooleanSetting down = sgPlace.add(new BooleanSetting.Builder()
-            .name("Down")
-            .description("Press shift / sneak to go down")
-            .onSettingChange(this)
-            .defaultValue(false)
-            .build()
-    );
     /* General */
     BlockListSetting blocks = sgGeneral.add(new BlockListSetting.Builder()
             .name("Blocks")
@@ -99,6 +91,13 @@ public class Scaffold extends Module_ {
             .defaultValue(5d)
             .range(0, 120)
             .roundingPlace(0)
+            .build()
+    );
+    public BooleanSetting down = sgPlace.add(new BooleanSetting.Builder()
+            .name("Down")
+            .description("Press shift / sneak to go down")
+            .onSettingChange(this)
+            .defaultValue(false)
             .build()
     );
     BooleanSetting airPlace = sgPlace.add(new BooleanSetting.Builder()
@@ -246,14 +245,30 @@ public class Scaffold extends Module_ {
         //Place the block below the player
         placeBlockPos(center, itemSlot);
 
-        // Calculate the direction the player is looking
-        Direction direction = mc.player.getHorizontalFacing();
+        // Calculate the direction the player is moving
+        Vec3d direction = Vec3d.ZERO;
+        if (mc.options.forwardKey.isPressed()) {
+            direction = direction.add(mc.player.getRotationVector());
+        }
+        if (mc.options.backKey.isPressed()) {
+            direction = direction.subtract(mc.player.getRotationVector());
+        }
+        if (mc.options.leftKey.isPressed()) {
+            direction = direction.add(new Vec3d(-mc.player.getRotationVector().z, 0, mc.player.getRotationVector().x));
+        }
+        if (mc.options.rightKey.isPressed()) {
+            direction = direction.add(new Vec3d(mc.player.getRotationVector().z, 0, -mc.player.getRotationVector().x));
+        }
+
+        // Normalize the direction vector to prevent faster movement when moving diagonally
+        direction = direction.normalize();
 
         for (int i = 1; i <= extendRange.value; i++) {
-            BlockPos pos = center.offset(direction, i);
+            BlockPos pos = center.add((int) (direction.x * i), 0, (int) (direction.z * i));
 
             // Check if the block can be placed at the position
-            if (!BlockUtils.canPlace(pos, mc.world.getBlockState(pos))) continue;
+            BlockState state = mc.world.getBlockState(pos);
+            if (!BlockUtils.canPlace(pos, state) || !state.isAir()) continue;
 
             if (!placeBlockPos(pos, itemSlot)) {
                 break;
@@ -316,8 +331,8 @@ public class Scaffold extends Module_ {
                             ColorManager.INSTANCE::getPrimaryGradientEnd,
                             pos,
                             true,
-                            1000,
-                            QuadColor.CardinalDirection.EAST
+                            500,
+                            QuadColor.CardinalDirection.DIAGONAL_LEFT
                     );
                 } else {
                     Renderer3d.renderFadingBlock(lineColor.value, fillColor.value, pos.toCenterPos().subtract(0.5f, 0.5f, 0.5f), dimensions, 1000);

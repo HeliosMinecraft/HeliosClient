@@ -74,7 +74,7 @@ public class Zoom extends Module_ {
             float t = Math.min(1.0f, (float) timer.getElapsedTime()); // Normalize time to [0, 1]
 
             // Apply easing to zoom amount
-            zoomAmount = Easing.ease(EasingType.LINEAR_IN, t) * amount.value;
+            zoomAmount = MathHelper.clamp(Easing.ease(EasingType.BOUNCE_IN, t) * amount.value,0,amount.value);
         }
     }
 

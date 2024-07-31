@@ -795,6 +795,16 @@ public class Renderer2D implements Listener {
 
         draw();
     }
+    public static void drawFilledTriangle(Matrix4f matrix4f, int x1, int y1, int x2, int y2, int x3, int y3, int color) {
+        BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+
+        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(color).next();
+        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(color).next();
+        bufferBuilder.vertex(matrix4f, x3, y3, 0).color(color).next();
+       // bufferBuilder.vertex(matrix4f, x1, y1, 0).color(color).next();
+
+        draw();
+    }
 
     /**
      * Draws a outline quadrant
@@ -1182,6 +1192,37 @@ public class Renderer2D implements Listener {
         RenderSystem.defaultBlendFunc();
     }
 
+    /**
+     * Draws and masks to a gradient;
+     */
+    public static void drawToGradientMask(Matrix4f matrix, Color color1, Color color2, Color color3, Color color4, float x, float y, float width, float height,Runnable run) {
+        RenderSystem.enableBlend();
+        RenderSystem.colorMask(false, false, false, true);
+        RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.colorMask(true, true, true, true);
+
+        run.run();
+
+        RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
+
+        RenderSystem.enableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+
+        BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+
+        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB()).next();
+        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB()).next();
+        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB()).next();
+        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB()).next();
+
+        draw();
+
+        RenderSystem.disableBlend();
+
+        RenderSystem.defaultBlendFunc();
+    }
+
     private static BufferBuilder setupAndBegin(VertexFormat.DrawMode m, VertexFormat vf) {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(m,vf);
@@ -1219,12 +1260,34 @@ public class Renderer2D implements Listener {
     }
 
     /* ==== Drawing Lines ==== */
-    public static void drawVerticalLine(Matrix4f matrix4f, float x, float y1, float height, float thickness, int color) {
-        drawRectangle(matrix4f, x, y1, thickness, height, color);
+
+    public static void drawLine(MatrixStack matrixStack, int x1, int y1, int x2, int y2,float lineWidth, int color) {
+        Matrix4f matrix = matrixStack.peek().getPositionMatrix();
+
+        float red = (color >> 16 & 255) / 255.0F;
+        float green = (color >> 8 & 255) / 255.0F;
+        float blue = (color & 255) / 255.0F;
+        float alpha = (color >> 24 & 255) / 255.0F;
+
+        RenderSystem.lineWidth(lineWidth);
+
+        BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(red, green, blue, alpha).next();
+
+        draw();
+
+        RenderSystem.lineWidth(1.0f);
     }
 
-    public static void drawHorizontalLine(Matrix4f matrix4f, float x1, float width, float y, float thickness, int color) {
-        drawRectangle(matrix4f, x1, y, width, thickness, color);
+    public static void drawVerticalLine(Matrix4f matrix4f, float x, float y, float height, float thickness, int color) {
+        drawRectangle(matrix4f, x, y, thickness, height, color);
+    }
+
+    public static void drawHorizontalLine(Matrix4f matrix4f, float x1, float width, float y, float height, int color) {
+        drawRectangle(matrix4f, x1, y, width, height, color);
     }
 
     // Minecraft InventoryScreen source code but 360 degree support and smoother tickdelta

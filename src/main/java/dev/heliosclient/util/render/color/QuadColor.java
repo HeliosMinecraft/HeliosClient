@@ -114,7 +114,9 @@ public class QuadColor extends RenderColor {
         NORTH(3, 0),
         EAST(0, 1),
         SOUTH(1, 2),
-        WEST(2, 3);
+        WEST(2, 3),
+        DIAGONAL_LEFT(0, 2), // from top-left to bottom-right
+        DIAGONAL_RIGHT(1, 3); // from top-right to bottom-left
 
         public final int vertex1;
         public final int vertex2;

@@ -37,6 +37,56 @@ public class ColorManager implements Listener {
     public Color primaryGradientStart = new Color(0);
     public Color primaryGradientEnd = new Color(0);
 
+    private ColorManager() {
+        new GradientManager.GradientBuilder()
+                .setName("Rainbow")
+                .setStartGradient(ColorUtils::getRainbowColor)
+                .setEndGradient(ColorUtils::getRainbowColor2)
+                .register();
+
+        new GradientManager.GradientBuilder()
+                .setName("DaySky")
+                .setStartGradient(() -> {
+                    float hue = (System.currentTimeMillis() % 10000) / 10000f;
+                    return ColorUtils.getDaySkyColors(hue)[0];
+                })
+                .setEndGradient(() -> {
+                    float hue = (System.currentTimeMillis() % 10000) / 10000f;
+                    return ColorUtils.getDaySkyColors(hue)[1];
+                })
+                .register();
+
+        new GradientManager.GradientBuilder()
+                .setName("EveningSky")
+                .setStartGradient(() -> {
+                    float hue = (System.currentTimeMillis() % 10000) / 10000f;
+                    return ColorUtils.getEveningSkyColors(hue)[0];
+                })
+                .setEndGradient(() -> {
+                    float hue = (System.currentTimeMillis() % 10000) / 10000f;
+                    return ColorUtils.getEveningSkyColors(hue)[1];
+                })
+                .register();
+
+        new GradientManager.GradientBuilder()
+                .setName("NightSky")
+                .setStartGradient(() -> {
+                    float hue = (System.currentTimeMillis() % 10000) / 10000f;
+                    return ColorUtils.getNightSkyColors(hue)[0];
+                })
+                .setEndGradient(() -> {
+                    float hue = (System.currentTimeMillis() % 10000) / 10000f;
+                    return ColorUtils.getNightSkyColors(hue)[1];
+                })
+                .register();
+
+        new GradientManager.GradientBuilder()
+                .setName("Linear2D")
+                .setStartGradient(() -> ModuleManager.get(GUI.class).linear2Start.getColor())
+                .setEndGradient(() -> ModuleManager.get(GUI.class).linear2end.getColor())
+                .register();
+    }
+
     public int defaultTextColor() {
         return defaultTextColor;
     }
@@ -97,32 +147,14 @@ public class ColorManager implements Listener {
 
         GUI gui = (ModuleManager.get(GUI.class));
 
+        clickGuiPrimary = gui.clickGUIPrimary.getColor().getRGB();
 
         if (gui.ColorMode.value == 0) {
             updatePrimaryGradients(gui.staticColor.getColor(), gui.staticColor.getColor());
-        }
 
-        clickGuiPrimary = gui.clickGUIPrimary.getColor().getRGB();
+        }else if (gui.ColorMode.value == 1) {
 
-
-        if (gui.ColorMode.value == 1) {
-            switch (gui.GradientType.value) {
-                case 0 -> {
-                    updatePrimaryGradients(ColorUtils.getRainbowColor(), ColorUtils.getRainbowColor2());
-                }
-                case 1 -> {
-                    updatePrimaryGradients(ColorUtils.getDaySkyColors(hue)[0], ColorUtils.getDaySkyColors(hue)[1]);
-                }
-                case 2 -> {
-                    updatePrimaryGradients(ColorUtils.getEveningSkyColors(hue)[0], ColorUtils.getEveningSkyColors(hue)[1]);
-                }
-                case 3 -> {
-                    updatePrimaryGradients(ColorUtils.getNightSkyColors(hue)[0], ColorUtils.getNightSkyColors(hue)[1]);
-                }
-                case 4 -> {
-                    updatePrimaryGradients(gui.linear2Start.getColor(), gui.linear2end.getColor());
-                }
-            }
+            updatePrimaryGradients(GradientManager.getGradient(gui.GradientType.getOption().toString()).getStartGradient(), GradientManager.getGradient(gui.GradientType.getOption().toString()).getEndGradient());
         }
 
 

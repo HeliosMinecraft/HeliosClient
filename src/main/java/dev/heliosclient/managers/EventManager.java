@@ -19,7 +19,7 @@ public class EventManager {
 
     private static final Comparator<EventListener> METHOD_COMPARATOR = Comparator.comparingInt(el -> {
         SubscribeEvent annotation = el.method.getAnnotation(SubscribeEvent.class);
-        return (annotation != null) ? annotation.priority().ordinal() : Integer.MIN_VALUE;
+        return (annotation != null) ? annotation.priority().ordinal() : -1;
     });
 
     private static final Map<Class<?>, Long> LAST_POSTED = new ConcurrentHashMap<>();

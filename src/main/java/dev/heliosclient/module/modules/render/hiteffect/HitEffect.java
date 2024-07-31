@@ -30,10 +30,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HitEffect extends Module_ {
 
-    private static final Random random = Random.create();
+    private final Random random = Random.create();
 
     List<HitEffectParticle> particles = new CopyOnWriteArrayList<>();
-
 
     SettingGroup sgGeneral = new SettingGroup("General");
 
@@ -129,7 +128,6 @@ public class HitEffect extends Module_ {
             .inputMode(InputBox.InputMode.ALL)
             .characterLimit(100)
             .defaultBoxes(10)
-            .value(new String[]{"Kachow", "EZ", "Hit", "Pow!", "BAM!", "BOOM!", "Zap", "GG", "Owned", "LOL"})
             .defaultValue(new String[]{"Kachow", "EZ", "Hit", "Pow!", "BAM!", "BOOM!", "Zap", "GG", "Owned", "LOL"})
             .shouldRender(() -> type.getOption() == EffectType.TEXT)
             .build()
@@ -164,15 +162,13 @@ public class HitEffect extends Module_ {
             .build()
     );
 
-
-    int i = 0;
-
     public HitEffect() {
         super("HitEffect", "Displays particles when you hit", Categories.RENDER);
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
 
         particle_effect.setMaxSelectable(1);
+
         TextParticle.COMICAL = comicalText.value;
         OrbParticle.COOLER_PHYSICS = coolerPhysics.value;
     }
@@ -196,12 +192,14 @@ public class HitEffect extends Module_ {
         particles.removeIf(hitEffectParticle -> hitEffectParticle.isDiscarded);
 
         for (HitEffectParticle particle : particles) {
+            if(particle == null) continue;
             particle.tick();
         }
     }
 
     @SubscribeEvent
     public void on3dRender(Render3DEvent event) {
+
         RenderSystem.enableDepthTest();
         for (HitEffectParticle particle : particles) {
             particle.render(event.getMatrices(), color.value);
@@ -211,9 +209,11 @@ public class HitEffect extends Module_ {
 
     @SubscribeEvent
     public void onHit(PlayerAttackEntityEvent event) {
+        if(mc.player == null ||  mc.player.isDead()) return;
+
         Random random = Random.create();
         Entity target = event.getTarget();
-        for (i = 0; i < (int) particleAmount.value; i++) {
+        for (int i = 0; i < (int) particleAmount.value; i++) {
             // Use a random angle for the spread of particles
             double angle = 2 * Math.PI * random.nextDouble();
             // Use the square root of the random number for a more even distribution
@@ -230,9 +230,6 @@ public class HitEffect extends Module_ {
                     if (blockState.isAir()) {
                         Vec3d velocity = new Vec3d(-target.getVelocity().x / 10, 0, -target.getVelocity().z / 10);
                         particles.add(new OrbParticle(position, velocity, randomRadius.value ? random.nextFloat() + 0.2f : (float) orbsRadius.value, (float) gravityAmount.value, (float) time_in_seconds.value, randomColor.value));
-                    }else{
-                        i--;
-                        continue;
                     }
                 }
                 case TEXT -> {

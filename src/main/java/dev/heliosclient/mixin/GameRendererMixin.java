@@ -1,15 +1,16 @@
 package dev.heliosclient.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.event.events.render.Render3DEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.player.NoMiningTrace;
+import dev.heliosclient.module.modules.render.AspectRatio;
 import dev.heliosclient.module.modules.render.NoRender;
 import dev.heliosclient.module.modules.render.Zoom;
 import dev.heliosclient.module.modules.world.LiquidInteract;
 import dev.heliosclient.util.render.GradientBlockRenderer;
-import me.x150.renderer.util.RenderProfiler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -18,10 +19,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.hit.HitResult;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
+import org.joml.Matrix4f;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -41,13 +40,67 @@ public abstract class GameRendererMixin {
     @Final
     private Camera camera;
 
+    @Shadow private float zoom;
+
+    @Shadow public abstract void render(float tickDelta, long startTime, boolean tick);
+
+    @Shadow public abstract float getFarPlaneDistance();
+
+    @Shadow private float zoomX;
+    @Shadow private float zoomY;
+    @Unique private float lastZoom;
+    @Unique private boolean isZooming;
+
+
     // MeteorClient.com
     @Inject(method = "renderWorld", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = {"ldc=hand"}), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private void render(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
         camera = client.gameRenderer.getCamera();
+
         EventManager.postEvent(Render3DEvent.get(matrices, tickDelta, camera.getPos().x, camera.getPos().y, camera.getPos().z));
 
         GradientBlockRenderer.renderGradientBlocks();
+    }
+
+    @Inject(method = "getBasicProjectionMatrix", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;mul(Lorg/joml/Matrix4fc;)Lorg/joml/Matrix4f;"), cancellable = true)
+    private void getBasicProjectionMatrix$ChangeAspectRatio(double fov, CallbackInfoReturnable<Matrix4f> cir) {
+        AspectRatio ratio = ModuleManager.get(AspectRatio.class);
+
+        if (ratio.isActive()) {
+            cir.cancel();
+        }else{
+            return;
+        }
+
+        MatrixStack matrixStack = new MatrixStack();
+        matrixStack.peek().getPositionMatrix().identity();
+        if (this.zoom != 1.0F) {
+            matrixStack.translate(zoomX, -zoomY, 0.0F);
+            matrixStack.scale(this.zoom, this.zoom, 1.0F);
+        }
+         float aspectRatio = (float) ratio.aspectRatio.value;
+        float cameraDepth = (float) ratio.cameraDepth.value;
+
+        matrixStack.peek().getPositionMatrix().mul((new Matrix4f()).setPerspective((float)(fov * 0.01745329238474369), aspectRatio, cameraDepth, this.getFarPlaneDistance()));
+
+        cir.setReturnValue(matrixStack.peek().getPositionMatrix());
+    }
+
+
+    @Inject(method = "renderWorld", at = @At(value = "HEAD"))
+    private void renderWorld$ChangeZoom(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+        if (ModuleManager.get(Zoom.class).isActive()) {
+            if(!isZooming){
+                lastZoom = zoom;
+                isZooming = true;
+            }
+            zoom = (float) ModuleManager.get(Zoom.class).getZoomAmount();
+        }else{
+            if(isZooming){
+                zoom = lastZoom;
+            }
+            isZooming = false;
+        }
     }
 
     @Inject(method = "bobView", at = @At(value = "HEAD"), cancellable = true)
@@ -58,15 +111,6 @@ public abstract class GameRendererMixin {
     @ModifyArg(at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/RotationAxis;rotationDegrees(F)Lorg/joml/Quaternionf;"), method = "bobView", require = 1)
     public float changeBobIntensity(float value) {
         return 0.0F;
-    }
-
-    @Inject(at = @At(value = "RETURN", ordinal = 1),
-            method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D",
-            cancellable = true)
-    private void setFovForZoom(Camera camera, float tickDelta, boolean changingFov, CallbackInfoReturnable<Double> cir) {
-        if (ModuleManager.get(Zoom.class).isActive()) {
-            cir.setReturnValue(ModuleManager.get(Zoom.class).getZoomAmount());
-        }
     }
 
     @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;D)Lnet/minecraft/util/hit/EntityHitResult;"), cancellable = true)

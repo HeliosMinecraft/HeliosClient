@@ -43,9 +43,8 @@ public class GradientBlockRenderer {
                 exclude
         );
 
-        gradientBlocks.add(gb);
-
         gradientBlockBoxMap.put(gb, new Box(pos).expand(0.005f));
+        gradientBlocks.add(gb);
     }
 
     private static void clearGradientBlocks(){
