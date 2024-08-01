@@ -15,7 +15,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.*;
 
@@ -50,6 +52,15 @@ public class BlockSelection extends Module_ {
             .shouldRender(() -> outline.value)
             .build()
     );
+    BooleanSetting renderOneSide = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Flat Render")
+            .description("Renders only the side you are looking at.")
+            .value(false)
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
+
     BooleanSetting fill = sgGeneral.add(new BooleanSetting.Builder()
             .name("Fill")
             .description("Draw side fill of holes")
@@ -101,22 +112,28 @@ public class BlockSelection extends Module_ {
 
         if (shape.isEmpty()) return;
 
+        Direction[] dirs = new Direction[6];
+
+        if(renderOneSide.value){
+            dirs =  ArrayUtils.removeElement(Direction.values(),result.getSide());
+        }
+
         if (advanced.value) {
             for (Box b : shape.getBoundingBoxes()) {
-                renderSelection(b.offset(result.getBlockPos()).expand(0.0045f));
+                renderSelection(b.offset(result.getBlockPos()).expand(0.0045f),dirs);
             }
         } else {
-            renderSelection(shape.getBoundingBox().offset(result.getBlockPos()).expand(0.0045f));
+            renderSelection(shape.getBoundingBox().offset(result.getBlockPos()).expand(0.0045f),dirs);
         }
     }
 
-    public void renderSelection(Box box) {
+    public void renderSelection(Box box,Direction... exclude) {
         if (outline.value && fill.value) {
-            Renderer3D.drawBoxBoth(box, QuadColor.single(fillColor.value.getRGB()), QuadColor.single(lineColor.value.getRGB()), (float) outlineWidth.value);
+            Renderer3D.drawBoxBoth(box, QuadColor.single(fillColor.value.getRGB()), QuadColor.single(lineColor.value.getRGB()), (float) outlineWidth.value,exclude);
         } else if (outline.value) {
-            Renderer3D.drawBoxOutline(box, QuadColor.single(lineColor.value.getRGB()), (float) outlineWidth.value);
+            Renderer3D.drawBoxOutline(box, QuadColor.single(lineColor.value.getRGB()), (float) outlineWidth.value,exclude);
         } else if (fill.value) {
-            Renderer3D.drawBoxFill(box, QuadColor.single(fillColor.value.getRGB()));
+            Renderer3D.drawBoxFill(box, QuadColor.single(fillColor.value.getRGB()),exclude);
         }
     }
 }

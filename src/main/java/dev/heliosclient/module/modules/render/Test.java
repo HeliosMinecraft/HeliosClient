@@ -67,6 +67,14 @@ public class Test extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
+        GradientBlockRenderer.renderGradientBlock(
+                ColorManager.INSTANCE::getPrimaryGradientStart,
+                ColorManager.INSTANCE::getPrimaryGradientEnd,
+                new BlockPos(100,70,100),
+                true,
+                1020300,
+                null
+        );
     }
 
     @Override
@@ -103,15 +111,6 @@ public class Test extends Module_ {
 
         if (GradientRounded.value)
             Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), 22, 20, 40, 40, Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 2, 20, Color.WHITE);
-
-        GradientBlockRenderer.renderGradientBlock(
-                ColorManager.INSTANCE::getPrimaryGradientStart,
-                ColorManager.INSTANCE::getPrimaryGradientEnd,
-                new BlockPos(100,70,100),
-                true,
-                1020300,
-                QuadColor.CardinalDirection.DIAGONAL_LEFT
-        );
     }
 
     @SubscribeEvent

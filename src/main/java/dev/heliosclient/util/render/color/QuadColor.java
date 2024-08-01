@@ -8,6 +8,8 @@
  */
 package dev.heliosclient.util.render.color;
 
+import net.minecraft.util.math.Box;
+
 import java.util.function.Function;
 
 public class QuadColor extends RenderColor {
@@ -43,9 +45,15 @@ public class QuadColor extends RenderColor {
                 (color2 & 0xff0000) >> 16, (color2 & 0xff00) >> 8, color2 & 0xff, color2 >> 24 & 0xff,
                 direction);
     }
+    public static QuadColor gradient(int color1, int color2) {
+        return QuadColor.gradient(
+                (color1 & 0xff0000) >> 16, (color1 & 0xff00) >> 8, color1 & 0xff, color1 >> 24 & 0xff,
+                (color2 & 0xff0000) >> 16, (color2 & 0xff00) >> 8, color2 & 0xff, color2 >> 24 & 0xff);
+    }
 
     public static QuadColor gradient(int red1, int green1, int blue1, int alpha1, int red2, int green2, int blue2, int alpha2, CardinalDirection direction) {
         return new QuadColor(curVertex -> {
+
             if (direction.isStartVertex(curVertex)) {
                 return new int[]{red1, green1, blue1, alpha1};
             }
@@ -53,6 +61,17 @@ public class QuadColor extends RenderColor {
             return new int[]{red2, green2, blue2, alpha2};
         });
     }
+    public static QuadColor gradient(int red1, int green1, int blue1, int alpha1, int red2, int green2, int blue2, int alpha2) {
+        return new QuadColor(curVertex -> {
+            float t = (float) curVertex / 3; // Interpolate between 0 and 1 based on vertex index
+            int red = (int) (red1 * (1 - t) + red2 * t);
+            int green = (int) (green1 * (1 - t) + green2 * t);
+            int blue = (int) (blue1 * (1 - t) + blue2 * t);
+            int alpha = (int) (alpha1 * (1 - t) + alpha2 * t);
+            return new int[]{red, green, blue, alpha};
+        });
+    }
+
 
     public static QuadColor custom(float red1, float green1, float blue1, float alpha1, float red2, float green2, float blue2, float alpha2, float red3, float green3, float blue3, float alpha3, float red4, float green4, float blue4, float alpha4) {
         return QuadColor.custom(
@@ -71,15 +90,30 @@ public class QuadColor extends RenderColor {
     }
 
     public static QuadColor custom(int red1, int green1, int blue1, int alpha1, int red2, int green2, int blue2, int alpha2, int red3, int green3, int blue3, int alpha3, int red4, int green4, int blue4, int alpha4) {
-        return new QuadColor(curVertex -> {
-            return switch (curVertex) {
-                case 0 -> new int[]{red1, green1, blue1, alpha1};
-                case 1 -> new int[]{red2, green2, blue2, alpha2};
-                case 2 -> new int[]{red3, green3, blue3, alpha3};
-                default -> new int[]{red4, green4, blue4, alpha4};
-            };
+        return new QuadColor(curVertex -> switch (curVertex) {
+            case 0 -> new int[]{red1, green1, blue1, alpha1};
+            case 1 -> new int[]{red2, green2, blue2, alpha2};
+            case 2 -> new int[]{red3, green3, blue3, alpha3};
+            default -> new int[]{red4, green4, blue4, alpha4};
         });
     }
+
+    public int[] getColorForVertex(float x, float y, float z, Box box) {
+        float tX = (x - (float) box.minX) / ((float) box.maxX - (float) box.minX);
+        float tY = (y - (float) box.minY) / ((float) box.maxY - (float) box.minY);
+        float tZ = (z - (float) box.minZ) / ((float) box.maxZ - (float) box.minZ);
+
+        int[] color1 = getColor(0);
+        int[] color2 = getColor(3);
+
+        int red = (int) (color1[0] * (1 - tX) + color2[0] * tX);
+        int green = (int) (color1[1] * (1 - tY) + color2[1] * tY);
+        int blue = (int) (color1[2] * (1 - tZ) + color2[2] * tZ);
+        int alpha = (int) (color1[3] * (1 - tX) + color2[3] * tX);
+
+        return new int[]{red, green, blue, alpha};
+    }
+
 
     public int[] getColor(int curVertex) {
         int[] outColor = getColorFunc.apply(curVertex);

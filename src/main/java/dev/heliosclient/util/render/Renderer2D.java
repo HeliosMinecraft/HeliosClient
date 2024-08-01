@@ -796,7 +796,7 @@ public class Renderer2D implements Listener {
         draw();
     }
     public static void drawFilledTriangle(Matrix4f matrix4f, int x1, int y1, int x2, int y2, int x3, int y3, int color) {
-        BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+        BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
         bufferBuilder.vertex(matrix4f, x1, y1, 0).color(color).next();
         bufferBuilder.vertex(matrix4f, x2, y2, 0).color(color).next();

@@ -74,16 +74,23 @@ public class GradientBlockRenderer {
                 endG = ColorUtils.argbToRgb(endG,MODIFY_ALPHA_VALUE);
             }
 
+            QuadColor color = null;
+            if(gb.dir == null){
+                color = QuadColor.gradient(startG,endG);
+            }else{
+               color = QuadColor.gradient(startG,endG, gb.dir);
+            }
+
             if(OUTLINE && FILL){
-                Renderer3D.drawBoxBoth(gradientBlockBoxMap.get(gb), QuadColor.gradient(startG,endG, gb.dir),LINE_WIDTH,gb.exclude());
+                Renderer3D.drawBoxBoth(gradientBlockBoxMap.get(gb), color,LINE_WIDTH,gb.exclude());
                 continue;
             }
 
             if(OUTLINE){
-                Renderer3D.drawBoxOutline(gradientBlockBoxMap.get(gb), QuadColor.gradient(startG,endG, gb.dir),LINE_WIDTH,gb.exclude());
+                Renderer3D.drawBoxOutline(gradientBlockBoxMap.get(gb), color,LINE_WIDTH,gb.exclude());
             }
             if(FILL){
-                Renderer3D.drawBoxFill(gradientBlockBoxMap.get(gb), QuadColor.gradient(startG,endG, gb.dir),gb.exclude());
+                Renderer3D.drawBoxFill(gradientBlockBoxMap.get(gb), color,gb.exclude());
             }
         }
 

@@ -90,7 +90,7 @@ public class CustomCrosshair extends Module_ {
     );
     BooleanSetting dynamic = sgGeneral.add(new BooleanSetting.Builder()
             .name("Dynamic")
-            .description("Draws the crosshair only when you are looking at smth (block / entity")
+            .description("Draws the crosshair only when you are looking at smth (block / entity)")
             .defaultValue(false)
             .onSettingChange(this)
             .build()
@@ -129,7 +129,7 @@ public class CustomCrosshair extends Module_ {
         mask(dr, () -> {
             Renderer2D.drawHorizontalLine(dr.getMatrices().peek().getPositionMatrix(), x - (float) size.value / 2.0f, (float) size.value, (float) (y - thickness.value / 2.0f), (float) thickness.value, -1);
             Renderer2D.drawVerticalLine(dr.getMatrices().peek().getPositionMatrix(), x - (float) thickness.value / 2.0f, (float) (y - size.value / 2.0f), (float) size.value, (float) thickness.value, -1);
-        }, x - getSize() / 2 - 2, y - getSize() / 2 - 2, width + getSize() + 2, height + getSize() + 2);
+        }, x - getSize() / 2 - 2, y - getSize() / 2 - 2, getSize() + 2, getSize() + 2);
 
     }
 
@@ -138,13 +138,13 @@ public class CustomCrosshair extends Module_ {
             Renderer2D.drawRoundedRectangle(dr.getMatrices().peek().getPositionMatrix(), x - (float) size.value / 2.0f, (float) (y - thickness.value / 2.0f), (float) size.value, (float) thickness.value, (float) radius.value, -1);
             Renderer2D.drawRoundedRectangle(dr.getMatrices().peek().getPositionMatrix(), x - (float) thickness.value / 2.0f, (float) (y - size.value / 2.0f), (float) thickness.value, (float) size.value, (float) radius.value, -1);
 
-        }, x - getSize() / 2, y - getSize() / 2, width + getSize(), height + getSize());
+        }, x - getSize() / 2, y - getSize() / 2, getSize(), getSize());
     }
 
     public void renderSquare(DrawContext dr, int x, int y, int width, int height) {
         mask(dr, () -> {
             Renderer2D.drawOutlineRoundedBox(dr.getMatrices().peek().getPositionMatrix(), x - (float) size.value / 2.0f, (float) (y - size.value / 2.0f), (float) size.value, (float) size.value, (float) radius.value, (float) thickness.value, -1);
-        }, x - getSize() / 2, y - getSize() / 2, width + getSize(), height + getSize());
+        }, x - getSize() / 2 - 5, y - getSize() / 2 - 5, getSize() + 5, getSize() + 5);
     }
 
     public void renderInverseTriangleGap(DrawContext dr, int x, int y) {
@@ -167,15 +167,15 @@ public class CustomCrosshair extends Module_ {
     }
 
     public void renderDot(DrawContext dr, int x, int y, int width, int height) {
-        mask(dr, () -> Renderer2D.drawFilledCircle(dr.getMatrices().peek().getPositionMatrix(), x, y, (float) size.value / 2.0f, -1), x - getSize() / 2 - getSize() / 5, y - getSize() / 2 - getSize() / 5, width + getSize() + getSize() / 5, height + getSize() + getSize() / 5);
+        mask(dr, () -> Renderer2D.drawFilledCircle(dr.getMatrices().peek().getPositionMatrix(), x, y, (float) size.value / 2.0f, -1), x - getSize() * 2, y - getSize() * 2 ,  getSize() * 4, getSize()  * 4);
     }
 
     public void renderCircle(DrawContext dr, int x, int y, int width, int height) {
-        mask(dr, () -> Renderer2D.drawCircle(dr.getMatrices().peek().getPositionMatrix(), x, y, (float) size.value / 2.0f, (float) thickness.value, -1), x - getSize() - getSize() / 5, y - getSize() - getSize() / 5, width + getSize() + getSize() / 5, height + getSize() + getSize() / 5);
+        mask(dr, () -> Renderer2D.drawCircle(dr.getMatrices().peek().getPositionMatrix(), x, y, (float) size.value / 2.0f, (float) thickness.value, -1), x - (getSize() * 2) - (int) thickness.value,  y - (getSize() * 2) - (int) thickness.value, getSize() * 4 + (int) thickness.value,  getSize() * 4 + (int) thickness.value);
     }
 
     private int getSize() {
-        return (int) size.value;
+        return (int) Math.ceil(size.value);
     }
 
     public void mask(DrawContext dr, Runnable task, int x, int y, int width, int height) {

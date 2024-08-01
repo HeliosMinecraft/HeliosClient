@@ -80,7 +80,7 @@ public class Scaffold extends Module_ {
             .description("Radius around the place to place the blocks")
             .onSettingChange(this)
             .defaultValue(0d)
-            .range(0, 5)
+            .range(0, 7)
             .roundingPlace(0)
             .build()
     );
@@ -245,35 +245,35 @@ public class Scaffold extends Module_ {
         //Place the block below the player
         placeBlockPos(center, itemSlot);
 
-        // Calculate the direction the player is moving
-        Vec3d direction = Vec3d.ZERO;
-        if (mc.options.forwardKey.isPressed()) {
-            direction = direction.add(mc.player.getRotationVector());
-        }
-        if (mc.options.backKey.isPressed()) {
-            direction = direction.subtract(mc.player.getRotationVector());
-        }
-        if (mc.options.leftKey.isPressed()) {
-            direction = direction.add(new Vec3d(-mc.player.getRotationVector().z, 0, mc.player.getRotationVector().x));
-        }
-        if (mc.options.rightKey.isPressed()) {
-            direction = direction.add(new Vec3d(mc.player.getRotationVector().z, 0, -mc.player.getRotationVector().x));
-        }
-
-        // Normalize the direction vector to prevent faster movement when moving diagonally
-        direction = direction.normalize();
-
-        for (int i = 1; i <= extendRange.value; i++) {
-            BlockPos pos = center.add((int) (direction.x * i), 0, (int) (direction.z * i));
-
-            // Check if the block can be placed at the position
-            BlockState state = mc.world.getBlockState(pos);
-            if (!BlockUtils.canPlace(pos, state) || !state.isAir()) continue;
-
-            if (!placeBlockPos(pos, itemSlot)) {
-                break;
+            // Calculate the direction the player is moving
+            Vec3d direction = Vec3d.ZERO;
+            if (mc.options.forwardKey.isPressed()) {
+                direction = direction.add(mc.player.getRotationVector());
             }
-        }
+            if (mc.options.backKey.isPressed()) {
+                direction = direction.subtract(mc.player.getRotationVector());
+            }
+            if (mc.options.rightKey.isPressed()) {
+                direction = direction.add(new Vec3d(-mc.player.getRotationVector().z, 0, mc.player.getRotationVector().x));
+            }
+            if (mc.options.leftKey.isPressed()) {
+                direction = direction.add(new Vec3d(mc.player.getRotationVector().z, 0, -mc.player.getRotationVector().x));
+            }
+
+            // Normalize the direction vector to prevent faster movement when moving diagonally
+            direction = direction.normalize();
+
+            for (int i = 1; i <= extendRange.value; i++) {
+                BlockPos pos = center.add((int) (direction.x * i), 0, (int) (direction.z * i));
+
+                // Check if the block can be placed at the position
+                BlockState state = mc.world.getBlockState(pos);
+                if (!BlockUtils.canPlace(pos, state) || !state.isAir()) continue;
+
+                if (!placeBlockPos(pos, itemSlot)) {
+                    break;
+                }
+            }
 
         int rangeInt = (int) placeRadius.value;
 
@@ -332,7 +332,7 @@ public class Scaffold extends Module_ {
                             pos,
                             true,
                             500,
-                            QuadColor.CardinalDirection.DIAGONAL_LEFT
+                            null
                     );
                 } else {
                     Renderer3d.renderFadingBlock(lineColor.value, fillColor.value, pos.toCenterPos().subtract(0.5f, 0.5f, 0.5f), dimensions, 1000);

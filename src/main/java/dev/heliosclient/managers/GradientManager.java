@@ -1,13 +1,12 @@
 package dev.heliosclient.managers;
 
 import java.awt.Color;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.function.Supplier;
 
 public class GradientManager {
-    private static final Map<String, Gradient> gradients = new HashMap<>();
+    private static final LinkedHashMap<String, Gradient> gradients = new LinkedHashMap<>();
 
     public static void registerGradient(String name, Gradient gradientSupplier) {
         gradients.put(name, gradientSupplier);
