@@ -237,17 +237,20 @@ public class BlockUtils {
         Vec3d hitPos = Vec3d.ofCenter(pos);
 
         Direction d = getPlaceSide(pos);
-        Direction dOld = d;
+        BlockPos neighbour = null;
 
         if (d == null) {
             d = Direction.UP;
+            neighbour = pos;
         } else {
+            neighbour = airPlace ? pos : pos.offset(d);
+
             hitPos = hitPos.add(d.getOffsetX() * 0.5, d.getOffsetY() * 0.5, d.getOffsetZ() * 0.5);
         }
 
-        Block neighborBlock = mc.world.getBlockState(pos.offset(d)).getBlock();
+        Block neighborBlock = mc.world.getBlockState(neighbour).getBlock();
 
-        BlockHitResult blockHitResult = new BlockHitResult(hitPos, d.getOpposite(), airPlace || dOld == null ? pos : pos.offset(d), false);
+        BlockHitResult blockHitResult = new BlockHitResult(hitPos, d.getOpposite(), neighbour, false);
 
         ActionResult result = ActionResult.FAIL;
         if (rotate) {
@@ -265,7 +268,7 @@ public class BlockUtils {
     }
 
     private static ActionResult interactBlock(BlockHitResult blockHitResult,Block block, Hand hand){
-        if (!isClickable(block)) {
+        if (isClickable(block)) {
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
         }
 
@@ -276,7 +279,7 @@ public class BlockUtils {
             mc.player.swingHand(hand);
         }
 
-        if (!isClickable(block))
+        if (isClickable(block))
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
 
         return result;

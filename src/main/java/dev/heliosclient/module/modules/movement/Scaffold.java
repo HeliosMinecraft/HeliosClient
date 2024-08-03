@@ -57,13 +57,21 @@ public class Scaffold extends Module_ {
             .shouldRender(() -> towerMode.getOption() != TowerMode.None)
             .build()
     );
-    /* Place */
     BooleanSetting whileMoving = sgGeneral.add(new BooleanSetting.Builder()
             .name("Tower While Moving")
             .description("Will only tower if you are moving in x,z axis")
             .onSettingChange(this)
             .defaultValue(false)
             .shouldRender(() -> towerMode.getOption() != TowerMode.None)
+            .build()
+    );
+
+    /* Place */
+    BooleanSetting onEdge = sgGeneral.add(new BooleanSetting.Builder()
+            .name("On Edge")
+            .description("Will only place when you are on edge near a block")
+            .onSettingChange(this)
+            .defaultValue(false)
             .build()
     );
     DoubleSetting extendRange = sgPlace.add(new DoubleSetting.Builder()
@@ -191,6 +199,8 @@ public class Scaffold extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
+        if(onEdge.value && PlayerUtils.isPlayerAtEdge())return;
+
         if (blocks.getSelectedEntries().isEmpty()) return;
 
         Vec3d nextPos = mc.player.getPos().add(mc.player.getVelocity());
@@ -202,7 +212,7 @@ public class Scaffold extends Module_ {
             nextPos = nextPos.subtract(0, 1, 0);
         }
 
-        blockPos.set(BlockUtils.toBlockPos(nextPos));
+        blockPos.set(nextPos.x,nextPos.y,nextPos.z);
 
         if (blockPos.getY() >= mc.player.getBlockPos().getY()) {
             blockPos.setY(mc.player.getBlockPos().getY() - 1);
@@ -210,14 +220,12 @@ public class Scaffold extends Module_ {
 
         BlockPos immutable = blockPos.toImmutable();
 
-
         placeFromCenter(immutable);
 
 
         if (towerMode.getOption() != TowerMode.None && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed()) {
             //Only tower if there is air above.
-            BlockState state = mc.world.getBlockState(mc.player.getBlockPos().up(2));
-            if (state.isAir()) {
+            if (!mc.world.getBlockCollisions(mc.player,mc.player.getBoundingBox().stretch(0,0.4f,0)).iterator().hasNext()) {
                 if (whileMoving.value || !PlayerUtils.isMoving(mc.player)) {
                     mc.player.setVelocity(mc.player.getVelocity().x, towerSpeed.value, mc.player.getVelocity().z);
                 }
@@ -261,9 +269,9 @@ public class Scaffold extends Module_ {
             }
 
             // Normalize the direction vector to prevent faster movement when moving diagonally
-            direction = direction.normalize();
+           if(direction != Vec3d.ZERO) direction = direction.normalize();
 
-            for (int i = 1; i <= extendRange.value; i++) {
+           for (int i = 1; i <= extendRange.value; i++) {
                 BlockPos pos = center.add((int) (direction.x * i), 0, (int) (direction.z * i));
 
                 // Check if the block can be placed at the position

@@ -8,10 +8,7 @@ import dev.heliosclient.event.events.player.PostMovementUpdatePlayerEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.modules.movement.AutoSneak;
-import dev.heliosclient.module.modules.movement.NoSlow;
-import dev.heliosclient.module.modules.movement.Scaffold;
-import dev.heliosclient.module.modules.movement.Velocity;
+import dev.heliosclient.module.modules.movement.*;
 import dev.heliosclient.module.modules.render.Freecam;
 import dev.heliosclient.module.modules.world.BetterPortals;
 import net.minecraft.client.MinecraftClient;
@@ -61,9 +58,13 @@ public abstract class ClientPlayerEntityMixin {
     private void onIsSneaking(CallbackInfoReturnable<Boolean> info) {
         if (ModuleManager.get(Scaffold.class).isActive() && ModuleManager.get(Scaffold.class).down.value) info.setReturnValue(false);
 
-        if (ModuleManager.get(AutoSneak.class).isActive()) info.setReturnValue(true);
+        if (ModuleManager.get(AutoSneak.class).isActive() && ModuleManager.get(AutoSneak.class).packet.value) info.setReturnValue(true);
     }
 
+    @ModifyExpressionValue(method = "sendMovementPackets", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isSneaking()Z"))
+    private boolean isSneaking(boolean sneaking) {
+        return (ModuleManager.get(SafeWalk.class).isActive() && ModuleManager.get(SafeWalk.class).packet.value) || sneaking;
+    }
 
     @Inject(method = "init", at = @At(value = "TAIL"))
     public void onInit(CallbackInfo ci) {

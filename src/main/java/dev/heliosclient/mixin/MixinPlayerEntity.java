@@ -108,6 +108,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
     @Inject(method = "clipAtLedge", at = @At("HEAD"), cancellable = true)
     protected void clipAtLedge(CallbackInfoReturnable<Boolean> info) {
         ClipAtLedgeEvent event = new ClipAtLedgeEvent();
+
         EventManager.postEvent(event);
         if (event.isCanceled()) info.setReturnValue(event.isCanceled());
     }

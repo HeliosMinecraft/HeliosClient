@@ -26,6 +26,21 @@ public class PlayerUtils {
         Box entityBox = entity.getBoundingBox();
         return mc.player.getWorld().raycast(new RaycastContext(playerEyePos, entityBox.getCenter(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
     }
+    public static boolean isPlayerAtEdge() {
+        Vec3d playerPos = mc.player.getPos();
+        BlockPos blockPos = mc.player.getBlockPos();
+
+        // Get the player's position within the block
+        double offsetX = playerPos.x - blockPos.getX();
+        double offsetZ = playerPos.z - blockPos.getZ();
+
+        // Check if the player is near the edge of the block
+        double edgeThreshold = 0.1; // Adjust this value as needed
+        boolean nearEdgeX = offsetX < edgeThreshold || offsetX > (1 - edgeThreshold);
+        boolean nearEdgeZ = offsetZ < edgeThreshold || offsetZ > (1 - edgeThreshold);
+
+        return nearEdgeX || nearEdgeZ;
+    }
 
     public static boolean canSeeEntityMC(PlayerEntity player, Entity entity) {
         return player.canSee(entity);

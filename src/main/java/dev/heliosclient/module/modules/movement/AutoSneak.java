@@ -18,6 +18,13 @@ public class AutoSneak extends Module_ {
             .value(false)
             .build()
     );
+    public BooleanSetting packet = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Packet")
+            .description("Packet mode for sneaking instead of regular vanilla")
+            .onSettingChange(this)
+            .value(false)
+            .build()
+    );
 
     public AutoSneak() {
         super("AutoSneak", "Sneaks automatically while on", Categories.MOVEMENT);
@@ -37,6 +44,9 @@ public class AutoSneak extends Module_ {
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
         if (!inWater.value && (mc.player.isTouchingWater() || mc.player.isSubmergedInWater())) return;
+
+        if(packet.value) return;
+
         mc.options.sneakKey.setPressed(true);
     }
 }
