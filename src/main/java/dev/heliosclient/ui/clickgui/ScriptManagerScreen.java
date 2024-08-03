@@ -1,8 +1,11 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.module.settings.buttonsetting.Button;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
+import dev.heliosclient.ui.clickgui.gui.tables.Table;
+import dev.heliosclient.ui.clickgui.gui.tables.TableEntry;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeyboardUtils;
@@ -17,6 +20,7 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
+import java.util.List;
 
 public class ScriptManagerScreen extends Screen {
     public static ScriptManagerScreen INSTANCE = new ScriptManagerScreen();
@@ -31,10 +35,13 @@ public class ScriptManagerScreen extends Screen {
     public NavBar navBar = new NavBar();
     String heading = "Script Manager";
     Color darkerGray = Color.DARK_GRAY.darker().darker();
-    private int numRows = 4; // Number of rows (adjust as needed)
-    private int numColumns = 4; // Number of columns (adjust as needed)
+    //private int numRows = 4; // Number of rows (adjust as needed)
+  //  private int numColumns = 4; // Number of columns (adjust as needed)
     private int scrollOffset = 0, maxScroll;
-    private int entryWidth, entryHeight;
+    //private int entryWidth, entryHeight;
+
+    private Table scriptTable = new Table();
+
 
     protected ScriptManagerScreen() {
         super(Text.of("ScriptSelector"));
@@ -75,7 +82,7 @@ public class ScriptManagerScreen extends Screen {
         //Renderer2D.stopScaling(drawContext.getMatrices());
     }
 
-    public static boolean isMouseOver(double mouseX, double mouseY, float x, float y, float width, float height) {
+    public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, double width, double height) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
@@ -89,16 +96,13 @@ public class ScriptManagerScreen extends Screen {
     @Override
     public void onDisplayed() {
         super.onDisplayed();
-    }
-
-    @Override
-    public void resize(MinecraftClient client, int width, int height) {
-        super.resize(client, width, height);
+        addTableEntries();
     }
 
     @Override
     protected void init() {
         super.init();
+        addTableEntries();
         calculateTable();
         scrollOffset = Math.min(scrollOffset, maxScroll);
     }
@@ -159,30 +163,29 @@ public class ScriptManagerScreen extends Screen {
     public void drawLocalScriptEntries(DrawContext context, int mouseX, int mouseY) {
         // Enable scissor for scrolling
         float startEntryX = startX + (managerWidth * 0.20f) - 2;
-        int spacing = 10;
 
         Renderer2D.enableScissor((int) (startEntryX), 50, managerWidth + 50, managerHeight - 20);
 
         // Render script entries
-        for (int i = 0; i < LuaScriptManager.luaFiles.size(); i++) {
-            int row = i / numColumns;
-            int col = i % numColumns;
-            int entryX = (int) (startEntryX + col * entryWidth + spacing);
-            int entryY = (55 + (row * entryHeight) + spacing) - scrollOffset;
-
-            drawScript(context, entryX, entryY, mouseX, mouseY, LuaScriptManager.luaFiles.get(i));
+        for(List<TableEntry> row: scriptTable.table){
+            for (TableEntry entry : row) {
+                if (entry instanceof ScriptEntry scriptEntry) {
+                    drawScript(context, (float) scriptEntry.getX(),  (float) scriptEntry.getY(), mouseX, mouseY, scriptEntry.getLuaFile());
+                }
+            }
         }
+
         Renderer2D.disableScissor();
 
         // Draw scrollbar
         int scrollbarX = startX + managerWidth + 5;
         int scrollbarY = 50;
-        float scrollbarHeight = maxScroll > 0 ? (int) (Math.pow(entryHeight, 2) * 2 / maxScroll) : 0;
+        float scrollbarHeight = maxScroll > 0 ? (int) (Math.pow(70 + 10, 2) * 2 / maxScroll) : 0;
         float scrollbarPosition = maxScroll > 0 ? scrollbarY + (scaledHeight - 100 - scrollbarHeight) * scrollOffset / maxScroll : scrollbarY; // Position of the scrollbar depends on the current scroll offset
         Renderer2D.drawRectangleWithShadow(context.getMatrices(), scrollbarX, scrollbarPosition, 1.5f, scrollbarHeight, Color.BLACK.brighter().brighter().getRGB(), 2);
     }
 
-    public void drawScript(DrawContext drawContext, int x, int y, int mouseX, int mouseY, LuaFile file) {
+    public void drawScript(DrawContext drawContext, float x, float y, int mouseX, int mouseY, LuaFile file) {
         //Icon
         Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x, y, 60, 70, 4, 4, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary().darker().darker().darker(), 169).getRGB());
         Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, 60, 70, 4, 0.7f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientStart());
@@ -217,27 +220,21 @@ public class ScriptManagerScreen extends Screen {
         }
     }
 
+    private void addTableEntries(){
+        scaledWidth = mc.getWindow().getScaledWidth();
+        scaledHeight = mc.getWindow().getScaledHeight();
+        managerWidth = scaledWidth - 200;
+        managerHeight = scaledHeight - 80;
+
+        scriptTable = new Table();
+        for (LuaFile luaFile: LuaScriptManager.luaFiles) {
+            scriptTable.addEntry(new ScriptEntry(luaFile),managerWidth * 0.88 - 15);
+        }
+    }
+
     public void calculateTable() {
-        //Dimension of the script drawn with 10 pixel padding
-        entryHeight = 70 + 10;
-        entryWidth = 60 + 10;
-
-        numColumns = (managerWidth - startX + 15) / entryWidth;
-
-        if (numColumns <= 0) {
-            numColumns = 2;
-        }
-
-        //Since we have the num of columns, we can get the num of rows
-        numRows = LuaScriptManager.luaFiles.size() / numColumns;
-
-        if (numRows == 0) {
-            numRows = 2;
-        }
-
-        // Calculate the maximum scroll offset based on the number of scripts and the size of the entries
-        // Don't scroll if the luaFiles size is 1 or less
-        maxScroll = LuaScriptManager.luaFiles.size() > 1 ? Math.max(0, (numRows * entryHeight) + 10) : 0;
+        float startEntryX = startX + (managerWidth * 0.20f) + 10;
+        maxScroll = (int) Math.ceil(scriptTable.adjustTableLayout(startEntryX, 65,managerWidth * 0.8 - 15,false));
     }
 
     public boolean hoveredOverRefreshAll(double mouseX, double mouseY) {
@@ -252,19 +249,19 @@ public class ScriptManagerScreen extends Screen {
         return isMouseOver(mouseX, mouseY, startX + 12, 100, managerWidth * 0.18f - 15, 20);
     }
 
-    public boolean hoveredOverFileState(double mouseX, double mouseY, int entryX, int entryY) {
+    public boolean hoveredOverFileState(double mouseX, double mouseY, double entryX, double entryY) {
         return isMouseOver(mouseX, mouseY, entryX + 26, entryY + 60, 16, 8);
     }
 
-    public boolean hoveredOverRefreshFile(double mouseX, double mouseY, int entryX, int entryY) {
+    public boolean hoveredOverRefreshFile(double mouseX, double mouseY, double entryX, double entryY) {
         return isMouseOver(mouseX, mouseY, entryX + 45f, entryY + 59.5f, 4 + FontRenderers.Small_iconRenderer.getStringWidth("\uEA75"), 8);
     }
 
-    public boolean hoveredOverEditFile(double mouseX, double mouseY, int entryX, int entryY) {
+    public boolean hoveredOverEditFile(double mouseX, double mouseY, double entryX, double entryY) {
         return isMouseOver(mouseX, mouseY, entryX + 46f, entryY + 3f, 4 + FontRenderers.Small_iconRenderer.getStringWidth("\uEAF3"), 8);
     }
 
-    public boolean hoveredOverBind(double mouseX, double mouseY, LuaFile file, int entryX, int entryY) {
+    public boolean hoveredOverBind(double mouseX, double mouseY, LuaFile file, double entryX, double entryY) {
         String bindKeyName = KeyboardUtils.translateShort(file.bindKey).toUpperCase();
         return isMouseOver(mouseX, mouseY, entryX + 5f, entryY + 60f, FontRenderers.Small_fxfontRenderer.getStringWidth(bindKeyName) + 3, 7.4f);
     }
@@ -278,32 +275,30 @@ public class ScriptManagerScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         navBar.mouseClicked((int) mouseX, (int) mouseY, button);
-        float startEntryX = startX + (managerWidth * 0.20f) - 2;
-        int spacing = 10;
         // Check mouse clicked on any of the entries
-        for (int i = 0; i < LuaScriptManager.luaFiles.size(); i++) {
-            int row = i / numColumns;
-            int col = i % numColumns;
-            int entryX = (int) (startEntryX + col * entryWidth + spacing);
-            int entryY = (55 + (row * entryHeight) + spacing) - scrollOffset;
-            LuaFile file = LuaScriptManager.luaFiles.get(i);
-            if (hoveredOverFileState(mouseX, mouseY, entryX, entryY)) {
-                SoundUtils.playInstanceSound(SoundUtils.CLICK_SOUNDEVENT);
-                if (file.isLoaded()) {
-                    LuaScriptManager.INSTANCE.closeScript(file);
-                } else {
-                    LuaScriptManager.INSTANCE.loadScript(file);
+        for(List<TableEntry> row: scriptTable.table){
+            for (TableEntry entry : row) {
+                if (entry instanceof ScriptEntry scriptEntry) {
+                    LuaFile file = scriptEntry.getLuaFile();
+                    if (hoveredOverFileState(mouseX, mouseY, scriptEntry.getX(), scriptEntry.getY())) {
+                        SoundUtils.playInstanceSound(SoundUtils.CLICK_SOUNDEVENT);
+                        if (file.isLoaded()) {
+                            LuaScriptManager.INSTANCE.closeScript(file);
+                        } else {
+                            LuaScriptManager.INSTANCE.loadScript(file);
+                        }
+                    }
+                    if (hoveredOverRefreshFile(mouseX, mouseY, scriptEntry.getX(), scriptEntry.getY())) {
+                        LuaScriptManager.reloadScript(file);
+                    }
+                    if (hoveredOverBind(mouseX, mouseY, file, scriptEntry.getX(), scriptEntry.getY())) {
+                        file.setListening(true);
+                        isListening = true;
+                    }
+                    if (hoveredOverEditFile(mouseX, mouseY, scriptEntry.getX(), scriptEntry.getY())) {
+                        //Todo
+                    }
                 }
-            }
-            if (hoveredOverRefreshFile(mouseX, mouseY, entryX, entryY)) {
-                LuaScriptManager.reloadScript(file);
-            }
-            if (hoveredOverBind(mouseX, mouseY, file, entryX, entryY)) {
-                file.setListening(true);
-                isListening = true;
-            }
-            if (hoveredOverEditFile(mouseX, mouseY, entryX, entryY)) {
-                //Todo
             }
         }
         if (hoveredOverLocalScripts(mouseX, mouseY)) {
@@ -316,6 +311,7 @@ public class ScriptManagerScreen extends Screen {
         }
         if (hoveredOverRefreshAll(mouseX, mouseY)) {
             LuaScriptManager.getScripts();
+            addTableEntries();
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -353,4 +349,48 @@ public class ScriptManagerScreen extends Screen {
 
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
+
+    public class ScriptEntry implements TableEntry {
+        private final LuaFile luaFile;
+        private double x;
+        private double y;
+
+        public ScriptEntry(LuaFile luaFile) {
+            this.luaFile = luaFile;
+        }
+
+        public LuaFile getLuaFile() {
+            return luaFile;
+        }
+
+        @Override
+        public double getWidth() {
+            return 60 + 10;
+        }
+
+        @Override
+        public double getHeight() {
+            return 70 + 10;
+        }
+
+        @Override
+        public void setPosition(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public void setWidth(double width) {
+
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public double getY() {
+            return y - ScriptManagerScreen.this.scrollOffset;
+        }
+    }
+
 }

@@ -38,11 +38,6 @@ public class DoubleSetting extends Setting<Double> {
         inputBox = new InputBox(String.valueOf(max).length() * 6, 11, String.valueOf(value), 10, InputBox.InputMode.DIGITS);
     }
 
-    private void onSettingChange() {
-        if (this.iSettingChange != null)
-            iSettingChange.onSettingChange(this);
-    }
-
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
@@ -58,7 +53,7 @@ public class DoubleSetting extends Setting<Double> {
             } else {
                 value = MathUtils.round(((diff / 100) * (max - min) + min), roundingPlace);
             }
-            onSettingChange();
+            postSettingChange();
         }
 
         value = MathHelper.clamp(value, min, max);
@@ -105,7 +100,7 @@ public class DoubleSetting extends Setting<Double> {
             } else {
                 value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
             }
-            onSettingChange();
+            postSettingChange();
         }
         value = MathHelper.clamp(value, min, max);
 
@@ -138,7 +133,7 @@ public class DoubleSetting extends Setting<Double> {
         super.mouseClicked(mouseX, mouseY, button);
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             value = defaultValue;
-            onSettingChange();
+            postSettingChange();
         }
         if (hovered((int) mouseX, (int) mouseY) && button == 0 && !inputBox.isFocused() && !inputBox.isFocusedHover(mouseX, mouseY)) {
             this.sliding = true;
@@ -151,7 +146,12 @@ public class DoubleSetting extends Setting<Double> {
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
         sliding = false;
-        onSettingChange();
+        postSettingChange();
+    }
+
+    @Override
+    public Double get() {
+        return this.value;
     }
 
     @Override
@@ -166,7 +166,7 @@ public class DoubleSetting extends Setting<Double> {
         } else {
             value = (double) MAP.get(getSaveName());
         }
-        onSettingChange();
+        postSettingChange();
     }
 
     @Override
@@ -204,7 +204,7 @@ public class DoubleSetting extends Setting<Double> {
                 }
                 value = newVal;
                 inputBox.setValue(String.valueOf(value));
-                onSettingChange();
+                postSettingChange();
             } catch (NumberFormatException ignored) {
             }
         }

@@ -1,5 +1,6 @@
 package dev.heliosclient.util.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.ColorUtils;
@@ -234,9 +235,6 @@ public class Renderer3D {
 
         MatrixStack matrices = matrixFrom(start.x, start.y, start.z);
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
         // Line
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
@@ -246,9 +244,11 @@ public class Renderer3D {
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
         GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
 
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+        BufferBuilder buffer = Renderer2D.setupAndBegin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+
         Vertexer.vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (end.x - start.x), (float) (end.y - start.y), (float) (end.z - start.z), color);
-        tessellator.draw();
+
+        Renderer2D.draw();
 
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
         GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_FASTEST);
@@ -532,6 +532,7 @@ public class Renderer3D {
 
     public static void setup() {
         RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         RenderSystem.enableDepthTest();
         RenderSystem.depthFunc(renderThroughWalls ? GL11.GL_ALWAYS : GL11.GL_LEQUAL);

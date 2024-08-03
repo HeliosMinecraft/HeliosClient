@@ -1223,14 +1223,14 @@ public class Renderer2D implements Listener {
         RenderSystem.defaultBlendFunc();
     }
 
-    private static BufferBuilder setupAndBegin(VertexFormat.DrawMode m, VertexFormat vf) {
+    public static BufferBuilder setupAndBegin(VertexFormat.DrawMode m, VertexFormat vf) {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(m,vf);
 
         return bufferBuilder;
     }
 
-    private static void draw() {
+    static void draw() {
         draw(Tessellator.getInstance().getBuffer());
     }
 

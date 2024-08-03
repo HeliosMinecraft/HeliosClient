@@ -169,6 +169,7 @@ public class HeliosClient implements ModInitializer, Listener {
             if (DiscordRPC.INSTANCE.isRunning) {
                 DiscordRPC.INSTANCE.stopPresence();
             }
+            CapeManager.capeTextureManager.stopCapeAnimation();
         });
         //Saving is also handled in MixinCrashReport and ClickGUI.java
 

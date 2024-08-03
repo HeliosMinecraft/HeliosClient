@@ -1,7 +1,10 @@
 package dev.heliosclient.managers;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.awt.Color;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -15,9 +18,21 @@ public class GradientManager {
     public static Gradient getGradient(String name) {
         return gradients.get(name);
     }
+
     public static Set<String> getAllGradientsNames(){
         return gradients.keySet();
     }
+
+    @Nullable
+    public static String getKeyForGradient(Gradient gradient) {
+        for (Map.Entry<String, Gradient> entry : gradients.entrySet()) {
+            if (entry.getValue().equals(gradient)) {
+                return entry.getKey();
+            }
+        }
+        return null; // Return null if the gradient is not found
+    }
+
 
     public static class Gradient {
         private final Supplier<Color> startGradient;

@@ -5,10 +5,7 @@ import dev.heliosclient.managers.GradientManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.CycleSetting;
-import dev.heliosclient.module.settings.RGBASetting;
-import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 
@@ -35,6 +32,15 @@ public class GUI extends Module_ {
             .shouldRender(() -> ColorMode.value == 0)
             .build()
     );
+    public GradientSetting gradientType = sgColors.add(new GradientSetting.Builder()
+            .name("Gradient")
+            .description("Choose a gradient from the following.")
+            .onSettingChange(this)
+            .defaultValue("Rainbow")
+            .shouldRender(() -> ColorMode.value == 1)
+            .build()
+    );
+    /*
     public CycleSetting GradientType = sgColors.add(new CycleSetting.Builder()
             .name("Gradient Type")
             .description("Gradient type for the gradient color mode")
@@ -44,13 +50,15 @@ public class GUI extends Module_ {
             .shouldRender(() -> ColorMode.value == 1)
             .build()
     );
+
+     */
     public RGBASetting linear2Start = sgColors.add(new RGBASetting.Builder()
             .name("Linear-Start")
             .description("Linear Color Start of Linear mode")
             .onSettingChange(this)
             .value(Color.GREEN)
             .defaultValue(Color.GREEN)
-            .shouldRender(() -> GradientType.value == 4 && ColorMode.value == 1)
+            .shouldRender(() -> gradientType.isLinear2D() && ColorMode.value == 1)
             .build()
     );
     public RGBASetting linear2end = sgColors.add(new RGBASetting.Builder()
@@ -58,7 +66,7 @@ public class GUI extends Module_ {
             .description("Linear Color End of Linear mode")
             .onSettingChange(this)
             .value(Color.YELLOW)
-            .shouldRender(() -> GradientType.value == 4 && ColorMode.value == 1)
+            .shouldRender(() -> gradientType.isLinear2D() && ColorMode.value == 1)
             .defaultValue(Color.YELLOW)
             .build()
     );
@@ -109,10 +117,6 @@ public class GUI extends Module_ {
         super("GUI", "The HeliosClient GUI settings.", Categories.RENDER);
         active.value = true;
 
-        GradientType.alsoRender(renderContext -> {
-            Renderer2D.drawRoundedGradientRectangle(renderContext.drawContext().getMatrices().peek().getPositionMatrix(), ColorManager.INSTANCE.primaryGradientStart, ColorManager.INSTANCE.primaryGradientEnd, ColorManager.INSTANCE.primaryGradientEnd, ColorManager.INSTANCE.primaryGradientStart, renderContext.x() + 170, renderContext.y() + 2, 20, 15, 2);
-        });
-
         addSettingGroup(sgColors);
         addQuickSettings(sgColors.getSettings());
 
@@ -127,8 +131,5 @@ public class GUI extends Module_ {
         showInModulesList.value = false;
 
         ColorManager.INSTANCE.onTick(null);
-
-        GradientType.options = GradientManager.getAllGradientsNames().stream().toList();
-
     }
 }

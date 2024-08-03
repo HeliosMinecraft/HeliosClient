@@ -25,6 +25,7 @@ import net.minecraft.world.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
@@ -41,7 +42,7 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
             if (!CapeModule.forEveryone() && abstractClientPlayerEntity != HeliosClient.MC.player)
                 return;
 
-            Identifier capeTexture = CapeManager.CURRENT_PLAYER_CAPE;
+            Identifier capeTexture = CapeManager.getCurrentCapeTexture();
             ItemStack itemStack = abstractClientPlayerEntity.getEquippedStack(EquipmentSlot.CHEST);
 
             if (capeTexture == null) {
@@ -100,6 +101,11 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
             }
         }
         ci.cancel();
+    }
+
+    @Redirect(method = "render*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;getEntitySolid(Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/render/RenderLayer;"))
+    private RenderLayer fixCapeTransparency(Identifier texture) {
+        return RenderLayer.getArmorCutoutNoCull(texture);
     }
 }
 

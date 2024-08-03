@@ -24,7 +24,7 @@ public abstract class AbstractClientPlayerEntityMixin {
     private static @NotNull SkinTextures getModifiedSkinTexture(SkinTextures original) {
         Identifier elytraTexture = original.elytraTexture();
         if (ModuleManager.get(CapeModule.class).elytra.value) {
-            elytraTexture = CapeManager.CURRENT_PLAYER_CAPE;
+            elytraTexture = CapeManager.getCurrentElytraTexture();
         }
 
         if (elytraTexture == null) {
@@ -32,7 +32,7 @@ public abstract class AbstractClientPlayerEntityMixin {
         }
 
         //Modify the skin texture
-        return new SkinTextures(original.texture(), original.textureUrl(), CapeManager.CURRENT_PLAYER_CAPE == null? original.capeTexture() : CapeManager.CURRENT_PLAYER_CAPE, elytraTexture, original.model(), original.secure());
+        return new SkinTextures(original.texture(), original.textureUrl(), CapeManager.getCurrentCapeTexture() == null ? original.capeTexture() : CapeManager.getCurrentCapeTexture(), elytraTexture, original.model(), original.secure());
     }
 
     @Inject(method = "getSkinTextures", at = @At("RETURN"), cancellable = true)
@@ -46,7 +46,7 @@ public abstract class AbstractClientPlayerEntityMixin {
                 return;
             }
 
-            if (CapeManager.CURRENT_PLAYER_CAPE != null && ModuleManager.get(CapeModule.class).isActive()) {
+            if (CapeManager.getCurrentCapeTexture() != null && ModuleManager.get(CapeModule.class).isActive()) {
                 //Set elytraTexture if elytra-setting is enabled
                 SkinTextures modified = getModifiedSkinTexture(original);
                 cir.setReturnValue(modified);

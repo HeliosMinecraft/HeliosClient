@@ -16,6 +16,7 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
@@ -258,6 +259,11 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     public void charTyped(char chr, int modifiers) {
     }
 
+    protected void postSettingChange(){
+        if(this.iSettingChange != null){
+            this.iSettingChange.onSettingChange(this);
+        }
+    }
     /**
      * Returns the value
      *

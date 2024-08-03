@@ -168,6 +168,10 @@ public class Window implements Listener {
         return y;
     }
 
+    public int getContentY() {
+        return y + 30 + (wrappedText.size() * (HeliosClient.MC.textRenderer.fontHeight + 3));
+    }
+
     public void setY(int y) {
         this.y = y;
     }

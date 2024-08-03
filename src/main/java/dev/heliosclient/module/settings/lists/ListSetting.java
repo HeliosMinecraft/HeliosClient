@@ -158,12 +158,6 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
         }
     }
 
-    protected void postSettingChange() {
-        if (iSettingChange != null) {
-            iSettingChange.onSettingChange(this);
-        }
-    }
-
     public void setMaxSelectable(int maxSelectable) {
         this.maxSelectable = maxSelectable;
     }

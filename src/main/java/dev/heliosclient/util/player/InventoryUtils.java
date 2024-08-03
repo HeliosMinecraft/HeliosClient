@@ -219,6 +219,8 @@ public class InventoryUtils {
         ArrayList<Option<Item>> options = new ArrayList<>();
         for (Item item : Registries.ITEM) {
             String itemName = Text.translatable(item.getTranslationKey()).getLiteralString();
+            //Why is this a thing?????????
+            //Why did I add this. When did I add this. Do I have dementia? I think I am going to keep this for now.
             options.add(new Option<>(itemName, item, false));
         }
         return options;

@@ -332,7 +332,7 @@ public class Scaffold extends Module_ {
                             pos,
                             true,
                             500,
-                            null
+                            QuadColor.CardinalDirection.DIAGONAL_LEFT
                     );
                 } else {
                     Renderer3d.renderFadingBlock(lineColor.value, fillColor.value, pos.toCenterPos().subtract(0.5f, 0.5f, 0.5f), dimensions, 1000);

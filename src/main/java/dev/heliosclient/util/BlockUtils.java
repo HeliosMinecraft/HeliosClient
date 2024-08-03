@@ -253,7 +253,9 @@ public class BlockUtils {
         if (rotate) {
             RotationUtils.rotate(RotationUtils.getYaw(hitPos), RotationUtils.getPitch(hitPos), clientSideRotation,()-> interactBlock(blockHitResult, neighborBlock, hand));
             //hmm
-            return true;
+            if(clientSideRotation) {
+                return true;
+            }
         }
 
         result = interactBlock(blockHitResult,neighborBlock,hand);

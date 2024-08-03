@@ -4,7 +4,8 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.ui.clickgui.gui.Table;
+import dev.heliosclient.ui.clickgui.gui.tables.Table;
+import dev.heliosclient.ui.clickgui.gui.tables.TableEntry;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -25,25 +26,27 @@ public class ButtonSetting extends Setting<Boolean> {
 
     public void addButton(String buttonText, int rowIndex, int columnIndex, Runnable task) {
         Button button = new Button(buttonText, task, this.x, this.y, this.width, this.height);
-        buttonTable.addButton(rowIndex, columnIndex, button);
+        buttonTable.addEntry(rowIndex, columnIndex, button);
 
         // Adjust the layout after every button has been added
-        this.height = buttonTable.adjustButtonLayout(this.x, this.y, this.width, false) + 5;
+        this.height = (int) buttonTable.adjustTableLayout(this.x, this.y, this.width, false) + 5;
     }
 
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, (float) HeliosClient.MC.getWindow().getScaledWidth() / 2 - (float) textRenderer.getWidth(name) / 2 + 1, y + 2, ColorManager.INSTANCE.defaultTextColor());
-        this.height = buttonTable.adjustButtonLayout(x, Math.round(y + 4 + Renderer2D.getFxStringHeight(name)), this.width, false) + 5;
+        this.height = (int) buttonTable.adjustTableLayout(x, Math.round(y + 4 + Renderer2D.getFxStringHeight(name)), this.width, false) + 5;
 
 
-        for (List<Button> row : buttonTable.table) {
-            for (Button button : row) {
-                if (button != null)
+        for (List<TableEntry> row : buttonTable.table) {
+            for (TableEntry entry : row) {
+                if (entry instanceof Button button) {
                     button.render(drawContext, mouseX, mouseY, textRenderer);
+                }
             }
         }
+
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {
@@ -58,10 +61,12 @@ public class ButtonSetting extends Setting<Boolean> {
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
-        for (List<Button> row : buttonTable.table) {
-            for (Button button1 : row) {
-                if (button1 != null)
+
+        for (List<TableEntry> row : buttonTable.table) {
+            for (TableEntry entry : row) {
+                if (entry instanceof Button button1) {
                     button1.mouseClicked(mouseX, mouseY);
+                }
             }
         }
     }

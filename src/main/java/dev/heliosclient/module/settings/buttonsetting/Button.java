@@ -1,12 +1,13 @@
 package dev.heliosclient.module.settings.buttonsetting;
 
+import dev.heliosclient.ui.clickgui.gui.tables.TableEntry;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 
-public class Button {
+public class Button implements TableEntry {
     private final String text;
     private final Runnable task;
     private int x, y, width, height;
@@ -73,7 +74,7 @@ public class Button {
         this.y = y;
     }
 
-    public int getWidth() {
+    public double getWidth() {
         return width;
     }
 
@@ -81,8 +82,19 @@ public class Button {
         this.width = width;
     }
 
-    public int getHeight() {
+    public double getHeight() {
         return height;
+    }
+
+    @Override
+    public void setPosition(double x, double y) {
+        this.x = (int) x;
+        this.y = (int) y;
+    }
+
+    @Override
+    public void setWidth(double width) {
+        this.width = (int) width;
     }
 
     public void setHeight(int height) {

@@ -7,18 +7,13 @@ import dev.heliosclient.mixin.AccessorWorldRenderer;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.BlockUtils;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.MathUtils;
-import dev.heliosclient.util.animation.AnimationUtils;
-import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.BlockBreakingInfo;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.shape.VoxelShape;
 
 import java.awt.*;
@@ -101,10 +96,9 @@ public class BreakIndicator extends Module_ {
             Box stretchedBox = shrinkBoxExtreme(box).stretch(0,0,breakingProg/10.0);
             Renderer3D.drawBoxBoth(stretchedBox, QuadColor.single(getColor((int)breakingProg)), 1f);
 
-        } else if (IndicateType.values()[type.value] == Shrink) {
+        } else if (IndicateType.values()[type.value] == Contract) {
             Box shrunkBox = box.expand(breakingProg / 20.0 - 1.0);
             Renderer3D.drawBoxBoth(shrunkBox, QuadColor.single(getColor((int)breakingProg)), 1f);
-
         }
     }
 
@@ -123,7 +117,7 @@ public class BreakIndicator extends Module_ {
 
     public enum IndicateType {
         Highlight,
-        Shrink,
+        Contract,
         Stretch
     }
 }

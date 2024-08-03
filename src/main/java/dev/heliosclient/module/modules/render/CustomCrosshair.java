@@ -73,12 +73,11 @@ public class CustomCrosshair extends Module_ {
             .shouldRender(() -> colorMode.value == 0)
             .build()
     );
-    public CycleSetting gradientType = sgGeneral.add(new CycleSetting.Builder()
+    public GradientSetting gradientType = sgGeneral.add(new GradientSetting.Builder()
             .name("Gradient Type")
             .description("Gradient type for the gradient color mode")
             .onSettingChange(this)
-            .value(GradientManager.getAllGradientsNames().stream().toList())
-            .defaultListIndex(1)
+            .defaultValue("Rainbow")
             .shouldRender(() -> colorMode.value == 1)
             .build()
     );
@@ -148,8 +147,8 @@ public class CustomCrosshair extends Module_ {
     }
 
     public void renderInverseTriangleGap(DrawContext dr, int x, int y) {
-        Color startG = colorMode.value == 0 ? staticColor.getColor() : GradientManager.getGradient(gradientType.getOption().toString()).getStartGradient();
-        Color endG = colorMode.value == 0 ? staticColor.getColor() : GradientManager.getGradient(gradientType.getOption().toString()).getStartGradient();
+        Color startG = colorMode.value == 0 ? staticColor.getColor() : gradientType.get().getStartGradient();
+        Color endG = colorMode.value == 0 ? staticColor.getColor() : gradientType.get().getEndGradient();
 
         Matrix4f mc = dr.getMatrices().peek().getPositionMatrix();
         //left
@@ -179,9 +178,8 @@ public class CustomCrosshair extends Module_ {
     }
 
     public void mask(DrawContext dr, Runnable task, int x, int y, int width, int height) {
-        Color startG = colorMode.value == 0 ? staticColor.getColor() : GradientManager.getGradient(gradientType.getOption().toString()).getStartGradient();
-        Color endG = colorMode.value == 0 ? staticColor.getColor() : GradientManager.getGradient(gradientType.getOption().toString()).getStartGradient();
-
+        Color startG = colorMode.value == 0 ? staticColor.getColor() : gradientType.get().getStartGradient();
+        Color endG = colorMode.value == 0 ? staticColor.getColor() : gradientType.get().getEndGradient();
 
         Renderer2D.drawToGradientMask(dr.getMatrices().peek().getPositionMatrix(),
                 startG,

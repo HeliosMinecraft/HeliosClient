@@ -1,20 +1,21 @@
-/*
- * This file is part of the BleachHack distribution (https://github.com/BleachDev/BleachHack/).
- * Copyright (c) 2021 Bleach and contributors.
- *
- * This source code is subject to the terms of the GNU General Public
- * License, version 3. If a copy of the GPL was not distributed with this
- * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
- */
 package dev.heliosclient.util.render.color;
 
+import dev.heliosclient.util.ColorUtils;
+import me.x150.renderer.util.Colors;
 import net.minecraft.util.math.Box;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 public class QuadColor extends RenderColor {
 
     private final Function<Integer, int[]> getColorFunc;
+    private CardinalDirection direction;
+
+    private QuadColor(Function<Integer, int[]> getColorFunc, CardinalDirection direction) {
+        this.getColorFunc = getColorFunc;
+        this.direction = direction;
+    }
 
     private QuadColor(Function<Integer, int[]> getColorFunc) {
         this.getColorFunc = getColorFunc;
@@ -45,33 +46,16 @@ public class QuadColor extends RenderColor {
                 (color2 & 0xff0000) >> 16, (color2 & 0xff00) >> 8, color2 & 0xff, color2 >> 24 & 0xff,
                 direction);
     }
-    public static QuadColor gradient(int color1, int color2) {
-        return QuadColor.gradient(
-                (color1 & 0xff0000) >> 16, (color1 & 0xff00) >> 8, color1 & 0xff, color1 >> 24 & 0xff,
-                (color2 & 0xff0000) >> 16, (color2 & 0xff00) >> 8, color2 & 0xff, color2 >> 24 & 0xff);
-    }
 
     public static QuadColor gradient(int red1, int green1, int blue1, int alpha1, int red2, int green2, int blue2, int alpha2, CardinalDirection direction) {
         return new QuadColor(curVertex -> {
-
             if (direction.isStartVertex(curVertex)) {
                 return new int[]{red1, green1, blue1, alpha1};
             }
 
             return new int[]{red2, green2, blue2, alpha2};
-        });
+        },direction);
     }
-    public static QuadColor gradient(int red1, int green1, int blue1, int alpha1, int red2, int green2, int blue2, int alpha2) {
-        return new QuadColor(curVertex -> {
-            float t = (float) curVertex / 3; // Interpolate between 0 and 1 based on vertex index
-            int red = (int) (red1 * (1 - t) + red2 * t);
-            int green = (int) (green1 * (1 - t) + green2 * t);
-            int blue = (int) (blue1 * (1 - t) + blue2 * t);
-            int alpha = (int) (alpha1 * (1 - t) + alpha2 * t);
-            return new int[]{red, green, blue, alpha};
-        });
-    }
-
 
     public static QuadColor custom(float red1, float green1, float blue1, float alpha1, float red2, float green2, float blue2, float alpha2, float red3, float green3, float blue3, float alpha3, float red4, float green4, float blue4, float alpha4) {
         return QuadColor.custom(
@@ -104,15 +88,52 @@ public class QuadColor extends RenderColor {
         float tZ = (z - (float) box.minZ) / ((float) box.maxZ - (float) box.minZ);
 
         int[] color1 = getColor(0);
-        int[] color2 = getColor(3);
+        int[] color2 = getColor(1);
+        int[] color3 = getColor(2);
+        int[] color4 = getColor(3);
 
-        int red = (int) (color1[0] * (1 - tX) + color2[0] * tX);
-        int green = (int) (color1[1] * (1 - tY) + color2[1] * tY);
-        int blue = (int) (color1[2] * (1 - tZ) + color2[2] * tZ);
-        int alpha = (int) (color1[3] * (1 - tX) + color2[3] * tX);
+        int[] blendedColor = new int[4];
+        float ratio = 0;
 
-        return new int[]{red, green, blue, alpha};
+        if (direction == null) {
+            ratio = tX;
+            blendedColor = ColorUtils.blend(color1, color4, ratio);
+        } else {
+            switch (direction) {
+                case NORTH:
+                    blendedColor = ColorUtils.blend(color1, color3, tY);
+                    break;
+                case EAST:
+                    blendedColor = ColorUtils.blend(color1, color2, tX);
+                    break;
+                case SOUTH:
+                    blendedColor = ColorUtils.blend(color2, color4, tY);
+                    break;
+                case WEST:
+                    blendedColor = ColorUtils.blend(color3, color4, tX);
+                    break;
+                case DIAGONAL_LEFT:
+                    float tDL = (tX + tZ) / 2;
+                    blendedColor = ColorUtils.blend(color1, color4, tDL);
+                    break;
+                case DIAGONAL_RIGHT:
+                    float tDR = (tX + (1 - tZ)) / 2;
+                    blendedColor = ColorUtils.blend(color2, color3, tDR);
+                    break;
+                default:
+                    ratio = tX;
+                    blendedColor = ColorUtils.blend(color1, color4, ratio);
+                    break;
+            }
+        }
+       // System.out.println("tX: " + tX + ", tY: " + tY + ", tZ: " + tZ);
+      //  System.out.println("Blending Ratio: " + ratio);
+       // System.out.println("Blended Color: " + blendedColor[0] + ", " + blendedColor[1] + ", " + blendedColor[2] + ", " + blendedColor[3]);
+
+        return blendedColor;
     }
+
+
 
 
     public int[] getColor(int curVertex) {

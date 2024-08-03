@@ -1,6 +1,8 @@
 package dev.heliosclient.module.modules.misc;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
@@ -77,7 +79,7 @@ public class CapeModule extends Module_ {
 
     public BooleanSetting elytra = sgCape.add(new BooleanSetting.Builder()
             .name("Elytra")
-            .description("Cape Texture for elytra (Bad most of times with improper textures)")
+            .description("Applies cape Texture to elytra. Cape textures without elytra may look weird.")
             .defaultValue(false)
             .onSettingChange(this)
             .shouldSaveAndLoad(true)
@@ -90,8 +92,6 @@ public class CapeModule extends Module_ {
 
     public CapeModule() {
         super("Capes", "Use Custom Capes from `heliosclient/capes` directory", Categories.MISC);
-
-        capes.options = List.of(CapeManager.CAPE_NAMES);
         addSettingGroup(sgCape);
 
 
@@ -123,7 +123,7 @@ public class CapeModule extends Module_ {
                     AnimationUtils.addErrorToast("Failed to fetch cape. Check logs", false, 1000);
                     AnimationUtils.addErrorToast("Reason: " + e.getMessage().trim(), false, 1000);
                 } else {
-                    ChatUtils.sendHeliosMsg("Failed to fetch CURRENT_PLAYER_CAPE. Check logs");
+                    ChatUtils.sendHeliosMsg("Failed to fetch cape. Check logs");
                     ChatUtils.sendHeliosMsg("Reason: " + e.getMessage().trim());
                 }
             }
@@ -131,6 +131,8 @@ public class CapeModule extends Module_ {
 
 
         loadCapes.addButton("Reload Capes", 0, 1, CapeManager::loadCapes);
+
+        setCapes();
     }
 
     public static boolean forEveryone() {
@@ -148,34 +150,33 @@ public class CapeModule extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-        setCape();
+        if(mc.player != null && capes.getOption() != null) {
+            CapeManager.capeTextureManager.assignCapeToPlayer(mc.player.getUuid(), capes.getOption().toString().toLowerCase());
+        }
+        setCapes();
     }
 
     @Override
     public void onSettingChange(Setting<?> setting) {
         super.onSettingChange(setting);
 
-        setCape();
+        if(setting == capes && mc.player != null && capes.getOption() != null){
+            CapeManager.capeTextureManager.assignCapeToPlayer(mc.player.getUuid(),capes.getOption().toString().toLowerCase());
+        }
+        setCapes();
     }
 
-    public void setCape() {
-        if (CapeManager.capeIdentifiers.isEmpty() || capes.value == -1){
-            CapeManager.CURRENT_PLAYER_CAPE = null;
-            return;
-        }
-
+    public void setCapes() {
         capes.options = List.of(CapeManager.CAPE_NAMES);
-
-        if (capes.value < CapeManager.capeIdentifiers.size()) {
-            CapeManager.CURRENT_PLAYER_CAPE = CapeManager.capeIdentifiers.get(capes.value);
-        }
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
-        if (capes.value < CapeManager.capeIdentifiers.size()) {
-            CapeManager.CURRENT_PLAYER_CAPE = CapeManager.capeIdentifiers.get(capes.value);
+
+        setCapes();
+        if(mc.player != null && capes.getOption() != null) {
+            CapeManager.capeTextureManager.assignCapeToPlayer(mc.player.getUuid(), capes.getOption().toString().toLowerCase());
         }
     }
 }

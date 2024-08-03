@@ -5,6 +5,7 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.render.Render3DEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.managers.GradientManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
@@ -54,6 +55,13 @@ public class Test extends Module_ {
             .filter(item -> true)
             .build()
     );
+    GradientSetting gradientSetting = sgGeneral.add(new GradientSetting.Builder()
+            .name("gradientSetting")
+            .description("gradientSetting2")
+            .defaultValue(GradientManager.getGradient("Rainbow"))
+            .onSettingChange(this)
+            .build()
+    );
 
 
     public Test() {
@@ -73,13 +81,14 @@ public class Test extends Module_ {
                 new BlockPos(100,70,100),
                 true,
                 1020300,
-                null
+                QuadColor.CardinalDirection.NORTH
         );
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
+        GradientBlockRenderer.clearGradientBlocks();
     }
 
     @SubscribeEvent

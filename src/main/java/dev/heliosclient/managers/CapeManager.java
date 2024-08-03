@@ -9,13 +9,12 @@ import dev.heliosclient.module.modules.misc.CapeModule;
 import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.cape.CapeTextureManager;
 import dev.heliosclient.util.cape.ProfileUtils;
 import dev.heliosclient.util.fontutils.FontLoader;
-import net.fabricmc.loader.api.FabricLoader;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import org.apache.http.client.HttpResponseException;
@@ -39,25 +38,16 @@ public class CapeManager {
     private static final String DEFAULT_CAPE = "helioscape.png";
     //The default cape texture of heliosclient.
     public static final Identifier DEFAULT_CAPE_TEXTURE = new Identifier("heliosclient", "capes/" + DEFAULT_CAPE);
-    //All the capes which are registered in the dynamic texture manager
-    private static final Set<String> registeredTextures = new HashSet<>();
-    //A map of all cape textures keyed with the UUID
-    private static final Map<UUID, Identifier> CAPES = new HashMap<>();
 
-    //These maps are supposed to be used when we need to check for heliosclient users to apply capes to them
-    // (this will be moved to somewhere else probably)
-    //A map of all elytra textures keyed with the UUID
-    private static final Map<UUID, Identifier> ELYTRAS = new HashMap<>();
     public static CapeManager INSTANCE = new CapeManager();
-    //A string of the names of the CURRENT_PLAYER_CAPE. Used in CapeModule
+
+    //A string of the names of the capes. Used in CapeModule
     public static String[] CAPE_NAMES = new String[]{};
 
-    //Current cape texture we are applying to the player
-    public static Identifier CURRENT_PLAYER_CAPE;
-
     //List of all capes and elytra textures.
-    public static List<Identifier> capeIdentifiers = new ArrayList<>();
-    public static List<Identifier> elytraIdentifiers = new ArrayList<>();
+    public static final CapeTextureManager capeTextureManager = new CapeTextureManager();
+
+
 
     /**
      * Works similar to {@link FontLoader#loadFonts()}
@@ -89,7 +79,7 @@ public class CapeManager {
             }
 
             // Get the cape files from `heliosclient/capes` directory in an array
-            File[] capeFiles = CAPE_DIRECTORY.listFiles((dir, name) -> name.toLowerCase().endsWith(".png"));
+            File[] capeFiles = CAPE_DIRECTORY.listFiles((dir, name) -> name.toLowerCase().endsWith(".png") || name.toLowerCase().endsWith(".gif"));
 
             if (capeFiles == null) {
                 HeliosClient.LOGGER.info("No cape files found");
@@ -104,7 +94,8 @@ public class CapeManager {
                     String capeName = fileName.substring(0, fileName.lastIndexOf('.'));
                     capeNames.add(capeName);
 
-                    loadCapeTexture(inputStream, fileName, file);
+                    capeTextureManager.registerCapeTextures(inputStream, file, capeName.toLowerCase());
+                    HeliosClient.LOGGER.info("Loaded cape: {}", fileName);
                 } catch (IOException e) {
                     HeliosClient.LOGGER.error("An error has occurred while reading cape file: {}{}", ColorUtils.darkGreen, file.getName(), e);
                 }
@@ -124,32 +115,21 @@ public class CapeManager {
         }
     }
 
-    public static void loadCapeTexture(InputStream inputStream, String fileName, File file) throws IOException {
-        if (registeredTextures.contains(fileName)) {
-            return; // Skip if texture is already registered
+    private static Int2ObjectOpenHashMap<NativeImage> parseAnimatedCape(NativeImage img) {
+        Int2ObjectOpenHashMap<NativeImage> animatedCape = new Int2ObjectOpenHashMap<>();
+        int totalFrames = img.getHeight() / (img.getWidth() / 2);
+        for (int currentFrame = 0; currentFrame < totalFrames; currentFrame++) {
+            NativeImage frame = new NativeImage(img.getWidth(), img.getWidth() / 2, true);
+            for (int x = 0; x < frame.getWidth(); x++) {
+                for (int y = 0; y < frame.getHeight(); y++) {
+                    frame.setColor(x, y, img.getColor(x, y + (currentFrame * (img.getWidth() / 2))));
+                }
+            }
+            animatedCape.put(currentFrame, frame);
         }
-
-        NativeImage image = NativeImage.read(inputStream);
-
-        //Execute with main thread.
-        HeliosClient.MC.execute(() -> {
-            TextureManager textureManager = HeliosClient.MC.getTextureManager();
-            Identifier capeIdentifier;
-            Identifier elytraIdentifier;
-
-            //Parse textures and store them
-            capeIdentifier = textureManager.registerDynamicTexture("cape_" + fileName.toLowerCase(Locale.ROOT), new NativeImageBackedTexture(parseCape(image)));
-            elytraIdentifier = textureManager.registerDynamicTexture("elytra_" + fileName.toLowerCase(Locale.ROOT), new NativeImageBackedTexture(image));
-
-
-            capeIdentifiers.add(capeIdentifier);
-            elytraIdentifiers.add(elytraIdentifier);
-
-            registeredTextures.add(fileName);
-
-            HeliosClient.LOGGER.info("Loaded cape: {}", fileName);
-        });
+        return animatedCape;
     }
+
 
     /**
      * <a href="https://github.com/dragonostic/of-capes/blob/main/src/main/java/net/drago/ofcapes/util/PlayerHandler.java">Credit</a>
@@ -208,7 +188,7 @@ public class CapeManager {
                 default:
                     throw new IllegalArgumentException("Invalid cape type: " + type);
             }
-            loadCapes();
+            CAPE_NAMES = loadCapes();
             return null;
         });
         future.get();
@@ -255,23 +235,6 @@ public class CapeManager {
             throw new HttpResponseException(connection.getResponseCode(), connection.getResponseMessage());
         }
     }
-    
-    public static boolean shouldPlayerHaveCape(PlayerEntity player) {
-        return CAPES.containsKey(player.getUuid()) || ELYTRAS.containsKey(player.getUuid());
-    }
-
-    public static Identifier getCapeTexture(PlayerEntity player) {
-        return CAPES.get(player.getUuid());
-    }
-
-    public static Identifier getElytraTexture(PlayerEntity player) {
-        return ELYTRAS.get(player.getUuid());
-    }
-
-    public static void setCapeAndElytra(PlayerEntity player, Identifier texture, Identifier elytraTexture) {
-        CAPES.put(player.getUuid(), texture);
-        ELYTRAS.put(player.getUuid(), elytraTexture);
-    }
 
     private void getOptifineCape(String profileName) throws Exception {
         String url = "http://s.optifine.net/capes/" + profileName + ".png";
@@ -313,6 +276,19 @@ public class CapeManager {
             throw new HttpResponseException(connection.getResponseCode(), connection.getResponseMessage());
         }
     }
+    public static Identifier getCurrentCapeTexture() {
+        if(HeliosClient.MC.player == null){
+            return null;
+        }
+        return capeTextureManager.getCurrentCapeTexture(HeliosClient.MC.player.getUuid());
+    }
+
+    public static Identifier getCurrentElytraTexture() {
+        if(HeliosClient.MC.player == null){
+            return null;
+        }
+        return capeTextureManager.getCurrentElytraTexture(HeliosClient.MC.player.getUuid());
+    }
 
     public enum CapeType {
         NONE,
@@ -320,4 +296,5 @@ public class CapeManager {
         CRAFATAR,
         MINECRAFTCAPES
     }
+
 }

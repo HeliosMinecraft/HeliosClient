@@ -151,10 +151,8 @@ public class ColorManager implements Listener {
 
         if (gui.ColorMode.value == 0) {
             updatePrimaryGradients(gui.staticColor.getColor(), gui.staticColor.getColor());
-
         }else if (gui.ColorMode.value == 1) {
-
-            updatePrimaryGradients(GradientManager.getGradient(gui.GradientType.getOption().toString()).getStartGradient(), GradientManager.getGradient(gui.GradientType.getOption().toString()).getEndGradient());
+            updatePrimaryGradients(gui.gradientType.get().getStartGradient(), gui.gradientType.get().getEndGradient());
         }
 
 

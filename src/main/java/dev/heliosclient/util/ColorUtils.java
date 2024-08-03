@@ -182,6 +182,7 @@ public class ColorUtils {
             return new Color(Objects.requireNonNullElse(color, -1));
     }
 
+
     /**
      * Changes alpha on integer color.
      *
@@ -299,6 +300,14 @@ public class ColorUtils {
         return new Color(r, g, b);
     }
 
+    public static int[] blend(int[] color1, int[] color2, float ratio) {
+        int red = (int) (color1[0] * (1 - ratio) + color2[0] * ratio);
+        int green = (int) (color1[1] * (1 - ratio) + color2[1] * ratio);
+        int blue = (int) (color1[2] * (1 - ratio) + color2[2] * ratio);
+        int alpha = (int) (color1[3] * (1 - ratio) + color2[3] * ratio);
+        return new int[]{red, green, blue, alpha};
+    }
+
     // The fraction parameter is used to adjust the hue of the colors over time, creating a constantly changing effect.
     public static Color[] getDaySkyColors(float fraction) {
         Color color1 = Color.getHSBColor(fraction, 0.6f, 1.0f); // Sky blue
@@ -316,5 +325,9 @@ public class ColorUtils {
         Color color1 = Color.getHSBColor(fraction, 0.66f, 0.2f); // Dark blue
         Color color2 = Color.getHSBColor(fraction, 0.66f, 0.4f); // Lighter blue
         return new Color[]{color1, color2};
+    }
+
+    public static Color toColor(int[] color1) {
+        return new Color(color1[0],color1[1],color1[2],color1[3]);
     }
 }
