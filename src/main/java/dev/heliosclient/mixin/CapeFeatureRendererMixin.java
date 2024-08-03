@@ -103,9 +103,5 @@ public abstract class CapeFeatureRendererMixin extends FeatureRenderer<AbstractC
         ci.cancel();
     }
 
-    @Redirect(method = "render*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayer;getEntitySolid(Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/render/RenderLayer;"))
-    private RenderLayer fixCapeTransparency(Identifier texture) {
-        return RenderLayer.getArmorCutoutNoCull(texture);
-    }
 }
 
