@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.mixin.AbstractClientPlayerEntityMixin;
 import dev.heliosclient.module.modules.misc.CapeModule;
 import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.util.ColorUtils;
@@ -14,6 +15,7 @@ import dev.heliosclient.util.cape.ProfileUtils;
 import dev.heliosclient.util.fontutils.FontLoader;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -278,14 +280,16 @@ public class CapeManager {
     }
     public static Identifier getCurrentCapeTexture() {
         if(HeliosClient.MC.player == null){
-            return null;
+            return capeTextureManager.getCurrentCapeTexture(HeliosClient.MC.getGameProfile().getId());
         }
         return capeTextureManager.getCurrentCapeTexture(HeliosClient.MC.player.getUuid());
     }
 
+    private static final Identifier SKIN = new Identifier("textures/entity/elytra.png");
+
     public static Identifier getCurrentElytraTexture() {
         if(HeliosClient.MC.player == null){
-            return null;
+            return SKIN;
         }
         return capeTextureManager.getCurrentElytraTexture(HeliosClient.MC.player.getUuid());
     }

@@ -61,7 +61,7 @@ public class TargetUtils {
         setFilter(filter);
 
         //If current target is not found or the filter result for currentTarget is not satisfying then get a new one.
-        if (currentTarget == null || (applyFilter && !this.filter.test(currentTarget))) {
+        if (currentTarget == null || !currentTarget.isAlive() || (applyFilter && !this.filter.test(currentTarget))) {
             return getTarget(mc.player);
         }
 

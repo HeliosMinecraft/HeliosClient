@@ -10,6 +10,7 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
+import dev.heliosclient.util.player.DisplayPreviewEntity;
 import dev.heliosclient.util.render.color.QuadColor;
 import dev.heliosclient.util.render.textures.Texture;
 import ladysnake.satin.api.managed.ShaderEffectManager;
@@ -18,11 +19,13 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -1333,6 +1336,41 @@ public class Renderer2D implements Listener {
     }
 
     /* ==== Drawing Custom Stuff ==== */
+    public static void drawDisplayPreviewEntity( int x, int y, int size, DisplayPreviewEntity entity, float mouseX, float mouseY) {
+        MatrixStack matrixStack = RenderSystem.getModelViewStack();
+        matrixStack.push();
+        matrixStack.translate(x, y, 1050.0f);
+        matrixStack.scale(1.0f, 1.0f, -1.0f);
+        RenderSystem.applyModelViewMatrix();
+        MatrixStack matrixStack2 = new MatrixStack();
+        matrixStack2.translate(0.0, 0.0, 1000.0);
+        matrixStack2.scale(size, size, size);
+
+        matrixStack2.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
+
+        DiffuseLighting.method_34742();
+        EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
+        entityRenderDispatcher.setRenderShadows(false);
+        VertexConsumerProvider.Immediate immediate = mc.getBufferBuilders().getEntityVertexConsumers();
+        RenderSystem.runAsFancy(()->{
+            EntityRendererFactory.Context ctx = new EntityRendererFactory.Context(
+                    mc.getEntityRenderDispatcher(),
+                    mc.getItemRenderer(),
+                    mc.getBlockRenderManager(),
+                    mc.getEntityRenderDispatcher().getHeldItemRenderer(),
+                    mc.getResourceManager(),
+                    mc.getEntityModelLoader(),
+                    mc.textRenderer
+            );
+            DisplayPreviewEntityRenderer displayPlayerEntityRenderer = new DisplayPreviewEntityRenderer(ctx,entity.slim);
+            displayPlayerEntityRenderer.render(entity, mc.getTickDelta(), matrixStack2, immediate, 0xF000F0,mouseX, mouseY);
+        });
+        immediate.draw();
+        entityRenderDispatcher.setRenderShadows(true);
+        matrixStack.pop();
+        RenderSystem.applyModelViewMatrix();
+        DiffuseLighting.enableGuiDepthLighting();
+    }
 
     public static void drawEntity(DrawContext context, int x, int y, int size, Entity entity, float delta) {
         float yaw = MathHelper.wrapDegrees(entity.prevYaw + (entity.getYaw() - entity.prevYaw) * HeliosClient.MC.getTickDelta());
@@ -1373,11 +1411,6 @@ public class Renderer2D implements Listener {
         entity.setPitch(j);
         entity.prevYaw = k;
         entity.setHeadYaw(l);
-    }
-
-    public static void drawEntityBoxOutline(Entity entity, QuadColor color, int lineWidth) {
-        Box box = entity.getBoundingBox();
-        Renderer3D.drawBoxOutline(box, color, lineWidth);
     }
 
     public static float getStringWidth(String text) {

@@ -73,6 +73,9 @@ public class CapeTextureManager {
             return staticCapeTextures.getOrDefault(capeName, CapeManager.DEFAULT_CAPE_TEXTURE);
         }
     }
+    public Identifier getStaticCapeTexture(String capeName) {
+        return staticCapeTextures.getOrDefault(capeName, CapeManager.DEFAULT_CAPE_TEXTURE);
+    }
 
     public Identifier getCurrentElytraTexture(UUID playerUUID) {
         String capeName = playerCapes.get(playerUUID);

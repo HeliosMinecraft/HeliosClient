@@ -1,10 +1,12 @@
 package dev.heliosclient.util.player;
 
 import dev.heliosclient.util.render.Renderer3D;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +17,23 @@ public class RotationUtils {
 
     public static void lookAt(Entity entity, LookAtPos lookAtPos) {
         lookAt(lookAtPos.positionGetter.getPosition(entity));
+    }
+
+
+    public static void lookAtEntityMC(Entity entity, LookAtPos lookAtPos) {
+        Vec3d vec3d = lookAtPos.positionGetter.getPosition(mc.player);
+        double d = entity.getPos().x - vec3d.x;
+        double e = entity.getPos().y - vec3d.y;
+        double f = entity.getPos().z - vec3d.z;
+        double g = Math.sqrt(d * d + f * f);
+        mc.player.setPitch(MathHelper.wrapDegrees((float)(-(MathHelper.atan2(e, g) * 57.2957763671875))));
+        mc.player.setYaw(MathHelper.wrapDegrees((float)(MathHelper.atan2(f, d) * 57.2957763671875) - 90.0F));
+        mc.player.setHeadYaw(mc.player.getYaw());
+        mc.player.prevPitch = mc.player.getPitch();
+        mc.player.prevYaw = mc.player.getYaw();
+        mc.player.prevHeadYaw =  mc.player.headYaw;
+        mc.player.bodyYaw =  mc.player.headYaw;
+        mc.player.prevBodyYaw =  mc.player.bodyYaw;
     }
 
     public static void lookAt(Vec3d pos) {

@@ -101,6 +101,13 @@ public class AimAssist extends Module_ {
             .value(true)
             .build()
     );
+    BooleanSetting onlyAttackAttackable = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Only attack attackable")
+            .description("Only attacks attackable entities")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .build()
+    );
 
     BooleanSetting simulateRotation = sgGeneral.add(new BooleanSetting.Builder()
             .name("Simulate Rotation")
@@ -200,6 +207,14 @@ public class AimAssist extends Module_ {
         return FriendManager.isFriend(entity.getName().getString());
     }
 
+    private boolean isAttackable(LivingEntity entity) {
+        if (!onlyAttackAttackable.value) {
+            return true;
+        }
+
+        return entity.isAttackable();
+    }
+
 
 
     @SubscribeEvent
@@ -221,7 +236,8 @@ public class AimAssist extends Module_ {
                     e1.distanceTo(mc.player) <= range  &&
                     !isFriend(e1) &&
                     isEntityVisible(e1) &&
-                    !isDead(e1), true);
+                    !isDead(e1) &&
+                    isAttackable(e1), true);
         }
 
         if (ignoreTeammate && ModuleManager.get(Teams.class).isInMyTeam(targetEntity)) {

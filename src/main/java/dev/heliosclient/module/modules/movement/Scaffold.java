@@ -67,11 +67,21 @@ public class Scaffold extends Module_ {
     );
 
     /* Place */
-    BooleanSetting onEdge = sgGeneral.add(new BooleanSetting.Builder()
+    BooleanSetting onEdge = sgPlace.add(new BooleanSetting.Builder()
             .name("On Edge")
             .description("Will only place when you are on edge near a block")
             .onSettingChange(this)
             .defaultValue(false)
+            .build()
+    );
+    DoubleSetting edgeThreshold = sgPlace.add(new DoubleSetting.Builder()
+            .name("Edge Distance")
+            .description("Distance from the edge to scaffold")
+            .onSettingChange(this)
+            .defaultValue(0.12d)
+            .range(0, 0.2)
+            .roundingPlace(3)
+            .shouldRender(()->onEdge.value)
             .build()
     );
     DoubleSetting extendRange = sgPlace.add(new DoubleSetting.Builder()
@@ -199,7 +209,16 @@ public class Scaffold extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        if(onEdge.value && PlayerUtils.isPlayerAtEdge())return;
+        if (towerMode.getOption() != TowerMode.None && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed()) {
+            //Only tower if there is air above.
+            if (!mc.world.getBlockCollisions(mc.player,mc.player.getBoundingBox().stretch(0,0.4f,0)).iterator().hasNext()) {
+                if (whileMoving.value || !PlayerUtils.isMoving(mc.player)) {
+                    mc.player.setVelocity(mc.player.getVelocity().x, towerSpeed.value, mc.player.getVelocity().z);
+                }
+            }
+        }
+
+        if(onEdge.value && !PlayerUtils.isPlayerAtEdge(edgeThreshold.value))return;
 
         if (blocks.getSelectedEntries().isEmpty()) return;
 
@@ -221,16 +240,6 @@ public class Scaffold extends Module_ {
         BlockPos immutable = blockPos.toImmutable();
 
         placeFromCenter(immutable);
-
-
-        if (towerMode.getOption() != TowerMode.None && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed()) {
-            //Only tower if there is air above.
-            if (!mc.world.getBlockCollisions(mc.player,mc.player.getBoundingBox().stretch(0,0.4f,0)).iterator().hasNext()) {
-                if (whileMoving.value || !PlayerUtils.isMoving(mc.player)) {
-                    mc.player.setVelocity(mc.player.getVelocity().x, towerSpeed.value, mc.player.getVelocity().z);
-                }
-            }
-        }
     }
 
     public void placeFromCenter(BlockPos center) {

@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class ProfileUtils {
@@ -28,6 +29,9 @@ public class ProfileUtils {
         HttpURLConnection connection = (HttpURLConnection) new URL("https://api.mojang.com/users/profiles/minecraft/" + profileName).openConnection();
         JsonObject response = new JsonParser().parse(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)).getAsJsonObject();
         return insertHyphensToUUID(response.get("id").getAsString());
+    }
+    public static UUID getAsUUID(String profileName) throws IOException {
+        return UUID.fromString(getUUID(profileName));
     }
 
     private static String insertHyphensToUUID(String uuid) {

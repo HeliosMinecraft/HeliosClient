@@ -3,6 +3,7 @@ package dev.heliosclient.mixin;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.ui.HeliosClientInfoScreen;
 import dev.heliosclient.ui.altmanager.AltManagerScreen;
+import dev.heliosclient.util.player.DisplayPreviewEntity;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -19,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen {
+
+    @Unique private DisplayPreviewEntity  entity = new DisplayPreviewEntity();
 
     public TitleScreenMixin(Text text) {
         super(text);
@@ -38,9 +41,19 @@ public abstract class TitleScreenMixin extends Screen {
         }, this.textRenderer));
     }
 
+
     @Inject(at = @At("RETURN"), method = "render")
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         Renderer2D.setDrawContext(context);
+
+        int y = this.height / 4 + 48 + 20 + 72 + 22;
+        int x = this.width / 2 + 104 + 20 + 20;
+
+        if(entity.profile != client.getGameProfile()){
+            entity = new DisplayPreviewEntity();
+        }
+
+        Renderer2D.drawDisplayPreviewEntity(x,y,30,entity,mouseX,mouseY);
     }
 
     @Inject(at = @At("RETURN"), method = "init")

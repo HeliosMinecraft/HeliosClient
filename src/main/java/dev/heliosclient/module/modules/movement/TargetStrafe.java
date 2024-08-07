@@ -2,11 +2,10 @@ package dev.heliosclient.module.modules.movement;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.input.KeyboardInputEvent;
 import dev.heliosclient.managers.ModuleManager;
-import dev.heliosclient.mixin.AccessorKeybind;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.modules.combat.AimAssist;
 import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.modules.world.Timer;
 import dev.heliosclient.module.settings.*;
@@ -14,9 +13,7 @@ import dev.heliosclient.util.SortMethod;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import dev.heliosclient.util.player.TargetUtils;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.PassiveEntity;
@@ -25,7 +22,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
@@ -43,6 +39,7 @@ public class TargetStrafe extends Module_ {
             .defaultListOption(SortMethod.LowestHealth)
             .build()
     );
+
     BooleanSetting legit = sgGeneral.add(new BooleanSetting.Builder()
             .name("Legit")
             .description("Uses movement keys to simulate strafing. Should work on most servers but does not offer proper void checks. Use aim assist for better rotation bypass")
@@ -55,10 +52,10 @@ public class TargetStrafe extends Module_ {
             .name("Speed")
             .description("Speed of the movement")
             .onSettingChange(this)
-            .defaultValue(2d)
+            .defaultValue(1)
             .min(0.0)
-            .max(12d)
-            .roundingPlace(1)
+            .max(3)
+            .roundingPlace(2)
             .shouldRender(() -> !legit.value)
             .build()
     );
@@ -98,6 +95,14 @@ public class TargetStrafe extends Module_ {
             .value(true)
             .build()
     );
+    BooleanSetting onlyAttackAttackable = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Only attack attackable")
+            .description("Only attacks attackable entities")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .value(false)
+            .build()
+    );
     BooleanSetting jump = sgGeneral.add(new BooleanSetting.Builder()
             .name("Jump")
             .description("Jumps while moving")
@@ -106,10 +111,10 @@ public class TargetStrafe extends Module_ {
             .value(true)
             .build()
     );
+
     BooleanSetting players = sgEntities.add(new BooleanSetting("Players", "Aim at players", this, true, () -> true, true));
     BooleanSetting passive = sgEntities.add(new BooleanSetting("Passive", "Aim at passives", this, false, () -> true, true));
     BooleanSetting hostiles = sgEntities.add(new BooleanSetting("Hostiles", "Aim at hostiles", this, false, () -> true, true));
-    BooleanSetting items = sgEntities.add(new BooleanSetting("Items", "Aim at items", this, false, () -> true, true));
     BooleanSetting tamed = sgEntities.add(new BooleanSetting("Tamed", "Aim at tamed", this, false, () -> true, true));
     BooleanSetting others = sgEntities.add(new BooleanSetting("Other", "Aim at others", this, false, () -> true, true));
 
@@ -138,14 +143,21 @@ public class TargetStrafe extends Module_ {
 
         return PlayerUtils.canSeeEntity(entity);
     }
+    private boolean isAttackable(Entity entity) {
+        if (!onlyAttackAttackable.value) {
+            return true;
+        }
+
+        return entity.isAttackable();
+    }
 
     @Override
     public void onDisable() {
         super.onDisable();
 
-        setPressedNoDirectKey(mc.options.forwardKey, false);
-        setPressedNoDirectKey(mc.options.leftKey, false);
-        setPressedNoDirectKey(mc.options.rightKey, false);
+        // setPressedNoDirectKey(mc.options.forwardKey, false);
+        //setPressedNoDirectKey(mc.options.leftKey, false);
+        //setPressedNoDirectKey(mc.options.rightKey, false);
 
         if (timer.value != 1.0) {
             ModuleManager.get(Timer.class).setOverride(Timer.RESET);
@@ -153,87 +165,125 @@ public class TargetStrafe extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTicks(TickEvent.PLAYER event) {
-        TargetUtils.getInstance().setRange(range.value);
-        LivingEntity entity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(e-> !isBlackListed(e),true);
+    public void onTick(TickEvent.PLAYER event) {
+        if (legit.value) return;
 
-        if (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam(entity)) {
+        TargetUtils.getInstance().setSortMethod((SortMethod) sort.getOption());
+        TargetUtils.getInstance().setRange(range.value);
+        Entity entity = TargetUtils.getInstance().getNewTargetIfNull(e -> !isBlackListed(e) && isEntityVisible(e) && isAttackable(e) && mc.player.distanceTo(e) <= range.value && (onlyAttackAttackable.value && e.isAttackable()), true);
+
+        if (!(entity instanceof LivingEntity livingEntity) || (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam(livingEntity))) {
             return;
         }
 
-        if (entity != null && entity.distanceTo(mc.player) <= range.value) {
-            if (mc.player == null || !entity.isAlive()) return;
-
-            Vec3d targetPos = entity.getPos();
-            Vec3d playerPos = mc.player.getPos();
+        if (entity.distanceTo(mc.player) <= range.value) {
+            if (mc.player == null || !livingEntity.isAlive()) return;
 
             if (timer.value != 1.0) {
                 ModuleManager.get(Timer.class).setOverride(timer.value);
             }
 
 
-            if (legit.value) {
-                //Look at target only if AimAssist is not enabled
-                //Major issue with this would be desync of target entities between AimAssist and target strafe.
-                //Could be fixed by having a TargetUtils class to handle targets which should keep them both in sync
-                //and every other module.
-                if (!ModuleManager.get(AimAssist.class).isActive()) {
-                    RotationUtils.lookAt(entity.getBoundingBox().getCenter());
-                }
-
-
-                //Move forward if player is not nearby to the entity enough
-                if (mc.player.distanceTo(entity) < range.value) {
-                    setPressedNoDirectKey(mc.options.forwardKey, true);
-                }
-
-
-                if (strafeDirectionChanged) {
-                    setPressedNoDirectKey(mc.options.rightKey, true);
-                } else {
-                    setPressedNoDirectKey(mc.options.leftKey, true);
-                }
-
-                //Todo: Fix impl. currently not working / failing
-                if (!canStrafeTo(mc.player.getBlockPos().getY(), mc.player.getBlockX(), mc.player.getBlockZ()) || mc.player.horizontalCollision) {
-                    if (!strafeDirectionChanged) {
-                        strafeDirectionChanged = true;
-                    }
-                } else {
-                    strafeDirectionChanged = false;
-                }
-
-            } else {
-                doMotionStrafe(playerPos, entity, targetPos);
+            if (!legit.value) {
+                strafeAround(entity);
             }
             // jump while strafing
             if (jump.value && mc.player.isOnGround()) {
                 mc.player.jump();
             }
-        } else if (legit.value) {
-            setPressedNoDirectKey(mc.options.forwardKey, mc.options.forwardKey.isPressed());
-            setPressedNoDirectKey(mc.options.leftKey, mc.options.leftKey.isPressed());
-            setPressedNoDirectKey(mc.options.rightKey, mc.options.rightKey.isPressed());
         }
     }
 
-    public void setPressedNoDirectKey(KeyBinding bind, boolean pressed) {
-        int code = ((AccessorKeybind) bind).getKey().getCode();
-        mc.keyboard.onKey(mc.getWindow().getHandle(), code, GLFW.glfwGetKeyScancode(code), pressed ? GLFW.GLFW_PRESS : GLFW.GLFW_RELEASE, 0);
-        if (pressed)
-            mc.keyboard.onKey(mc.getWindow().getHandle(), code, GLFW.glfwGetKeyScancode(code), GLFW.GLFW_REPEAT, 0);
+    @SubscribeEvent
+    public void onKeyBoardInput(KeyboardInputEvent event) {
+        if(mc.options.leftKey.isPressed()){
+            strafeDirectionChanged = true;
+        }else if(mc.options.rightKey.isPressed()){
+            strafeDirectionChanged = false;
+        }
+
+        if (!legit.value) return;
+        if (mc.player == null) return;
+
+        TargetUtils.getInstance().setSortMethod((SortMethod) sort.getOption());
+        TargetUtils.getInstance().setRange(range.value);
+        Entity entity = TargetUtils.getInstance().getNewTargetIfNull(e -> !isBlackListed(e) && isEntityVisible(e) && isAttackable(e) && mc.player.distanceTo(e) <= range.value && (onlyAttackAttackable.value && e.isAttackable()), true);
+
+        if (!(entity instanceof LivingEntity livingEntity) || (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam(livingEntity))) {
+            return;
+        }
+
+            if (timer.value != 1.0) {
+                ModuleManager.get(Timer.class).setOverride(timer.value);
+            }
+
+            //Look at target only if AimAssist is not enabled
+            //Major issue with this would be desync of target entities between AimAssist and target strafe.
+            //Could be fixed by having a TargetUtils class to handle targets which should keep them both in sync
+            //and every other module.
+            RotationUtils.lookAt(entity.getBoundingBox().getCenter());
+
+            //Move forward if player is not nearby to the entity enough
+            if (mc.player.distanceTo(entity) > range.value - 0.5) {
+                event.pressingForward = true;
+            } else {
+                event.pressingBack = true;
+            }
+
+
+            if (strafeDirectionChanged) {
+                event.pressingLeft = true;
+            } else {
+                event.pressingRight = true;
+            }
+
+            Vec3d vec = mc.player.getPos().add(mc.player.getVelocity());
+            if (PlayerUtils.willFallMoreThanFiveBlocks(vec) || mc.player.horizontalCollision) {
+                strafeDirectionChanged = !strafeDirectionChanged;
+            }
+
+            // jump while strafing
+            if (jump.value && !mc.player.isOnGround()) {
+                mc.player.jump();
+            }
+            event.cancel();
     }
 
     @Override
     public void onSettingChange(Setting<?> setting) {
         super.onSettingChange(setting);
-
-        if (mc.options != null) {
-            setPressedNoDirectKey(mc.options.forwardKey, false);
-            setPressedNoDirectKey(mc.options.leftKey, false);
-            setPressedNoDirectKey(mc.options.rightKey, false);
-        }
     }
+
+    public void strafeAround(Entity target) {
+        Vec3d playerPos = mc.player.getPos();
+        Vec3d targetPos = target.getPos();
+        Vec3d direction = targetPos.subtract(playerPos).normalize();
+
+        double distance = playerPos.distanceTo(targetPos);
+        if (distance < range.value - 1) {
+            direction = direction.multiply(-1); // Move away from the target
+        }
+
+        double strafeAngle = strafeDirectionChanged ? Math.PI / 2 : -Math.PI / 2; // 90 degrees to the right or left
+        Vec3d strafeDirection = new Vec3d(
+                direction.x * Math.cos(strafeAngle) - direction.z * Math.sin(strafeAngle),
+                direction.y,
+                direction.x * Math.sin(strafeAngle) + direction.z * Math.cos(strafeAngle)
+        ).normalize();
+
+        Vec3d strafePos = playerPos.add(strafeDirection.multiply(speed.value * 0.15f));
+
+        // Check for horizontal collision
+        if (PlayerUtils.hasHorizontalCollision(strafePos) || PlayerUtils.willFallMoreThanFiveBlocks(strafePos)) {
+            strafeDirectionChanged = !strafeDirectionChanged; // Reverse strafe direction
+        } else {
+            mc.player.updatePosition(strafePos.x, strafePos.y, strafePos.z);
+        }
+
+        // Rotate player to face the target
+        RotationUtils.lookAt(target, RotationUtils.LookAtPos.CENTER);
+    }
+
 
     public void doMotionStrafe(Vec3d playerPos, Entity entity, Vec3d targetPos) {
         double dx = targetPos.x - playerPos.x;
@@ -285,7 +335,6 @@ public class TargetStrafe extends Module_ {
                 (!(entity instanceof PassiveEntity) || !passive.value) &&
                 (!(entity instanceof TameableEntity) || !tamed.value) &&
                 (!(entity instanceof PlayerEntity) || !players.value) &&
-                (!(entity instanceof ItemEntity) || !items.value) &&
-                !others.value;
+                (!(entity instanceof LivingEntity) || !others.value);
     }
 }

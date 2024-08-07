@@ -15,6 +15,7 @@ import dev.heliosclient.module.settings.lists.EntityTypeListSetting;
 import dev.heliosclient.util.SortMethod;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.TargetUtils;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Hand;

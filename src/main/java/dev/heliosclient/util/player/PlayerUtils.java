@@ -2,7 +2,11 @@ package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.mixin.AccessorMinecraftClient;
+import dev.heliosclient.util.EntityUtils;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.render.Renderer2D;
+import dev.heliosclient.util.render.Renderer3D;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -26,8 +30,8 @@ public class PlayerUtils {
         Box entityBox = entity.getBoundingBox();
         return mc.player.getWorld().raycast(new RaycastContext(playerEyePos, entityBox.getCenter(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
     }
-    public static boolean isPlayerAtEdge() {
-        Vec3d playerPos = mc.player.getPos();
+    public static boolean isPlayerAtEdge(double edgeThreshold) {
+        Vec3d playerPos = Renderer3D.getInterpolatedPosition(mc.player);
         BlockPos blockPos = mc.player.getBlockPos();
 
         // Get the player's position within the block
@@ -35,12 +39,19 @@ public class PlayerUtils {
         double offsetZ = playerPos.z - blockPos.getZ();
 
         // Check if the player is near the edge of the block
-        double edgeThreshold = 0.1; // Adjust this value as needed
         boolean nearEdgeX = offsetX < edgeThreshold || offsetX > (1 - edgeThreshold);
         boolean nearEdgeZ = offsetZ < edgeThreshold || offsetZ > (1 - edgeThreshold);
 
-        return nearEdgeX || nearEdgeZ;
+        // Check if the block next to the edge is air or something the player can fall through
+        if (nearEdgeX || nearEdgeZ) {
+            BlockPos edgeBlockPos = blockPos.add(nearEdgeX ? (offsetX < edgeThreshold ? -1 : 1) : 0, 0, nearEdgeZ ? (offsetZ < edgeThreshold ? -1 : 1) : 0);
+            BlockState edgeBlockState = mc.world.getBlockState(edgeBlockPos);
+            return edgeBlockState.isAir() || edgeBlockState.isReplaceable();
+        }
+
+        return false;
     }
+
 
     public static boolean canSeeEntityMC(PlayerEntity player, Entity entity) {
         return player.canSee(entity);
@@ -55,6 +66,19 @@ public class PlayerUtils {
         return (player.getVelocity().lengthSquared() > 0 || player.getVelocity().horizontalLengthSquared() > 0) && (player.getX() != player.prevX && player.getY() != player.prevY && player.getZ() != player.prevZ);
     }
 
+    public static boolean hasHorizontalCollision(Vec3d pos) {
+        return mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(pos.subtract(mc.player.getPos()))).iterator().hasNext();
+    }
+    public static boolean willFallMoreThanFiveBlocks(Vec3d pos) {
+        BlockPos blockPos = BlockPos.Mutable.ofFloored(pos);
+        for (int i = 0; i < 5; i++) {
+            blockPos = blockPos.down();
+            if (!mc.world.isAir(blockPos)) {
+                return false;
+            }
+        }
+        return true;
+    }
     public static boolean isPlayerLookingAtEntity(PlayerEntity player, Entity target, double maxDistance) {
         Vec3d eyePos = player.getEyePos();
         double squaredDist = Math.pow(maxDistance, 2);
