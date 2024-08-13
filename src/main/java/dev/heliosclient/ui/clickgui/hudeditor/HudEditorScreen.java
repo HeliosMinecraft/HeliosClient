@@ -151,7 +151,7 @@ public class HudEditorScreen extends Screen implements Listener {
                 HudManager.INSTANCE.hudElements.get(i).selected = true;
                 if (button == 1) {
                     HudManager.INSTANCE.hudElements.get(i).selected = false;
-                    HeliosClient.MC.setScreen(new HudEditorSettingScreen(HudManager.INSTANCE.hudElements.get(i), 180, 180));
+                    HeliosClient.MC.setScreen(new HudEditorSettingScreen(HudManager.INSTANCE.hudElements.get(i)));
                 }
                 lastHoveredIndex = i;
                 break;

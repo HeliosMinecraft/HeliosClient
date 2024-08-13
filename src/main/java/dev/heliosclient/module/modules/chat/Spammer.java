@@ -23,14 +23,14 @@ public class Spammer extends Module_ {
     String[] spamLines = null;
     int lineIndex;
     SettingGroup sgGeneral = new SettingGroup("General");
-    public BooleanSetting randomLine = sgGeneral.add(new BooleanSetting.Builder()
+    BooleanSetting randomLine = sgGeneral.add(new BooleanSetting.Builder()
             .name("Random")
             .description("Randomly selects a line")
             .value(true)
             .onSettingChange(this)
             .build()
     );
-    public BooleanSetting antiantiSpam = sgGeneral.add(new BooleanSetting.Builder()
+    BooleanSetting antiantiSpam = sgGeneral.add(new BooleanSetting.Builder()
             .name("Anti - AntiSpam")
             .description("Adds random letters at the end of message of given length to bypass anti spams")
             .defaultValue(false)
@@ -47,6 +47,13 @@ public class Spammer extends Module_ {
             .max(256)
             .roundingPlace(0)
             .shouldRender(() -> antiantiSpam.value)
+            .build()
+    );
+    BooleanSetting commands = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Send as command")
+            .description("Sends the messages as commands instead of player messages.")
+            .value(false)
+            .onSettingChange(this)
             .build()
     );
     CycleSetting mode = sgGeneral.add(new CycleSetting.Builder()
@@ -131,7 +138,11 @@ public class Spammer extends Module_ {
             if (antiantiSpam.value) {
                 lineToSend += " " + UniqueID.setLengthAndGet((int) antispam_length.value).getUniqueID();
             }
-            ChatUtils.sendPlayerMessage(lineToSend);
+            if(commands.value){
+                ChatUtils.sendChatCommand(lineToSend);
+            } else {
+                ChatUtils.sendPlayerMessage(lineToSend);
+            }
         } else {
             timer++;
         }

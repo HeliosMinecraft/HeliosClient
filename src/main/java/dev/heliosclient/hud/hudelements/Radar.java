@@ -185,9 +185,9 @@ public class Radar extends HudElement {
 
                 // Choose a color based on the entity type
                 int color = getColor(entity);
-                float radius = 0.5f;
+                float radius = 1.2f;
                 if (entity instanceof PlayerEntity) {
-                    radius = 1f;
+                    radius = 1.5f;
                 }
                 if (entity == mc.player) {
                     FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF123", x2 - 1.5f, y2 - 1.2f, color);

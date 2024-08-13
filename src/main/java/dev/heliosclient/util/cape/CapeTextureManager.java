@@ -1,12 +1,7 @@
 package dev.heliosclient.util.cape;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.CapeManager;
-import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.util.render.GifTextureManager;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;

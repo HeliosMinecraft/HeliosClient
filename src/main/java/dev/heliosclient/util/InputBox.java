@@ -20,6 +20,8 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 public class InputBox implements Listener {
     protected final InputMode inputMode;
@@ -319,55 +321,29 @@ public class InputBox implements Listener {
 
     @SubscribeEvent
     public void charTyped(CharTypedEvent event) {
-        char chr = event.getI();
+        char chr = event.getCharacter();
         if (focused) {
-            switch (inputMode) {
-                case DIGITS -> {
-                    if (Character.isDigit(chr) || Character.toString(chr).equals(".")) {
-                        insertCharacter(chr);
-                    } else {
-                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only digits " + ColorUtils.green + "0-9 ", true, 1000);
-                    }
+            Predicate<Character> predicate = inputMode.get();
+            if (predicate != null && predicate.test(chr)) {
+                insertCharacter(chr);
+            } else {
+                String errorMessage = switch (inputMode) {
+                    case DIGITS -> "Enter only digits 0-9";
+                    case CHARACTERS -> "Enter only letters a-z // A-Z";
+                    case CHARACTERS_AND_WHITESPACE -> "Enter only letters or blank a-z // A-Z // ";
+                    case DIGITS_AND_CHARACTERS -> "Enter only digits or letters a-z // A-Z // 0-9";
+                    case DIGITS_AND_CHARACTERS_AND_UNDERSCORE -> "Enter only digits or letters or underscore a-z // A-Z // 0-9 // _";
+                    case DIGITS_AND_CHARACTERS_AND_WHITESPACE -> "Enter only digits or letters or blank a-z // A-Z //   // 0-9";
+                    case ALL -> null;
+                    case PREDICATE -> "Invalid character";
+                };
+                if (errorMessage != null) {
+                    AnimationUtils.addErrorToast(ColorUtils.red + errorMessage, true, 1000);
                 }
-                case CHARACTERS -> {
-                    if (Character.isLetter(chr)) {
-                        insertCharacter(chr);
-                    } else {
-                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only letters a-z // A-Z", true, 1000);
-                    }
-                }
-                case CHARACTERS_AND_WHITESPACE -> {
-                    if (Character.isLetter(chr) || Character.isWhitespace(chr)) {
-                        insertCharacter(chr);
-                    } else {
-                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only letters or blank " + ColorUtils.green + " a-z // A-Z //  ", true, 1000);
-                    }
-                }
-                case DIGITS_AND_CHARACTERS_AND_WHITESPACE -> {
-                    if (Character.isLetterOrDigit(chr) || Character.isWhitespace(chr)) {
-                        insertCharacter(chr);
-                    } else {
-                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only digits or letters or blank " + ColorUtils.green + " a-z // A-Z //   // 0-9", true, 1000);
-                    }
-                }
-                case DIGITS_AND_CHARACTERS -> {
-                    if (Character.isLetterOrDigit(chr)) {
-                        insertCharacter(chr);
-                    } else {
-                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only digits or letters" + ColorUtils.green + " a-z // A-Z // 0-9", true, 1000);
-                    }
-                }
-                case DIGITS_AND_CHARACTERS_AND_UNDERSCORE -> {
-                    if (Character.isLetterOrDigit(chr) || chr == '_') {
-                        insertCharacter(chr);
-                    } else {
-                        AnimationUtils.addErrorToast(ColorUtils.red + "Enter only digits or letters or underscore" + ColorUtils.green + " a-z // A-Z // 0-9 // _", true, 1000);
-                    }
-                }
-                case ALL -> insertCharacter(chr);
             }
         }
     }
+
 
 
     private void insertCharacter(char chr) {
@@ -508,13 +484,42 @@ public class InputBox implements Listener {
     }
 
     public enum InputMode {
-        DIGITS,
-        CHARACTERS,
-        CHARACTERS_AND_WHITESPACE,
-        DIGITS_AND_CHARACTERS,
-        DIGITS_AND_CHARACTERS_AND_UNDERSCORE,
-        DIGITS_AND_CHARACTERS_AND_WHITESPACE,
-        ALL
+        DIGITS(Character::isDigit),
+        CHARACTERS(Character::isLetter),
+        CHARACTERS_AND_WHITESPACE(chr -> Character.isLetter(chr) || Character.isWhitespace(chr)),
+        DIGITS_AND_CHARACTERS(Character::isLetterOrDigit),
+        DIGITS_AND_CHARACTERS_AND_UNDERSCORE(chr -> Character.isLetterOrDigit(chr) || chr == '_'),
+        DIGITS_AND_CHARACTERS_AND_WHITESPACE(chr -> Character.isLetterOrDigit(chr) || Character.isWhitespace(chr)),
+        ALL(chr -> true),
+        /**
+         * In order to use this, you should do
+         *<pre><code>
+         *InputBox.InputMode.PREDICATE((c)-> // My condition //);
+         * // or //
+         *InputBox.InputMode.REGEX(my_character_regex);
+         *</code></pre>
+         */
+        PREDICATE(chr->true); // Placeholder for custom predicate
+
+        private Predicate<Character> predicate;
+
+        InputMode(Predicate<Character> predicate) {
+            this.predicate = predicate;
+        }
+
+        public Predicate<Character> get() {
+            return predicate;
+        }
+
+        public static InputMode PREDICATE(Predicate<Character> customPredicate) {
+            InputMode predicateMode = PREDICATE;
+            predicateMode.predicate = customPredicate;
+            return predicateMode;
+        }
+        public static InputMode REGEX(String regex) {
+            Pattern pattern = Pattern.compile(regex);
+            return PREDICATE(chr -> pattern.matcher(Character.toString(chr)).matches());
+        }
     }
 
 }

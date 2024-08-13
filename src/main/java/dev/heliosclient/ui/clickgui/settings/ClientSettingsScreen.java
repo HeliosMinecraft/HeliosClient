@@ -3,13 +3,14 @@ package dev.heliosclient.ui.clickgui.settings;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.FontManager;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
+import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
@@ -57,6 +58,10 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
             super.renderBackgroundTexture(drawContext);
         }
 
+        if(GUI.coolVisuals()){
+            PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(),mouseX,mouseY);
+        }
+
         windowHeight = 50;
         for (SettingGroup settingGroup : module.settingGroups) {
             float groupNameHeight = settingGroup.getGroupNameHeight();
@@ -87,7 +92,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     @Override
     public void renderContent(Window window, DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
         // This should not happen but just in case.
-        if (module.settingGroups == null) return;
+        if (module.settingGroups == null || module.settingGroups.isEmpty()) return;
 
         updateSetting();
 

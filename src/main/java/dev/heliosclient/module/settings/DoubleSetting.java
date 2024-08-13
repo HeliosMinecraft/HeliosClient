@@ -38,6 +38,13 @@ public class DoubleSetting extends Setting<Double> {
         inputBox = new InputBox(String.valueOf(max).length() * 6, 11, String.valueOf(value), 10, InputBox.InputMode.DIGITS);
     }
 
+    public float getFloat() {
+        return (float) value;
+    }
+    public int getInt() {
+        return (int) value;
+    }
+
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);

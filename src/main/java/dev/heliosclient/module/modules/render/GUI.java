@@ -6,6 +6,7 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
+import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 
@@ -15,9 +16,11 @@ import java.util.List;
 
 public class GUI extends Module_ {
     public SettingGroup sgColors = new SettingGroup("Colors");
+    public SettingGroup sgVisuals = new SettingGroup("Visuals");
+
     public CycleSetting ColorMode = sgColors.add(new CycleSetting.Builder()
             .name("Color Mode")
-            .description("Color mode for parts of the client")
+            .description("Color mode for GUI and parts of the client")
             .onSettingChange(this)
             .value(new ArrayList<>(List.of("Static", "Gradient")))
             .defaultListIndex(0)
@@ -40,18 +43,6 @@ public class GUI extends Module_ {
             .shouldRender(() -> ColorMode.value == 1)
             .build()
     );
-    /*
-    public CycleSetting GradientType = sgColors.add(new CycleSetting.Builder()
-            .name("Gradient Type")
-            .description("Gradient type for the gradient color mode")
-            .onSettingChange(this)
-            .value(GradientManager.getAllGradientsNames().stream().toList())
-            .defaultListIndex(0)
-            .shouldRender(() -> ColorMode.value == 1)
-            .build()
-    );
-
-     */
     public RGBASetting linear2Start = sgColors.add(new RGBASetting.Builder()
             .name("Linear-Start")
             .description("Linear Color Start of Linear mode")
@@ -105,10 +96,60 @@ public class GUI extends Module_ {
             .onSettingChange(this)
             .build()
     );
-    public BooleanSetting displayModuleCount = sgColors.add(new BooleanSetting.Builder()
+    public BooleanSetting displayModuleCount = sgVisuals.add(new BooleanSetting.Builder()
             .name("Display Module counts")
             .description("Displays module count in category pane for each category.")
             .value(false)
+            .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting bounceAnimation = sgVisuals.add(new BooleanSetting.Builder()
+            .name("Animate while opening/closing")
+            .description("Animates the GUI during opening and closing.")
+            .value(false)
+            .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting background = sgVisuals.add(new BooleanSetting.Builder()
+            .name("Background")
+            .description("Draws a very faint background behind the clickGUI with the clickGUI primary color")
+            .value(false)
+            .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting coolVisuals = sgVisuals.add(new BooleanSetting.Builder()
+            .name("Render Cool Polygon mesh")
+            .description("Renders lines and connecting dots that look good but may drain performance like Abyss client")
+            .value(false)
+            .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting inChatHud = sgVisuals.add(new BooleanSetting.Builder()
+            .name("Render the polygon mesh in chat hud")
+            .value(false)
+            .onSettingChange(this)
+            .shouldRender(()->coolVisuals.value)
+            .build()
+    );
+    public DoubleSetting dotRadius = sgVisuals.add(new DoubleSetting.Builder()
+            .name("Dot Radius")
+            .description("Radius of the dots")
+            .min(0.1f)
+            .max(3)
+            .defaultValue(1.5d)
+            .roundingPlace(1)
+            .shouldRender(()->coolVisuals.value)
+            .onSettingChange(this)
+            .build()
+    );
+    public DoubleSetting lineMaxLength = sgVisuals.add(new DoubleSetting.Builder()
+            .name("Line Max Length")
+            .description("Max length of the lines to join to different points")
+            .min(20f)
+            .max(500)
+            .defaultValue(75d)
+            .roundingPlace(0)
+            .shouldRender(()->coolVisuals.value)
             .onSettingChange(this)
             .build()
     );
@@ -118,8 +159,9 @@ public class GUI extends Module_ {
         active.value = true;
 
         addSettingGroup(sgColors);
+        addSettingGroup(sgVisuals);
         addQuickSettings(sgColors.getSettings());
-
+        addQuickSettings(sgVisuals.getSettings());
     }
 
     @Override
@@ -127,9 +169,29 @@ public class GUI extends Module_ {
     }
 
     @Override
+    public void onSettingChange(Setting<?> setting) {
+        super.onSettingChange(setting);
+
+            PolygonMeshPatternRenderer.INSTANCE.maskGradient = gradientType.get();
+            PolygonMeshPatternRenderer.INSTANCE.radius = (float) dotRadius.value;
+            PolygonMeshPatternRenderer.INSTANCE.MAX_DISTANCE = (float) lineMaxLength.value;
+    }
+
+    @Override
     public void onLoad() {
         showInModulesList.value = false;
 
         ColorManager.INSTANCE.onTick(null);
+
+        PolygonMeshPatternRenderer.INSTANCE.maskGradient = gradientType.get();
+        PolygonMeshPatternRenderer.INSTANCE.radius = (float) dotRadius.value;
+        PolygonMeshPatternRenderer.INSTANCE.MAX_DISTANCE = (float) lineMaxLength.value;
+    }
+
+    public static boolean coolVisuals(){
+        return ModuleManager.get(GUI.class).coolVisuals.value;
+    }
+    public static boolean coolVisualsChatHud(){
+        return ModuleManager.get(GUI.class).coolVisuals.value && ModuleManager.get(GUI.class).inChatHud.value;
     }
 }

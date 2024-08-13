@@ -6,6 +6,8 @@ import dev.heliosclient.event.events.player.ChatMessageEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.chat.ChatTweaks;
+import dev.heliosclient.module.modules.render.GUI;
+import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.ChatHud;
@@ -49,6 +51,12 @@ public abstract class MixinChatHud {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHudLine$Visible;addedTime()I"))
     public void getChatLineIndex(CallbackInfo ci, @Local(ordinal = 13) int chatLineIndex) {
         this.chatLineIndex = chatLineIndex;
+    }
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;isChatHidden()Z",shift = At.Shift.AFTER))
+    public void onRender$GUICoolVisuals(DrawContext context, int currentTick, int mouseX, int mouseY,CallbackInfo ci) {
+        if(GUI.coolVisualsChatHud()){
+            PolygonMeshPatternRenderer.INSTANCE.render(context.getMatrices(),mouseX,mouseY);
+        }
     }
 
     @Unique

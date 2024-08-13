@@ -61,8 +61,8 @@ public class DisplayPreviewEntityRenderer extends LivingEntityRenderer<LivingEnt
         setAngles(limbAngle, limbDistance,false);
 
         // Calculate rotation based on head mouse position
-        float mouseXRotation = (mouseX - (float) MinecraftClient.getInstance().getWindow().getScaledWidth() / 2) * 0.015f;
-        float mouseYRotation = (mouseY - (float) MinecraftClient.getInstance().getWindow().getScaledHeight() / 2) * 0.015f;
+        float mouseXRotation = (mouseX - (float) MinecraftClient.getInstance().getWindow().getScaledWidth() / 2 + matrixStack.peek().getPositionMatrix().m03()) * 0.015f;
+        float mouseYRotation = (mouseY - (float) MinecraftClient.getInstance().getWindow().getScaledHeight() / 2 + matrixStack.peek().getPositionMatrix().m13()) * 0.015f;
 
         model.head.yaw = entity.getYaw() - mouseXRotation * 0.15f;
         model.head.pitch = mouseYRotation * 0.15f;

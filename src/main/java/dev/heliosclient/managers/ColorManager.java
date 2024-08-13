@@ -85,11 +85,22 @@ public class ColorManager implements Listener {
                 .setStartGradient(() -> ModuleManager.get(GUI.class).linear2Start.getColor())
                 .setEndGradient(() -> ModuleManager.get(GUI.class).linear2end.getColor())
                 .register();
+
+        new GradientManager.GradientBuilder()
+                .setName("Primary")
+                .setStartGradient(this::getPrimaryGradientStart)
+                .setEndGradient(this::getPrimaryGradientEnd)
+                .register();
     }
 
     public int defaultTextColor() {
         return defaultTextColor;
     }
+
+    public static GradientManager.Gradient getPrimaryGradient() {
+        return GradientManager.getGradient("Primary");
+    }
+
 
     public Color getPrimaryGradientStart() {
         return primaryGradientStart;

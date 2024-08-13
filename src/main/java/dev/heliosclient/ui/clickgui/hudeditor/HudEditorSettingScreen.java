@@ -5,7 +5,7 @@ import dev.heliosclient.module.settings.ParentScreenSetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
+import dev.heliosclient.ui.clickgui.settings.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -18,7 +18,7 @@ public class HudEditorSettingScreen extends AbstractSettingScreen implements IWi
 
     int x, y, windowWidth = 224, windowHeight;
 
-    public HudEditorSettingScreen(HudElement hudElement, int windowHeight, int windowWidth) {
+    public HudEditorSettingScreen(HudElement hudElement) {
         super(Text.of(hudElement.name), hudElement, 0, 224);
         updateSetting();
     }

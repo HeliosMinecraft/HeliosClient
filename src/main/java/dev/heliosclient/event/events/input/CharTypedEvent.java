@@ -8,12 +8,12 @@ import dev.heliosclient.event.LuaEvent;
 @LuaEvent("CharTypedEvent")
 public class CharTypedEvent extends Event {
     private final long window;
-    private final char i;
+    private final char character;
     private final int j;
 
-    public CharTypedEvent(long window, char i, int j) {
+    public CharTypedEvent(long window, char character, int j) {
         this.window = window;
-        this.i = i;
+        this.character = character;
         this.j = j;
     }
 
@@ -21,8 +21,8 @@ public class CharTypedEvent extends Event {
         return window;
     }
 
-    public char getI() {
-        return i;
+    public char getCharacter() {
+        return character;
     }
 
     public int getJ() {

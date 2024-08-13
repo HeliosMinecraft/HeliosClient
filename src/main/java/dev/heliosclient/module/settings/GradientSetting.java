@@ -16,16 +16,16 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 ;
 import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 public class GradientSetting extends ParentScreenSetting<GradientManager.Gradient> {
     public final Set<String> gradientList;
     protected float nameWidth = 10;
     public Table gradientTable;
+    public GradientManager.Gradient value;
+    public GradientManager.Gradient defaultValue;
 
     public GradientSetting(String name, String description, BooleanSupplier shouldRender, GradientManager.Gradient defaultValue, ISettingChange iSettingChange) {
         super(shouldRender, defaultValue);
@@ -36,7 +36,8 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
         gradientList = GradientManager.getAllGradientsNames();
 
         if(defaultValue == null){
-            this.value = GradientManager.getGradient(gradientList.stream().findFirst().get());
+            Optional<String> optional = gradientList.stream().findFirst();
+            optional.ifPresent(s -> this.value = GradientManager.getGradient(s));
         }
     }
     public void createTable(double width){
@@ -50,6 +51,13 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
+
+        //Should fix any null values
+        if(value == null){
+            Optional<String> optional = gradientList.stream().findFirst();
+            optional.ifPresent(s -> this.value = GradientManager.getGradient(s));
+        }
+
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 4, -1);
 
@@ -126,6 +134,10 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
+        if(value == null){
+            Optional<String> optional = gradientList.stream().findFirst();
+            optional.ifPresent(s -> this.value = GradientManager.getGradient(s));
+        }
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth), x + 2, y + 4, -1);
 
@@ -171,6 +183,10 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
 
     @Override
     public GradientManager.Gradient get() {
+        if(value == null){
+            Optional<String> optional = gradientList.stream().findFirst();
+            optional.ifPresent(s -> this.value = GradientManager.getGradient(s));
+        }
         return this.value;
     }
 

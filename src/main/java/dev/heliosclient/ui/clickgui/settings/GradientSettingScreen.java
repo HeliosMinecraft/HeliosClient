@@ -2,10 +2,12 @@ package dev.heliosclient.ui.clickgui.settings;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.GradientManager;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.GradientSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.ui.clickgui.gui.tables.TableEntry;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
@@ -34,6 +36,9 @@ public class GradientSettingScreen extends Screen implements IWindowContentRende
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         if (this.client.world == null) {
             super.renderBackgroundTexture(drawContext);
+        }
+        if(GUI.coolVisuals()){
+            PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(),mouseX,mouseY);
         }
 
         if (textRenderer.getWidth(setting.name) > windowWidth) {

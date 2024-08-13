@@ -2,27 +2,32 @@ package dev.heliosclient.module.modules.combat;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.render.Render3DEvent;
 import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.world.AntiBot;
 import dev.heliosclient.module.modules.world.Teams;
-import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.DoubleSetting;
-import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.EntityTypeListSetting;
+import dev.heliosclient.system.TickRate;
 import dev.heliosclient.util.SortMethod;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.TargetUtils;
+import dev.heliosclient.util.render.TargetRenderer;
+import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Hand;
 
+import java.util.List;
+
 public class TriggerBot extends Module_ {
 
     SettingGroup sgGeneral = new SettingGroup("General");
+    SettingGroup sgRender = new SettingGroup("Render");
 
     DoubleSetting range = sgGeneral.add(new DoubleSetting.Builder()
             .name("Range")
@@ -33,6 +38,13 @@ public class TriggerBot extends Module_ {
             .roundingPlace(1)
             .build()
     );
+    BooleanSetting smartDelay = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Smart Delay")
+            .description("Applies smart delay for different items like swords, axes, ")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .build()
+    );
     DoubleSetting attackDelay = sgGeneral.add(new DoubleSetting.Builder()
             .name("Attack Delay")
             .description("Delay (in ticks) to attack enemy.")
@@ -40,6 +52,7 @@ public class TriggerBot extends Module_ {
             .range(0, 60d)
             .roundingPlace(0)
             .defaultValue(10d)
+            .shouldRender(() -> !smartDelay.value)
             .build()
     );
     BooleanSetting ignoreTeammate = sgGeneral.add(new BooleanSetting.Builder()
@@ -74,6 +87,14 @@ public class TriggerBot extends Module_ {
             .value(true)
             .build()
     );
+    BooleanSetting tpsSync = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Tps Sync")
+            .description("Tries to sync your hits with the tps")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .value(true)
+            .build()
+    );
     EntityTypeListSetting entities = sgGeneral.add(new EntityTypeListSetting.Builder()
             .name("Entities to attack")
             .description("Attacks the selected entities")
@@ -81,14 +102,51 @@ public class TriggerBot extends Module_ {
             .build()
     );
 
+    GradientSetting color = sgRender.add(new GradientSetting.Builder()
+            .name("Color")
+            .description("Color of target rendering")
+            .defaultValue("Primary")
+            .onSettingChange(this)
+            .build()
+    );
+    DropDownSetting renderMode = sgRender.add(new DropDownSetting.Builder()
+            .name("Render Mode")
+            .description("Mode of target rendering")
+            .onSettingChange(this)
+            .defaultValue(List.of(TargetRenderer.RenderMode.values()))
+            .defaultListOption(TargetRenderer.RenderMode.Circle)
+            .build()
+    );
+    DoubleSetting radius = sgRender.add(new DoubleSetting.Builder()
+            .name("Radius")
+            .description("Radius of the circle")
+            .onSettingChange(this)
+            .range(0, 3d)
+            .roundingPlace(1)
+            .defaultValue(1d)
+            .shouldRender(() -> renderMode.getOption() == TargetRenderer.RenderMode.Circle)
+            .build()
+    );
+    CycleSetting direction = sgRender.add(new CycleSetting.Builder()
+            .name("Gradient Direction")
+            .description("Direction of the gradient to apply")
+            .onSettingChange(this)
+            .defaultValue(List.of(QuadColor.CardinalDirection.values()))
+            .defaultListOption(QuadColor.CardinalDirection.EAST)
+            .build()
+    );
     TargetUtils targetFinder = new TargetUtils();
 
     private int delay;
-    private LivingEntity targetEntity;
+    private Entity targetEntity;
 
     public TriggerBot() {
         super("TriggerBot", "Attacks entities when you look at them", Categories.COMBAT);
         addSettingGroup(sgGeneral);
+        addSettingGroup(sgRender);
+
+        addQuickSettings(sgGeneral.getSettings());
+
         targetFinder.setSortMethod(SortMethod.LowestDistance);
     }
 
@@ -116,40 +174,86 @@ public class TriggerBot extends Module_ {
         }
 
         return entity.isInvisible();
+
+    }
+
+    public boolean shouldAttack() {
+        float baseTimer = (!smartDelay.value) ? attackDelay.getFloat() : 0.5f;
+        if (tpsSync.get()) baseTimer = baseTimer / (TickRate.INSTANCE.getTPS() / 20);
+
+        if (smartDelay.value) {
+            return mc.player.getAttackCooldownProgress(baseTimer) >= 1;
+        } else {
+            if (this.delay < baseTimer) {
+                this.delay++;
+                return false;
+            } else {
+                this.delay = 0;
+                return true;
+            }
+        }
     }
 
 
     @SubscribeEvent
     public void onTickPlayer(TickEvent.PLAYER event) {
-        if(pauseInGUI.value && mc.currentScreen != null){
+        if (pauseInGUI.value && mc.currentScreen != null) {
             return;
         }
-        if (delay > 0) {
-            delay--;
-        } else {
-            targetEntity = (LivingEntity) targetFinder.getNewTargetIfNull(true);
+
+        if(shouldAttack()) {
+            targetEntity = targetFinder.getNewTargetIfNull(true);
 
             if (targetEntity != null) {
                 mc.interactionManager.attackEntity(mc.player, targetEntity);
                 mc.player.swingHand(Hand.MAIN_HAND);
-                delay = (int) attackDelay.value;
             }
         }
+    }
+
+    @SubscribeEvent
+    public void render3d(Render3DEvent event) {
+        if (targetEntity == null || !(targetEntity instanceof LivingEntity livingEntity)) return;
+
+        TargetRenderer.INSTANCE.set(livingEntity);
+        TargetRenderer.INSTANCE.color = color.get();
+        TargetRenderer.INSTANCE.renderMode = (TargetRenderer.RenderMode) renderMode.getOption();
+        TargetRenderer.INSTANCE.radius = (float) radius.value;
+        TargetRenderer.INSTANCE.dir = (QuadColor.CardinalDirection) direction.getOption();
+
+        TargetRenderer.INSTANCE.render();
     }
 
     @Override
     public void onSettingChange(Setting<?> setting) {
         super.onSettingChange(setting);
+
+
         targetFinder.setRange(range.value);
-        targetFinder.setFilter(entity ->
-                        entity instanceof LivingEntity e &&
-                        entities.getSelectedEntries().contains(e.getType()) &&
+        targetFinder.setFilter(entity -> {
+
+            //Apply to all entities (like end crystal, TNT, etc.)
+            boolean A = entities.getSelectedEntries().contains(entity.getType()) &&
+                    PlayerUtils.isPlayerLookingAtEntity(mc.player, entity, range.value) &&
+                    entity.isAlive() &&
+                    entity.isAttackable();
+
+            boolean B = true;
+
+            //Apply to only living entities
+            if (entity instanceof LivingEntity e) {
+                B = entities.getSelectedEntries().contains(entity.getType()) &&
                         PlayerUtils.isPlayerLookingAtEntity(mc.player, entity, range.value) &&
                         entity.isAlive() &&
                         entity.isAttackable() &&
                         !isTeamMate(e) &&
                         !isFriend(e) &&
-                        !isInvisible(e)
-        );
+                        !isInvisible(e) &&
+                        !AntiBot.isBot(e);
+            }
+
+            return A && B;
+        });
     }
+
 }

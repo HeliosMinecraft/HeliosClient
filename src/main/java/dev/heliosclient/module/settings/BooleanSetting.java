@@ -94,6 +94,10 @@ public class BooleanSetting extends Setting<Boolean> {
             checkBoxAnimation.startFading(value);
         }
     }
+    @Override
+    public Boolean get() {
+        return value;
+    }
 
     @Override
     public Object saveToFile(List<Object> objectList) {

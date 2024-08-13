@@ -35,7 +35,7 @@ import java.util.Map;
 public class Painter extends Module_ {
 
     //Text block
-    private final String FOUR_BY_FOUR_WALL = """
+    private static final String FOUR_BY_FOUR_WALL = """
             [0,0,0]{minecraft:obsidian}
             [1,0,0]{minecraft:obsidian}
             [2,0,0]{minecraft:obsidian}
@@ -53,7 +53,7 @@ public class Painter extends Module_ {
             [3,2,0]{minecraft:obsidian}
             [3,3,0]{minecraft:obsidian}""";
 
-    private final String WITHER = """
+    private static final String WITHER = """
             [0,0,0]{minecraft:soul_sand}
             [0,1,0]{minecraft:soul_sand}
             [0,1,-1]{minecraft:soul_sand}
@@ -61,6 +61,48 @@ public class Painter extends Module_ {
             [0,2,0]{minecraft:wither_skeleton_skull}
             [0,2,1]{minecraft:wither_skeleton_skull}
             [0,2,-1]{minecraft:wither_skeleton_skull}""";
+
+    private static final String NOMAD_HUT = """
+            [1,0,0]{minecraft:obsidian}
+            [1,1,0]{minecraft:obsidian}
+            [1,2,0]{minecraft:obsidian}
+            [0,2,0]{minecraft:obsidian}
+            [-1,0,0]{minecraft:obsidian}
+            [-1,1,0]{minecraft:obsidian}
+            [-1,2,0]{minecraft:obsidian}
+            [2,0,1]{minecraft:obsidian}
+            [2,1,1]{minecraft:obsidian}
+            [2,2,1]{minecraft:obsidian}
+            [2,0,2]{minecraft:obsidian}
+            [2,2,2]{minecraft:obsidian}
+            [2,0,3]{minecraft:obsidian}
+            [2,1,3]{minecraft:obsidian}
+            [2,2,3]{minecraft:obsidian}
+            [-2,0,1]{minecraft:obsidian}
+            [-2,1,1]{minecraft:obsidian}
+            [-2,2,1]{minecraft:obsidian}
+            [-2,0,2]{minecraft:obsidian}
+            [-2,2,2]{minecraft:obsidian}
+            [-2,0,3]{minecraft:obsidian}
+            [-2,1,3]{minecraft:obsidian}
+            [-2,2,3]{minecraft:obsidian}
+            [1,0,4]{minecraft:obsidian}
+            [1,1,4]{minecraft:obsidian}
+            [1,2,4]{minecraft:obsidian}
+            [0,0,4]{minecraft:obsidian}
+            [0,2,4]{minecraft:obsidian}
+            [-1,0,4]{minecraft:obsidian}
+            [-1,1,4]{minecraft:obsidian}
+            [-1,2,4]{minecraft:obsidian}
+            [1,3,3]{minecraft:obsidian}
+            [0,3,3]{minecraft:obsidian}
+            [-1,3,3]{minecraft:obsidian}
+            [1,3,2]{minecraft:obsidian}
+            [0,3,2]{minecraft:obsidian}
+            [-1,3,2]{minecraft:obsidian}
+            [1,3,1]{minecraft:obsidian}
+            [0,3,1]{minecraft:obsidian}
+            [-1,3,1]{minecraft:obsidian}""";
 
     public Direction lockedDirection = null;
     public BlockPos lockedStartPos = null;
@@ -227,6 +269,16 @@ public class Painter extends Module_ {
                 ChatUtils.sendHeliosMsg(ColorUtils.red + "File selected is empty or is not matching the proper syntax. Please review it.");
             }
         });
+        selectFile.addButton("Re-parse file", 1, 0, () -> {
+
+            if (painterFile != null) {
+                CANVAS_MAP = PainterFileParser.parseFile(painterFile);
+            }
+
+            if (painterFile == null) {
+                ChatUtils.sendHeliosMsg(ColorUtils.red + "File selected is not selected.");
+            }
+        });
     }
 
     @SubscribeEvent
@@ -248,15 +300,22 @@ public class Painter extends Module_ {
         isLocked = !lockCanvas.value;
         ticksPassed = 0;
 
+        loadCanvas();
+    }
+
+
+
+    private void loadCanvas(){
         if (structure.getOption() == Structure.Custom && painterFile == null) {
             ChatUtils.sendHeliosMsg("Paint file has not been selected! Toggling off...");
             toggle();
-        } else if (structure.getOption() == Structure.Wither) {
-            CANVAS_MAP = PainterFileParser.parseString(WITHER);
-        } else if (structure.getOption() == Structure.Wall4x4) {
-            CANVAS_MAP = PainterFileParser.parseString(FOUR_BY_FOUR_WALL);
+        } else if(painterFile != null){
+            CANVAS_MAP = PainterFileParser.parseFile(painterFile);
+        }else {
+            CANVAS_MAP = PainterFileParser.parseString(((Structure)structure.getOption()).structureString);
         }
     }
+
 
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
@@ -372,21 +431,24 @@ public class Painter extends Module_ {
         super.onSettingChange(setting);
 
         if (setting == structure) {
-            if (structure.getOption() == Structure.Wither) {
-                CANVAS_MAP = PainterFileParser.parseString(WITHER);
-            } else if (structure.getOption() == Structure.Wall4x4) {
-                CANVAS_MAP = PainterFileParser.parseString(FOUR_BY_FOUR_WALL);
-            }
+            loadCanvas();
         }
     }
 
     public Direction getBlockRotation() {
-        return isLocked ? lockedDirection : (autoRotate.value ? mc.player.getMovementDirection() : (Direction) rotationDirection.getOption());
+        return isLocked ? lockedDirection : (autoRotate.value ? mc.player.getMovementDirection().getOpposite() : (Direction) rotationDirection.getOption());
     }
 
     public enum Structure {
-        Wall4x4,
-        Wither,
-        Custom
+        Nomad_Hut_FitMC(NOMAD_HUT),
+        Wither(WITHER),
+        Wall4x4(FOUR_BY_FOUR_WALL),
+        Custom("");
+
+        public final String structureString;
+
+        Structure(String structureString){
+            this.structureString = structureString;
+        }
     }
 }

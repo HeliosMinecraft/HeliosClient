@@ -34,6 +34,11 @@ public class KeyBind extends Setting<Integer> {
         EventManager.register(this);
     }
 
+    @Override
+    public Integer get() {
+        return value;
+    }
+
     public static int none() {
         return -1;
     }

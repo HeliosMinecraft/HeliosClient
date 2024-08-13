@@ -48,6 +48,11 @@ public class AutoTool extends Module_ {
         if (mc.player.isCreative() || mc.player.isSpectator())
             return;
 
+        if (!mc.interactionManager.isBreakingBlock() &&  swapBack.value && hasSwapped) {
+            InventoryUtils.swapBackHotbar();
+            hasSwapped = false;
+        }
+
         if (mc.interactionManager.isBreakingBlock()) {
             BlockPos blockBreakingPos = ((AccessorClientPlayerInteractionManager) mc.interactionManager).getCurrentBreakingBlockPos();
             int bestToolSlot = InventoryUtils.getFastestTool(mc.world.getBlockState(blockBreakingPos), antiBreak.value);
@@ -56,9 +61,6 @@ public class AutoTool extends Module_ {
                 InventoryUtils.swapToSlot(bestToolSlot, swapBack.value);
                 hasSwapped = true;
             }
-        } else if (swapBack.value && hasSwapped) {
-            InventoryUtils.swapBackHotbar();
-            hasSwapped = false;
         }
     }
 }

@@ -20,6 +20,7 @@ import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.util.BufferUtils;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -186,8 +187,14 @@ public class CategoryPane implements Listener {
             if (gui.categoryBorder.value) {
                 drawOutlineGradientBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width);
             }
+
+            // Calculate the scale factor from the MatrixStack
+            Matrix4f matrix = drawContext.getMatrices().peek().getPositionMatrix();
+            float scaleY = matrix.m11();
+
             drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3,ColorManager.INSTANCE.clickGuiPrimary);
-            Renderer2D.enableScissor(x - 2, y + categoryNameHeight + 6, width + 5, (int) hudBox.getHeight() - 1);
+            // Apply the scale factor to the scissor box dimensions
+            Renderer2D.enableScissor(x - 20, (int) ((y + categoryNameHeight + 6) * scaleY), width + 40, (int) ((hudBox.getHeight() - 1) * scaleY));
         }
 
         if (collapsed) {

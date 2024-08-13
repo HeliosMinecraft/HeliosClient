@@ -43,6 +43,7 @@ public class ModuleManager {
 
         // World
         registerModules(
+                new AntiBot(),
                 new AntiBookBan(),
                 new SpeedMine(),
                 new PacketMine(),
@@ -183,7 +184,7 @@ public class ModuleManager {
 
     public static Module_ getModuleByName(String moduleName) {
         for (Module_ module : modules) {
-            if ((module.name.trim().equalsIgnoreCase(moduleName))) {
+            if (module.name.trim().equalsIgnoreCase(moduleName)) {
                 return module;
             }
         }

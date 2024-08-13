@@ -1,13 +1,14 @@
 package dev.heliosclient.ui.clickgui.settings;
 
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.ParentScreenSetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
+import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -49,6 +50,10 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         if (this.client.world == null) {
             super.renderBackgroundTexture(drawContext);
+        }
+
+        if(GUI.coolVisuals()){
+            PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(),mouseX,mouseY);
         }
 
         windowHeight = 50;

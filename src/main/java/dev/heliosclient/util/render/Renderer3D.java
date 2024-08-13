@@ -354,22 +354,6 @@ public class Renderer3D {
         RenderSystem.disableBlend();
     }
 
-    public static void drawOutlineCircleAroundPos(Vec3d pos, float radius, float lineWidth, LineColor color, int points) {
-        double y = pos.y;
-
-        for (int i = 0; i < points; i++) {
-            double angle1 = ((double) i / points) * 2.0 * Math.PI;
-            double angle2 = ((double) (i + 1) / points) * 2.0 * Math.PI;
-
-            // Calculate the start and end points for this segment of the circle
-            Vec3d start = new Vec3d(pos.x + Math.cos(angle1) * radius, y, pos.z + Math.sin(angle1) * radius);
-            Vec3d end = new Vec3d(pos.x + Math.cos(angle2) * radius, y, pos.z + Math.sin(angle2) * radius);
-
-            // Draw the line segment
-            Renderer3D.drawLine(start, end, color, lineWidth);
-        }
-    }
-
     public static void drawTriangle(Vec3d pos1, Vec3d center, Vec3d pos3, QuadColor color) {
         if (!FrustumUtils.isPointVisible(center)) {
             return;
@@ -409,7 +393,7 @@ public class Renderer3D {
         }
 
 
-        MatrixStack matrices = matrixFrom(center.x, center.y, center.z);
+        MatrixStack matrices = matrixFrom(center.x, center.y + 0.05f, center.z);
 
         setup();
         Tessellator tessellator = Tessellator.getInstance();
@@ -434,6 +418,7 @@ public class Renderer3D {
 
             Vertexer.vertexTriangle(matrices, buffer, Vec3d.ZERO, pos1, pos2, color);
         }
+
         tessellator.draw();
 
         RenderSystem.depthMask(true);

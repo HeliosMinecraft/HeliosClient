@@ -82,7 +82,8 @@ public class StringSetting extends Setting<String> {
         return characterLimit;
     }
 
-    public String getValue() {
+    @Override
+    public String get() {
         return value;
     }
 

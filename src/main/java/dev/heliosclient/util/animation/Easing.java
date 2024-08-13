@@ -1,5 +1,7 @@
 package dev.heliosclient.util.animation;
 
+import net.minecraft.util.math.MathHelper;
+
 public class Easing {
     public static float ease(EasingType type, float t) {
         return switch (type) {
@@ -54,7 +56,6 @@ public class Easing {
         }
     }
 
-
     public static float linearSigmoid(float t) {
         return (float) (1 / (1 + Math.exp(-10 * (t - 0.5))));
     }
@@ -76,6 +77,7 @@ public class Easing {
             return 1 - (f * f * f) / 2;
         }
     }
+
     public static float quarticIn(float t) {
         return t * t * t * t;
     }
@@ -99,22 +101,27 @@ public class Easing {
     }
 
     public static float bounceOut(float t) {
-        if (t < 4/11.0) {
-            return (121 * t * t)/16.0f;
-        } else if (t < 8/11.0) {
-            return (363/40.0f * t * t) - (99/10.0f * t) + 17/5.0f;
-        } else if (t < 9/10.0) {
-            return (4356/361.0f * t * t) - (35442/1805.0f * t) + 16061/1805.0f;
+        float n1 = 7.5625f;
+        float d1 = 2.75f;
+        if (t < 1 / d1) {
+            return n1 * t * t;
+        } else if (t < 2 / d1) {
+            t -= 1.5 / d1;
+            return n1 * t * t + 0.75f;
+        } else if (t < 2.5 / d1) {
+            t -= 2.25 / d1;
+            return n1 * t * t + 0.9375f;
         } else {
-            return (54/5.0f * t * t) - (513/25.0f * t) + 268/25.0f;
+            t -= 2.625 / d1;
+            return n1 * t * t + 0.984375f;
         }
     }
 
     public static float bounceInOut(float t) {
-        if(t < 0.5) {
-            return 0.5f * bounceIn(t*2);
+        if (t < 0.5) {
+            return bounceIn(t * 2) * 0.5f;
         } else {
-            return 0.5f * bounceOut(t * 2 - 1) + 0.5f;
+            return bounceOut(t * 2 - 1) * 0.5f + 0.5f;
         }
     }
 
@@ -129,5 +136,4 @@ public class Easing {
     public static float easeInOutSine(float t) {
         return (1 - (float) Math.cos(t * Math.PI)) / 2;
     }
-
 }

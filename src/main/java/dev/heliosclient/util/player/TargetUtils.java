@@ -1,5 +1,6 @@
 package dev.heliosclient.util.player;
 
+import dev.heliosclient.module.modules.world.AntiBot;
 import dev.heliosclient.util.EntityUtils;
 import dev.heliosclient.util.SortMethod;
 import net.minecraft.entity.Entity;
@@ -19,6 +20,7 @@ public class TargetUtils {
     public Entity currentTarget = null;
     private double range;
     private Predicate<Entity> filter = (entity) -> true;
+
 
     public TargetUtils() {
     }

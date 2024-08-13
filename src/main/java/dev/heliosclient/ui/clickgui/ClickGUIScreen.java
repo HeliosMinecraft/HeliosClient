@@ -2,18 +2,26 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CategoryManager;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.sysmodules.ClickGUI;
+import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.animation.Easing;
+import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -26,6 +34,9 @@ public class ClickGUIScreen extends Screen {
     static int scrollY = 0;
     public final ArrayList<CategoryPane> categoryPanes;
     public SearchBar searchBar;
+    private float scale = 0.0f;
+    private long timeOnOpen = 0;
+    private boolean shouldClose = false;
 
     public ClickGUIScreen() {
         super(Text.literal("ClickGUI"));
@@ -60,12 +71,43 @@ public class ClickGUIScreen extends Screen {
     }
 
     @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        super.resize(client, width, height);
+
+        PolygonMeshPatternRenderer.INSTANCE.create();
+    }
+
+    @Override
     public void onDisplayed() {
         super.onDisplayed();
+        shouldClose = false;
+        timeOnOpen = System.currentTimeMillis();
+
         //Rerun for any missed font changes.
         if (categoryPanes != null && !categoryPanes.isEmpty()) {
             for (CategoryPane pane : categoryPanes) {
                 pane.onFontChange(null);
+            }
+        }
+    }
+
+    private void updateScale(float speed, boolean close){
+        if(ModuleManager.get(GUI.class).bounceAnimation.value) {
+            long currentTime = System.currentTimeMillis();
+            if (close) {
+                this.scale -= speed * Easing.ease(EasingType.BOUNCE_OUT, MathHelper.clamp((currentTime - timeOnOpen) / 1500f, 0, 1));
+                if (this.scale <= 0.0) {
+                    super.close();
+                    shouldClose = false;
+                }
+            } else {
+                this.scale += speed * Easing.ease(EasingType.BOUNCE_IN_OUT, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1));
+            }
+            this.scale = MathHelper.clamp(this.scale, 0.0f, 1f);
+        }else{
+            this.scale = 1.0f;
+            if(shouldClose){
+                super.close();
             }
         }
     }
@@ -86,8 +128,17 @@ public class ClickGUIScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        GUI gui = ModuleManager.get(GUI.class);
+
+        updateScale((float) HeliosClient.CLICKGUI.animationSpeed.value,shouldClose);
         if (this.client.world == null) {
             super.renderBackgroundTexture(drawContext);
+        }else if(gui.background.value){
+            Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), 0,0,width,height, ColorUtils.changeAlphaGetInt(ColorManager.INSTANCE.getPrimaryGradientStart().getRGB(), 50),ColorUtils.changeAlphaGetInt(ColorManager.INSTANCE.getPrimaryGradientEnd().getRGB(),50), Renderer2D.Direction.LEFT_RIGHT);
+        }
+
+        if(gui.coolVisuals.value) {
+            PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(), mouseX, mouseY);
         }
 
         if (HeliosClient.CLICKGUI.ScreenHelp.value) {
@@ -96,6 +147,8 @@ public class ClickGUIScreen extends Screen {
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Middle Click - Open QuickSettings", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (fontHeight) - 2, -1);
         }
+
+        Renderer2D.scaleAndPosition(drawContext.getMatrices(),0,0,width,height,scale);
 
         for (CategoryPane category : categoryPanes) {
             category.y += scrollY * 10;
@@ -116,6 +169,8 @@ public class ClickGUIScreen extends Screen {
                 }
             }
         }
+
+        Renderer2D.stopScaling(drawContext.getMatrices());
 
         searchBar.render(drawContext, drawContext.getScaledWindowWidth() / 2 - searchBar.width / 2 + 7, drawContext.getScaledWindowHeight() - searchBar.height - 11, mouseX, mouseY, textRenderer);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
@@ -153,6 +208,11 @@ public class ClickGUIScreen extends Screen {
             category.charTyped(chr, modifiers);
         }
         return super.charTyped(chr, modifiers);
+    }
+
+    @Override
+    public void close() {
+        shouldClose = true;
     }
 
     @Override

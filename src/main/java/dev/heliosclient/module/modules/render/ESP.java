@@ -28,6 +28,9 @@ import java.util.List;
 public class ESP extends Module_ {
 
     SettingGroup sgGeneral = new SettingGroup("General");
+    SettingGroup sgEntities = new SettingGroup("Entities");
+    SettingGroup sgColor = new SettingGroup("Color");
+
     public CycleSetting boxMode = sgGeneral.add(new CycleSetting.Builder()
             .name("BoxMode")
             .description("Mode to draw box / outline of entities")
@@ -70,8 +73,7 @@ public class ESP extends Module_ {
             .onSettingChange(this)
             .build()
     );
-    SettingGroup sgEntities = new SettingGroup("Entities");
-    SettingGroup sgColor = new SettingGroup("Color");
+
     BooleanSetting team = sgGeneral.add(new BooleanSetting.Builder()
             .name("Team")
             .description("Override render colors of players to their team color.")

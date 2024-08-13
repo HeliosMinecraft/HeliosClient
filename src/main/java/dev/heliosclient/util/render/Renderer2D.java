@@ -1264,7 +1264,7 @@ public class Renderer2D implements Listener {
 
     /* ==== Drawing Lines ==== */
 
-    public static void drawLine(MatrixStack matrixStack, int x1, int y1, int x2, int y2,float lineWidth, int color) {
+    public static void drawLine(MatrixStack matrixStack, float x1, float y1, float x2, float y2,float lineWidth, int color) {
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 
         float red = (color >> 16 & 255) / 255.0F;

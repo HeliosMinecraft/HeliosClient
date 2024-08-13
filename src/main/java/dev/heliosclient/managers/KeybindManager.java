@@ -13,7 +13,7 @@ import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
-import dev.heliosclient.ui.clickgui.gui.AbstractSettingScreen;
+import dev.heliosclient.ui.clickgui.settings.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;

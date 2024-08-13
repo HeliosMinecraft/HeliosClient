@@ -1,13 +1,16 @@
-package dev.heliosclient.ui.clickgui.gui;
+package dev.heliosclient.ui.clickgui.settings;
 
 
 import com.google.common.util.concurrent.AtomicDouble;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.Tooltip;
+import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
+import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -29,7 +32,7 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
         this.window = new Window(windowHeight, windowWidth, true, this);
     }
 
-    public AbstractSettingScreen(Text title, Setting setting, int windowHeight, int windowWidth) {
+    public AbstractSettingScreen(Text title, Setting<?> setting, int windowHeight, int windowWidth) {
         super(title);
         this.setting = setting;
         this.window = new Window(windowHeight, windowWidth, true, this);
@@ -59,6 +62,10 @@ public abstract class AbstractSettingScreen extends Screen implements IWindowCon
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        if(GUI.coolVisuals()){
+            PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(),mouseX,mouseY);
+        }
+
         if (module != null) {
             window.render(drawContext, mouseX, mouseY, module.name, module.description, textRenderer);
         } else if (setting != null) {

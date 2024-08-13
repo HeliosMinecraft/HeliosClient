@@ -18,7 +18,7 @@ public class ConsoleScreen extends Screen {
 
     public ConsoleScreen() {
         super(Text.of("Console"));
-        consoleBox = new MultiLineInputBox(50, 50, "Test", Long.MAX_VALUE, MultiLineInputBox.InputMode.ALL);
+        consoleBox = new MultiLineInputBox(50, 50, "Test", Long.MAX_VALUE, InputBox.InputMode.ALL);
         consoleBox.doSyntaxHighLighting = false;
         consoleBox.displayLineNos = true;
         consoleBox.autoScroll = true;

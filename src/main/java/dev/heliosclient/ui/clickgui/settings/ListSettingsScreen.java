@@ -2,8 +2,10 @@ package dev.heliosclient.ui.clickgui.settings;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.ui.clickgui.SearchBar;
+import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -34,6 +36,10 @@ public class ListSettingsScreen extends Screen implements IWindowContentRenderer
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
+
+        if(GUI.coolVisuals()){
+            PolygonMeshPatternRenderer.INSTANCE.render(context.getMatrices(),mouseX,mouseY);
+        }
 
         window.render(context, mouseX, mouseY, setting.name, setting.description, textRenderer);
         setting.setSearchTerm(searchBar.getValue());

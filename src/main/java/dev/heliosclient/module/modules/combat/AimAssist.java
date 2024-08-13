@@ -7,6 +7,7 @@ import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
+import dev.heliosclient.module.modules.world.AntiBot;
 import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
@@ -237,8 +238,11 @@ public class AimAssist extends Module_ {
                     !isFriend(e1) &&
                     isEntityVisible(e1) &&
                     !isDead(e1) &&
-                    isAttackable(e1), true);
+                    isAttackable(e1) &&
+                    !AntiBot.isBot(e1), true);
+
         }
+
 
         if (ignoreTeammate && ModuleManager.get(Teams.class).isInMyTeam(targetEntity)) {
             return;

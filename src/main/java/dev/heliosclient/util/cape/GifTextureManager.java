@@ -1,4 +1,4 @@
-package dev.heliosclient.util.render;
+package dev.heliosclient.util.cape;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CapeManager;
@@ -6,7 +6,6 @@ import dev.heliosclient.util.FileUtils;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
-import org.spongepowered.asm.mixin.transformer.ClassInfo;
 
 import java.io.File;
 import java.io.IOException;

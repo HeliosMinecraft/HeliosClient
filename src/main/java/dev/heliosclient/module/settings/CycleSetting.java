@@ -74,6 +74,11 @@ public class CycleSetting extends Setting<Integer> {
         }
     }
 
+    @Override
+    public Integer get() {
+        return value;
+    }
+
     public boolean mouseHoveringOverOptions(int mouseX, int mouseY) {
         return mouseX >= x + 2 && mouseX <= x + 2 + Renderer2D.getFxStringWidth(name + ": ") && mouseY >= y + 3 && mouseY <= y + 3 + Renderer2D.getFxStringHeight() + 4;
     }

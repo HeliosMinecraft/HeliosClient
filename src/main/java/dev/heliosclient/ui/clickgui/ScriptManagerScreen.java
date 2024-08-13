@@ -1,9 +1,11 @@
 package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.managers.ColorManager;
+import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.buttonsetting.Button;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
+import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.gui.tables.Table;
 import dev.heliosclient.ui.clickgui.gui.tables.TableEntry;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
@@ -112,6 +114,11 @@ public class ScriptManagerScreen extends Screen {
         if (mc.world == null) {
             super.renderBackgroundTexture(context);
         }
+
+        if(GUI.coolVisuals()) {
+            PolygonMeshPatternRenderer.INSTANCE.render(context.getMatrices(), mouseX, mouseY);
+        }
+
         scaledWidth = mc.getWindow().getScaledWidth();
         scaledHeight = mc.getWindow().getScaledHeight();
         managerWidth = scaledWidth - 200;
