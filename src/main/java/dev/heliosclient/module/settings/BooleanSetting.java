@@ -100,6 +100,11 @@ public class BooleanSetting extends Setting<Boolean> {
     }
 
     @Override
+    public void setValue(Boolean value) {
+        super.setValue(value);
+    }
+
+    @Override
     public Object saveToFile(List<Object> objectList) {
         return value;
     }

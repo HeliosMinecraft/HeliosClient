@@ -12,7 +12,7 @@ import java.awt.*;
 
 public class ColorManager implements Listener {
 
-    public static final ColorManager INSTANCE = new ColorManager();
+    public static ColorManager INSTANCE;
 
     public static boolean SYNC_ACCENT = false;
 
@@ -36,6 +36,10 @@ public class ColorManager implements Listener {
     //This is the gradient we use across the GUI
     public Color primaryGradientStart = new Color(0);
     public Color primaryGradientEnd = new Color(0);
+
+    public static void createInstance(){
+        INSTANCE = new ColorManager();
+    }
 
     private ColorManager() {
         new GradientManager.GradientBuilder()
@@ -91,6 +95,7 @@ public class ColorManager implements Listener {
                 .setStartGradient(this::getPrimaryGradientStart)
                 .setEndGradient(this::getPrimaryGradientEnd)
                 .register();
+
     }
 
     public int defaultTextColor() {

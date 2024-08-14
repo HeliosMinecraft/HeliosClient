@@ -109,10 +109,17 @@ public class AimAssist extends Module_ {
             .defaultValue(false)
             .build()
     );
+    BooleanSetting onlyWithWeapon = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Only with weapon")
+            .description("Aims only when you are holding a weapon")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .build()
+    );
 
     BooleanSetting simulateRotation = sgGeneral.add(new BooleanSetting.Builder()
             .name("Simulate Rotation")
-            .description("Simulates your rotation to the enemy linearly for more natural human-like movement instead of blatantly moving")
+            .description("Simulates your rotation to the enemy linearly for more natural human-like movement instead of instantly rotating")
             .onSettingChange(this)
             .defaultValue(true)
             .value(true)
@@ -221,6 +228,8 @@ public class AimAssist extends Module_ {
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
         RotationSimulator.pauseInGUI = pauseInGUI.value;
+
+        if(onlyWithWeapon.value && !PlayerUtils.hasWeaponInHand(mc.player)) return;
         simulateRotationLook(range.value, ignoreTeammate.value, null);
     }
 

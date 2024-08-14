@@ -183,6 +183,10 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
 
     @Override
     public Object saveToFile(List<Object> objectList) {
+        if(selectedEntries.size() == value.size()){
+            return "all";
+        }
+
         for (T entry : selectedEntries) {
             objectList.add(registry.getRawId(entry));
         }
@@ -191,6 +195,12 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
 
     @Override
     public void loadFromFile(Map<String, Object> MAP) {
+        if(MAP.get(getSaveName()) instanceof String stringVal && stringVal.equalsIgnoreCase("all")){
+            selectedEntries.clear();
+            selectedEntries.addAll(value);
+            return;
+        }
+
         List<Object> tomlSelectedItem = (List<Object>) MAP.get(getSaveName());
 
         selectedEntries.clear();

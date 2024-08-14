@@ -137,6 +137,7 @@ public class HeliosClient implements ModInitializer, Listener {
 
         LOGGER.info("Initialising Helios Client...");
 
+        ColorManager.createInstance();
         CONFIG.init();
         CLICKGUI = new ClickGUI();
 

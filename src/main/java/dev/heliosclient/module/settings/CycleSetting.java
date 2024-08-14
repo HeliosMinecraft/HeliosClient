@@ -74,6 +74,10 @@ public class CycleSetting extends Setting<Integer> {
         }
     }
 
+    public void setValue(int value) {
+        this.value = value;
+    }
+
     @Override
     public Integer get() {
         return value;

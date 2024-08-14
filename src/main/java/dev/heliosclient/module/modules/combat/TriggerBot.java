@@ -55,6 +55,14 @@ public class TriggerBot extends Module_ {
             .shouldRender(() -> !smartDelay.value)
             .build()
     );
+    BooleanSetting onlyWithWeapon = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Only with weapon")
+            .description("Attacks only when you are holding a weapon")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .build()
+    );
+
     BooleanSetting ignoreTeammate = sgGeneral.add(new BooleanSetting.Builder()
             .name("Ignore teammate")
             .description("Uses teams module to avoid hitting at team members")
@@ -121,12 +129,13 @@ public class TriggerBot extends Module_ {
             .name("Radius")
             .description("Radius of the circle")
             .onSettingChange(this)
-            .range(0, 3d)
+            .range(0, 2d)
             .roundingPlace(1)
-            .defaultValue(1d)
+            .defaultValue(0.7)
             .shouldRender(() -> renderMode.getOption() == TargetRenderer.RenderMode.Circle)
             .build()
     );
+
     CycleSetting direction = sgRender.add(new CycleSetting.Builder()
             .name("Gradient Direction")
             .description("Direction of the gradient to apply")
@@ -195,8 +204,10 @@ public class TriggerBot extends Module_ {
     }
 
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = SubscribeEvent.Priority.HIGH)
     public void onTickPlayer(TickEvent.PLAYER event) {
+        if(onlyWithWeapon.value && !PlayerUtils.hasWeaponInHand(mc.player)) return;
+
         if (pauseInGUI.value && mc.currentScreen != null) {
             return;
         }

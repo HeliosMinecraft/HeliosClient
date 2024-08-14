@@ -277,7 +277,7 @@ public class TargetStrafe extends Module_ {
         if (PlayerUtils.hasHorizontalCollision(strafePos) || PlayerUtils.willFallMoreThanFiveBlocks(strafePos)) {
             strafeDirectionChanged = !strafeDirectionChanged; // Reverse strafe direction
         } else {
-            mc.player.updatePosition(strafePos.x, strafePos.y, strafePos.z);
+            mc.player.updatePosition(strafePos.x, mc.player.getY(), strafePos.z);
         }
 
         // Rotate player to face the target

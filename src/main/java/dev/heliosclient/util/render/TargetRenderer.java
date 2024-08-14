@@ -31,7 +31,7 @@ public class TargetRenderer {
             case Circle -> Renderer3D.drawFlatFilledCircle(radius,Renderer3D.getInterpolatedPosition(targetEntity),320,color);
             case Outline -> Renderer3D.drawBoxOutline(targetEntity.getBoundingBox(),color,3f);
             case WireFrame,
-                 Player_Skeleton -> WireframeEntityRenderer.render(targetEntity,1.0f,color, LineColor.gradient(this.color.getStartGradient().getRGB(),this.color.getEndGradient().getRGB()),1f,true,true,renderMode == RenderMode.Player_Skeleton);
+                 Player_Skeleton -> WireframeEntityRenderer.render(targetEntity,1.0f,color, LineColor.gradient(this.color.getStartGradient().getRGB(),this.color.getEndGradient().getRGB()),1.5f,true,true,renderMode == RenderMode.Player_Skeleton);
         }
     }
 

@@ -106,6 +106,11 @@ public class ColorSetting extends Setting<Integer> {
     }
 
     @Override
+    public void setValue(Integer value) {
+        super.setValue(value);
+    }
+
+    @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
 
         double diff = Math.min(100, Math.max(0, (mouseY - y - 14) / 0.6));

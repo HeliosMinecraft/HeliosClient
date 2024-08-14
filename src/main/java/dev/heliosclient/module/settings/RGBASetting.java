@@ -359,6 +359,11 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         return value;
     }
 
+    @Override
+    public void setValue(Color value) {
+        this.value = value;
+    }
+
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
         if (rainbow) {

@@ -52,13 +52,6 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
 
-        //Should fix any null values
-        if(value == null){
-            Optional<String> optional = gradientList.stream().findFirst();
-            optional.ifPresent(s -> this.value = GradientManager.getGradient(s));
-        }
-
-
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 4, -1);
 
         // Draw a '🖋' button next to the text
@@ -134,11 +127,6 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        if(value == null){
-            Optional<String> optional = gradientList.stream().findFirst();
-            optional.ifPresent(s -> this.value = GradientManager.getGradient(s));
-        }
-
         Renderer2D.drawFixedString(drawContext.getMatrices(), FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth), x + 2, y + 4, -1);
 
         // Draw a '🖋' button next to the text
@@ -206,6 +194,11 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
         }else{
             this.value = defaultValue;
         }
+    }
+
+    @Override
+    public void setValue(GradientManager.Gradient value) {
+        this.value = value;
     }
 
     public static class GradientEntry implements TableEntry{

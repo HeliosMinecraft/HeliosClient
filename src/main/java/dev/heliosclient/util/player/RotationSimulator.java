@@ -79,7 +79,7 @@ public class RotationSimulator implements Listener {
 
         public Rotation(double yaw, double pitch, boolean clientSide, Runnable task, int tickTiming, int randomness, EasingType type) {
             this.setTarget(yaw, pitch, clientSide, task, tickTiming, randomness, type);
-            ticksPassed = 0;
+            Rotation.ticksPassed = 0;
             this.startYaw = mc.player.getYaw(mc.getTickDelta());
             this.startPitch = mc.player.getPitch(mc.getTickDelta());
         }
@@ -104,11 +104,11 @@ public class RotationSimulator implements Listener {
 
             ticksPassed++;
 
-            double progress = MathHelper.clamp((float) ticksPassed / tickTiming, 0.0f, 1.0f);
+            double progress = MathHelper.clamp((float) ticksPassed / tickTiming, 0.0f, 0.999f);
             progress = Easing.ease(type, (float) progress);
 
-            if (progress >= 1.0) {
-                progress = 1.0;
+            if (progress >= 1.0f) {
+                progress = 1.0f;
                 if (task != null) {
                     task.run();
                 }
@@ -120,8 +120,8 @@ public class RotationSimulator implements Listener {
 
             // Add randomness to the target yaw and pitch
             if (randomness != 0.0 && progress < 0.97f && rand.nextBetween(0, 20) > 18) {
-                interpolatedYaw += (rand.nextGaussian() - 1) * randomness;
-                interpolatedPitch += (rand.nextGaussian() - 1) * randomness;
+                interpolatedYaw += (rand.nextGaussian() - 0.5) * randomness * 0.5;
+                interpolatedPitch += (rand.nextGaussian() - 0.5) * randomness * 0.5;
             }
 
             RotationUtils.rotate((float) interpolatedYaw, (float) interpolatedPitch, clientSide, null);

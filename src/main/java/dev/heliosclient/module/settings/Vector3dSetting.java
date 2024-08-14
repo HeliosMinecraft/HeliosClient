@@ -184,6 +184,11 @@ public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
         return value;
     }
 
+    @Override
+    public void setValue(Vec3d value) {
+        super.setValue(value);
+    }
+
     public static class Builder extends SettingBuilder<Builder, Vec3d, Vector3dSetting> {
         ISettingChange ISettingChange;
         double min, max;

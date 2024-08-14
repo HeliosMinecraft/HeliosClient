@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.item.*;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -90,6 +91,17 @@ public class PlayerUtils {
             return entityHitResult.getEntity() == target;
         }
         return false;
+    }
+
+    public static boolean hasWeaponInHand(PlayerEntity player){
+        if(player.getMainHandStack() == null) return false;
+        Item item = player.getMainHandStack().getItem();
+        return item instanceof SwordItem ||  item instanceof AxeItem ||  item instanceof TridentItem  /* || item instanceof MaceItem*/;
+    }
+    public static boolean hasRangedWeaponInHand(PlayerEntity player){
+        if(player.getMainHandStack() == null) return false;
+        Item item = player.getMainHandStack().getItem();
+        return item instanceof BowItem ||  item instanceof CrossbowItem || item instanceof SnowballItem || item instanceof EggItem;
     }
 
 
