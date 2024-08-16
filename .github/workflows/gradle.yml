@@ -88,4 +88,4 @@ jobs:
                 GITHUB_REPOSITORY: ${{ github.repository }}
                 PUSH_USER: ${{ github.actor }}
                 RUN_ID: ${{ github.run_id }}
-                COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}
+                COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
