@@ -1,6 +1,8 @@
 package dev.heliosclient.util.animation;
 
 
+import net.minecraft.util.math.MathHelper;
+
 public class Animation {
     private float FADE_SPEED = 0.05f;
     private float alpha = 1.0f;
@@ -23,7 +25,7 @@ public class Animation {
             alpha += fadeIn ? FADE_SPEED : -FADE_SPEED;
             if (alpha <= 0.0f || alpha >= 1.0f) {
                 fading = false;
-                alpha = Math.max(0.0f, Math.min(1.0f, alpha));
+                alpha = MathHelper.clamp(alpha,0.0f,1.0f);
             }
         }
     }

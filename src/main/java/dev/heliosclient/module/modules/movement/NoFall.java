@@ -120,7 +120,7 @@ public class NoFall extends Module_ {
     public void onSettingChange(Setting<?> setting) {
         super.onSettingChange(setting);
         if (cancelBounce.value && mode.value == 2) {
-            ChatUtils.sendHeliosMsg("SlimeBlocks will cause fall damage with cancelBounce on!");
+            ChatUtils.sendHeliosMsg("(NoFall Clutch) SlimeBlocks will cause fall damage with cancelBounce on!");
         }
     }
 

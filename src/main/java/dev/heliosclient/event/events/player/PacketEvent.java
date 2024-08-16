@@ -35,5 +35,18 @@ public class PacketEvent extends Event {
             return packet;
         }
     }
+
+    @LuaEvent("packetSentEvent")
+    public static class SENT extends PacketEvent {
+        public Packet<?> packet;
+
+        public SENT(Packet<?> packet) {
+            this.packet = packet;
+        }
+
+        public Packet<?> getPacket() {
+            return packet;
+        }
+    }
 }
 

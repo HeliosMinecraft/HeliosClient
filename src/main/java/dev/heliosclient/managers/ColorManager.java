@@ -44,8 +44,8 @@ public class ColorManager implements Listener {
     private ColorManager() {
         new GradientManager.GradientBuilder()
                 .setName("Rainbow")
-                .setStartGradient(ColorUtils::getRainbowColor)
-                .setEndGradient(ColorUtils::getRainbowColor2)
+                .setStartGradient(ColorUtils::getRainbowColor2)
+                .setEndGradient(ColorUtils::getRainbowColor)
                 .register();
 
         new GradientManager.GradientBuilder()

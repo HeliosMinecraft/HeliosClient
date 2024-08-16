@@ -31,6 +31,7 @@ public class AntiHunger extends Module_ {
             .min(0)
             .max(20)
             .roundingPlace(0)
+            .shouldRender(()-> suppressJumping.value)
             .build()
     );
 

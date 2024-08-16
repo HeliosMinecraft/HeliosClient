@@ -113,12 +113,12 @@ public class Window implements Listener {
             Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y + 20,true,true,true,true, windowWidth, windowHeight, 5, color);
 
             if (!description.isEmpty()) {
-                wrappedText = Renderer2D.wrapText("§o" + description, windowWidth, HeliosClient.MC.textRenderer);
+                wrappedText = Renderer2D.wrapText(description, windowWidth, HeliosClient.MC.textRenderer);
 
                 int textOffsetY = 0;
                 for (String text : wrappedText) {
                     int warpedTextWidth = textRenderer.getWidth(text);
-                    drawContext.drawText(textRenderer, text, x + windowWidth / 2 - warpedTextWidth / 2 + 1, y + 26 + textOffsetY, ColorManager.INSTANCE.defaultTextColor(), false);
+                    drawContext.drawText(textRenderer, ColorUtils.italic + text, x + windowWidth / 2 - warpedTextWidth / 2 + 1, y + 26 + textOffsetY, ColorManager.INSTANCE.defaultTextColor(), false);
                     textOffsetY += textRenderer.fontHeight + 3;
                 }
                 descriptionHeight = textOffsetY;

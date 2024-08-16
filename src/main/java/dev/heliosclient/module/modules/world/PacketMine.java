@@ -33,6 +33,7 @@ public class PacketMine extends Module_ {
     private final Map<BlockPos, Double> progressMap = new HashMap<>();
     private final Map<BlockPos, Integer> timerMap = new HashMap<>();
     private final Map<BlockPos, Boolean> miningMap = new HashMap<>();
+
     private final DoubleSetting delay = sgGeneral.add(new DoubleSetting.Builder()
             .name("Delay")
             .description("Delay between mining blocks (in ticks).")
@@ -45,7 +46,7 @@ public class PacketMine extends Module_ {
     private final BooleanSetting rotate = sgGeneral.add(new BooleanSetting.Builder()
             .name("Rotate")
             .description("Rotates to look at the block before mining it")
-            .defaultValue(true)
+            .defaultValue(false)
             .onSettingChange(this)
             .build()
     );

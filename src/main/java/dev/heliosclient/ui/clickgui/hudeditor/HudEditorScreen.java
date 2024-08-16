@@ -12,11 +12,17 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
+import dev.heliosclient.util.TimerUtils;
+import dev.heliosclient.util.animation.Animation;
+import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -34,19 +40,27 @@ public class HudEditorScreen extends Screen implements Listener {
     private boolean isDragging = false;
     private HudBox dragBox = null;
     private final Map<String, Object> copiedSettings = new HashMap<>();
-
+    private final int defaultSnapSize = 120;
+    private boolean isScrolling;
+    Animation fadeAnimation = new Animation(EasingType.LINEAR_IN);
+    private final Color LIGHT_YELLOW = new Color(237, 248, 174, 95);
+    private TimerUtils scrollTimer = new TimerUtils();
+    private static final long SCROLL_TIMEOUT = 2000; // 2 seconds
 
     private HudEditorScreen() {
         super(Text.of("Hud editor"));
         EventManager.register(this);
         dragBox = new HudBox(0, 0, 0, 0);
         selectedElements.clear();
+        fadeAnimation.setFadeSpeed(0.01f);
+        fadeAnimation.setAlpha(0);
     }
 
     @Override
     public void onDisplayed() {
         super.onDisplayed();
         selectedElements.clear();
+        scrollTimer.startTimer();
     }
 
     @Override
@@ -66,6 +80,7 @@ public class HudEditorScreen extends Screen implements Listener {
 
         if (HeliosClient.CLICKGUI.ScreenHelp.value) {
             float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
+            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Shift + Scroll - To increase/decrease snap size", 2, drawContext.getScaledWindowHeight() - (6 * fontHeight) - 6 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Ctrl- C/V - To Copy/Paste HudElement properties", 2, drawContext.getScaledWindowHeight() - (5 * fontHeight) - 5 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Select Element", 2, drawContext.getScaledWindowHeight() - (4 * fontHeight) - 4 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (3 * fontHeight) - 3 * 2, -1);
@@ -82,6 +97,21 @@ public class HudEditorScreen extends Screen implements Listener {
             drawContext.drawBorder(Math.round(dragBox.getX() - 1), Math.round(dragBox.getY() - 1), Math.round(dragBox.getWidth() + 1), Math.round(dragBox.getHeight() + 1), new Color(255, 255, 255, 155).getRGB());
             drawContext.getMatrices().pop();
         }
+
+        //Fade out every SCROLL_TIMEOUT ms
+        scrollTimer.every(SCROLL_TIMEOUT,()-> {
+            if(fadeAnimation.getInterpolatedAlpha() > 0.5f) {
+                fadeAnimation.startFading(false);
+            }
+        });
+
+        String sizeChangeText = "Snap Size changed to " + HudElement.getSnapSize();
+        float textWidth = Renderer2D.getFxStringWidth(sizeChangeText);
+        float textHeight = Renderer2D.getFxStringHeight(sizeChangeText);
+        float x = this.width / 2f - textWidth / 2f;
+        float y = this.height - textHeight * 2f;
+        AnimationUtils.drawFadingAndPoppingBoxBetter(drawContext,fadeAnimation,x - 2,y - 2,textWidth + 4,textHeight + 4,LIGHT_YELLOW.getRGB(),true,3f);
+        AnimationUtils.drawFadingAndPoppingText(drawContext,fadeAnimation,sizeChangeText,x,y,-1,true);
 
         HudManager.INSTANCE.renderEditor(drawContext, textRenderer, mouseX, mouseY);
         HudCategoryPane.INSTANCE.render(drawContext, textRenderer, mouseX, mouseY, delta);
@@ -248,7 +278,7 @@ public class HudEditorScreen extends Screen implements Listener {
                 continue;
             }
 
-            if (element.selected && isPaste(keyCode) && copiedSettings != null && !copiedSettings.isEmpty()) {
+            if (element.selected && isPaste(keyCode) && !copiedSettings.isEmpty()) {
                 for (SettingGroup settingGroup : element.settingGroups) {
                     for (Setting<?> setting : settingGroup.getSettings()) {
                         if (!setting.shouldSaveAndLoad()) continue;
@@ -262,6 +292,24 @@ public class HudEditorScreen extends Screen implements Listener {
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (Screen.hasShiftDown()) {
+            if (!isScrolling) {
+                fadeAnimation.startFading(true);
+            }
+            isScrolling = true;
+            HudElement.setSnapSize(HudElement.getSnapSize() + MathHelper.ceil(verticalAmount));
+            scrollTimer.resetTimer();
+        } else {
+            if (isScrolling) {
+                fadeAnimation.startFading(false);
+            }
+            isScrolling = false;
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
@@ -270,6 +318,7 @@ public class HudEditorScreen extends Screen implements Listener {
                 element.shiftDown = false;
             }
         }
+
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
 }

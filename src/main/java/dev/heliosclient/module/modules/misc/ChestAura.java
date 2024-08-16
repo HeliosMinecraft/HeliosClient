@@ -35,7 +35,7 @@ public class ChestAura extends Module_ {
     BooleanSetting trappedChests = sgGeneral.add(new BooleanSetting("Trapped Chests", "Opens trapped chests as well", this, false, () -> true, false));
     BooleanSetting rotate = sgGeneral.add(new BooleanSetting("Rotate", "Rotates to look at the chest before opening it", this, true, () -> true, true));
     BooleanSetting clearOnDisable = sgGeneral.add(new BooleanSetting("Clear on disable", "Clears opened container cache on module disable", this, true, () -> true, true));
-    BooleanSetting autoSteal = sgGeneral.add(new BooleanSetting("AutoSteal", "Automatically steals all the items from the chest (buggy and unreliable).", this, false, () -> true, false));
+    BooleanSetting autoSteal = sgGeneral.add(new BooleanSetting("AutoSteal", "Automatically steals all the items from the chest (maybe unreliable).", this, false, () -> true, false));
 
 
     public ChestAura() {

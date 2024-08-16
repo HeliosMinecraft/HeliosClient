@@ -48,7 +48,7 @@ public class TimerUtils {
 
     // Resets the timer
     public void resetTimer() {
-        startTime = 0;
+        startTime = System.currentTimeMillis();
         hasTimerStarted = false;
     }
 
@@ -70,10 +70,10 @@ public class TimerUtils {
     }
 
     public boolean every(long ms, Runnable task) {
-        if (getElapsedTime() >= ms / 1000.0) {
+        if (getElapsedTimeMS() >= ms) {
             task.run();
             resetTimer();
         }
-        return getElapsedTime() >= ms / 1000.0;
+        return getElapsedTimeMS() >= ms;
     }
 }

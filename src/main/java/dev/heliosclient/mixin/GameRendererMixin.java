@@ -10,8 +10,12 @@ import dev.heliosclient.module.modules.render.AspectRatio;
 import dev.heliosclient.module.modules.render.NoRender;
 import dev.heliosclient.module.modules.render.Zoom;
 import dev.heliosclient.module.modules.world.LiquidInteract;
+import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.util.render.GradientBlockRenderer;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -29,6 +33,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.awt.*;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
@@ -49,6 +55,7 @@ public abstract class GameRendererMixin {
 
     @Shadow private float zoomX;
     @Shadow private float zoomY;
+    @Shadow @Final private BufferBuilderStorage buffers;
     @Unique private float lastZoom;
     @Unique private boolean isZooming;
 
@@ -101,6 +108,16 @@ public abstract class GameRendererMixin {
                 zoom = lastZoom;
             }
             isZooming = false;
+        }
+    }
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;renderWithTooltip(Lnet/minecraft/client/gui/DrawContext;IIF)V",shift = At.Shift.AFTER))
+    private void renderWorld$GlowMouse(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+        if(ClickGUI.shouldGlowMousePointer()) {
+            DrawContext drawContext = new DrawContext(this.client, this.buffers.getEntityVertexConsumers());
+
+            double i = this.client.mouse.getX() * (double) this.client.getWindow().getScaledWidth() / (double) this.client.getWindow().getWidth();
+            double j = this.client.mouse.getY() * (double) this.client.getWindow().getScaledHeight() / (double) this.client.getWindow().getHeight();
+            Renderer2D.drawCircularBlurredShadow(drawContext.getMatrices(), (float) i, (float) j,5.0f, ClickGUI.getGlowColor(), ClickGUI.getGlowRadius());
         }
     }
 

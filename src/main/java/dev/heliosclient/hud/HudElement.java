@@ -20,6 +20,7 @@ import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.MathHelper;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -59,6 +60,9 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public SettingGroup sgUI = new SettingGroup("UI");
     public boolean isInHudEditor = false;
     public UniqueID id;
+    int startX, startY;
+    private static int snapSize = 120;
+
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
             .description("Render the background for the element")
@@ -138,7 +142,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .shouldRender(() -> shadow.value && !syncShadowColorAsBackground.value && renderBg.value)
             .onSettingChange(this)
             .build());
-    int startX, startY, snapSize = 120;
 
 
     public HudElement(HudElementData<?> hudElementInfo) {
@@ -490,5 +493,13 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         this.height = MathUtils.d2iSafe(obj.get(3));
         this.distanceX = x;
         this.distanceY = y;
+    }
+
+    public static void setSnapSize(int snapSize){
+        HudElement.snapSize = MathHelper.clamp(snapSize,0,mc.getWindow().getScaledWidth() * mc.getWindow().getScaledHeight());
+    }
+
+    public static int getSnapSize() {
+        return snapSize;
     }
 }

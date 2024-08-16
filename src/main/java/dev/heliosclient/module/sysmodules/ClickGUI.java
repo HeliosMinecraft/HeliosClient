@@ -9,6 +9,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
+import dev.heliosclient.ui.clickgui.ModuleButton;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
@@ -64,13 +65,23 @@ public class ClickGUI extends Module_ {
     );
     public DoubleSetting CategoryHeight = sgMisc.add(new DoubleSetting.Builder()
             .name("CategoryPane Height")
-            .description("CategoryPane Height for the ClickGUI")
+            .description("Max CategoryPane Height for the ClickGUI")
             .onSettingChange(this)
             .defaultValue(230.0)
             .max(500)
             .min(230.0)
             .roundingPlace(0)
             .shouldRender(() -> ScrollType.value == 1)
+            .build()
+    );
+    public DoubleSetting moduleButtonHeight = sgMisc.add(new DoubleSetting.Builder()
+            .name("ModuleButton Height")
+            .description("ModuleButton Height for the ClickGUI")
+            .onSettingChange(this)
+            .defaultValue(16)
+            .max(50)
+            .min(1)
+            .roundingPlace(0)
             .build()
     );
     public DoubleSetting ScrollSpeed = sgMisc.add(new DoubleSetting.Builder()
@@ -208,6 +219,31 @@ public class ClickGUI extends Module_ {
             .defaultValue(new Color(ColorManager.INSTANCE.defaultTextColor))
             .build()
     );
+    public BooleanSetting glowMousePointer = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Glowing mouse pointer")
+            .onSettingChange(this)
+            .value(true)
+            .build()
+    );
+    public DoubleSetting glowRadius = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Glow Radius")
+            .description("Radius of the glow")
+            .onSettingChange(this)
+            .defaultValue(20d)
+            .min(0)
+            .max(100)
+            .roundingPlace(0)
+            .shouldRender(()->glowMousePointer.value)
+            .build()
+    );
+    public RGBASetting glowColor = sgGeneral.add(new RGBASetting.Builder()
+            .name("Glow color")
+            .description("Color of the glow")
+            .onSettingChange(this)
+            .defaultValue(Color.WHITE)
+            .shouldRender(()-> glowMousePointer.value)
+            .build()
+    );
     public KeyBind clickGUIKeyBind = sgConfig.add(new KeyBind.Builder()
             .name("ClickGUI bind")
             .description("The key to open the ClickGUI screen")
@@ -276,7 +312,6 @@ public class ClickGUI extends Module_ {
         addSettingGroup(sgTooltip);
         addSettingGroup(sgConfig);
         //addSettingGroup(sgExpert);
-
 
         active.value = true;
 
@@ -357,6 +392,10 @@ public class ClickGUI extends Module_ {
             HeliosClient.CONFIG.writeModuleConfig();
             HeliosClient.CONFIG.moduleConfigManager.switchConfig(switchConfigs.getOption().toString(), true);
         }
+
+        if(setting == moduleButtonHeight){
+            ModuleButton.height = moduleButtonHeight.getInt();
+        }
     }
 
 
@@ -375,6 +414,27 @@ public class ClickGUI extends Module_ {
         fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
 
         FontManager.INSTANCE.registerFonts();
+    }
+    public static boolean shouldGlowMousePointer(){
+        if(HeliosClient.CLICKGUI != null){
+            return HeliosClient.CLICKGUI.glowMousePointer.value;
+        }
+
+        return false;
+    }
+    public static int getGlowRadius(){
+        if(HeliosClient.CLICKGUI != null){
+            return HeliosClient.CLICKGUI.glowRadius.getInt();
+        }
+
+        return 0;
+    }
+    public static Color getGlowColor(){
+        if(HeliosClient.CLICKGUI != null){
+            return HeliosClient.CLICKGUI.glowColor.getColor();
+        }
+
+        return Color.WHITE;
     }
 
     public int getAccentColor() {

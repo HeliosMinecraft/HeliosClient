@@ -11,10 +11,9 @@ import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.player.DisplayPreviewEntity;
-import dev.heliosclient.util.render.color.QuadColor;
 import dev.heliosclient.util.render.textures.Texture;
-import ladysnake.satin.api.managed.ShaderEffectManager;
 import me.x150.renderer.font.FontRenderer;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
@@ -395,7 +394,7 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.colorMask(false, false, false, true);
         RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, MinecraftClient.IS_SYSTEM_MAC);
         RenderSystem.colorMask(true, true, true, true);
 
         drawRectangle(matrix, x, y, width, height, Color.BLACK.getRGB());
@@ -502,7 +501,7 @@ public class Renderer2D implements Listener {
 
         RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         RenderSystem.enableBlend();
-        renderTexture(matrices, xCenter - radius, yCenter - radius, shadowWidth, shadowHeight, 0, 0, shadowWidth, shadowHeight, shadowWidth, shadowHeight);
+        renderTexture(matrices, xCenter - blurRadius - radius, yCenter - blurRadius - radius, shadowWidth, shadowHeight, 0, 0, shadowWidth, shadowHeight, shadowWidth, shadowHeight);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
@@ -1626,7 +1625,16 @@ public class Renderer2D implements Listener {
 
     public enum Direction {
         // Left_Right means from left to right. Same for others //
-        LEFT_RIGHT, TOP_BOTTOM, RIGHT_LEFT, BOTTOM_TOP
+        LEFT_RIGHT, TOP_BOTTOM, RIGHT_LEFT, BOTTOM_TOP;
+
+        public Direction getOpposite(){
+            return switch (this) {
+                case LEFT_RIGHT -> RIGHT_LEFT;
+                case RIGHT_LEFT -> LEFT_RIGHT;
+                case TOP_BOTTOM -> BOTTOM_TOP;
+                default -> TOP_BOTTOM;
+            };
+        }
     }
 
     public enum Renderers {

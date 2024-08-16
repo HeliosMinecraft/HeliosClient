@@ -6,17 +6,18 @@ const runNumber = process.env.GITHUB_RUN_NUMBER;
 const repoName = process.env.GITHUB_REPOSITORY;
 const pushUser = process.env.PUSH_USER;
 const runID = process.env.RUN_ID;
+const commitMessage = process.env.COMMIT_MESSAGE;
 
 function sendBuildStatus(status) {
   let title, description, color, buildOutput;
+
+  description = `*${commitMessage}*`;
   if (status === 'success') {
     title = 'Build Successful';
-    description = 'The latest build of the project was successful. Details...';
     color = 3066993; // green
     buildOutput = `https://github.com/HeliosMinecraft/HeliosClient/actions/runs/${runID}`;
   } else if (status === 'failure') {
     title = 'Build Failed';
-    description = 'The latest build of the project failed. Details...';
     color = 15158332; // red
     buildOutput = `https://github.com/HeliosMinecraft/HeliosClient/actions`;
   }

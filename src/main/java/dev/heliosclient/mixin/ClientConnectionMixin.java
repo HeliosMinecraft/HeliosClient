@@ -31,8 +31,8 @@ public abstract class ClientConnectionMixin extends SimpleChannelInboundHandler<
         } else if (EventManager.postEvent(new PacketEvent.RECEIVE(packet)).isCanceled()) info.cancel();
     }
 
-    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;)V", at = @At("HEAD"), cancellable = true)
-    public void send(Packet<?> packet, PacketCallbacks callbacks, CallbackInfo ci) {
+    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;Z)V", at = @At("HEAD"), cancellable = true)
+    public void send(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo ci) {
         if (EventManager.postEvent(new PacketEvent.SEND(packet)).isCanceled()) ci.cancel();
 
         // Call commands if the prefix is sent
@@ -45,5 +45,9 @@ public abstract class ClientConnectionMixin extends SimpleChannelInboundHandler<
             }
             ci.cancel();
         }
+    }
+    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;Z)V", at = @At("TAIL"))
+    public void sent(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo ci) {
+        EventManager.postEvent(new PacketEvent.SENT(packet));
     }
 }

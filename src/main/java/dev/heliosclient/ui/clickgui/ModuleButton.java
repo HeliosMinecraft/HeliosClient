@@ -36,7 +36,8 @@ public class ModuleButton implements Listener {
     public int hoverAnimationTimer;
     public Module_ module;
     public float x, y;
-    public int width, height;
+    public int width;
+    public static int height = 16;
     public boolean settingsOpen = false;
     public int boxHeight = 0;
     public Screen screen;
@@ -46,7 +47,6 @@ public class ModuleButton implements Listener {
     public ModuleButton(Module_ module, Screen parentScreen) {
         this.module = module;
         this.width = CategoryPane.getWidth() - 2;
-        this.height = 16;
         this.parentScreen = parentScreen;
         hitBox = new HudBox(x, y, width, height);
         EventManager.register(this);
@@ -102,7 +102,7 @@ public class ModuleButton implements Listener {
             drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y, width, height, 2);
         }
         if (settingsOpen && boxHeight >= 4) {
-            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2.0f, y + this.height + 2, (float) scale);
+            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2.0f, y + height + 2, (float) scale);
             drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorStart, 100), x + 1, y + height, width, boxHeight + 2, 2);
             Renderer2D.stopScaling(drawContext.getMatrices());
         }
@@ -144,8 +144,8 @@ public class ModuleButton implements Listener {
         int settingYOffset = 0;
         updateScale(settingsOpen);
         if (scale > 0.0f) {
-            settingYOffset = this.height + 2;
-            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + (float) width / 2, y + this.height + 2, (float) scale);
+            settingYOffset = height + 2;
+            Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + (float) width / 2, y + height + 2, (float) scale);
             for (Setting<?> setting : module.quickSettings) {
                 // Reset the animation if the setting is not visible.
                 if (!setting.shouldRender()) {
@@ -172,7 +172,7 @@ public class ModuleButton implements Listener {
         }
 
         //Multiplying by the scale gives us the "sliding in/out" effect.
-        int finalHeight = (int) Math.round((settingYOffset - this.height - 2) * scale);
+        int finalHeight = (int) Math.round((settingYOffset - height - 2) * scale);
         setBoxHeight(finalHeight);
 
         // Return the total height of the quick settings

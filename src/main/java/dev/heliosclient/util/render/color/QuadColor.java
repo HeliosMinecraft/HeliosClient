@@ -99,32 +99,24 @@ public class QuadColor extends RenderColor {
             ratio = tX;
             blendedColor = ColorUtils.blend(color1, color4, ratio);
         } else {
-            switch (direction) {
-                case NORTH:
-                    blendedColor = ColorUtils.blend(color1, color3, tY);
-                    break;
-                case EAST:
-                    blendedColor = ColorUtils.blend(color1, color2, tX);
-                    break;
-                case SOUTH:
-                    blendedColor = ColorUtils.blend(color2, color4, tY);
-                    break;
-                case WEST:
-                    blendedColor = ColorUtils.blend(color3, color4, tX);
-                    break;
-                case DIAGONAL_LEFT:
+            blendedColor = switch (direction) {
+                case NORTH -> ColorUtils.blend(color1, color3, tY);
+                case EAST -> ColorUtils.blend(color1, color2, tX);
+                case SOUTH -> ColorUtils.blend(color4, color2, tY);
+                case WEST -> ColorUtils.blend(color4, color3, tX);
+                case DIAGONAL_LEFT -> {
                     float tDL = (tX + tZ) / 2;
-                    blendedColor = ColorUtils.blend(color1, color4, tDL);
-                    break;
-                case DIAGONAL_RIGHT:
+                    yield ColorUtils.blend(color1, color4, tDL);
+                }
+                case DIAGONAL_RIGHT -> {
                     float tDR = (tX + (1 - tZ)) / 2;
-                    blendedColor = ColorUtils.blend(color2, color3, tDR);
-                    break;
-                default:
+                    yield ColorUtils.blend(color2, color3, tDR);
+                }
+                default -> {
                     ratio = tX;
-                    blendedColor = ColorUtils.blend(color1, color4, ratio);
-                    break;
-            }
+                    yield ColorUtils.blend(color1, color4, ratio);
+                }
+            };
         }
        // System.out.println("tX: " + tX + ", tY: " + tY + ", tZ: " + tZ);
       //  System.out.println("Blending Ratio: " + ratio);

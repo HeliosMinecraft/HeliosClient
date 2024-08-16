@@ -90,6 +90,7 @@ public class CategoryPane implements Listener {
         EventManager.register(this);
     }
 
+
     public static int getWidth() {
         return width;
     }
