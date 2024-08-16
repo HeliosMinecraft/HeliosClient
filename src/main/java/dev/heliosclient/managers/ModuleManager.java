@@ -88,6 +88,7 @@ public class ModuleManager {
                 new AutoSneak(),
                 new AutoWalk(),
                 new Sprint(),
+                new AntiVoid(),
                 new EntityControl(),
                 new EntitySpeed(),
                 new Fly(),

@@ -43,7 +43,7 @@ public class HudEditorScreen extends Screen implements Listener {
     private final int defaultSnapSize = 120;
     private boolean isScrolling;
     Animation fadeAnimation = new Animation(EasingType.LINEAR_IN);
-    private final Color LIGHT_YELLOW = new Color(237, 248, 174, 95);
+    private final Color LIGHT_YELLOW = new Color(223, 248, 89, 121);
     private TimerUtils scrollTimer = new TimerUtils();
     private static final long SCROLL_TIMEOUT = 2000; // 2 seconds
 
@@ -100,7 +100,7 @@ public class HudEditorScreen extends Screen implements Listener {
 
         //Fade out every SCROLL_TIMEOUT ms
         scrollTimer.every(SCROLL_TIMEOUT,()-> {
-            if(fadeAnimation.getInterpolatedAlpha() > 0.5f) {
+            if(fadeAnimation.getInterpolatedAlpha() > 0.7f) {
                 fadeAnimation.startFading(false);
             }
         });
@@ -302,7 +302,7 @@ public class HudEditorScreen extends Screen implements Listener {
             HudElement.setSnapSize(HudElement.getSnapSize() + MathHelper.ceil(verticalAmount));
             scrollTimer.resetTimer();
         } else {
-            if (isScrolling) {
+            if (isScrolling && fadeAnimation.getInterpolatedAlpha() > 0.7f) {
                 fadeAnimation.startFading(false);
             }
             isScrolling = false;

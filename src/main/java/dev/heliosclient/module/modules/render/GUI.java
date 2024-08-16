@@ -131,6 +131,17 @@ public class GUI extends Module_ {
             .shouldRender(()->coolVisuals.value)
             .build()
     );
+    public DoubleSetting polygonPoints = sgVisuals.add(new DoubleSetting.Builder()
+            .name("Polygon Points")
+            .description("Number of points")
+            .min(10)
+            .max(400)
+            .defaultValue(75)
+            .roundingPlace(0)
+            .shouldRender(()->coolVisuals.value)
+            .onSettingChange(this)
+            .build()
+    );
     public DoubleSetting dotRadius = sgVisuals.add(new DoubleSetting.Builder()
             .name("Dot Radius")
             .description("Radius of the dots")
@@ -175,6 +186,10 @@ public class GUI extends Module_ {
             PolygonMeshPatternRenderer.INSTANCE.maskGradient = gradientType.get();
             PolygonMeshPatternRenderer.INSTANCE.radius = (float) dotRadius.value;
             PolygonMeshPatternRenderer.INSTANCE.MAX_DISTANCE = (float) lineMaxLength.value;
+
+            if(setting == polygonPoints){
+                PolygonMeshPatternRenderer.INSTANCE.setNumOfPoints(polygonPoints.getInt());
+            }
     }
 
     @Override
@@ -186,6 +201,7 @@ public class GUI extends Module_ {
         PolygonMeshPatternRenderer.INSTANCE.maskGradient = gradientType.get();
         PolygonMeshPatternRenderer.INSTANCE.radius = (float) dotRadius.value;
         PolygonMeshPatternRenderer.INSTANCE.MAX_DISTANCE = (float) lineMaxLength.value;
+        PolygonMeshPatternRenderer.INSTANCE.setNumOfPoints(polygonPoints.getInt());
     }
 
     public static boolean coolVisuals(){
