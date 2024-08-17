@@ -21,8 +21,6 @@ public class NoBreakDelay extends Module_ {
     public NoBreakDelay() {
         super("NoBreakDelay", "Modifies your breaking cooldown", Categories.PLAYER);
         addSettingGroup(sgGeneral);
-
         addQuickSetting(breakDelay);
-
     }
 }

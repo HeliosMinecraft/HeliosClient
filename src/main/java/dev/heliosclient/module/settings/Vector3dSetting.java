@@ -59,14 +59,14 @@ public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
         this.height = xSet.height + ySet.height + zSet.height + 10;
         this.heightCompact = xSet.heightCompact + ySet.heightCompact + zSet.heightCompact + 5;
 
+        //Result of bad coding.... ugghhhh. I am gonna replace this with scale based animation later.
+        //Todo
         xSet.setAnimationDone(true);
         xSet.setAnimationProgress(1.0f);
         ySet.setAnimationDone(true);
         ySet.setAnimationProgress(1.0f);
         zSet.setAnimationDone(true);
         zSet.setAnimationProgress(1.0f);
-
-
     }
 
     public Vector3dSetting(String name, String description, BooleanSupplier shouldRender, Vec3d defaultValue, double min, double max, int roundingPlace, ISettingChange settingChange) {

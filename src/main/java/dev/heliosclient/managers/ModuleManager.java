@@ -130,7 +130,9 @@ public class ModuleManager {
                 new Rotation(),
                 new Reach(),
                 new NoBreakDelay(),
-                new PingSpoof()
+                new TpsSync(),
+                new PingSpoof(),
+                new XCarry()
         );
 
         // Render

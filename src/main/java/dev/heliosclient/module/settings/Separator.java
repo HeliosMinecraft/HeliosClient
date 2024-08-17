@@ -6,10 +6,11 @@ import net.minecraft.client.gui.DrawContext;
 
 import java.util.function.BooleanSupplier;
 
-public class Separator extends Setting<Boolean> {
+public class Separator extends Setting<Void> {
 
-    public Separator(int height, BooleanSupplier shouldRender, boolean defaultValue) {
-        super(shouldRender, defaultValue);
+    public Separator(int height, BooleanSupplier shouldRender) {
+        super(shouldRender, (Void) null);
+        this.value = null;
         this.height = height;
     }
 
@@ -23,4 +24,8 @@ public class Separator extends Setting<Boolean> {
         Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + (float) heightCompact / 2, getWidthCompact() - 2, 1, 0xCCFFFFFF);
     }
 
+    @Override
+    public Void get() {
+        return null;
+    }
 }

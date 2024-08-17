@@ -11,7 +11,7 @@ public class PolygonMeshPatternRenderer {
     private static final Random random = new Random();
     public static PolygonMeshPatternRenderer INSTANCE = new PolygonMeshPatternRenderer();
     private int NUM_POINTS = 75;
-    private final Point[] points = new Point[NUM_POINTS];
+    private Point[] points = new Point[NUM_POINTS];
     public float MAX_DISTANCE = 75.0f;
     public float radius = 2f;
     public GradientManager.Gradient maskGradient = GradientManager.getGradient("Linear2D");
@@ -28,6 +28,8 @@ public class PolygonMeshPatternRenderer {
             width = MinecraftClient.getInstance().getWindow().getScaledWidth();
             height = MinecraftClient.getInstance().getWindow().getScaledHeight();
         }
+
+        points = new Point[NUM_POINTS];
 
         for (int i = 0; i < NUM_POINTS; i++) {
             points[i] = new Point(random.nextFloat() * width, random.nextFloat() * height);

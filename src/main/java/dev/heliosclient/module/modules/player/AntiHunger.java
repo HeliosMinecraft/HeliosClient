@@ -4,6 +4,7 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.player.PacketEvent;
 import dev.heliosclient.event.events.player.PlayerJumpEvent;
 import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.mixin.AccessorPlayerPositionLookS2CPacket;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.movement.AutoJump;
@@ -11,10 +12,18 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class AntiHunger extends Module_ {
     SettingGroup sgGeneral = new SettingGroup("General");
 
+    BooleanSetting sprint = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Cancel Sprint")
+            .description("No sprint +")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
     BooleanSetting suppressJumping = sgGeneral.add(new BooleanSetting.Builder()
             .name("Suppress Jumping")
             .description("Prevents you from jumping if your hunger is below a certain threshold to save hunger")
@@ -43,11 +52,10 @@ public class AntiHunger extends Module_ {
 
     @SubscribeEvent
     public void packetSendEvent(PacketEvent.SEND event) {
-
         if (mc.player == null || mc.player.hasVehicle() || mc.player.isTouchingWater() || mc.player.isSubmergedInWater())
             return;
 
-        if (event.packet instanceof ClientCommandC2SPacket p && p.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING) {
+        if (sprint.value && event.packet instanceof ClientCommandC2SPacket p && p.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING) {
             event.setCanceled(true);
         }
     }

@@ -1,5 +1,7 @@
 package dev.heliosclient.module.settings;
 
+
+//what is this anyone explain pls.
 public class Option<T> {
     private String name;
     private T value;
