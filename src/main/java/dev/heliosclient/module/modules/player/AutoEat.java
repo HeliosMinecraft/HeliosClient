@@ -132,12 +132,12 @@ public class AutoEat extends Module_ {
     public boolean shouldEat() {
         boolean eat = false;
         switch ((EatReason) eatReason.getOption()) {
-            case Health -> eat = mc.player.getHealth() < healthThreshold.value;
+            case Health -> eat = mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthThreshold.value;
             case Hunger -> eat = mc.player.getHungerManager().getFoodLevel() <= hungerThreshold.value;
             case Both ->
-                    eat = mc.player.getHungerManager().getFoodLevel() <= hungerThreshold.value && mc.player.getHealth() <= healthThreshold.value;
+                    eat = mc.player.getHungerManager().getFoodLevel() <= hungerThreshold.value && mc.player.getHealth() + mc.player.getAbsorptionAmount() <= healthThreshold.value;
             case Any ->
-                    eat = mc.player.getHungerManager().getFoodLevel() <= hungerThreshold.value || mc.player.getHealth() <= healthThreshold.value;
+                    eat = mc.player.getHungerManager().getFoodLevel() <= hungerThreshold.value || mc.player.getHealth() + mc.player.getAbsorptionAmount() <= healthThreshold.value;
             case Always -> eat = true;
         }
         return bestFoodSlot != -1 && eat;

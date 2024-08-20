@@ -16,7 +16,7 @@ public class AutoTool extends Module_ {
     SettingGroup sgGeneral = new SettingGroup("General");
     BooleanSetting swapBack = sgGeneral.add(new BooleanSetting.Builder()
             .name("Swap back")
-            .description("Swaps back to the slot you were orignally on when you stop breaking a block")
+            .description("Swaps back to the slot you were originally on when you stop breaking a block.")
             .onSettingChange(this)
             .defaultValue(false)
             .build()

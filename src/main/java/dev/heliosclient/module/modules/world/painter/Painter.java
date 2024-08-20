@@ -24,6 +24,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 import java.awt.*;
@@ -339,7 +340,7 @@ public class Painter extends Module_ {
         for(Map.Entry<BlockPos, Block> entry: CANVAS_MAP.entrySet()) {
                 BlockPos pos = entry.getKey();
                 Block block = entry.getValue();
-                Vec3i offSet = new Vec3i((int) offsetFromPlayer.getVecX(), (int) offsetFromPlayer.getVecY(), (int) offsetFromPlayer.getVecZ());
+                Vec3i offSet = BlockPos.ofFloored(offsetFromPlayer.getVecX(), offsetFromPlayer.getVecY(), offsetFromPlayer.getVecZ());
                 BlockPos changedPos = getPlayerPos().add(rotateBlockPosition(pos, getBlockRotation())).add(offSet);
                 BlockState state = mc.world.getBlockState(changedPos);
                 if (ticksPassed > ticksEachBlock.value && !state.getBlock().equals(block) && state.isReplaceable()) {
@@ -361,10 +362,10 @@ public class Painter extends Module_ {
                     if(item == null)continue;
 
                     int slot = InventoryUtils.findItemInHotbar(item);
+
                     if (slot == -1) {
                         ChatUtils.sendHeliosMsg(item.getName().getString() + " was NOT found in hot bar");
                     } else {
-
                         boolean swapped = InventoryUtils.swapToSlot(slot, false);
 
                         if (swapped) {
@@ -397,12 +398,16 @@ public class Painter extends Module_ {
 
         CANVAS_MAP.forEach((pos, block) -> {
             if (getBlockRotation() != null) {
-                Vec3i offSet = new Vec3i((int) offsetFromPlayer.getVecX(), (int) offsetFromPlayer.getVecY(), (int) offsetFromPlayer.getVecZ());
-                BlockPos changedPos = getPlayerPos().add(rotateBlockPosition(pos, getBlockRotation())).add(offSet);
+                Vec3i offSet = BlockPos.ofFloored(offsetFromPlayer.getVecX(), offsetFromPlayer.getVecY(), offsetFromPlayer.getVecZ());
+                BlockPos changedPos = getAppliedRotation(pos).add(offSet);
 
                 renderBlock(changedPos, block);
             }
         });
+    }
+
+    public BlockPos getAppliedRotation(BlockPos pos){
+        return getPlayerPos().add(rotateBlockPosition(pos, getBlockRotation()));
     }
 
     public BlockPos getPlayerPos() {
@@ -442,7 +447,13 @@ public class Painter extends Module_ {
     }
 
     public Direction getBlockRotation() {
-        return isLocked ? lockedDirection : (autoRotate.value ? mc.player.getMovementDirection().getOpposite() : (Direction) rotationDirection.getOption());
+        if(isLocked){
+            return lockedDirection;
+        } else if(autoRotate.value){
+            return mc.player.getMovementDirection().getOpposite();
+        }else {
+            return (Direction) rotationDirection.getOption();
+        }
     }
 
     public enum Structure {

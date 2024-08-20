@@ -24,7 +24,7 @@ public class FriendManager {
     }
 
     public static boolean isFriend(String userName) {
-        return friends.contains(new Friend(userName));
+        return friendsName.contains(userName);
     }
 
     public static void addFriend(Friend friend) {

@@ -11,17 +11,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.explosion.Explosion;
-import org.joml.Vector3f;
 
 import java.awt.*;
-import java.util.Optional;
 
 public class OrbParticle extends HitEffectParticle implements Listener {
     public static boolean COOLER_PHYSICS = false;

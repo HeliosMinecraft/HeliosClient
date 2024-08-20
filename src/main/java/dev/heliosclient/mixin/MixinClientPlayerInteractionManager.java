@@ -1,9 +1,6 @@
 package dev.heliosclient.mixin;
 
-import dev.heliosclient.event.events.block.BeginBreakingBlockEvent;
-import dev.heliosclient.event.events.block.BlockBreakEvent;
-import dev.heliosclient.event.events.block.BlockInteractEvent;
-import dev.heliosclient.event.events.block.CancelBlockBreakingEvent;
+import dev.heliosclient.event.events.block.*;
 import dev.heliosclient.event.events.player.PlayerAttackEntityEvent;
 import dev.heliosclient.event.events.player.ReachEvent;
 import dev.heliosclient.managers.EventManager;
@@ -12,6 +9,7 @@ import dev.heliosclient.module.modules.player.NoBreakDelay;
 import dev.heliosclient.module.modules.render.Freecam;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
@@ -40,6 +38,10 @@ public abstract class MixinClientPlayerInteractionManager {
 
     @Shadow
     public abstract float getReachDistance();
+
+    @Shadow public abstract boolean breakBlock(BlockPos pos);
+
+    @Shadow @Final private ClientPlayNetworkHandler networkHandler;
 
     @Inject(method = "getReachDistance()F", at = @At(value = "HEAD"), cancellable = true)
     private void getReach(CallbackInfoReturnable<Float> cir) {
@@ -77,9 +79,17 @@ public abstract class MixinClientPlayerInteractionManager {
         }
     }
 
-    @Inject(method = "attackBlock", at = @At(value = "TAIL"), cancellable = true)
+    @Inject(method = "attackBlock", at = @At(value = "HEAD"), cancellable = true)
     private void onAttackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         BeginBreakingBlockEvent event = new BeginBreakingBlockEvent(pos, direction);
+        if (EventManager.postEvent(event).isCanceled()) {
+            cir.cancel();
+        }
+    }
+
+    @Inject(method = "attackBlock", at = @At(value = "RETURN"), cancellable = true)
+    private void onAttackBlockPost(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        PostAttackBlockEvent event = new PostAttackBlockEvent(pos, direction);
         if (EventManager.postEvent(event).isCanceled()) {
             cir.cancel();
         }

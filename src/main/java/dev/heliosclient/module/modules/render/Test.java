@@ -10,7 +10,6 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.ItemListSetting;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.render.GradientBlockRenderer;
 import dev.heliosclient.util.render.Renderer2D;

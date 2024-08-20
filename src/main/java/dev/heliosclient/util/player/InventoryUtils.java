@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 
@@ -99,7 +100,7 @@ public class InventoryUtils {
             if (HeliosClient.MC.player.getInventory().getStack(i).isEmpty()) {
                 for (int j = 9; j < HeliosClient.MC.player.getInventory().size(); j++) {
                     if (HeliosClient.MC.player.getInventory().getStack(j) == itemStack) {
-                        moveItem(i, j - 9, SlotActionType.PICKUP);
+                        moveItem(i, j - 9, SlotActionType.PICKUP_ALL,SlotActionType.PICKUP_ALL);
                         break;
                     }
                 }
@@ -239,16 +240,28 @@ public class InventoryUtils {
     }
 
     /**
+     * Moves an item from a slot using quick move.
+     *
+     * @param fromSlot The index of the slot to move the item from.
+     */
+    public static void moveItemQuickMove(ScreenHandler handler, int fromSlot) {
+        ClientPlayerEntity player = HeliosClient.MC.player;
+        if (player != null && HeliosClient.MC.currentScreen != null) {
+            HeliosClient.MC.interactionManager.clickSlot(handler.syncId, fromSlot, 0, SlotActionType.QUICK_MOVE, player);
+        }
+    }
+
+    /**
      * Moves an item from one slot to another using the specified action
      *
      * @param fromSlot The index of the slot to move the item from.
      * @param toSlot   The index of the slot to move the item to.
      */
-    public static void moveItem(int fromSlot, int toSlot, SlotActionType action) {
+    public static void moveItem(int fromSlot, int toSlot, SlotActionType fromAction,SlotActionType toAction) {
         ClientPlayerEntity player = HeliosClient.MC.player;
         if (player != null && HeliosClient.MC.currentScreen != null) {
-            HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, fromSlot, 0, action, player);
-            HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, toSlot, 1, action, player);
+            HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, fromSlot, 0, fromAction, player);
+            HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, toSlot, 1, toAction, player);
         }
     }
 }

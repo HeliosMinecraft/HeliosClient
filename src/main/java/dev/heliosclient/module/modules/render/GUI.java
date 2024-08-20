@@ -1,14 +1,11 @@
 package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.managers.GradientManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
-import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.render.Renderer2D;
 
 import java.awt.*;
 import java.util.ArrayList;

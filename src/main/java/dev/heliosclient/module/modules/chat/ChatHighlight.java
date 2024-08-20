@@ -13,7 +13,6 @@ import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.InputBox;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 

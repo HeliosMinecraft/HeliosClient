@@ -69,6 +69,7 @@
     "MixinEndCrystalEntityRenderer",
     "MixinEntityRenderDispatcher",
     "MixinEntityRenderer",
+    "MixinHandledScreen",
     "MixinHeldItemRenderer",
     "MixinInGameOverlayRenderer",
     "MixinItemRenderer",

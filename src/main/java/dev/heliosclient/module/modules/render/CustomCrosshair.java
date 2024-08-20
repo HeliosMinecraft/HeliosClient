@@ -2,7 +2,6 @@ package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.render.CrosshairRenderEvent;
-import dev.heliosclient.managers.GradientManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;

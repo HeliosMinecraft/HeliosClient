@@ -14,8 +14,6 @@ import dev.heliosclient.util.BlockUtils;
 import net.minecraft.item.BlockItem;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
 
 public class AirPlace extends Module_ {
     int actionTimer = 0;

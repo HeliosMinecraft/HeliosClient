@@ -15,9 +15,6 @@ import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.player.PlayerUtils;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 public class TickShift extends Module_ {
     SettingGroup sgGeneral = new SettingGroup("General");
 

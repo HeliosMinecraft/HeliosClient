@@ -2,7 +2,6 @@ package dev.heliosclient.module.modules.world;
 
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
-import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;

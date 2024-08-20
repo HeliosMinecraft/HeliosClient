@@ -8,7 +8,6 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.player.PlayerUtils;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;

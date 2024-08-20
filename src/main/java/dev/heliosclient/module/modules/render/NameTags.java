@@ -10,7 +10,6 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
@@ -260,7 +259,7 @@ public class NameTags extends Module_ {
             return ColorUtils.green;
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
     public void entityLabelRenderEvent(EntityLabelRenderEvent event) {
         if (event.getEntity() instanceof FreeCamEntity) return;
 
@@ -280,7 +279,7 @@ public class NameTags extends Module_ {
 
         event.setCanceled(true);
 
-        boolean isFriend = entity instanceof PlayerEntity && FriendManager.isFriend(new Friend(entity.getName().getString()));
+        boolean isFriend = entity instanceof PlayerEntity && FriendManager.isFriend(entity.getName().getString());
 
         renderNameTag(entity, (float) (yOffset.value + 0.5f), (isFriend ? ColorUtils.aqua : "") + event.getEntityName().getString() + ColorUtils.white);
     }
@@ -325,7 +324,6 @@ public class NameTags extends Module_ {
                 builder.append(" ").append(entry.getLatency()).append("ms");
             }
         }
-        try {
             float dataHeight = FontRenderers.Large_fxfontRenderer.getStringHeight(builder.toString());
             float dataWidth = FontRenderers.Large_fxfontRenderer.getStringWidth(builder.toString());
             float halfDataWidth = dataWidth / 2.0f;
@@ -335,10 +333,10 @@ public class NameTags extends Module_ {
             Renderer3D.draw2DIn3D((float) entityPos.x, (float) (entityPos.y + entity.getHeight() + entityYOff), (float) entityPos.z, adjustedScale, stack -> {
                 if (background.value) {
                     //Render background
-                    Renderer2D.drawRoundedRectangle(stack.peek().getPositionMatrix(), -(halfDataWidth) - 2f, -1f, true, true, !showBar, !showBar, dataWidth + 3.0f, dataHeight + 2f, (float) radius.value, backgroundColor.value.getRGB());
+                    Renderer2D.drawRoundedRectangle(stack.peek().getPositionMatrix(), -(halfDataWidth) - 2f, -1f, true, true, true, true, dataWidth + 3.0f, dataHeight + 2f, (float) radius.value, backgroundColor.value.getRGB());
                 }
                 if (showBar) {
-                    float healthBarWidth = (entityHealth / maxHealth) * (dataWidth + 3.0f - (float) radius.value / 5.0f);
+                    float healthBarWidth = (entityHealth / maxHealth) * (dataWidth + 2f - (float) radius.value / 4.8f);
                     Renderer2D.drawRectangle(stack.peek().getPositionMatrix(), -(halfDataWidth) - 2f + (float) radius.value / 5.0f, dataHeight + 0.1f, healthBarWidth, 1.2f, getHealthColor(entityHealth).getRGB());
                 }
                 if (renderOutline.value) {
@@ -348,12 +346,10 @@ public class NameTags extends Module_ {
                         Renderer2D.drawOutlineGradientRoundedBox(stack.peek().getPositionMatrix(), -(halfDataWidth) - 3f, -2f, dataWidth + 4f, dataHeight + 3f + (showBar ? 1.4f : 0f), (float) radius.value, 1.1f, outlineStart.value, outlineEnd.value, outlineEnd.value, outlineStart.value);
                     }
                 }
+                //Draw the string we need
+                int textColor = team.value ? ModuleManager.get(Teams.class).getActualTeamColor(entity) : Color.WHITE.getRGB();
+                Renderer2D.drawCustomString(FontRenderers.Large_fxfontRenderer,stack,builder.toString(),-(dataWidth / 2.0f) - 0.9f,(-entity.getHeight() - entityYOff) + (dataHeight + 3f)/5.0f,textColor);
             });
-            int textColor = team.value ? ModuleManager.get(Teams.class).getActualTeamColor(entity) : Color.WHITE.getRGB();
-
-            Renderer3D.drawText(FontRenderers.Large_fxfontRenderer, builder.toString(), (float) entityPos.x, (float) (entityPos.y + entity.getHeight() + entityYOff), (float) entityPos.z, -(dataWidth / 2.0f) - 0.9f, 0, adjustedScale, textColor);
-        } catch (NullPointerException ignored) {
-        }
     }
 
     private void renderItemNameTag(ItemEntity entity, float entityYOff, String text) {

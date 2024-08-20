@@ -2,6 +2,7 @@ package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.input.KeyboardInputEvent;
 import dev.heliosclient.event.events.player.PacketEvent;
 import dev.heliosclient.event.events.player.PlayerDeathEvent;
 import dev.heliosclient.module.Categories;
@@ -32,6 +33,13 @@ public class Freecam extends Module_ {
             .min(0)
             .max(10)
             .roundingPlace(1)
+            .build()
+    );
+    BooleanSetting cancelAllMovementInputs = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Cancel All Movement Inputs")
+            .description("All movement inputs for the player will be cancelled.")
+            .onSettingChange(this)
+            .value(true)
             .build()
     );
     BooleanSetting rotateToInteract = sgGeneral.add(new BooleanSetting.Builder()
@@ -82,6 +90,7 @@ public class Freecam extends Module_ {
             toggle();
     }
 
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -112,6 +121,14 @@ public class Freecam extends Module_ {
             mc.setCameraEntity(previousCamEntity);
         }
         freeCamEntity.remove();
+    }
+
+    @SubscribeEvent
+    public void onInput(KeyboardInputEvent e){
+        if(cancelAllMovementInputs.value){
+            e.setNone();
+            e.cancel();
+        }
     }
 
     @SubscribeEvent

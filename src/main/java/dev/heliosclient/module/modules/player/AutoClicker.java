@@ -2,15 +2,12 @@ package dev.heliosclient.module.modules.player;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.event.events.input.MouseClickEvent;
-import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.KeyboardUtils;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;

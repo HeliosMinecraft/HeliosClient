@@ -158,8 +158,9 @@ public class HeliosClient implements ModInitializer, Listener {
         SoundUtils.registerSounds();
         HudElementList.INSTANCE = new HudElementList();
 
-        CapeManager.CAPE_NAMES = CapeManager.loadCapes();
-
+        HeliosExecutor.execute(()->{
+             CapeManager.CAPE_NAMES = CapeManager.loadCapes();
+        });
 
         HeliosExecutor.execute(HeliosClient::loadConfig);
 

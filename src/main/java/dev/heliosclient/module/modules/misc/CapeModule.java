@@ -1,8 +1,6 @@
 package dev.heliosclient.module.modules.misc;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;

@@ -4,7 +4,6 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.player.PacketEvent;
 import dev.heliosclient.event.events.player.PlayerJumpEvent;
 import dev.heliosclient.managers.ModuleManager;
-import dev.heliosclient.mixin.AccessorPlayerPositionLookS2CPacket;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.movement.AutoJump;
@@ -12,7 +11,6 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class AntiHunger extends Module_ {
     SettingGroup sgGeneral = new SettingGroup("General");

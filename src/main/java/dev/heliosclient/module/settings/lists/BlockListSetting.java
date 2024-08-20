@@ -149,7 +149,12 @@ public class BlockListSetting extends ListSetting<Block> {
         // Render the selected list of items
         int offsetY = 0;
         int offsetX = 0;
+        int i = 0;
         for (Block block : selectedEntries) {
+            //Only limit upto 30
+            if(i > 30){
+                break;
+            }
 
             String blockName = block.getName().getString();
             if (blockName.contains("Air")) {
@@ -167,6 +172,8 @@ public class BlockListSetting extends ListSetting<Block> {
             } else {
                 offsetX += 16;
             }
+
+            i++;
         }
         return offsetY + 16;
     }

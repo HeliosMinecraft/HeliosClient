@@ -337,7 +337,7 @@ public class Scaffold extends Module_ {
         if (autoSwitch.value) {
             placeResult = BlockUtils.place(pos, airPlace.value, rotate.value, clientSide.value, itemSlot, silentSwitch.value);
         } else {
-            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value);
+            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value,  clientSide.value);
         }
 
         if (placeResult) {

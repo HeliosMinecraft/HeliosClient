@@ -6,6 +6,7 @@ import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import dev.heliosclient.util.render.Renderer2D;
+import net.minecraft.block.Block;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.Item;
@@ -120,12 +121,17 @@ public class ItemListSetting extends ListSetting<Item> {
             return 0;
         }
 
+
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width - 30, height - 25, 3, Color.BLACK.getRGB());
 
         // Render the selected list of items
         int offsetY = 0;
         int offsetX = 0;
+        int i = 0;
         for (Item item : selectedEntries) {
+            if(i > 30){
+                break;
+            }
             if (item == Items.AIR) {
                 FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Air", x + offsetX + 4, y + offsetY + 3, -1);
             }
@@ -141,6 +147,7 @@ public class ItemListSetting extends ListSetting<Item> {
             } else {
                 offsetX += 16;
             }
+            i++;
         }
         return offsetY + 16;
     }

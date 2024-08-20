@@ -64,6 +64,7 @@ public class ModuleManager {
         );
         // Misc
         registerModules(
+                new InventoryTweaks(),
                 new AutoReconnect(),
                 new AutoLog(),
                 new NoSwing(),

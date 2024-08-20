@@ -1,13 +1,9 @@
 package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.module.Categories;
-import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.module.settings.lists.BlockListSetting;
-import dev.heliosclient.util.BlockUtils;
-import net.minecraft.block.Blocks;
 
 public class AspectRatio extends Module_ {
     SettingGroup sgGeneral = new SettingGroup("General");
