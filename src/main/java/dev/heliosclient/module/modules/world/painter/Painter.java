@@ -101,15 +101,15 @@ public class Painter extends Module_ {
             [1,3,3]{minecraft:obsidian}
             [0,3,3]{minecraft:obsidian}
             [-1,3,3]{minecraft:obsidian}
+            [1,3,3]{minecraft:obsidian}
+            [0,3,3]{minecraft:obsidian}
+            [-1,3,3]{minecraft:obsidian}
             [1,3,1]{minecraft:obsidian}
             [0,3,1]{minecraft:obsidian}
             [-1,3,1]{minecraft:obsidian}
             [1,3,2]{minecraft:obsidian}
             [0,3,2]{minecraft:obsidian}
-            [-1,3,2]{minecraft:obsidian}
-            [1,3,3]{minecraft:obsidian}
-            [0,3,3]{minecraft:obsidian}
-            [-1,3,3]{minecraft:obsidian}""";
+            [-1,3,2]{minecraft:obsidian}""";
 
     public Direction lockedDirection = null;
     public BlockPos lockedStartPos = null;

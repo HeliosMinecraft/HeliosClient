@@ -129,9 +129,12 @@ public class ItemListSetting extends ListSetting<Item> {
         int offsetX = 0;
         int i = 0;
         for (Item item : selectedEntries) {
-            if(i > 30){
+            if(i > MAX_PREVIEW_COUNT){
+                //Show a text displaying the count of remaining entries
+                FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "+" + (selectedEntries.size() - i), x + offsetX + 2f , y + offsetY + 4, -1);
                 break;
             }
+
             if (item == Items.AIR) {
                 FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Air", x + offsetX + 4, y + offsetY + 3, -1);
             }

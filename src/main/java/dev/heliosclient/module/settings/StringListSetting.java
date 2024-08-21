@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class StringListSetting extends Setting<String[]> {
-    private final List<InputBox> defaultInputBoxes = new ArrayList<>();
+    private final List<InputBox> defaultInputBoxes;
     private final List<InputBox> inputBoxes = new ArrayList<>();
 
     private final int characterLimit;
@@ -33,7 +33,8 @@ public class StringListSetting extends Setting<String[]> {
         for (int i = 0; i < defaultBoxes; i++) {
             inputBoxes.add(new InputBox(160, 12, defaultValues[i], characterLimit, inputMode));
         }
-        defaultInputBoxes.addAll(inputBoxes);
+
+        defaultInputBoxes = new ArrayList<>(inputBoxes);
     }
 
 

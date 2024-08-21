@@ -4,7 +4,6 @@ import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.player.DisplayPreviewEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -22,8 +21,6 @@ import net.minecraft.entity.LivingEntity;
 ;import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import java.awt.*;
 
@@ -39,7 +36,7 @@ public class DisplayPreviewEntityRenderer extends LivingEntityRenderer<LivingEnt
         this.elytra = new ElytraEntityModel<>(ctx.getModelLoader().getModelPart(EntityModelLayers.ELYTRA));
     }
 
-    public void render(DisplayPreviewEntity entity, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, float mouseX, float mouseY) {
+    public void render(DisplayPreviewEntity entity, float x, float y, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, float mouseX, float mouseY) {
         setModelPose();
         matrixStack.push();
 
@@ -60,9 +57,10 @@ public class DisplayPreviewEntityRenderer extends LivingEntityRenderer<LivingEnt
 
         setAngles(limbAngle, limbDistance,false);
 
-        // Calculate rotation based on head mouse position
-        float mouseXRotation = (mouseX - (float) MinecraftClient.getInstance().getWindow().getScaledWidth() / 2 + matrixStack.peek().getPositionMatrix().m03()) * 0.015f;
-        float mouseYRotation = (mouseY - (float) MinecraftClient.getInstance().getWindow().getScaledHeight() / 2 + matrixStack.peek().getPositionMatrix().m13()) * 0.015f;
+        // Calculate rotation based on head to mouse position
+        // 0.015f is the sensitivity coefficient.
+        float mouseXRotation = (mouseX - x ) * 0.015f;
+        float mouseYRotation = (mouseY - y) * 0.015f;
 
         model.head.yaw = entity.getYaw() - mouseXRotation * 0.15f;
         model.head.pitch = mouseYRotation * 0.15f;

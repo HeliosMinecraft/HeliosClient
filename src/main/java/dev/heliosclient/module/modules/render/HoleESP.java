@@ -212,7 +212,9 @@ public class HoleESP extends Module_ {
             }
 
             //Contract and offset so that it does not fight for Z level with block textures.
-            Box box = new Box(info.holePosition).contract(0.005f, 0f, 0.005f).offset(0, 0.005f, 0).withMaxY(new Box(info.holePosition).maxY + height.value);
+            Box box = new Box(info.holePosition);
+            double ogMaxY = box.maxY;
+            box = box.contract(0.005f, 0f, 0.005f).offset(0, 0.005f, 0).withMaxY(ogMaxY + height.value);
 
             if (info.holeType == SAFE) {
                 renderHole(QuadColor.gradient(safeColorStart.value.getRGB(), safeColorEnd.value.getRGB(), direction), QuadColor.single(safeColorStart.value.getRGB()), box);
@@ -224,7 +226,7 @@ public class HoleESP extends Module_ {
                 renderHole(QuadColor.gradient(dangerColorStart.value.getRGB(), dangerColorEnd.value.getRGB(), direction), QuadColor.single(dangerColorStart.value.getRGB()), box);
             }
             if (info.holeType == SIZED) {
-                //   Renderer3D.drawBoxFill(box, QuadColor.single(TRANSPARENT_BLUE.getRGB()), Direction.UP,Direction.NORTH,Direction.SOUTH,Direction.EAST,Direction.WEST);
+                //Renderer3D.drawBoxFill(box, QuadColor.single(TRANSPARENT_BLUE.getRGB()), Direction.UP,Direction.NORTH,Direction.SOUTH,Direction.EAST,Direction.WEST);
             }
         }
         if (throughWalls.value)

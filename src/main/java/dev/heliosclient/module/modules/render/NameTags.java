@@ -22,6 +22,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -324,8 +326,16 @@ public class NameTags extends Module_ {
                 builder.append(" ").append(entry.getLatency()).append("ms");
             }
         }
-            float dataHeight = FontRenderers.Large_fxfontRenderer.getStringHeight(builder.toString());
-            float dataWidth = FontRenderers.Large_fxfontRenderer.getStringWidth(builder.toString());
+            float dataHeight;
+            float dataWidth;
+            if(Renderer2D.isVanillaRenderer()){
+                dataHeight = mc.textRenderer.fontHeight + 4f;
+                dataWidth = mc.textRenderer.getWidth(builder.toString()) +   mc.textRenderer.getWidth(builder.toString()) / 2.5f;
+            }else{
+                dataHeight = FontRenderers.Large_fxfontRenderer.getStringHeight(builder.toString());
+                dataWidth = FontRenderers.Large_fxfontRenderer.getStringWidth(builder.toString());
+            }
+
             float halfDataWidth = dataWidth / 2.0f;
 
 
@@ -346,10 +356,17 @@ public class NameTags extends Module_ {
                         Renderer2D.drawOutlineGradientRoundedBox(stack.peek().getPositionMatrix(), -(halfDataWidth) - 3f, -2f, dataWidth + 4f, dataHeight + 3f + (showBar ? 1.4f : 0f), (float) radius.value, 1.1f, outlineStart.value, outlineEnd.value, outlineEnd.value, outlineStart.value);
                     }
                 }
-                //Draw the string we need
-                int textColor = team.value ? ModuleManager.get(Teams.class).getActualTeamColor(entity) : Color.WHITE.getRGB();
-                Renderer2D.drawCustomString(FontRenderers.Large_fxfontRenderer,stack,builder.toString(),-(dataWidth / 2.0f) - 0.9f,(-entity.getHeight() - entityYOff) + (dataHeight + 3f)/5.0f,textColor);
+                //Draw the string we need if vanilla fontrenderer is not selected
+                if(!Renderer2D.isVanillaRenderer()){
+                    int textColor = team.value ? ModuleManager.get(Teams.class).getActualTeamColor(entity) : Color.WHITE.getRGB();
+                    FontRenderers.Large_fxfontRenderer.drawString(stack, builder.toString(), -(dataWidth / 2.0f) - 0.9f, (-entity.getHeight() - entityYOff) + (dataHeight + 3f) / 5.0f, textColor);
+                }
             });
+
+        if(Renderer2D.isVanillaRenderer()){
+            int textColor = team.value ? ModuleManager.get(Teams.class).getActualTeamColor(entity) : Color.WHITE.getRGB();
+            Renderer3D.drawText(Text.of(builder.toString()),entityPos.x, entityPos.y + entity.getHeight() + entityYOff - 0.005f, entityPos.z, adjustedScale + 0.125f,false,textColor);
+        }
     }
 
     private void renderItemNameTag(ItemEntity entity, float entityYOff, String text) {
@@ -376,7 +393,11 @@ public class NameTags extends Module_ {
             }
         });
 
-        Renderer3D.drawText(FontRenderers.Large_fxfontRenderer, text, (float) entityPos.x, (float) (entityPos.y + entity.getHeight() + entityYOff), (float) entityPos.z, -(dataWidth / 2.0f) - 0.87f, 0, adjustedScale, Color.WHITE.getRGB());
+        if(Renderer2D.isVanillaRenderer()){
+            Renderer3D.drawText(Text.of(text),entityPos.x, (entityPos.y + entity.getHeight() + entityYOff), entityPos.z, adjustedScale,false,-1);
+        }else {
+            Renderer3D.drawText(FontRenderers.Large_fxfontRenderer, text, (float) entityPos.x, (float) (entityPos.y + entity.getHeight() + entityYOff), (float) entityPos.z, -(dataWidth / 2.0f) - 0.87f, 0, adjustedScale, Color.WHITE.getRGB());
+        }
     }
 
     public String getGameMode(PlayerEntity entity) {

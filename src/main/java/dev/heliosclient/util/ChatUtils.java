@@ -35,7 +35,9 @@ public class ChatUtils {
     public static void sendMsg(Text msg) {
         if (mc.world == null) return;
 
-        mc.inGameHud.getChatHud().addMessage(msg);
+        mc.execute(()->{
+           mc.inGameHud.getChatHud().addMessage(msg);
+        });
     }
 
     public static void sendHeliosMsg(Text msg) {

@@ -47,7 +47,7 @@ public class PlayerUtils {
         if (nearEdgeX || nearEdgeZ) {
             BlockPos edgeBlockPos = blockPos.add(nearEdgeX ? (offsetX < edgeThreshold ? -1 : 1) : 0, 0, nearEdgeZ ? (offsetZ < edgeThreshold ? -1 : 1) : 0);
             BlockState edgeBlockState = mc.world.getBlockState(edgeBlockPos);
-            return edgeBlockState.isAir() || edgeBlockState.isReplaceable();
+            return edgeBlockState.isAir() || !edgeBlockState.isSolid();
         }
 
         return false;

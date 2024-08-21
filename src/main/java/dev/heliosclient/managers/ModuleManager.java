@@ -56,7 +56,7 @@ public class ModuleManager {
                 new BetterPortals(),
                 new LiquidInteract(),
                 new Painter(),
-                new AutoSign(),
+                new SignTweaks(),
                 new Collisions(),
                 new AbortBreaking(),
                 new AntiGhostBlocks(),

@@ -49,7 +49,7 @@ public class LightLevelESP extends Module_ {
         while (iterator.hasNext()) {
             BlockPos pos = iterator.next();
 
-            if (!FrustumUtils.isBoxVisible(new Box(pos)) || !mc.world.isTopSolid(pos.down(), mc.player) || mc.world.isTopSolid(pos, mc.player)) {
+            if (!mc.world.isTopSolid(pos.down(), mc.player) || mc.world.isTopSolid(pos, mc.player)) {
                 continue;
             }
 

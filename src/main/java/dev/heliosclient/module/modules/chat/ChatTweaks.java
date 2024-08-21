@@ -17,7 +17,9 @@ import java.util.Date;
 
 public class ChatTweaks extends Module_ {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+
     SettingGroup sgGeneral = new SettingGroup("General");
+
     public BooleanSetting slideInAnimation = sgGeneral.add(new BooleanSetting.Builder()
             .name("Slide In Animation")
             .description("Animates chat messages to look like they are sliding in from left side")

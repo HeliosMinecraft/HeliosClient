@@ -42,6 +42,10 @@ public class TickRate implements Listener {
         if (HeliosClient.MC.player == null || HeliosClient.MC.player.getWorld() == null) return 0;
         if (System.currentTimeMillis() - gameJoinedTime < 4000) return 20;
 
+        if(tickRates.length == 0){
+            return 0;
+        }
+
         int numTicks = 0;
         float sumTickRates = 0.0f;
         for (float tickRate : tickRates) {

@@ -1362,7 +1362,7 @@ public class Renderer2D implements Listener {
                     mc.textRenderer
             );
             DisplayPreviewEntityRenderer displayPlayerEntityRenderer = new DisplayPreviewEntityRenderer(ctx,entity.slim);
-            displayPlayerEntityRenderer.render(entity, mc.getTickDelta(), matrixStack2, immediate, 0xF000F0,mouseX, mouseY);
+            displayPlayerEntityRenderer.render(entity,x,y, mc.getTickDelta(), matrixStack2, immediate, 0xF000F0,mouseX, mouseY);
         });
         immediate.draw();
         entityRenderDispatcher.setRenderShadows(true);

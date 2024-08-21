@@ -10,6 +10,7 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.TickTimer;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
@@ -41,7 +42,8 @@ public class FakeLag extends Module_ {
             .defaultValue(false)
             .build()
     );
-    private int toggleTimer = -1;
+
+    private final TickTimer toggleTimer = new TickTimer();
 
     public FakeLag() {
         super("FakeLag", "FakeLag aka Blink momentarily stops sending position packets and dumps them all at once to look like you were lagging", Categories.PLAYER);
@@ -62,21 +64,18 @@ public class FakeLag extends Module_ {
         super.onDisable();
         sendPackets();
         lagPos = Vec3d.ZERO;
-        toggleTimer = 0;
+        toggleTimer.resetTimer();
     }
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
     public void onTick(TickEvent.PLAYER event) {
         if (timer.value > 0) {
-            toggleTimer++;
+            toggleTimer.increment();
         } else {
             return;
         }
 
-        if (toggleTimer > timer.value) {
-            toggle();
-            toggleTimer = 0;
-        }
+        toggleTimer.every(timer.getInt(), this::toggle);
     }
 
     @SubscribeEvent

@@ -18,7 +18,9 @@ public class RotationUtils {
     public static void lookAt(Entity entity, LookAtPos lookAtPos) {
         lookAt(lookAtPos.positionGetter.getPosition(entity));
     }
-
+    public static void lookAt(Entity entity) {
+        lookAt(LookAtPos.CENTER.positionGetter.getPosition(entity));
+    }
 
     public static void lookAtEntityMC(Entity entity, LookAtPos lookAtPos) {
         Vec3d vec3d = lookAtPos.positionGetter.getPosition(mc.player);

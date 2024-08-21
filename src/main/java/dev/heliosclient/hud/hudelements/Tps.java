@@ -11,6 +11,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class Tps extends HudElement {
+    public static HudElementData<Tps> DATA = new HudElementData<>("TPS", "Shows current tps", Tps::new);
 
     public Tps() {
         super(DATA);
@@ -25,8 +26,5 @@ public class Tps extends HudElement {
         this.width = Math.round(Renderer2D.getStringWidth(text)) + 1;
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x + 1, this.y, ColorManager.INSTANCE.hudColor);
     }
-
-    public static HudElementData<Tps> DATA = new HudElementData<>("TPS", "Shows current tps", Tps::new);
-
 
 }

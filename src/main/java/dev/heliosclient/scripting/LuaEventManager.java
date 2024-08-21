@@ -2,10 +2,12 @@ package dev.heliosclient.scripting;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.ChatUtils;
+import dev.heliosclient.util.ColorUtils;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,30 @@ public class LuaEventManager {
         LuaFunction luaFunction = listener.checkfunction();
         List<LuaFunction> eventListeners = listeners.get(eventType);
         if (eventListeners != null) {
-            eventListeners.remove(luaFunction);
+            System.out.println(eventListeners);
+            System.out.println( eventListeners.remove(luaFunction));
+        }
+    }
+
+    /**
+     * Clears all event listeners for a specific Lua file.
+     *
+     * @param luaFile The Lua file whose listeners should be removed.
+     */
+    public void clearListeners(LuaFile luaFile) {
+        List<String> unregisteredEvents = new ArrayList<>();
+        for (Map.Entry<String, List<LuaFunction>> entry : listeners.entrySet()) {
+            List<LuaFunction> eventListeners = entry.getValue();
+            boolean removed = eventListeners.removeIf(listener -> listener.tojstring().contains(luaFile.getScriptName()));
+            if (removed) {
+                unregisteredEvents.add(entry.getKey());
+            }
+        }
+        if (!unregisteredEvents.isEmpty()) {
+            HeliosClient.LOGGER.warn("Warning: Unregistered events for Lua file {}: {}", luaFile.getName(), unregisteredEvents);
+            ChatUtils.sendHeliosMsg(ColorUtils.yellow + "Warning: Unregistered events for Lua file " + ColorUtils.aqua + luaFile.getName() + ColorUtils.yellow + ": " + unregisteredEvents);
+            ChatUtils.sendHeliosMsg(ColorUtils.yellow + "The above event listeners were removed automatically. Please remove them manually in the code during `onStop()` call for the better!");
+
         }
     }
 

@@ -9,6 +9,7 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.lists.ItemListSetting;
+import dev.heliosclient.util.BlockUtils;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.player.InventoryUtils;
@@ -17,6 +18,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.util.hit.BlockHitResult;
 
 import java.util.List;
 
@@ -131,6 +133,12 @@ public class AutoEat extends Module_ {
 
     public boolean shouldEat() {
         boolean eat = false;
+
+        //We will open a container/inventory instead of eating so its better not to click
+        if(mc.crosshairTarget instanceof BlockHitResult hr && BlockUtils.isClickable(mc.world.getBlockState(hr.getBlockPos()).getBlock())){
+            return false;
+        }
+
         switch ((EatReason) eatReason.getOption()) {
             case Health -> eat = mc.player.getHealth() + mc.player.getAbsorptionAmount() < healthThreshold.value;
             case Hunger -> eat = mc.player.getHungerManager().getFoodLevel() <= hungerThreshold.value;
@@ -140,6 +148,7 @@ public class AutoEat extends Module_ {
                     eat = mc.player.getHungerManager().getFoodLevel() <= hungerThreshold.value || mc.player.getHealth() + mc.player.getAbsorptionAmount() <= healthThreshold.value;
             case Always -> eat = true;
         }
+
         return bestFoodSlot != -1 && eat;
     }
 

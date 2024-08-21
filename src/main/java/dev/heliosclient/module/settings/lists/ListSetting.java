@@ -34,6 +34,7 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
     protected float nameWidth = 10;
     protected String searchTerm = ""; // added search term field
     protected Registry<T> registry;
+    protected final static int MAX_PREVIEW_COUNT = 70;
 
     public ListSetting(String name, String description, BooleanSupplier shouldRender, List<T> defaultValue, List<T> defaultSelected, Predicate<T> filter, ISettingChange iSettingChange, Registry<T> registry) {
         super(shouldRender, defaultValue);

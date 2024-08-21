@@ -259,14 +259,14 @@ public class Renderer3D {
         cleanup();
     }
 
-    public static void drawText(Text text, double x, double y, double z, double scale, boolean shadow) {
-        drawText(text, x, y, z, 0, 0, scale, shadow);
+    public static void drawText(Text text, double x, double y, double z, double scale, boolean shadow, int color) {
+        drawText(text, x, y, z, 0, 0, scale, shadow,color);
     }
 
     /**
      * Draws text in the world.
      **/
-    public static void drawText(Text text, double x, double y, double z, double offX, double offY, double scale, boolean fill) {
+    public static void drawText(Text text, double x, double y, double z, double offX, double offY, double scale, boolean shadow, int color) {
         MatrixStack matrices = matrixFrom(x, y, z);
 
         Camera camera = mc.gameRenderer.getCamera();
@@ -277,12 +277,14 @@ public class Renderer3D {
         RenderSystem.defaultBlendFunc();
 
         matrices.translate(offX, offY, 0);
+
         matrices.scale(-0.025f * (float) scale, -0.025f * (float) scale, 1);
 
         int halfWidth = mc.textRenderer.getWidth(text) / 2;
 
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
 
+        /*
         if (fill) {
             int opacity = (int) (MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25F) * 255.0F) << 24;
             mc.textRenderer.draw(text, -halfWidth, 0f, 553648127, false, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, opacity, 0xf000f0);
@@ -295,7 +297,9 @@ public class Renderer3D {
             matrices.pop();
         }
 
-        mc.textRenderer.draw(text, -halfWidth, 0f, -1, false, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, 0, 0xf000f0);
+         */
+
+        mc.textRenderer.draw(text, -halfWidth, 0f, color, shadow, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, 0, 0xf000f0);
         immediate.draw();
 
         RenderSystem.disableBlend();

@@ -90,7 +90,7 @@ public class FileUtils {
             frames.add(nativeImage);
         }
 
-        System.out.println("Successfully read " + frames.size() + " frames from GIF file: " + gifFile.getName());
+        HeliosClient.LOGGER.info("(CapeManager) Successfully read {} frames from GIF file: {}", frames.size(), gifFile.getName());
         return frames;
     }
     private static NativeImage convertToNativeImage(BufferedImage image) {

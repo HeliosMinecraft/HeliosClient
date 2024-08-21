@@ -30,8 +30,6 @@ public class BoatFly extends Module_ {
             .defaultListOption(Mode.Velocity)
             .build()
     );
-
-
     DoubleSetting horizontalSpeed = sgGeneral.add(new DoubleSetting.Builder()
             .name("Horizontal Speed")
             .description("Horizontal speed of the boat")

@@ -14,6 +14,7 @@ import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.GradientBlockRenderer;
 import dev.heliosclient.util.render.color.QuadColor;
 import me.x150.renderer.render.Renderer3d;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -135,7 +136,7 @@ public class Scaffold extends Module_ {
     BooleanSetting clientSide = sgPlace.add(new BooleanSetting.Builder()
             .name("ClientSide rotation")
             .onSettingChange(this)
-            .defaultValue(false)
+            .defaultValue(true)
             .shouldRender(() -> rotate.value)
             .build()
     );
@@ -243,11 +244,10 @@ public class Scaffold extends Module_ {
     }
 
     public void placeFromCenter(BlockPos center) {
-        int itemSlot = -1;
+        int itemSlot = -2;
         if (autoSwitch.value) {
-            for (int i = 0; i < blocks.getSelectedEntries().size(); i++) {
-                int finalI = i;
-                itemSlot = InventoryUtils.findInHotbar(item -> blocks.getSelectedEntries().get(finalI).asItem() == item);
+            for(Block block: blocks.getSelectedEntries()){
+                itemSlot = InventoryUtils.findInHotbar(item -> block.asItem() != item);
 
                 if (itemSlot != -1) {
                     break;
@@ -341,7 +341,7 @@ public class Scaffold extends Module_ {
         }
 
         if (placeResult) {
-            if (render.value) {
+            if (render.value && mc.player.getMainHandStack() != null) {
                 if (clientColorCycle.value) {
                     GradientBlockRenderer.renderGradientBlock(
                             ColorManager.INSTANCE::getPrimaryGradientStart,

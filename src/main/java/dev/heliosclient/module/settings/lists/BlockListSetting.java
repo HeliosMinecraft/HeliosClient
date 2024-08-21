@@ -151,8 +151,9 @@ public class BlockListSetting extends ListSetting<Block> {
         int offsetX = 0;
         int i = 0;
         for (Block block : selectedEntries) {
-            //Only limit upto 30
-            if(i > 30){
+            if(i > MAX_PREVIEW_COUNT){
+                //Show a text displaying the count of remaining entries
+                FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "+" + (selectedEntries.size() - i), x + offsetX + 2f , y + offsetY + 4, -1);
                 break;
             }
 

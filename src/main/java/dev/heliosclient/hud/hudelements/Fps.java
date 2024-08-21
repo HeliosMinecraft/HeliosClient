@@ -9,6 +9,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class Fps extends HudElement {
+    public static HudElementData<Fps> DATA = new HudElementData<>("FPS", "Shows current Fps", Fps::new);
 
     public Fps() {
         super(DATA);
@@ -23,8 +24,5 @@ public class Fps extends HudElement {
         this.width = Math.round(Renderer2D.getStringWidth(text)) + 1;
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x + 1, this.y, ColorManager.INSTANCE.hudColor);
     }
-
-    public static HudElementData<Fps> DATA = new HudElementData<>("FPS", "Shows current Fps", Fps::new);
-
 
 }

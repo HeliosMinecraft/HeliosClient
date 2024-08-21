@@ -66,19 +66,24 @@ public class LuaLoader {
      */
     public void close(LuaFile file) {
         try {
-            LuaValue onRunFunction = file.getExecutor().getFunction("onStop");
-            if (onRunFunction.isfunction()) {
-                onRunFunction.call();
+            LuaValue onStopFunction = file.getExecutor().getFunction("onStop");
+            if (onStopFunction.isfunction()) {
+                onStopFunction.call();
             } else {
                 ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onStop() function not found for " + ColorUtils.blue + file.getAbsolutePath() + ColorUtils.darkRed + " while closing");
                 HeliosClient.LOGGER.error("onStop() function not found for file: {} while closing", file.getAbsolutePath());
             }
+
             file.getReader().close();
+
             file.isLoaded = false;
             ChatUtils.sendHeliosMsg(ColorUtils.green + "Closed LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + file.getScriptName() + ColorUtils.gray + "]");
             if (HeliosClient.shouldSendNotification() && ModuleManager.get(NotificationModule.class).scriptNotifications.value) {
                 NotificationManager.addNotification(new InfoNotification(file.getScriptName(), "was unloaded!", 1000, SoundUtils.TING_SOUNDEVENT));
             }
+
+            // Clear all event listeners for the Lua file
+            LuaEventManager.INSTANCE.clearListeners(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

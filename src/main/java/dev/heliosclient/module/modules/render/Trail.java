@@ -9,6 +9,7 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.util.TickTimer;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.LineColor;
@@ -20,7 +21,8 @@ import java.util.LinkedList;
 public class Trail extends Module_ {
 
     final LinkedList<Vec3d> lines = new LinkedList<>();
-    int ticksToAdd = 0, ticksToRemove = 0;
+    TickTimer ticksToAdd = new TickTimer();
+    TickTimer ticksToRemove = new TickTimer();
     SettingGroup sgGeneral = new SettingGroup("General");
 
     BooleanSetting whenStationary = sgGeneral.add(new BooleanSetting.Builder()
@@ -120,24 +122,19 @@ public class Trail extends Module_ {
         if (mc.player == null) return;
 
         if (!neverRemove.value) {
-            ++ticksToRemove;
-
-            if (ticksToRemove >= ticksExisted.value) {
+            ticksToRemove.incrementAndEvery(ticksExisted.getInt(),()->{
                 if (!lines.isEmpty()) {
                     lines.removeLast();
                 }
-                ticksToRemove = 0;
-            }
+            });
         }
 
         if (!whenStationary.value && !PlayerUtils.isMoving(mc.player))
             return;
 
-        ticksToAdd++;
-        if (ticksToAdd >= ticksPerLine.value) {
+        ticksToAdd.incrementAndEvery(ticksPerLine.getInt(),()->{
             lines.addFirst(mc.player.getPos());
-            ticksToAdd = 0;
-        }
+        });
     }
 
     @SubscribeEvent

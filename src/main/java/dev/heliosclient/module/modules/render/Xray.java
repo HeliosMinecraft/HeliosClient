@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Xray extends Module_ {
     private final SettingGroup sg = new SettingGroup("General");
-    List<Block> defaultXrayBlocks = List.of(Blocks.DIAMOND_ORE,
+    final List<Block> defaultXrayBlocks = List.of(Blocks.DIAMOND_ORE,
             Blocks.IRON_ORE,
             Blocks.GOLD_ORE,
             Blocks.EMERALD_ORE,

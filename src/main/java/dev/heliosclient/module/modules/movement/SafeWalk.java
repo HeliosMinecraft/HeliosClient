@@ -45,8 +45,8 @@ public class SafeWalk extends Module_ {
 
     @SubscribeEvent
     public void onKeyInput(KeyboardInputEvent event) {
-        if(onEdge.value && PlayerUtils.isPlayerAtEdge(edgeThreshold.value) && mc.player.isOnGround() && !mc.player.isSneaking()) {
-            event.setNone();
+        if(onEdge.value && PlayerUtils.isPlayerAtEdge(edgeThreshold.value) && mc.player.isOnGround()) {
+            event.sneaking = true;
         }
     }
 
