@@ -9,6 +9,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 
 import java.awt.*;
+import java.util.List;
 
 public class Tooltip {
     public static final Tooltip tooltip = new Tooltip();
@@ -55,10 +56,11 @@ public class Tooltip {
 
 
     private void renderTooltip(DrawContext drawContext, String text, int x, int y) {
-        int textWidth = Math.round(Renderer2D.getCustomStringWidth(text, FontRenderers.Small_fxfontRenderer));
+        List<String> lines = Renderer2D.wrapText(text, drawContext.getScaledWindowWidth() - x,FontRenderers.Small_fxfontRenderer);
+        int textWidth = Math.round(Renderer2D.getCustomStringWidth(lines.get(0), FontRenderers.Small_fxfontRenderer));
         float textHeight = Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer);
+        float totalHeight = textHeight * lines.size();
         float textY = y + textHeight / 2 + 4; // Center the text vertically
-
 
         drawContext.getMatrices().push();
         float scale = 1f;
@@ -68,17 +70,19 @@ public class Tooltip {
 
         Renderer2D.scaleAndPosition(drawContext.getMatrices(), x, y, scale);
 
-        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x + 5, textY - 2, textWidth + 8, textHeight + 3, 3, 3, Color.BLACK.brighter().brighter().getRGB());
-        Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 5, textY - 2, textWidth + 8, textHeight + 3, 3, 0.7f, ColorManager.INSTANCE.getPrimaryGradientStart().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientStart().darker());
+        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x + 5, textY - 2, textWidth + 8, totalHeight + 3, 3, 3, Color.BLACK.brighter().brighter().getRGB());
+        Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 5, textY - 2, textWidth + 8, totalHeight + 3, 3, 0.7f, ColorManager.INSTANCE.getPrimaryGradientStart().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientEnd().darker(), ColorManager.INSTANCE.getPrimaryGradientStart().darker());
 
         DrawContext prevDrawContext = Renderer2D.drawContext;
 
-        //Apply scaling to vanilla renderer
+        // Apply scaling to vanilla renderer
         if (Renderer2D.isVanillaRenderer()) {
             Renderer2D.setDrawContext(drawContext);
         }
 
-        Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), text, x + 8 + (Renderer2D.isVanillaRenderer() ? 1 : 0), textY + (Renderer2D.isVanillaRenderer() ? 1 : 0), ColorManager.INSTANCE.defaultTextColor());
+        for (int i = 0; i < lines.size(); i++) {
+            Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), lines.get(i), x + 8 + (Renderer2D.isVanillaRenderer() ? 1 : 0), textY + (Renderer2D.isVanillaRenderer() ? 1 : 0) + i * textHeight, ColorManager.INSTANCE.defaultTextColor());
+        }
 
         if (Renderer2D.isVanillaRenderer()) {
             Renderer2D.setDrawContext(prevDrawContext);

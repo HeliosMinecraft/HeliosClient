@@ -89,7 +89,7 @@ public class ESP extends Module_ {
             .build()
     );
     DoubleSetting width = sgGeneral.add(new DoubleSetting.Builder()
-            .name("Line Width")
+            .name("Tracer Line Width")
             .description("Width of the tracers drawn")
             .onSettingChange(this)
             .value(1.2d)

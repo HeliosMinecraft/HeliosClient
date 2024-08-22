@@ -1606,6 +1606,37 @@ public class Renderer2D implements Listener {
         return lines;
     }
 
+    public static List<String> wrapText(String text, int maxWidth, fxFontRenderer fontRenderer) {
+        List<String> lines = new ArrayList<>();
+
+        if (Math.ceil(getCustomStringWidth(text, fontRenderer)) < maxWidth) {
+            lines.add(text);
+            return lines;
+        }
+
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder();
+        int currentLineWidth = 0;
+
+        for (String word : words) {
+            int wordWidth = (int) Math.ceil(getCustomStringWidth(word + " ", fontRenderer));
+            if (currentLineWidth + wordWidth >= maxWidth) {
+                lines.add(line.toString());
+                line.setLength(0);
+                currentLineWidth = 0;
+            }
+            line.append(word).append(" ");
+            currentLineWidth += wordWidth;
+        }
+
+        if (line.length() > 0) {
+            lines.add(line.toString());
+        }
+
+        return lines;
+    }
+
+
     public static List<String> wrapText(String text, int maxWidth) {
         List<String> lines = new ArrayList<>();
         String[] words = text.split(" ");
