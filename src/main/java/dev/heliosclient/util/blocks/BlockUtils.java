@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.blocks;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.player.InventoryUtils;
@@ -32,8 +32,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.heliosclient.util.render.Renderer3D.mc;
 

@@ -1,7 +1,6 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.blocks;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.util.player.BlockIterator;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;

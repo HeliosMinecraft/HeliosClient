@@ -12,7 +12,7 @@ import dev.heliosclient.module.modules.render.hiteffect.particles.OrbParticle;
 import dev.heliosclient.module.modules.render.hiteffect.particles.TextParticle;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.ParticleListSetting;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.InputBox;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;

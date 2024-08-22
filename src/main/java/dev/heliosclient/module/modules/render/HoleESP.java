@@ -6,7 +6,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.HoleUtils;
+import dev.heliosclient.util.blocks.HoleUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.util.math.Box;
@@ -15,7 +15,7 @@ import net.minecraft.util.math.Direction;
 import java.awt.*;
 import java.util.List;
 
-import static dev.heliosclient.util.HoleUtils.HoleType.*;
+import static dev.heliosclient.util.blocks.HoleUtils.HoleType.*;
 
 public class HoleESP extends Module_ {
     static Color TRANSPARENT_BLUE = new Color(0, 30, 175, 179);

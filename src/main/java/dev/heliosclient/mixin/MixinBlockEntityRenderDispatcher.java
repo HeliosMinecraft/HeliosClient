@@ -3,7 +3,7 @@ package dev.heliosclient.mixin;
 
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.render.Xray;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.VertexConsumerProvider;

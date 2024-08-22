@@ -63,6 +63,9 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     int startX, startY;
     private static int snapSize = 120;
 
+    // Default settings
+    // This is a lot of complete customisation.
+    // Todo: Add radius setting for rounded background
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
             .name("Render background")
             .description("Render the background for the element")
@@ -70,11 +73,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .defaultValue(false)
             .onSettingChange(this)
             .build());
-
-
-    // Default settings
-    // This is a lot of complete customisation.
-    // Todo: Add radius setting for rounded background
     public BooleanSetting rounded = sgUI.add(new BooleanSetting.Builder()
             .name("Rounded background")
             .description("Rounds the background of the element for better visuals")
@@ -167,8 +165,8 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
 
             if (this.shiftDown && drawContext != null) {
                 // Calculate the size of each snap box
-                int snapBoxWidth = drawContext.getScaledWindowWidth() / this.snapSize;
-                int snapBoxHeight = drawContext.getScaledWindowHeight() / this.snapSize;
+                int snapBoxWidth = drawContext.getScaledWindowWidth() / snapSize;
+                int snapBoxHeight = drawContext.getScaledWindowHeight() / snapSize;
 
                 // Calculate the index of the snap box that the new position would be in
                 int snapBoxX = newX / snapBoxWidth;
@@ -496,7 +494,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     }
 
     public static void setSnapSize(int snapSize){
-        HudElement.snapSize = MathHelper.clamp(snapSize,0,mc.getWindow().getScaledWidth() * mc.getWindow().getScaledHeight());
+        HudElement.snapSize = MathHelper.clamp(snapSize,1,mc.getWindow().getScaledWidth() * mc.getWindow().getScaledHeight());
     }
 
     public static int getSnapSize() {

@@ -2,7 +2,7 @@ package dev.heliosclient.module.modules.world.painter;
 
 import com.ibm.icu.impl.InvalidFormatException;
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import net.minecraft.block.Block;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;

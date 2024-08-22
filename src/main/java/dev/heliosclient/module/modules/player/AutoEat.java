@@ -9,7 +9,7 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.lists.ItemListSetting;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.player.InventoryUtils;

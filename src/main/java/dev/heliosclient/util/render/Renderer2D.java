@@ -162,7 +162,7 @@ public class Renderer2D implements Listener {
         matrices.push(); // Save the current transformation state
 
         // Translate the origin back to the desired position
-        matrices.translate(x + width / 2.0f, y + height / 2.0f, 0);
+        matrices.translate(x + (width / 2.0f), y + (height / 2.0f), 0);
 
         // Scale the matrix
         matrices.scale(scale, scale, 1.0F);
@@ -1513,6 +1513,7 @@ public class Renderer2D implements Listener {
 
     public static void drawString(MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
+            color = fixColorValue(color);
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (getFontRenderer() != null) {
             try {
@@ -1524,6 +1525,7 @@ public class Renderer2D implements Listener {
 
     public static void drawCenteredString(MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
+            color = fixColorValue(color);
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (getFontRenderer() != null) {
             getFontRenderer().drawCenteredString(matrixStack, text, x, y, 256 - ColorUtils.getRed(color), 256 - ColorUtils.getGreen(color), 256 - ColorUtils.getBlue(color), 256 - ColorUtils.getAlpha(color));
@@ -1532,6 +1534,7 @@ public class Renderer2D implements Listener {
 
     public static void drawFixedString(MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
+            color = fixColorValue(color);
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (getFxFontRenderer() != null) {
             try {
@@ -1543,6 +1546,7 @@ public class Renderer2D implements Listener {
 
     public static void drawFixedCenteredString(MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
+            color =fixColorValue(color);
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (getFxFontRenderer() != null) {
             getFxFontRenderer().drawCenteredString(matrixStack, text, x, y, color);
@@ -1551,6 +1555,7 @@ public class Renderer2D implements Listener {
 
     public static void drawCustomString(fxFontRenderer fontRenderer, MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
+            color =fixColorValue(color);
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (fontRenderer != null) {
             try {
@@ -1562,10 +1567,14 @@ public class Renderer2D implements Listener {
 
     public static void drawCustomCenteredString(fxFontRenderer fontRenderer, MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
+            color = fixColorValue(color);
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (fontRenderer != null) {
             fontRenderer.drawCenteredString(matrixStack, text, x, y, color);
         }
+    }
+    private static int fixColorValue(int color){
+        return ColorUtils.changeAlpha(color,5f,5).getRGB();
     }
 
     public static void setRenderer(Renderers renderer) {

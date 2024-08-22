@@ -18,6 +18,7 @@ public class HudElementList {
         registerElement(ClientTag.DATA);
         registerElement(ModuleList.DATA);
         registerElement(Radar.DATA);
+        registerElement(ArmorHud.DATA);
         registerElement(CompassHud.DATA);
         registerElement(CompactData.DATA);
         registerElement(PlayerModel.DATA);

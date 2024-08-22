@@ -6,7 +6,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.ChunkUtils;
+import dev.heliosclient.util.blocks.ChunkUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.LineColor;

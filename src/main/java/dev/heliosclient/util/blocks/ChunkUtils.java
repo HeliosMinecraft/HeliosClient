@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.blocks;
 
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.ChunkPos;

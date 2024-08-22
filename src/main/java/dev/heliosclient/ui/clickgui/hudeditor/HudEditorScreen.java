@@ -110,8 +110,8 @@ public class HudEditorScreen extends Screen implements Listener {
         float textHeight = Renderer2D.getFxStringHeight(sizeChangeText);
         float x = this.width / 2f - textWidth / 2f;
         float y = this.height - textHeight * 2f;
-        AnimationUtils.drawFadingAndPoppingBoxBetter(drawContext,fadeAnimation,x - 2,y - 2,textWidth + 4,textHeight + 4,LIGHT_YELLOW.getRGB(),true,3f);
-        AnimationUtils.drawFadingAndPoppingText(drawContext,fadeAnimation,sizeChangeText,x,y,-1,true);
+        AnimationUtils.drawFadingAndPoppingBoxBetter(Renderer2D.drawContext,fadeAnimation,x - 2,y - 2,textWidth + 4,textHeight + 4,LIGHT_YELLOW.getRGB(),true,3f);
+        AnimationUtils.drawFadingAndPoppingText(Renderer2D.drawContext,fadeAnimation,sizeChangeText,x,y,-1,true);
 
         HudManager.INSTANCE.renderEditor(drawContext, textRenderer, mouseX, mouseY);
         HudCategoryPane.INSTANCE.render(drawContext, textRenderer, mouseX, mouseY, delta);

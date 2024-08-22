@@ -10,7 +10,7 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;

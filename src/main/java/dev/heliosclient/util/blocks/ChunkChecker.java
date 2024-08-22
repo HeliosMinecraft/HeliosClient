@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.blocks;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;

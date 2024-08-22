@@ -5,7 +5,7 @@ import dev.heliosclient.event.events.world.ExplosionEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.module.modules.render.hiteffect.HitEffectParticle;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;

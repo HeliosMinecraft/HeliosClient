@@ -79,8 +79,8 @@ public class GradientBlockRenderer {
             int endG = gb.gradientEnd.get().getRGB();
 
             if(gb.modifyAlpha){
-                startG = ColorUtils.changeAlpha(startG,MODIFY_ALPHA_VALUE,MODIFY_ALPHA_VALUE).getRGB();
-                endG = ColorUtils.changeAlpha(endG,MODIFY_ALPHA_VALUE,MODIFY_ALPHA_VALUE).getRGB();
+                startG = ColorUtils.changeAlpha(startG,MODIFY_ALPHA_VALUE,(float) MODIFY_ALPHA_VALUE).getRGB();
+                endG = ColorUtils.changeAlpha(endG,MODIFY_ALPHA_VALUE,(float) MODIFY_ALPHA_VALUE).getRGB();
             }
 
             long ageLeft = gb.getAgeLeft();

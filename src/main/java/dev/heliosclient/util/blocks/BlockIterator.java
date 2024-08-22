@@ -1,4 +1,4 @@
-package dev.heliosclient.util.player;
+package dev.heliosclient.util.blocks;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;

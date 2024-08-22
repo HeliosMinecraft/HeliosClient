@@ -2,7 +2,7 @@ package dev.heliosclient.scripting.libraries;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.settings.Option;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.block.BlockState;

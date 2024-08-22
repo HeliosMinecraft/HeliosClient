@@ -20,8 +20,11 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static dev.heliosclient.util.ColorUtils.blend;
 
 public class PlayerUtils {
     static MinecraftClient mc = MinecraftClient.getInstance();
@@ -44,13 +47,16 @@ public class PlayerUtils {
         boolean nearEdgeZ = offsetZ < edgeThreshold || offsetZ > (1 - edgeThreshold);
 
         // Check if the block next to the edge is air or something the player can fall through
+        /*
         if (nearEdgeX || nearEdgeZ) {
             BlockPos edgeBlockPos = blockPos.add(nearEdgeX ? (offsetX < edgeThreshold ? -1 : 1) : 0, 0, nearEdgeZ ? (offsetZ < edgeThreshold ? -1 : 1) : 0);
             BlockState edgeBlockState = mc.world.getBlockState(edgeBlockPos);
             return edgeBlockState.isAir() || !edgeBlockState.isSolid();
         }
+        
+         */
 
-        return false;
+        return nearEdgeX || nearEdgeZ;
     }
 
 
@@ -181,6 +187,14 @@ public class PlayerUtils {
         HeliosClient.MC.options.useKey.setPressed(true);
         ((AccessorMinecraftClient) HeliosClient.MC).rightClick();
         HeliosClient.MC.options.useKey.setPressed(false);
+    }
+
+    public static int getDurabilityColor(double durability) {
+        if (durability > 0.5) {
+            return blend(Color.RED, Color.GREEN, (float) ((durability - 0.5f) * 2)).getRGB();
+        } else {
+            return blend(Color.RED, Color.YELLOW, (float) (durability * 2)).getRGB();
+        }
     }
 
     public PlayerEntity getPlayer() {

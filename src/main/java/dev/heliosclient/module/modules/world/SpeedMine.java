@@ -8,7 +8,7 @@ import dev.heliosclient.mixin.AccessorClientPlayerInteractionManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.block.BlockState;

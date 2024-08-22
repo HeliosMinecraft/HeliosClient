@@ -9,7 +9,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
@@ -24,7 +24,6 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 import java.awt.*;

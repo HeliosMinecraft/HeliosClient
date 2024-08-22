@@ -10,7 +10,7 @@ import dev.heliosclient.module.modules.render.BlockSelection;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import net.minecraft.item.BlockItem;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;

@@ -7,7 +7,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.mixininterface.IVec3d;
-import dev.heliosclient.util.BlockUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.InventoryUtils;

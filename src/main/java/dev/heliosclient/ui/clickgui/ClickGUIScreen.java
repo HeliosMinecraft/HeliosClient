@@ -101,7 +101,7 @@ public class ClickGUIScreen extends Screen {
                     shouldClose = false;
                 }
             } else {
-                this.scale += speed * Easing.ease(EasingType.BOUNCE_IN_OUT, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1));
+                this.scale += speed * Easing.ease(EasingType.CUBIC_IN, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1));
             }
             this.scale = MathHelper.clamp(this.scale, 0.0f, 1f);
         }else{
@@ -129,6 +129,7 @@ public class ClickGUIScreen extends Screen {
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         GUI gui = ModuleManager.get(GUI.class);
+        Renderer2D.setDrawContext(drawContext);
 
         updateScale((float) HeliosClient.CLICKGUI.animationSpeed.value,shouldClose);
         if (this.client.world == null) {

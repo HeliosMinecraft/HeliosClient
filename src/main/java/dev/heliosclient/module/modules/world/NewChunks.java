@@ -10,7 +10,7 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.HeliosExecutor;
-import dev.heliosclient.util.ChunkChecker;
+import dev.heliosclient.util.blocks.ChunkChecker;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.block.BlockState;

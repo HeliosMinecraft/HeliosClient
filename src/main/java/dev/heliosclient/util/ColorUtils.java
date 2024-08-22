@@ -169,18 +169,33 @@ public class ColorUtils {
     }
 
     /**
-     * Changes alpha on integer color only if the alpha value is less than the given float.
+     * Changes alpha on integer color only if the alpha value is greater than the given float.
      *
      * @param color Target color.
      * @param alpha Target alpha.
      * @return Color with changed alpha.
      */
-    public static Color changeAlpha(Integer color, int alpha, float lessThanValue) {
-        if (color != null && getAlpha(color) > lessThanValue)
+    public static Color changeAlpha(Integer color, int alpha, float greaterThanValue) {
+        if (color != null && getAlpha(color) > greaterThanValue)
             return new Color(ColorUtils.getRed(color), ColorUtils.getGreen(color), ColorUtils.getBlue(color), alpha);
         else
             return new Color(Objects.requireNonNullElse(color, -1));
     }
+
+    /**
+     * Changes alpha on integer color only if the alpha value is less than the given float.
+     *
+     * @param color Target color.
+     * @param changeToAlpha Target alpha.
+     * @return Color with changed alpha.
+     */
+    public static Color changeAlpha(Integer color, float lessThanValue,int changeToAlpha) {
+        if (color != null && getAlpha(color) < lessThanValue)
+            return new Color(ColorUtils.getRed(color), ColorUtils.getGreen(color), ColorUtils.getBlue(color), changeToAlpha);
+        else
+            return new Color(Objects.requireNonNullElse(color, -1));
+    }
+
 
 
     /**
@@ -191,7 +206,7 @@ public class ColorUtils {
      * @return Color with changed alpha.
      */
     public static Color changeAlpha(Integer color, int alpha) {
-        return changeAlpha(color, alpha, -1);
+        return changeAlpha(color, alpha, (float) -1);
     }
     /**
      * Changes alpha on integer color.
@@ -330,4 +345,5 @@ public class ColorUtils {
     public static Color toColor(int[] color1) {
         return new Color(color1[0],color1[1],color1[2],color1[3]);
     }
+
 }
