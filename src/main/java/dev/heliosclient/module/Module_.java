@@ -118,6 +118,15 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public void addSettingGroup(SettingGroup settingGroup) {
         this.settingGroups.add(settingGroup);
     }
+    /**
+     * Adds a setting group to the main {@link #settingGroups} list and all its settings to quick settings
+     *
+     * @param settingGroup settingGroup to be added
+     */
+    public void addToBoth(SettingGroup settingGroup) {
+        addSettingGroup(settingGroup);
+        addQuickSettings(settingGroup.getSettings());
+    }
 
     /**
      * Adds a setting to the {@link #quickSettings} list

@@ -17,12 +17,12 @@ import dev.heliosclient.module.modules.player.*;
 import dev.heliosclient.module.modules.render.*;
 import dev.heliosclient.module.modules.render.hiteffect.HitEffect;
 import dev.heliosclient.module.modules.world.*;
-import dev.heliosclient.module.modules.world.Timer;
 import dev.heliosclient.module.modules.world.painter.Painter;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ModuleManager {
@@ -48,6 +48,7 @@ public class ModuleManager {
                 new SpeedMine(),
                 new PacketMine(),
                 new PacketPlace(),
+                new NoInteract(),
                 new Timer(),
                 new TNTIgnite(),
                 new NewChunks(),

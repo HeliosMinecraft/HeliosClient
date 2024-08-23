@@ -34,7 +34,7 @@ public class TriggerBot extends Module_ {
             .description("Range of the entity to be in order to start attacking")
             .onSettingChange(this)
             .defaultValue(3.5d)
-            .range(0, 5d)
+            .range(0, 10d)
             .roundingPlace(1)
             .build()
     );

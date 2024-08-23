@@ -8,6 +8,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.util.player.PlayerUtils;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 
@@ -15,6 +16,14 @@ import java.util.List;
 
 public class AntiVoid extends Module_ {
     public SettingGroup sgGeneral = new SettingGroup("General");
+
+    BooleanSetting fallCheck = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Fall Check")
+            .description("Tries to reset your position if you are falling more than 5 blocks")
+            .onSettingChange(this)
+            .value(false)
+            .build()
+    );
 
     BooleanSetting packetCancel = sgGeneral.add(new BooleanSetting.Builder()
             .name("Packet Cancel")
@@ -68,7 +77,7 @@ public class AntiVoid extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        if(mc.player.getY() < mc.world.getBottomY()) {
+        if(mc.player.getY() < mc.world.getBottomY() || fallCheck()) {
             if (position.value) {
                 mc.player.setPosition(mc.player.prevX, mc.player.prevY, mc.player.prevZ);
             }
@@ -82,7 +91,7 @@ public class AntiVoid extends Module_ {
     @SubscribeEvent
     public void onPacketSend(PacketEvent.SEND event){
         if(packetCancel.value && (cancelMode.isOption(CancelMode.Both) || cancelMode.isOption(CancelMode.OnGoing)) && event.getPacket() instanceof PlayerMoveC2SPacket pp && mc.world != null){
-            if(pp.changesPosition() && pp.getY(mc.player.getY()) < mc.world.getBottomY()){
+            if(pp.changesPosition() && pp.getY(mc.player.getY()) < mc.world.getBottomY() || fallCheck()){
                 event.cancel();
             }
         }
@@ -91,10 +100,18 @@ public class AntiVoid extends Module_ {
     @SubscribeEvent
     public void onPacketReceive(PacketEvent.RECEIVE event){
         if(packetCancel.value && (cancelMode.isOption(CancelMode.Both) || cancelMode.isOption(CancelMode.Incoming)) && event.getPacket() instanceof PlayerPositionLookS2CPacket pp && mc.world != null){
-            if(pp.getY() < mc.world.getBottomY()){
+            if(pp.getY() < mc.world.getBottomY() || fallCheck()){
                 event.cancel();
             }
         }
+    }
+
+    private boolean fallCheck(){
+        if(!fallCheck.value){
+            return false;
+        }
+
+        return PlayerUtils.willFallMoreThanFiveBlocks(mc.player.getPos());
     }
 
     public enum CancelMode{

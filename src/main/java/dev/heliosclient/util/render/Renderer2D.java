@@ -22,7 +22,6 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -1629,7 +1628,7 @@ public class Renderer2D implements Listener {
             currentLineWidth += wordWidth;
         }
 
-        if (line.length() > 0) {
+        if (!line.isEmpty()) {
             lines.add(line.toString());
         }
 

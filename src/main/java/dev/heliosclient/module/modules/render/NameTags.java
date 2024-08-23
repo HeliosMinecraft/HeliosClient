@@ -22,7 +22,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -347,7 +346,7 @@ public class NameTags extends Module_ {
                 }
                 if (showBar) {
                     float healthBarWidth = (entityHealth / maxHealth) * (dataWidth + 2f - (float) radius.value / 4.8f);
-                    Renderer2D.drawRectangle(stack.peek().getPositionMatrix(), -(halfDataWidth) - 2f + (float) radius.value / 5.0f, dataHeight + 0.1f, healthBarWidth, 1.2f, getHealthColor(entityHealth).getRGB());
+                    Renderer2D.drawRectangle(stack.peek().getPositionMatrix(), -(halfDataWidth) - 2f + (float) radius.value / 5.0f, dataHeight + 0.1f, healthBarWidth - 0.2f, 1.2f, getHealthColor(entityHealth).getRGB());
                 }
                 if (renderOutline.value) {
                     if (useClientColorsForOutline.value) {
@@ -359,7 +358,7 @@ public class NameTags extends Module_ {
                 //Draw the string we need if vanilla fontrenderer is not selected
                 if(!Renderer2D.isVanillaRenderer()){
                     int textColor = team.value ? ModuleManager.get(Teams.class).getActualTeamColor(entity) : Color.WHITE.getRGB();
-                    FontRenderers.Large_fxfontRenderer.drawString(stack, builder.toString(), -(dataWidth / 2.0f) - 0.9f, (-entity.getHeight() - entityYOff) + (dataHeight + 3f) / 5.0f, textColor);
+                    FontRenderers.Large_fxfontRenderer.drawString(stack, builder.toString(), -(dataWidth / 2.0f) - 0.9f, (-entity.getHeight() - entityYOff) + (dataHeight + 1f) / 5.0f, textColor);
                 }
             });
 

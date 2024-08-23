@@ -141,9 +141,8 @@ public class ChatTweaks extends Module_ {
 
     @SubscribeEvent
     public void onChatMessage(ChatMessageEvent e) {
-        e.setCanceled(true);
-
         if (appendTimeStamp.value) {
+            e.cancel();
             e.setMessage(Text.literal("<" + dateFormat.format(new Date()) + "> ").copy().append(e.getMessage()));
         }
     }

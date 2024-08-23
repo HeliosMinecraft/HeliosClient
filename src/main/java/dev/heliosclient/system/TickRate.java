@@ -43,7 +43,7 @@ public class TickRate implements Listener {
         if (System.currentTimeMillis() - gameJoinedTime < 4000) return 20;
 
         if(tickRates.length == 0){
-            return 0;
+            return 20;
         }
 
         int numTicks = 0;

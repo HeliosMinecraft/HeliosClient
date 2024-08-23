@@ -10,7 +10,6 @@ import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -61,19 +60,21 @@ public class ArmorHud extends HudElement {
         super.renderElement(drawContext, textRenderer);
         ItemStack helmet, chestplate, leggings, boots;
 
-        if(isInHudEditor || mc.player == null){
+        if(isInHudEditor && mc.player == null){
             helmet = Items.NETHERITE_HELMET.getDefaultStack();
             chestplate = Items.NETHERITE_CHESTPLATE.getDefaultStack();
             leggings = Items.NETHERITE_LEGGINGS.getDefaultStack();
             boots = Items.NETHERITE_BOOTS.getDefaultStack();
-        }else{
+        }else if(mc.player != null){
             helmet = mc.player.getEquippedStack(EquipmentSlot.HEAD);
             chestplate = mc.player.getEquippedStack(EquipmentSlot.CHEST);
             leggings = mc.player.getEquippedStack(EquipmentSlot.LEGS);
             boots = mc.player.getEquippedStack(EquipmentSlot.FEET);
+        } else{
+            return;
         }
 
-        int x = this.x + 2;
+        int x = this.x;
         int y = this.y;
 
         if(this.damageModeAbove.value){
@@ -124,6 +125,7 @@ public class ArmorHud extends HudElement {
     }
 
     public void drawDamageBar(DrawContext context, ItemStack stack, int x, int y){
+        if(stack == null || stack.isEmpty())return;
         //Gives percentage between 0 and 1
         double durabilityPercentage = ((double) stack.getMaxDamage() - (double) stack.getDamage()) / (double) stack.getMaxDamage();
         int barWidth = Math.round((float)durabilityPercentage * 16);
@@ -145,8 +147,8 @@ public class ArmorHud extends HudElement {
 
     private void drawText(DrawContext context,String text, int x, int y,int color){
         if(!Renderer2D.isVanillaRenderer()){
-            x += (int) (18 - FontRenderers.Super_Small_fxfontRenderer.getStringWidth(text))/2f;
-            FontRenderers.Super_Small_fxfontRenderer.drawString(context.getMatrices(),text,x,y,color);
+            x += Math.round(16.25 - FontRenderers.Super_Small_fxfontRenderer.getStringWidth(text))/2f;
+            FontRenderers.Super_Small_fxfontRenderer.drawString(context.getMatrices(),text,x,y - 0.1f,color);
         }else{
             context.getMatrices().push();
             context.getMatrices().scale(0.5f,0.5f,1);

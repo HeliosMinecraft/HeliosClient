@@ -1,6 +1,7 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.event.events.block.*;
+import dev.heliosclient.event.events.entity.EntityInteractEvent;
 import dev.heliosclient.event.events.player.PlayerAttackEntityEvent;
 import dev.heliosclient.event.events.player.ReachEvent;
 import dev.heliosclient.managers.EventManager;
@@ -99,7 +100,16 @@ public abstract class MixinClientPlayerInteractionManager {
     private void onInteractBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
         BlockInteractEvent event = new BlockInteractEvent(hitResult, hand);
         if (EventManager.postEvent(event).isCanceled()) {
-            cir.setReturnValue(ActionResult.PASS);
+            cir.setReturnValue(ActionResult.FAIL);
+            cir.cancel();
+        }
+    }
+
+    @Inject(method = "interactEntity", at = @At(value = "HEAD"), cancellable = true)
+    private void onInteractEntity(PlayerEntity player, Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        EntityInteractEvent event = new EntityInteractEvent(entity, hand);
+        if (EventManager.postEvent(event).isCanceled()) {
+            cir.setReturnValue(ActionResult.FAIL);
             cir.cancel();
         }
     }

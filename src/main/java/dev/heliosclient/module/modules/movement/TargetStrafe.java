@@ -3,6 +3,7 @@ package dev.heliosclient.module.modules.movement;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.input.KeyboardInputEvent;
+import dev.heliosclient.managers.FriendManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -79,9 +80,26 @@ public class TargetStrafe extends Module_ {
             .roundingPlace(2)
             .build()
     );
+
     BooleanSetting canSeeEntity = sgGeneral.add(new BooleanSetting.Builder()
             .name("Raycast check")
             .description("Checks if the entity is visible to the player or not")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .value(true)
+            .build()
+    );
+    BooleanSetting ignoreInvisible = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Ignore Invisible")
+            .description("Does not attack invisibles.")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .value(true)
+            .build()
+    );
+    BooleanSetting ignoreFriend = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Ignore Friend")
+            .description("Does not attack friends.")
             .onSettingChange(this)
             .defaultValue(true)
             .value(true)
@@ -137,11 +155,11 @@ public class TargetStrafe extends Module_ {
     }
 
     private boolean isEntityVisible(Entity entity) {
-        if (!canSeeEntity.value) {
+        if (!canSeeEntity.value || !ignoreInvisible.value) {
             return true;
         }
 
-        return PlayerUtils.canSeeEntity(entity);
+        return PlayerUtils.canSeeEntity(entity) || entity.isInvisible();
     }
     private boolean isAttackable(Entity entity) {
         if (!onlyAttackAttackable.value) {
@@ -150,14 +168,17 @@ public class TargetStrafe extends Module_ {
 
         return entity.isAttackable();
     }
+    private boolean isFriend(Entity entity) {
+        if (!ignoreFriend.value || !(entity instanceof PlayerEntity)) {
+            return false;
+        }
+
+        return FriendManager.isFriend(entity.getName().getString());
+    }
 
     @Override
     public void onDisable() {
         super.onDisable();
-
-        // setPressedNoDirectKey(mc.options.forwardKey, false);
-        //setPressedNoDirectKey(mc.options.leftKey, false);
-        //setPressedNoDirectKey(mc.options.rightKey, false);
 
         if (timer.value != 1.0) {
             ModuleManager.get(Timer.class).setOverride(Timer.RESET);
@@ -166,11 +187,15 @@ public class TargetStrafe extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
+        if (timer.value == 1.0) {
+            ModuleManager.get(Timer.class).setOverride(Timer.RESET);
+        }
+
         if (legit.value) return;
 
         TargetUtils.getInstance().setSortMethod((SortMethod) sort.getOption());
         TargetUtils.getInstance().setRange(range.value);
-        Entity entity = TargetUtils.getInstance().getNewTargetIfNull(e -> !isBlackListed(e) && isEntityVisible(e) && isAttackable(e) && mc.player.distanceTo(e) <= range.value && (onlyAttackAttackable.value && e.isAttackable()), true);
+        Entity entity = TargetUtils.getInstance().getNewTargetIfNull(e -> !isBlackListed(e) && isEntityVisible(e) && isAttackable(e) && mc.player.distanceTo(e) <= range.value && (onlyAttackAttackable.value && e.isAttackable()) && !isFriend(e), true);
 
         if (!(entity instanceof LivingEntity livingEntity) || (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam(livingEntity))) {
             return;
@@ -336,5 +361,10 @@ public class TargetStrafe extends Module_ {
                 (!(entity instanceof TameableEntity) || !tamed.value) &&
                 (!(entity instanceof PlayerEntity) || !players.value) &&
                 (!(entity instanceof LivingEntity) || !others.value);
+    }
+
+    enum StrafeMode{
+        Mode_A,
+        Mode_B
     }
 }
