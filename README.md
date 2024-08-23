@@ -37,6 +37,7 @@
 
 - Install both [Fabric](https://fabricmc.net/use/installer/) and [Fabric API](https://modrinth.com/mod/fabric-api) for Minecraft 1.20.4
 - Put this mod into the `.minecraft/mods` folder
+- The default keybind for the clickgui is `RSHIFT`.
 
 ***Note: In future we may require [Satin API](https://modrinth.com/mod/satin-api) for shaders (or it will be packedged together)***
 
