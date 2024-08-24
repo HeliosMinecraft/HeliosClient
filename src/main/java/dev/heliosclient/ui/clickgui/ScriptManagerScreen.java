@@ -2,7 +2,6 @@ package dev.heliosclient.ui.clickgui;
 
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.modules.render.GUI;
-import dev.heliosclient.module.settings.buttonsetting.Button;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
 import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
@@ -325,7 +324,7 @@ public class ScriptManagerScreen extends Screen {
 
     @Override
     public boolean shouldCloseOnEsc() {
-        return false;
+        return true;
     }
 
     @Override
@@ -387,9 +386,7 @@ public class ScriptManagerScreen extends Screen {
         }
 
         @Override
-        public void setWidth(double width) {
-
-        }
+        public void setWidth(double width) {}
 
         public double getX() {
             return x;
@@ -399,5 +396,4 @@ public class ScriptManagerScreen extends Screen {
             return y - ScriptManagerScreen.this.scrollOffset;
         }
     }
-
 }

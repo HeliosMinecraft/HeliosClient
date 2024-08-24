@@ -9,10 +9,10 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
-import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
@@ -162,14 +162,12 @@ public class Painter extends Module_ {
             .shouldRender(() -> !autoRotate.value)
             .build()
     );
-    BooleanSetting lockCanvas = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Lock Canvas")
-            .description("Locks canvas to the current set direction and position")
-            .value(false)
-            .defaultValue(false)
-            .onSettingChange(this)
+    ButtonSetting canvasState = sgGeneral.add(new ButtonSetting.Builder()
+            .name("Canvas state")
+            .description("Locks canvas to the current set direction and position or unlocks the canvas to return to normal")
             .build()
     );
+
     KeyBind lockCanvasKey = sgGeneral.add(new KeyBind.Builder()
             .name("Lock Canvas Key")
             .description("Keybind to lock canvas")
@@ -285,6 +283,10 @@ public class Painter extends Module_ {
                 ChatUtils.sendHeliosMsg(ColorUtils.red + "File selected is not selected.");
             }
         });
+
+        canvasState.addButton("Lock",0,0, this::lock);
+        canvasState.addButton("Unlock",1,0, this::unlock);
+
     }
 
     @SubscribeEvent
@@ -292,10 +294,8 @@ public class Painter extends Module_ {
         if (e.getKey() == lockCanvasKey.value) {
             if (!isLocked) {
                 lock();
-                lockCanvas.setValue(isLocked);
             } else {
                 unlock();
-                lockCanvas.setValue(isLocked);
             }
         }
     }
@@ -303,7 +303,6 @@ public class Painter extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-        isLocked = !lockCanvas.value;
         ticksPassed = 0;
 
         loadCanvas();
@@ -326,12 +325,6 @@ public class Painter extends Module_ {
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
         if(!HeliosClient.shouldUpdate()) return;
-
-        if (lockCanvas.value && !isLocked) {
-            lock();
-        } else if (!lockCanvas.value && isLocked) {
-            unlock();
-        }
         if (CANVAS_MAP == null || !autoPlace.value) return;
 
         ticksPassed++;

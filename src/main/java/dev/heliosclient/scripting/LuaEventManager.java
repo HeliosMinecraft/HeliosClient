@@ -41,8 +41,7 @@ public class LuaEventManager {
         LuaFunction luaFunction = listener.checkfunction();
         List<LuaFunction> eventListeners = listeners.get(eventType);
         if (eventListeners != null) {
-            System.out.println(eventListeners);
-            System.out.println( eventListeners.remove(luaFunction));
+           eventListeners.remove(luaFunction);
         }
     }
 

@@ -9,9 +9,7 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.ParentScreenSetting;
-import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.Setting;
-import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.settings.SettingsScreen;
@@ -74,6 +72,8 @@ public class ModuleButton implements Listener {
         this.x = x;
         this.y = y;
         this.shouldRender = shouldRender;
+        this.width = maxWidth;
+        hitBox.set(this.x, this.y, width, height);
 
         if (!shouldRender) return;
 
@@ -84,10 +84,6 @@ public class ModuleButton implements Listener {
         }
         // Get the width and height of the module name
         int moduleNameHeight = (int) Renderer2D.getFxStringHeight(module.name) - 1;
-
-        this.width = maxWidth;
-
-        hitBox.set(x, y, width, height);
 
         Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(ModuleManager.get(GUI.class).buttonColor.getColor(), 100);
         Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(ModuleManager.get(GUI.class).buttonColor.getColor(), 100);
@@ -135,7 +131,6 @@ public class ModuleButton implements Listener {
     }
 
     public int renderSettings(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
-
         if (!shouldRender){
             updateScale(false);
             return (int) (boxHeight * scale);

@@ -1,10 +1,7 @@
 package dev.heliosclient.util;
 
-import dev.heliosclient.HeliosClient;
-import net.minecraft.client.Keyboard;
 import org.lwjgl.glfw.GLFW;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
 /**
  * Utils for working with GLFW keycodes.
@@ -181,7 +178,7 @@ public class KeyboardUtils {
                 case GLFW.GLFW_KEY_NUM_LOCK -> {
                     return "NUM_LOCK";
                 }
-                case GLFW_KEY_SPACE -> {
+                case GLFW.GLFW_KEY_SPACE -> {
                     return "SPACE";
                 }
                 case GLFW.GLFW_KEY_ENTER -> {
@@ -371,7 +368,7 @@ public class KeyboardUtils {
                 case GLFW.GLFW_KEY_NUM_LOCK -> {
                     return "NUM";
                 }
-                case GLFW_KEY_SPACE -> {
+                case GLFW.GLFW_KEY_SPACE -> {
                     return "SPACE";
                 }
                 case GLFW.GLFW_KEY_ENTER -> {

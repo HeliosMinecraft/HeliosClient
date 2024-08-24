@@ -296,13 +296,14 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
         for (SettingGroup settingGroup : this.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldSaveAndLoad()) continue;
-                    //Any error caught should not cause the whole config system to fail to load.
-                    //Hopefully
-                    try {
-                        setting.loadFromFile(MAP);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+
+                //Any error caught should not cause the whole config system to fail to load.
+                //Hopefully
+                try {
+                    setting.loadFromFile(MAP);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 if (setting == this.active && this.isActive()) {
                     this.onEnable();
                 }

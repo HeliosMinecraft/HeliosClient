@@ -23,7 +23,7 @@ public class ConsoleScreen extends Screen {
         consoleBox.displayLineNos = true;
         consoleBox.autoScroll = true;
 
-        enterBox = new InputBox(33, 13, "", 256, InputBox.InputMode.ALL);
+        enterBox = new InputBox(29, 13, "", 256, InputBox.InputMode.ALL);
         enterButton = new Button("Enter", () -> {
             if (!enterBox.getValue().isEmpty()) {
                 HeliosClient.LOGGER.info(enterBox.getValue());
@@ -54,7 +54,7 @@ public class ConsoleScreen extends Screen {
 
     private void resizeBoxes(){
         consoleBox.setSize(HeliosClient.MC.getWindow().getScaledWidth() - 40, HeliosClient.MC.getWindow().getScaledHeight() - 55);
-        enterBox.setSize(HeliosClient.MC.getWindow().getScaledWidth() - 82, 13);
+        enterBox.setSize(HeliosClient.MC.getWindow().getScaledWidth() - 86, 13);
         enterButton.setX(HeliosClient.MC.getWindow().getScaledWidth() - 58);
         enterButton.setY(HeliosClient.MC.getWindow().getScaledHeight() - 33);
     }

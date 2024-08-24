@@ -205,7 +205,7 @@ public class Spammer extends Module_ {
         super.loadFromFile(MAP);
 
         String filePath = (String) MAP.get("File");
-        if(filePath.equals("unknown")) return;
+        if(filePath == null || filePath.equals("unknown")) return;
         spamFile = new File(filePath);
 
         if (spamFile.exists() && spamFile.isFile()) {

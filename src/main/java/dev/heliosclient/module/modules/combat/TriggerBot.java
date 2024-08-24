@@ -13,6 +13,7 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.EntityTypeListSetting;
 import dev.heliosclient.system.TickRate;
 import dev.heliosclient.util.SortMethod;
+import dev.heliosclient.util.TickTimer;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.TargetUtils;
 import dev.heliosclient.util.render.TargetRenderer;
@@ -146,7 +147,7 @@ public class TriggerBot extends Module_ {
     );
     TargetUtils targetFinder = new TargetUtils();
 
-    private int delay;
+    private TickTimer timer = new TickTimer();
     private Entity targetEntity;
 
     public TriggerBot() {
@@ -162,7 +163,7 @@ public class TriggerBot extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-        delay = 0;
+        timer = new TickTimer();
     }
 
     private boolean isTeamMate(LivingEntity targetEntity) {
@@ -193,13 +194,7 @@ public class TriggerBot extends Module_ {
         if (smartDelay.value) {
             return mc.player.getAttackCooldownProgress(baseTimer) >= 1;
         } else {
-            if (this.delay < baseTimer) {
-                this.delay++;
-                return false;
-            } else {
-                this.delay = 0;
-                return true;
-            }
+            return timer.incrementAndEvery((int) baseTimer);
         }
     }
 
