@@ -4,7 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.client.OpenScreenEvent;
-import dev.heliosclient.event.events.player.PlayerLeaveEvent;
+import dev.heliosclient.event.events.player.DisconnectEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.player.FastUse;
@@ -66,7 +66,7 @@ public abstract class MinecraftClientMixin {
     private void onDisconnect(Screen screen, CallbackInfo info) {
         if (world != null) {
             PlayerEntity player = HeliosClient.MC.player;
-            Event event = new PlayerLeaveEvent(player);
+            Event event = new DisconnectEvent(player);
             if (EventManager.postEvent(event).isCanceled())
                 info.cancel();
         }

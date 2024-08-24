@@ -1,8 +1,8 @@
 package dev.heliosclient.module.modules.player;
 
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.player.DisconnectEvent;
 import dev.heliosclient.event.events.player.PacketEvent;
-import dev.heliosclient.event.events.player.PlayerLeaveEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
@@ -68,7 +68,7 @@ public class PingSpoof extends Module_ {
     }
 
     @SubscribeEvent
-    public void onLeave(PlayerLeaveEvent event) {
+    public void onLeave(DisconnectEvent event) {
         clearPackets(false);
     }
 

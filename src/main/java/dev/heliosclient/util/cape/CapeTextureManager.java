@@ -10,10 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
+//Space complexity  = o(infinite)
 public class CapeTextureManager {
     public final Map<String, LinkedList<Identifier>> gifCapeTextures = new HashMap<>();
     private final Map<String, LinkedList<Identifier>> gifElytraTextures = new HashMap<>();
@@ -23,7 +21,8 @@ public class CapeTextureManager {
 
     public final Map<UUID, String> playerCapes = new HashMap<>();
     private final Map<UUID, Integer> currentFrame = new HashMap<>();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+    private Timer timer = new Timer("CapeTextureManager");
 
     public CapeTextureManager() {
         gifCapeTextures.clear();
@@ -33,10 +32,11 @@ public class CapeTextureManager {
 
     public void registerCapeTextures(InputStream stream, File capeFile, String prefix) throws IOException {
         if (capeFile.getName().toLowerCase().endsWith(".gif")) {
-            GifTextureManager gifTextureManager = new GifTextureManager();
+            final GifTextureManager gifTextureManager = new GifTextureManager();
             gifTextureManager.registerGifTextures(capeFile, prefix);
             gifCapeTextures.put(prefix, gifTextureManager.getCapeTextureIdentifiers());
             gifElytraTextures.put(prefix, gifTextureManager.getElytraTextureIdentifiers());
+            gifTextureManager.discardAll();
         } else {
             NativeImage image = NativeImage.read(stream);
             HeliosClient.MC.execute(()->{
@@ -100,15 +100,19 @@ public class CapeTextureManager {
                 int frameIndex = (currentFrame.get(playerUUID) + 1) % frames.size();
                 currentFrame.put(playerUUID, frameIndex);
             }
-
         }
     }
 
     public void startCapeAnimation() {
-        scheduler.scheduleAtFixedRate(this::cycleCapeTextures, 0, 100, TimeUnit.MILLISECONDS);
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                CapeTextureManager.this.cycleCapeTextures();
+            }
+        },0,100);
     }
 
     public void stopCapeAnimation() {
-        scheduler.shutdown();
+        timer.cancel();
     }
 }

@@ -2,7 +2,7 @@ package dev.heliosclient.mixin;
 
 import com.mojang.brigadier.ParseResults;
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.events.player.PlayerLeaveEvent;
+import dev.heliosclient.event.events.player.DisconnectEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -20,7 +20,7 @@ public abstract class MixinServerPlayNetworkHandler {
 
     @Inject(method = "onDisconnected", at = @At("RETURN"), cancellable = true)
     private void onDisconnected(Text reason, CallbackInfo ci) {
-        PlayerLeaveEvent event = new PlayerLeaveEvent(HeliosClient.MC.player);
+        DisconnectEvent event = new DisconnectEvent(HeliosClient.MC.player);
         EventManager.postEvent(event);
         if (event.isCanceled()) {
             ci.cancel();

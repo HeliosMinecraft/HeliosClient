@@ -3,7 +3,7 @@ package dev.heliosclient;
 import dev.heliosclient.addon.AddonManager;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.client.FontChangeEvent;
-import dev.heliosclient.event.events.player.PlayerLeaveEvent;
+import dev.heliosclient.event.events.player.DisconnectEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.*;
@@ -26,10 +26,7 @@ import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.render.Renderer2D;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.WorldSaveHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
@@ -121,7 +118,7 @@ public class HeliosClient implements ModInitializer, Listener {
     }
 
     @SubscribeEvent
-    public void onDisconnect(PlayerLeaveEvent client) {
+    public void onDisconnect(DisconnectEvent client) {
         HeliosClient.saveConfigHook();
     }
 

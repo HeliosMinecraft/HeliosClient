@@ -1,12 +1,8 @@
 package dev.heliosclient.util;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 public class TickTimer {
     private int ticks = 0;
-    boolean hasTimerStarted = false;
+    private boolean hasTimerStarted = false;
 
     public TickTimer(int defaultTicks) {
         ticks = defaultTicks;
@@ -47,16 +43,20 @@ public class TickTimer {
 
     // Checks if ticks have passed since the last reset
     public boolean every(int ticks) {
-        if (getElapsedTicks() >= ticks)
+        if (getElapsedTicks() >= ticks) {
             resetTimer();
+            startTicking();
+        }
         return getElapsedTicks() >= ticks;
     }
 
 
     public boolean incrementAndEvery(int ticks) {
         increment();
-        if (getElapsedTicks() >= ticks)
+        if (getElapsedTicks() >= ticks) {
             resetTimer();
+            startTicking();
+        }
         return getElapsedTicks() >= ticks;
     }
 
@@ -65,6 +65,7 @@ public class TickTimer {
         if (getElapsedTicks() >= ticks) {
             task.run();
             resetTimer();
+            startTicking();
         }
         return getElapsedTicks() >= ticks;
     }
@@ -73,6 +74,7 @@ public class TickTimer {
         if (getElapsedTicks() >= ticks) {
             task.run();
             resetTimer();
+            startTicking();
         }
         return getElapsedTicks() >= ticks;
     }

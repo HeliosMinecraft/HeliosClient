@@ -141,14 +141,14 @@ public class Config {
                 Map<String, Object> trashMap = cast(panesMap.get(category.name));
 
                 for (Module_ m : ModuleManager.getModulesByCategory(category)) {
-                    m.loadFromFile(trashMap);
+                    m.loadFromFile(cast(trashMap.get(m.name.replace(" ",""))));
                 }
             }
         });
         LOGGER.info("Loading Modules Complete");
     }
 
-    public Map<String, Object> cast(Object e) {
+    public static Map<String, Object> cast(Object e) {
         return (Map<String, Object>) e;
     }
 

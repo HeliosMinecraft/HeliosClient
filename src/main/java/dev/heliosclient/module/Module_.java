@@ -288,22 +288,21 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
 
     @Override
     public void loadFromFile(Map<String, Object> MAP) {
+        if(MAP == null) {
+            HeliosClient.LOGGER.error("Null map passed while loading Module: {}", this.name);
+            return;
+        }
+
         for (SettingGroup settingGroup : this.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldSaveAndLoad()) continue;
-
-
-                Map<String, Object> settingTable = HeliosClient.CONFIG.cast(MAP.get(this.name.replace(" ", "")));
-                if (settingTable != null) {
-
                     //Any error caught should not cause the whole config system to fail to load.
                     //Hopefully
                     try {
-                        setting.loadFromFile(settingTable);
+                        setting.loadFromFile(MAP);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
                 if (setting == this.active && this.isActive()) {
                     this.onEnable();
                 }

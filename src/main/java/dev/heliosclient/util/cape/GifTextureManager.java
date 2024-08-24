@@ -9,18 +9,13 @@ import net.minecraft.util.Identifier;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
 
 public class GifTextureManager {
     private final LinkedList<Identifier> capeTextureIdentifiers = new LinkedList<>();
     private final LinkedList<Identifier> elytraTextureIdentifiers = new LinkedList<>();
-    Set<File> gifFiles = new HashSet<>();
 
     public void registerGifTextures(File gifFile, String prefix) throws IOException {
-        if(gifFiles.contains(gifFile))return;
-
         LinkedList<NativeImage> frames = FileUtils.readGifFrames(gifFile);
         HeliosClient.MC.execute(()->{
         for (int i = 0; i < frames.size(); i++) {
@@ -31,8 +26,11 @@ public class GifTextureManager {
             capeTextureIdentifiers.add(capeIdentifier);
             elytraTextureIdentifiers.add(elytraIdentifier);
         }
-        gifFiles.add(gifFile);
         });
+    }
+    public void discardAll(){
+        capeTextureIdentifiers.clear();
+        elytraTextureIdentifiers.clear();
     }
 
     public LinkedList<Identifier> getCapeTextureIdentifiers() {

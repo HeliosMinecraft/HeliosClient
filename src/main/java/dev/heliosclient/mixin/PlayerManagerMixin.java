@@ -1,7 +1,7 @@
 package dev.heliosclient.mixin;
 
 import dev.heliosclient.event.Event;
-import dev.heliosclient.event.events.player.PlayerLeaveEvent;
+import dev.heliosclient.event.events.player.DisconnectEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerManagerMixin {
     @Inject(method = "remove", at = @At("TAIL"), cancellable = true)
     private void onDisconnect(ServerPlayerEntity player, CallbackInfo ci) {
-        Event event = new PlayerLeaveEvent(player);
+        Event event = new DisconnectEvent(player);
         if (EventManager.postEvent(event).isCanceled())
             ci.cancel();
     }

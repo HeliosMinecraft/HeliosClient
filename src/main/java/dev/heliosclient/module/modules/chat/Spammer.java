@@ -2,24 +2,27 @@ package dev.heliosclient.module.modules.chat;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.client.OpenScreenEvent;
+import dev.heliosclient.event.events.player.DisconnectEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
 import dev.heliosclient.system.UniqueID;
-import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.FileUtils;
-import dev.heliosclient.util.InputBox;
+import dev.heliosclient.system.config.Config;
+import dev.heliosclient.util.*;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.client.realms.gui.screen.DisconnectedRealmsScreen;
 import net.minecraft.util.math.random.Random;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public class Spammer extends Module_ {
     public File spamFile = null;
     public Random rand = Random.create();
-    int timer = 0;
+    TickTimer timer = new TickTimer();
     String[] spamLines = null;
     int lineIndex;
     SettingGroup sgGeneral = new SettingGroup("General");
@@ -90,7 +93,13 @@ public class Spammer extends Module_ {
             .roundingPlace(0)
             .build()
     );
-
+    BooleanSetting toggleOnDisconnect = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Disable on disconnect")
+            .description("Toggles the module off when you disconnect")
+            .value(true)
+            .onSettingChange(this)
+            .build()
+    );
 
     public Spammer() {
         super("Spammer", "Spams messages in chat", Categories.MISC);
@@ -110,8 +119,14 @@ public class Spammer extends Module_ {
     public void onEnable() {
         super.onEnable();
         lineIndex = 0;
-        timer = 0;
+        timer.startTicking();
         setSpamLines();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        timer.resetTimer();
     }
 
     public void setSpamLines() {
@@ -130,10 +145,22 @@ public class Spammer extends Module_ {
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent.PLAYER event) {
-        if (timer > delay.value) {
-            timer = 0;
+    public void onDisconnectScreen(OpenScreenEvent event) {
+        if(toggleOnDisconnect.value && (event.screen instanceof DisconnectedScreen || event.screen instanceof DisconnectedRealmsScreen)){
+            toggle();
+        }
+    }
 
+    @SubscribeEvent
+    public void onDisconnect(DisconnectEvent event) {
+        if(toggleOnDisconnect.value){
+            toggle();
+        }
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.PLAYER event) {
+        timer.incrementAndEvery(delay.getInt(),() -> {
             String lineToSend = next();
             if (antiantiSpam.value) {
                 lineToSend += " " + UniqueID.setLengthAndGet((int) antispam_length.value).getUniqueID();
@@ -143,9 +170,7 @@ public class Spammer extends Module_ {
             } else {
                 ChatUtils.sendPlayerMessage(lineToSend);
             }
-        } else {
-            timer++;
-        }
+        });
     }
 
     public String next() {
@@ -163,6 +188,28 @@ public class Spammer extends Module_ {
 
         if (setting == mode) {
             setSpamLines();
+        }
+    }
+
+    @Override
+    public Object saveToFile(List<Object> list) {
+        Map<String,Object> map = Config.cast(super.saveToFile(list));
+
+        map.put("File",spamFile == null ? "unknown" : spamFile.getAbsolutePath());
+
+        return map;
+    }
+
+    @Override
+    public void loadFromFile(Map<String, Object> MAP) {
+        super.loadFromFile(MAP);
+
+        String filePath = (String) MAP.get("File");
+        if(filePath.equals("unknown")) return;
+        spamFile = new File(filePath);
+
+        if (spamFile.exists() && spamFile.isFile()) {
+            selectFile.setButtonCategoryText("File Selected: " + spamFile.getName());
         }
     }
 

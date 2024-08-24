@@ -6,11 +6,11 @@ import dev.heliosclient.event.LuaEvent;
 import net.minecraft.entity.player.PlayerEntity;
 
 @Cancelable
-@LuaEvent("PlayerLeaveEvent")
-public class PlayerLeaveEvent extends Event {
+@LuaEvent("DisconnectEvent")
+public class DisconnectEvent extends Event {
     private final PlayerEntity player;
 
-    public PlayerLeaveEvent(PlayerEntity player) {
+    public DisconnectEvent(PlayerEntity player) {
         this.player = player;
     }
 
