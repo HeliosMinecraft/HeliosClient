@@ -7,8 +7,8 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.BlockListSetting;
-import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.GradientBlockRenderer;
@@ -38,6 +38,7 @@ public class Scaffold extends Module_ {
             .description("Blocks to place")
             .iSettingChange(this)
             .blocks(Blocks.DIRT, Blocks.TNT, Blocks.OBSIDIAN)
+            .filter(block -> !BlockUtils.airBreed(block) && !BlockUtils.isClickable(block))
             .build()
     );
     DropDownSetting towerMode = sgGeneral.add(new DropDownSetting.Builder()
@@ -247,7 +248,7 @@ public class Scaffold extends Module_ {
         int itemSlot = -2;
         if (autoSwitch.value) {
             for(Block block: blocks.getSelectedEntries()){
-                itemSlot = InventoryUtils.findInHotbar(item -> block.asItem() != item);
+                itemSlot = InventoryUtils.findInHotbar(item -> block.asItem() == item);
 
                 if (itemSlot != -1) {
                     break;

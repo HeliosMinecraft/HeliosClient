@@ -3,11 +3,13 @@ package dev.heliosclient.module.modules.combat;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.input.KeyPressedEvent;
 import dev.heliosclient.event.events.player.PacketEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
+import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
@@ -57,8 +59,16 @@ public class AutoTotem extends Module_ {
             .build()
     );
 
+    KeyBind totemSwitchKey = sgGeneral.add(new KeyBind.Builder()
+            .name("Totem Switch Key")
+            .description("When you press this key, the module will automatically switch to a totem")
+            .value(KeyBind.none())
+            .onSettingChange(this)
+            .build()
+    );
+
     int totemCount = 0;
-    private TickTimer timer = new TickTimer();
+    private final TickTimer timer = new TickTimer();
     boolean lastNoTotemNotified = false;
 
     public AutoTotem() {
@@ -80,6 +90,14 @@ public class AutoTotem extends Module_ {
         lastNoTotemNotified = false;
     }
 
+    @SubscribeEvent
+    public void onKey(KeyPressedEvent e){
+        if(e.getKey() == totemSwitchKey.value){
+            doAutoTotem();
+            timer.restartTimer();
+        }
+    }
+
     //High
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
     public void onTick(TickEvent.WORLD event) {
@@ -94,35 +112,37 @@ public class AutoTotem extends Module_ {
                    return;
                }
                if(always.value || isPlayerLow()) {
-                   boolean offhandHasItem = !mc.player.getOffHandStack().isEmpty();
-
-                   int itemSlot = InventoryUtils.findItemInInventory(Items.TOTEM_OF_UNDYING);
-                   if(itemSlot == -1){
-                       return;
-                   }
-
-                   //if is hotbar then swap item with offhand super fast.
-                   if(itemSlot >= 0 && itemSlot < 9){
-                       InventoryUtils.swapToSlot(itemSlot,true);
-                       mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-                       InventoryUtils.swapBackHotbar();
-                   }else {
-                       InventoryUtils.moveItem(itemSlot,45, SlotActionType.PICKUP, SlotActionType.PICKUP);
-
-                       if(offhandHasItem){
-                           mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,itemSlot,0,SlotActionType.PICKUP,mc.player);
-                       }
-                   }
+                   doAutoTotem();
 
                    if(log.value){
                        ChatUtils.sendHeliosMsg("Restocked Totem, Totems left: " + InventoryUtils.getItemCountInInventory(Items.TOTEM_OF_UNDYING));
                    }
-                   return;
                }
             });
-        }else if(log.value && !lastNoTotemNotified){
+        } else if(log.value && !lastNoTotemNotified){
             ChatUtils.sendHeliosMsg(ColorUtils.red + "No Totems left in your inventory");
             lastNoTotemNotified = true;
+        }
+    }
+
+    public void doAutoTotem(){
+        boolean offhandHasItem = !mc.player.getOffHandStack().isEmpty();
+        int itemSlot = InventoryUtils.findItemInInventory(Items.TOTEM_OF_UNDYING);
+        if(itemSlot == -1 || itemSlot == InventoryUtils.OFFHAND){
+            return;
+        }
+
+        //if is hotbar then swap item with offhand super fast.
+        if(itemSlot >= 0 && itemSlot < 9){
+            InventoryUtils.swapToSlot(itemSlot,true);
+            mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+            InventoryUtils.swapBackHotbar();
+        }else {
+            InventoryUtils.moveItem(itemSlot,45, SlotActionType.PICKUP, SlotActionType.PICKUP);
+
+            if(offhandHasItem){
+                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,itemSlot,0,SlotActionType.PICKUP,mc.player);
+            }
         }
     }
 
@@ -131,7 +151,7 @@ public class AutoTotem extends Module_ {
         if(e.packet instanceof EntityStatusS2CPacket packet){
             if(packet.getStatus() != 35 || packet.getEntity(mc.world) != mc.player) return;
 
-            timer.restartTimer();
+            timer.setTicks(delay.getInt());
         }
     }
 
