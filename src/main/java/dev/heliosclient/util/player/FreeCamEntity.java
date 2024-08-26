@@ -3,20 +3,18 @@ package dev.heliosclient.util.player;
 import dev.heliosclient.HeliosClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.OtherClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.UUID;
 
 
-public class FreeCamEntity extends OtherClientPlayerEntity {
+public class FreeCamEntity extends ClientPlayerEntity {
     public static float moveSpeed = 1.0f;
     public static FreeCamEntity camEntity;
     private boolean ghost;
@@ -30,17 +28,25 @@ public class FreeCamEntity extends OtherClientPlayerEntity {
         this(player, player.getX(), player.getY(), player.getZ());
     }
 
-    public FreeCamEntity(PlayerEntity player, double x, double y, double z) {
-        super(HeliosClient.MC.world, player.getGameProfile());
 
-        copyFrom(player);
-        copyPositionAndRotation(player);
+    public FreeCamEntity(PlayerEntity player, double x, double y, double z) {
+        super(mc, mc.world, mc.player.networkHandler, mc.player.getStatHandler(), mc.player.getRecipeBook(),false,false);
+        this.noClip = true;
+
+
+        this.copyFrom(player);
+        this.copyPositionAndRotation(player);
         this.setRotations(player.getYaw(), player.getPitch());
+        this.setPos(x,y,z);
+        this.input = mc.player.input;
+
 
         // Cache the player textures, then switch to a random uuid
         // because the world doesn't allow duplicate uuids in 1.17+
         dataTracker.set(PLAYER_MODEL_PARTS, player.getDataTracker().get(PLAYER_MODEL_PARTS));
         setUuid(UUID.randomUUID());
+        this.refreshPosition();
+
         camEntity = this;
     }
 
@@ -97,7 +103,12 @@ public class FreeCamEntity extends OtherClientPlayerEntity {
         }
     }
 
-    private static double getMoveSpeed() {
+    @Override
+    public boolean isUsingItem() {
+        return HeliosClient.MC.player.isUsingItem();
+    }
+
+    public static double getMoveSpeed() {
         return moveSpeed;
     }
 
