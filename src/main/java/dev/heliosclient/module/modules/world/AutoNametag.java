@@ -12,7 +12,6 @@ import dev.heliosclient.util.EntityUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 
@@ -83,7 +82,7 @@ public class AutoNametag extends Module_ {
             RotationUtils.lookAt(nameTagEntity, RotationUtils.LookAtPos.CENTER);
         }
 
-        interact(slot == PlayerInventory.OFF_HAND_SLOT);
+        interact(slot == InventoryUtils.OFFHAND);
     }
 
     private void interact(boolean offHand) {

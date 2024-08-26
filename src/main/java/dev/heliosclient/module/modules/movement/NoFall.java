@@ -7,14 +7,13 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.mixininterface.IVec3d;
-import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.ChatUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -300,7 +299,7 @@ public class NoFall extends Module_ {
 
                 ((IVec3d) mc.player.getVelocity()).heliosClient$setY(0);
 
-                BlockUtils.place(pos, rotate.value,false, airPlace.value, slot == PlayerInventory.OFF_HAND_SLOT ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                BlockUtils.place(pos, rotate.value,false, airPlace.value, slot == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
                 ((IVec3d) mc.player.getVelocity()).heliosClient$setY(prevY);
 

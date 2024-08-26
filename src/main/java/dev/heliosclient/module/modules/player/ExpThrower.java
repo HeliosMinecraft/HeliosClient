@@ -8,7 +8,6 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 
@@ -61,10 +60,10 @@ public class ExpThrower extends Module_ {
 
     public void throwXP(int slot) {
         if (mc.player.getInventory().selectedSlot == slot) {
-            mc.interactionManager.interactItem(mc.player, slot == PlayerInventory.OFF_HAND_SLOT ? Hand.OFF_HAND : Hand.MAIN_HAND);
+            mc.interactionManager.interactItem(mc.player, slot == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
         } else {
             InventoryUtils.swapToSlot(slot, swapBack.value);
-            mc.interactionManager.interactItem(mc.player, slot == PlayerInventory.OFF_HAND_SLOT ? Hand.OFF_HAND : Hand.MAIN_HAND);
+            mc.interactionManager.interactItem(mc.player, slot == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
             if (swapBack.value)
                 InventoryUtils.swapBackHotbar();

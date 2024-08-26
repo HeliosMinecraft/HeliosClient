@@ -1,9 +1,7 @@
 package dev.heliosclient.event.events;
 
-import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.LuaEvent;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 
 /**
@@ -21,12 +19,9 @@ public abstract class TickEvent extends Event {
     public static class CLIENT extends TickEvent {
     }
 
-    /**
-     * Note only works for single player worlds!!!
-     */
     @LuaEvent("WorldTick")
     public static class WORLD extends TickEvent {
-        //Called for every world Tick
+        //Called for every clientWorld Tick
     }
 
     @LuaEvent("PlayerTick")

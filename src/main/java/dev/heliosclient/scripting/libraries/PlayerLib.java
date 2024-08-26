@@ -47,7 +47,7 @@ public class PlayerLib extends TwoArgFunction {
         library.set("getFastestTool", new getFastestTool());
         library.set("getFastestToolAB", new getFastestToolAntibreak());
         library.set("getItemNames", new getItemNames());
-        library.set("getItemCount", new getItemCount());
+        library.set("getItemCountInInventory", new getItemCountInInventory());
         library.set("canSwapItem", new canSwapItem());
         library.set("swapBackHotbar", new swapBackHotbar());
         library.set("lookAtCoords", new lookAtCoords());
@@ -58,12 +58,12 @@ public class PlayerLib extends TwoArgFunction {
         return library;
     }
 
-    static class getItemCount extends OneArgFunction {
-        public LuaValue call(LuaValue itemStack) {
+    static class getItemCountInInventory extends OneArgFunction {
+        public LuaValue call(LuaValue item) {
             // Convert the LuaValue to a Java ItemStack object
-            ItemStack stack = (ItemStack) itemStack.checkuserdata(ItemStack.class);
+            Item stack = (Item) item.checkuserdata(Item.class);
 
-            return LuaValue.valueOf(InventoryUtils.getItemCount(stack));
+            return LuaValue.valueOf(InventoryUtils.getItemCountInInventory(stack));
         }
     }
 

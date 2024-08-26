@@ -1,4 +1,4 @@
-package dev.heliosclient.util.player;
+package dev.heliosclient.util.entity;
 
 import dev.heliosclient.HeliosClient;
 import net.minecraft.client.MinecraftClient;

@@ -1,8 +1,7 @@
-package dev.heliosclient.util.player;
+package dev.heliosclient.util.entity;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.PlayerSkinTexture;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.SkinTextures;
 

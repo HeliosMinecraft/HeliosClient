@@ -19,7 +19,6 @@ import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -361,7 +360,7 @@ public class Painter extends Module_ {
                         boolean swapped = InventoryUtils.swapToSlot(slot, false);
 
                         if (swapped) {
-                            BlockUtils.place(changedPos, playerRotate.value,false, airPlace.value, slot == PlayerInventory.OFF_HAND_SLOT ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                            BlockUtils.place(changedPos, playerRotate.value,false, airPlace.value, slot == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
                         }
                     }
                 }

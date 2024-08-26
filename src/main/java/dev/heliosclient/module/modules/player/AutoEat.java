@@ -9,12 +9,11 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.lists.ItemListSetting;
-import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.PlayerUtils;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -177,10 +176,10 @@ public class AutoEat extends Module_ {
         }
 
         //Offhand
-        Item item = mc.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT).getItem();
+        Item item = mc.player.getInventory().getStack(InventoryUtils.OFFHAND).getItem();
         FoodComponent component = item.getFoodComponent();
         if (component != null && item.getFoodComponent().getHunger() > maxHunger && !shouldAvoid(item)) {
-            return PlayerInventory.OFF_HAND_SLOT;
+            return InventoryUtils.OFFHAND;
         }
 
         return bestSlot;

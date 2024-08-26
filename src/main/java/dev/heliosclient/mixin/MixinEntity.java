@@ -10,7 +10,7 @@ import dev.heliosclient.module.modules.movement.NoFall;
 import dev.heliosclient.module.modules.movement.NoSlow;
 import dev.heliosclient.module.modules.render.Freecam;
 import dev.heliosclient.module.modules.render.NoRender;
-import dev.heliosclient.util.player.FreeCamEntity;
+import dev.heliosclient.util.entity.FreeCamEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec3d;

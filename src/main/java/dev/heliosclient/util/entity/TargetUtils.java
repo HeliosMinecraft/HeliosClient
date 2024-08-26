@@ -1,8 +1,8 @@
-package dev.heliosclient.util.player;
+package dev.heliosclient.util.entity;
 
-import dev.heliosclient.module.modules.world.AntiBot;
 import dev.heliosclient.util.EntityUtils;
 import dev.heliosclient.util.SortMethod;
+import dev.heliosclient.util.player.PlayerUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.Nullable;

@@ -9,7 +9,7 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.movement.Sprint;
 import dev.heliosclient.module.modules.world.SpeedMine;
 import dev.heliosclient.util.blocks.BlockUtils;
-import dev.heliosclient.util.player.FreeCamEntity;
+import dev.heliosclient.util.entity.FreeCamEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

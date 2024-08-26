@@ -2,14 +2,9 @@ package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.mixin.AccessorMinecraftClient;
-import dev.heliosclient.util.EntityUtils;
-import dev.heliosclient.util.MathUtils;
-import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.render.Renderer3D;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.*;
@@ -27,7 +22,7 @@ import java.util.List;
 import static dev.heliosclient.util.ColorUtils.blend;
 
 public class PlayerUtils {
-    static MinecraftClient mc = MinecraftClient.getInstance();
+    public static MinecraftClient mc = MinecraftClient.getInstance();
 
     public static boolean canSeeEntity(Entity entity) {
         Vec3d playerEyePos = mc.player.getEyePos();

@@ -10,7 +10,7 @@ import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.player.FreeCamEntity;
+import dev.heliosclient.util.entity.FreeCamEntity;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.WireframeEntityRenderer;
 import dev.heliosclient.util.render.color.LineColor;

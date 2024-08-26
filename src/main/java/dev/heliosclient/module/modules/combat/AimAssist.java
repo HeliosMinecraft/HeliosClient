@@ -15,10 +15,10 @@ import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.SortMethod;
 import dev.heliosclient.util.animation.EasingType;
+import dev.heliosclient.util.entity.TargetUtils;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.player.RotationUtils;
-import dev.heliosclient.util.player.TargetUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -259,7 +259,7 @@ public class AimAssist extends Module_ {
 
         if (targetEntity != null) {
             if (simulateRotation.value) {
-                simulator.simulateRotation(targetEntity, false, null, (int) simulateTime.value, (int) randomness.value, (RotationUtils.LookAtPos) lookAt.getOption(), (EasingType) easing.getOption());
+                simulator.simulateRotation(targetEntity,  null, (int) simulateTime.value, (int) randomness.value, (RotationUtils.LookAtPos) lookAt.getOption(), (EasingType) easing.getOption());
             } else if (!pauseInGUI.value && mc.currentScreen == null) {
                 RotationUtils.lookAt(targetEntity, (RotationUtils.LookAtPos) lookAt.getOption());
             }

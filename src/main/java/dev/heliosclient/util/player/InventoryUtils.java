@@ -7,7 +7,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
@@ -19,6 +18,9 @@ import java.util.ArrayList;
 import java.util.function.Predicate;
 
 public class InventoryUtils {
+    
+    public static final int OFFHAND = 45;
+    
     private static int previousHotbarSlot = -1;
 
     // Swap back to the previous slot in the hotbar
@@ -32,7 +34,7 @@ public class InventoryUtils {
 
 
     public static boolean swapToSlot(int hotbarSlot, boolean swapBack) {
-        if (hotbarSlot == PlayerInventory.OFF_HAND_SLOT) return true;
+        if (hotbarSlot == InventoryUtils.OFFHAND) return true;
         if (HeliosClient.MC.player.getInventory().selectedSlot == hotbarSlot) return true;
         if (hotbarSlot < 0 || hotbarSlot > 8) return false;
         if (swapBack) {
@@ -56,13 +58,15 @@ public class InventoryUtils {
     }
 
     // Get the count of the specified item in the player's inventory
-    public static int getItemCount(ItemStack itemStack) {
-        if(itemStack == null){
+    public static int getItemCountInInventory(Item item) {
+        if(item == null){
             return 0;
         }
 
-        return HeliosClient.MC.player.getInventory().count(itemStack.getItem());
+        return HeliosClient.MC.player.getInventory().count(item);
     }
+
+    //Gets the count of items in the item stack
     public static int getItemStackCountSafe(ItemStack itemStack) {
         if(itemStack == null){
             return 0;
@@ -122,7 +126,8 @@ public class InventoryUtils {
     // Find an item in the inventory
     public static int findItemInInventory(Item item) {
         for (int i = 0; i < HeliosClient.MC.player.getInventory().size(); i++) {
-            if (HeliosClient.MC.player.getInventory().getStack(i) != null && HeliosClient.MC.player.getInventory().getStack(i).getItem() == item) {
+            ItemStack stack = HeliosClient.MC.player.getInventory().getStack(i);
+            if (!stack.isEmpty() && stack.getItem() == item) {
                 return i;
             }
         }
@@ -137,15 +142,15 @@ public class InventoryUtils {
         for (int i = 0; i < 9; i++) {
             ItemStack stack = HeliosClient.MC.player.getInventory().getStack(i);
 
-            if (stack != null && stack.getItem() == item) {
+            if (!stack.isEmpty() && stack.getItem() == item) {
                 return i;
             }
         }
         //Offhand
-        ItemStack stack = HeliosClient.MC.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT);
+        ItemStack stack = HeliosClient.MC.player.getInventory().getStack(InventoryUtils.OFFHAND);
 
         if (stack != null &&  stack.getItem() == item) {
-            return PlayerInventory.OFF_HAND_SLOT;
+            return InventoryUtils.OFFHAND;
         }
         return -1; // Return -1 if the item was not found
     }
@@ -162,10 +167,10 @@ public class InventoryUtils {
             }
         }
         //Offhand
-        ItemStack stack = HeliosClient.MC.player.getInventory().getStack(PlayerInventory.OFF_HAND_SLOT);
+        ItemStack stack = HeliosClient.MC.player.getInventory().getStack(InventoryUtils.OFFHAND);
 
         if (stack != null && predicate.test(stack.getItem())) {
-            return PlayerInventory.OFF_HAND_SLOT;
+            return InventoryUtils.OFFHAND;
         }
         return -1; // Return -1 if the item was not found
     }
@@ -234,7 +239,7 @@ public class InventoryUtils {
      */
     public static void moveItemQuickMove(int fromSlot) {
         ClientPlayerEntity player = HeliosClient.MC.player;
-        if (player != null && HeliosClient.MC.currentScreen != null) {
+        if (player != null) {
             HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, fromSlot, 0, SlotActionType.QUICK_MOVE, player);
         }
     }
@@ -246,7 +251,7 @@ public class InventoryUtils {
      */
     public static void moveItemQuickMove(ScreenHandler handler, int fromSlot) {
         ClientPlayerEntity player = HeliosClient.MC.player;
-        if (player != null && HeliosClient.MC.currentScreen != null) {
+        if (player != null) {
             HeliosClient.MC.interactionManager.clickSlot(handler.syncId, fromSlot, 0, SlotActionType.QUICK_MOVE, player);
         }
     }
@@ -259,9 +264,9 @@ public class InventoryUtils {
      */
     public static void moveItem(int fromSlot, int toSlot, SlotActionType fromAction,SlotActionType toAction) {
         ClientPlayerEntity player = HeliosClient.MC.player;
-        if (player != null && HeliosClient.MC.currentScreen != null) {
-            HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, fromSlot, 0, fromAction, player);
-            HeliosClient.MC.interactionManager.clickSlot(HeliosClient.MC.player.currentScreenHandler.syncId, toSlot, 1, toAction, player);
+        if (player != null) {
+            HeliosClient.MC.interactionManager.clickSlot(player.currentScreenHandler.syncId, fromSlot, 0, fromAction, player);
+            HeliosClient.MC.interactionManager.clickSlot(player.currentScreenHandler.syncId, toSlot, 0, toAction, player);
         }
     }
 }

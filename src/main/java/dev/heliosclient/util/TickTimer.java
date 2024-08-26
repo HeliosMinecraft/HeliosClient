@@ -34,6 +34,12 @@ public class TickTimer {
         hasTimerStarted = false;
     }
 
+    // Restarts the timer
+    public void restartTimer() {
+        resetTimer();
+        startTicking();
+    }
+
     public void increment(){
         if(!hasTimerStarted){
             throw new IllegalStateException("Timer has not started yet");
@@ -44,8 +50,7 @@ public class TickTimer {
     // Checks if ticks have passed since the last reset
     public boolean every(int ticks) {
         if (getElapsedTicks() >= ticks) {
-            resetTimer();
-            startTicking();
+            restartTimer();
         }
         return getElapsedTicks() >= ticks;
     }
@@ -54,8 +59,7 @@ public class TickTimer {
     public boolean incrementAndEvery(int ticks) {
         increment();
         if (getElapsedTicks() >= ticks) {
-            resetTimer();
-            startTicking();
+            restartTimer();
         }
         return getElapsedTicks() >= ticks;
     }
@@ -64,8 +68,7 @@ public class TickTimer {
         increment();
         if (getElapsedTicks() >= ticks) {
             task.run();
-            resetTimer();
-            startTicking();
+            restartTimer();
         }
         return getElapsedTicks() >= ticks;
     }
@@ -73,8 +76,7 @@ public class TickTimer {
     public boolean every(int ticks, Runnable task) {
         if (getElapsedTicks() >= ticks) {
             task.run();
-            resetTimer();
-            startTicking();
+            restartTimer();
         }
         return getElapsedTicks() >= ticks;
     }

@@ -3,7 +3,7 @@ package dev.heliosclient.mixin;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.ui.HeliosClientInfoScreen;
 import dev.heliosclient.ui.altmanager.AltManagerScreen;
-import dev.heliosclient.util.player.DisplayPreviewEntity;
+import dev.heliosclient.util.entity.DisplayPreviewEntity;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;

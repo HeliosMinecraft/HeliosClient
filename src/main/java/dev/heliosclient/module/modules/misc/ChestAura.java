@@ -67,7 +67,7 @@ public class ChestAura extends Module_ {
 
                     if (rotate.value) {
                         Vec3d pos = blockEntity.getPos().toCenterPos();
-                        RotationSimulator.INSTANCE.simulateRotation(RotationUtils.getYaw(pos), RotationUtils.getPitch(pos), false, () -> interact(blockEntity), 4, 0);
+                        RotationSimulator.INSTANCE.simulateRotation(RotationUtils.getYaw(pos), RotationUtils.getPitch(pos), () -> interact(blockEntity), 4, 0);
                     } else {
                         interact(blockEntity);
                     }

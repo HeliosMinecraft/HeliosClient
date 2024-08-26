@@ -12,7 +12,7 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.mixininterface.IPlayerInteractEntityC2SPacket;
-import dev.heliosclient.util.player.FreeCamEntity;
+import dev.heliosclient.util.entity.FreeCamEntity;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.*;

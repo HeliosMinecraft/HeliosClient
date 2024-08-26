@@ -56,7 +56,7 @@ public class TickRate implements Listener {
         }
 
         //avg
-        return sumTickRates / numTicks;
+        return numTicks == 0 ? 20 : sumTickRates / numTicks;
     }
 
     public float getTimeSinceLastTick() {

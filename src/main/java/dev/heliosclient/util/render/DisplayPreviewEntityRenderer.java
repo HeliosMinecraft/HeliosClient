@@ -1,8 +1,8 @@
 package dev.heliosclient.util.render;
 
 import dev.heliosclient.managers.CapeManager;
+import dev.heliosclient.util.entity.DisplayPreviewEntity;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import dev.heliosclient.util.player.DisplayPreviewEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -18,11 +18,13 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.DefaultSkinHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
-;import net.minecraft.util.Identifier;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
 import java.awt.*;
+
+;
 
 public class DisplayPreviewEntityRenderer extends LivingEntityRenderer<LivingEntity, PlayerEntityModel<LivingEntity>> {
     private final ElytraEntityModel<LivingEntity> elytra;

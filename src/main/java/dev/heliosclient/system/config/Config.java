@@ -264,16 +264,19 @@ public class Config {
         Map<String, Object> elementMap = cast(object);
         if (elementMap.containsKey("name")) {
             HudElementData<?> hudElementData = HudElementList.INSTANCE.elementDataMap.get((String) elementMap.get("name"));
-            HudElement hudElement = hudElementData.create();
-            if (hudElement != null) {
-
-                try {
-                    hudElement.loadFromFile(elementMap);
-                    hudElement.id.setUniqueID(string);
-                    HudManager.INSTANCE.addHudElement(hudElement);
-                }catch (Exception e){
-                    LOGGER.error("An error occurred while loading hud element {}",hudElement.name);
+            if(hudElementData != null) {
+                HudElement hudElement = hudElementData.create();
+                if (hudElement != null) {
+                    try {
+                        hudElement.loadFromFile(elementMap);
+                        hudElement.id.setUniqueID(string);
+                        HudManager.INSTANCE.addHudElement(hudElement);
+                    } catch (Exception e) {
+                        LOGGER.error("An error occurred while loading hud element {}", hudElement.name);
+                    }
                 }
+            }else{
+                LOGGER.error("HudElement data was not found for {}", elementMap.get("name"));
             }
         }
     }

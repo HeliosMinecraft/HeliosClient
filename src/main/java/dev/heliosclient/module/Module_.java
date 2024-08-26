@@ -303,6 +303,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
                     setting.loadFromFile(MAP);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    continue;
                 }
                 if (setting == this.active && this.isActive()) {
                     this.onEnable();

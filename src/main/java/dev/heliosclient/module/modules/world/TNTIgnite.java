@@ -7,13 +7,12 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.blocks.BlockIterator;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -93,7 +92,7 @@ public class TNTIgnite extends Module_ {
             }
             if (autoSwitch.value && !hasSwitched) {
                 int flintAndSteelSlot = InventoryUtils.findItemInHotbar(Items.FLINT_AND_STEEL);
-                if(flintAndSteelSlot == PlayerInventory.OFF_HAND_SLOT){
+                if(flintAndSteelSlot == InventoryUtils.OFFHAND){
                     offHand = true;
                 }else {
                     if (flintAndSteelSlot != -1 && mc.player.getInventory().selectedSlot != flintAndSteelSlot) {

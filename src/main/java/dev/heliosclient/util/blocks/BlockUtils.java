@@ -13,7 +13,6 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -199,7 +198,7 @@ public class BlockUtils {
 
         InventoryUtils.swapToSlot(itemSlotHotbar, silentSwitch);
 
-        boolean returnVal = place(pos, rotate, clientSideRotation, airPlace, itemSlotHotbar == PlayerInventory.OFF_HAND_SLOT ? Hand.OFF_HAND : Hand.MAIN_HAND);
+        boolean returnVal = place(pos, rotate, clientSideRotation, airPlace, itemSlotHotbar == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
         if (silentSwitch)
             InventoryUtils.swapBackHotbar();

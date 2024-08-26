@@ -19,12 +19,13 @@ public class HudElementList {
         registerElement(ModuleList.DATA);
         registerElement(Radar.DATA);
         registerElement(ArmorHud.DATA);
-        registerElement(CompassHud.DATA);
+        registerElement(DirectionHud.DATA);
         registerElement(CompactData.DATA);
         registerElement(PlayerModel.DATA);
         registerElement(CoordinatesHud.DATA);
+        registerElement(ClockHud.DATA);
         registerElement(Fps.DATA);
-        registerElement(Bps.DATA);
+        registerElement(SpeedHud.DATA);
         registerElement(Ping.DATA);
         registerElement(Tps.DATA);
 
