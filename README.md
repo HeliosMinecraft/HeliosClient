@@ -47,13 +47,12 @@
 To submit a bug open an issue in this repository. Before doing so please assure yourself that the issues isn't already listed under [Known issues](#known-issues).
 
 ## Known issues
-- Buggy modules like Tick-Shift, NewChunks, PacketMine.
+- Buggy modules like Tick-Shift, PacketMine.
 - Incomplete modules like Phase.
-- HudElements don't resize to their proper locations sometimes.
+- ~~HudElements don't resize to their proper locations sometimes.~~
 - Scripting System (WIP).
 - Lack of combat and some important utility modules.
 - No Baritone Integration
-- Compatibility with performance mods like sodium (for now only XRay has an issue)
 - No AltManager
 - Lack of commands
 - Lack of shaders (Neither of the current contributors know much good about GLSL)

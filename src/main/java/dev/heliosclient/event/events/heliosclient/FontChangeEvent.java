@@ -1,4 +1,4 @@
-package dev.heliosclient.event.events.client;
+package dev.heliosclient.event.events.heliosclient;
 
 import dev.heliosclient.event.Event;
 

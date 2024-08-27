@@ -57,10 +57,12 @@ public class HudElementButton {
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
             HudManager.INSTANCE.addHudElement(instance);
-            HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).posX = 1;
-            HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).posY = 1;
-            HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).distanceX = 0;
-            HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1).distanceY = 0;
+            HudElement lastHudElement =  HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1);
+
+            lastHudElement.posX = 1;
+            lastHudElement.posY = 1;
+            lastHudElement.distanceX = 0;
+            lastHudElement.distanceY = 0;
         } catch (Exception e) {
             HeliosClient.LOGGER.error("Error adding hud element instance to list", e);
         }

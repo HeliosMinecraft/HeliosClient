@@ -1,7 +1,7 @@
 package dev.heliosclient.module.sysmodules;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.events.client.FontChangeEvent;
+import dev.heliosclient.event.events.heliosclient.FontChangeEvent;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.FontManager;
@@ -19,7 +19,6 @@ import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
-import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;

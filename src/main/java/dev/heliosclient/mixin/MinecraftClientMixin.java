@@ -13,12 +13,14 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.resource.language.LanguageManager;
+import net.minecraft.client.util.Window;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SystemDetails;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,6 +39,10 @@ public abstract class MinecraftClientMixin {
 
     @Shadow
     private int itemUseCooldown;
+
+    @Shadow @Final private Window window;
+
+    @Shadow public abstract Window getWindow();
 
     @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
     public void onTick(CallbackInfo ci) {

@@ -1,15 +1,13 @@
 package dev.heliosclient.ui.clickgui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.client.FontChangeEvent;
+import dev.heliosclient.event.events.heliosclient.FontChangeEvent;
 import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
-import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.GUI;
@@ -19,20 +17,12 @@ import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
-import me.x150.renderer.util.BufferUtils;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

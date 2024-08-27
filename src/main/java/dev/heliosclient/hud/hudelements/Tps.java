@@ -24,7 +24,7 @@ public class Tps extends HudElement {
         super.renderElement(drawContext, textRenderer);
         String text = "TPS: " + ColorUtils.gray + MathUtils.round(TickRate.INSTANCE.getTPS(), 1);
         this.width = Math.round(Renderer2D.getStringWidth(text)) + 1;
-        Renderer2D.drawString(drawContext.getMatrices(), text, this.x + 1, this.y, ColorManager.INSTANCE.hudColor);
+        Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, ColorManager.INSTANCE.hudColor);
     }
 
 }

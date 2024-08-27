@@ -18,7 +18,6 @@ import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
-import net.minecraft.client.Mouse;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -256,6 +255,7 @@ public class HudEditorScreen extends Screen implements Listener {
             for (int i = 0; i < HudManager.INSTANCE.hudElements.size(); i++) {
                 if (HudManager.INSTANCE.hudElements.get(i).selected) {
                     HudElement hudElement = HudManager.INSTANCE.hudElements.get(i);
+                    EventManager.unregister(hudElement);
                     HudManager.INSTANCE.removeHudElement(hudElement);
                     HudCategoryPane.INSTANCE.getHudElementButton(hudElement).updateCount();
                     i--;

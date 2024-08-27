@@ -76,6 +76,7 @@
     "MixinKeyboardInput",
     "MixinParticleManager",
     "MixinRenderTickCounter",
+    "MixinScreen",
     "MixinSplashScreen",
     "MouseMixin",
     "MultiplayerScreenMixin",

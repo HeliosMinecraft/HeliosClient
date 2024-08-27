@@ -2,7 +2,7 @@ package dev.heliosclient;
 
 import dev.heliosclient.addon.AddonManager;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.client.FontChangeEvent;
+import dev.heliosclient.event.events.heliosclient.FontChangeEvent;
 import dev.heliosclient.event.events.player.DisconnectEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.hud.HudElementList;
