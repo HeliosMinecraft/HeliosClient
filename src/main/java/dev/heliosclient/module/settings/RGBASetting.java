@@ -384,6 +384,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
             value = defaultValue;
             rainbow = defaultRainbow;
             HeliosClient.LOGGER.error("{} is null, Setting loaded to default", this.getSaveName());
+            updateHandles();
             return;
         }
 

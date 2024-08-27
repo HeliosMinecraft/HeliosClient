@@ -59,10 +59,9 @@ public class HudElementButton {
             HudManager.INSTANCE.addHudElement(instance);
             HudElement lastHudElement =  HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1);
 
-            lastHudElement.posX = 1;
-            lastHudElement.posY = 1;
-            lastHudElement.distanceX = 0;
-            lastHudElement.distanceY = 0;
+            lastHudElement.posX = HudElement.NUMBER_OF_LINES/2 - 1;
+            lastHudElement.posY = HudElement.NUMBER_OF_LINES/2 - 1;
+
         } catch (Exception e) {
             HeliosClient.LOGGER.error("Error adding hud element instance to list", e);
         }

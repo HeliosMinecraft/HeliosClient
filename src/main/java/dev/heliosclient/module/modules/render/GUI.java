@@ -116,7 +116,7 @@ public class GUI extends Module_ {
     );
     public BooleanSetting coolVisuals = sgVisuals.add(new BooleanSetting.Builder()
             .name("Render Cool Polygon mesh")
-            .description("Renders lines and connecting dots that look good but may drain performance like Abyss client")
+            .description("Renders lines and connecting dots that look good but may drain performance")
             .value(false)
             .onSettingChange(this)
             .build()

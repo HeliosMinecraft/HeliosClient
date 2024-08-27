@@ -20,8 +20,7 @@ public class WelcomeHud extends HudElement {
             .onSettingChange(this)
             .inputMode(InputBox.InputMode.ALL)
             .characterLimit(1000)
-            .defaultValue("Good morning, %s!")
-            .value("Welcome %s!")
+            .defaultValue("Good day, %s!")
             .build()
     );
     public WelcomeHud() {

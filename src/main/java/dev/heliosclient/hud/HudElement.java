@@ -65,7 +65,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
 
     //This variable is used to control the number of imaginary lines to use, to
     //anchor the hud elements during resize, as stated in the class comment.
-    private static final int NUMBER_OF_LINES = 100;
+    public static final int NUMBER_OF_LINES = 100;
 
     // Default settings
     // This is a lot of complete customisation.

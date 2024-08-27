@@ -80,6 +80,11 @@ public class HudCategoryPane {
         Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), "Hud elements", x + 4, y + 3, ColorManager.INSTANCE.clickGuiPaneText());
         Renderer2D.drawCustomString(FontRenderers.Small_fxfontRenderer, drawContext.getMatrices(), collapsed ? "+" : "-", x + width - Renderer2D.getCustomStringWidth(collapsed ? "+" : "-", FontRenderers.Small_fxfontRenderer) - 2, y + 3, ColorManager.INSTANCE.clickGuiPaneText());
     }
+    public void updateAllCount(){
+        for(HudElementButton elementButton: hudElementButtons){
+            elementButton.updateCount();
+        }
+    }
 
     public void mouseClicked(double mouseX, double mouseY, int button) {
         if (hovered(mouseX, mouseY) && button == 1) collapsed = !collapsed;

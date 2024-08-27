@@ -23,7 +23,14 @@ public class DirectionHud extends HudElement {
             .onSettingChange(this)
             .build()
     );
-
+    public BooleanSetting shortDirection = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Short Direction / Axis")
+            .description("The direction will be shown short as axis (like X+, Z-,etc.)")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .shouldRender(()-> mode.isOption(Mode.Simple))
+            .build()
+    );
     public BooleanSetting snapToCrosshair = sgGeneral.add(new BooleanSetting.Builder()
             .name("Snap to crosshair")
             .description("Snaps the compass to the crosshair")
@@ -74,7 +81,7 @@ public class DirectionHud extends HudElement {
             .defaultValue(0.7d)
             .shouldRender(()-> mode.isOption(Mode.Compass))
             .onSettingChange(this)
-            .shouldRender(() -> renderEllipse.value)
+            .shouldRender(() -> renderEllipse.value && mode.isOption(Mode.Compass))
             .build()
     );
     public RGBASetting compassColor = sgGeneral.add(new RGBASetting.Builder()
@@ -132,8 +139,10 @@ public class DirectionHud extends HudElement {
                 Renderer2D.drawString(drawContext.getMatrices(), text, x, y, ColorManager.INSTANCE.hudColor);
             }
         }else {
-            String text = ColorUtils.reset + "Direction: " + ColorUtils.white + (mc.player == null ? "North" :  mc.player.getHorizontalFacing().getName());
+            String directionAppend = shortDirection.value ? translateToShortAxis() : (mc.player == null ? "North" :  mc.player.getHorizontalFacing().getName());
+            String text = ColorUtils.reset + "Direction: " + ColorUtils.white + directionAppend;
             this.width = Math.round(Renderer2D.getStringWidth(text));
+            this.height = Math.round(Renderer2D.getStringHeight(text));
 
             super.renderElement(drawContext, textRenderer);
             Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, ColorManager.INSTANCE.hudColor);
@@ -147,6 +156,20 @@ public class DirectionHud extends HudElement {
             case 2 -> "W";
             case 3 -> "S";
             default -> "N";
+        };
+    }
+
+    private String translateToShortAxis(){
+        if(mc.player == null){
+            return "Z-";
+        }
+        return switch (mc.player.getHorizontalFacing()){
+            case DOWN -> "Y-";
+            case UP -> "Y+";
+            case NORTH -> "Z-";
+            case SOUTH -> "Z+";
+            case EAST -> "X+";
+            case WEST -> "X-";
         };
     }
 

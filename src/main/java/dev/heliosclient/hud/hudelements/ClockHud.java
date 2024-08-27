@@ -60,7 +60,8 @@ public class ClockHud extends HudElement {
             text = getRealLifeTime();
         }
 
-        this.width = (int) (Renderer2D.getStringWidth(text));
+        this.width = (int) Renderer2D.getStringWidth(text);
+        this.height = (int) Renderer2D.getStringHeight(text);
 
         super.renderElement(drawContext, textRenderer);
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, ColorManager.INSTANCE.hudColor);

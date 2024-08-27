@@ -16,6 +16,7 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
+import dev.heliosclient.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,6 +207,8 @@ public class Config {
             }
             pane.put("x", HudCategoryPane.INSTANCE == null ? 0 : HudCategoryPane.INSTANCE.x);
             pane.put("y", HudCategoryPane.INSTANCE == null ? 0 : HudCategoryPane.INSTANCE.y);
+            pane.put("collapsed", HudCategoryPane.INSTANCE != null && HudCategoryPane.INSTANCE.collapsed);
+
 
             pane.put("elements", hudElements.isEmpty() ? new HashMap<>() : hudElements);
 
@@ -245,13 +248,23 @@ public class Config {
         HudManager.INSTANCE.hudElements.clear();
         Map<String, Object> hudElementsPaneMap = getHudElementsPaneMap();
         if (hudElementsPaneMap != null) {
+            HudCategoryPane.INSTANCE.x = MathUtils.o2iSafe(hudElementsPaneMap.get("x"));
+            HudCategoryPane.INSTANCE.y = MathUtils.o2iSafe(hudElementsPaneMap.get("y"));
+            if(hudElementsPaneMap.containsKey("collapsed")) {
+                HudCategoryPane.INSTANCE.collapsed = (boolean) hudElementsPaneMap.get("collapsed");
+            }
+
             Map<String, Object> hudElementsMap = cast(hudElementsPaneMap.get("elements"));
             if (hudElementsMap != null) {
                 hudElementsMap.forEach(this::loadHudElement);
             }
         }
 
+
+
         loadHudElementSettings();
+
+        HudCategoryPane.INSTANCE.updateAllCount();
 
         LOGGER.info("Loading Hud Elements Complete");
     }

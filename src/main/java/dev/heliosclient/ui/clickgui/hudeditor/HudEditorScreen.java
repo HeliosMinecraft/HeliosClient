@@ -281,7 +281,7 @@ public class HudEditorScreen extends Screen implements Listener {
             if (element.selected && isPaste(keyCode) && !copiedSettings.isEmpty()) {
                 for (SettingGroup settingGroup : element.settingGroups) {
                     for (Setting<?> setting : settingGroup.getSettings()) {
-                        if (!setting.shouldSaveAndLoad()) continue;
+                        if (!setting.shouldSaveAndLoad() || !copiedSettings.containsKey(setting.getSaveName())) continue;
 
                         setting.loadFromFile(copiedSettings);
                     }

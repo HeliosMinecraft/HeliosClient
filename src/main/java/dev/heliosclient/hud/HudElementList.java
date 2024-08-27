@@ -24,6 +24,7 @@ public class HudElementList {
         registerElement(PlayerModel.DATA);
         registerElement(CoordinatesHud.DATA);
         registerElement(ClockHud.DATA);
+        registerElement(KeyBindsHud.DATA);
         registerElement(Fps.DATA);
         registerElement(SpeedHud.DATA);
         registerElement(Ping.DATA);
