@@ -49,35 +49,31 @@ public class TickTimer {
 
     // Checks if ticks have passed since the last reset
     public boolean every(int ticks) {
-        if (getElapsedTicks() >= ticks) {
+        boolean didTimerLapse = getElapsedTicks() >= ticks;
+        if (didTimerLapse) {
             restartTimer();
         }
-        return getElapsedTicks() >= ticks;
+        return didTimerLapse;
     }
 
 
     public boolean incrementAndEvery(int ticks) {
         increment();
-        if (getElapsedTicks() >= ticks) {
-            restartTimer();
-        }
-        return getElapsedTicks() >= ticks;
+        return every(ticks);
     }
 
     public boolean incrementAndEvery(int ticks, Runnable task) {
         increment();
-        if (getElapsedTicks() >= ticks) {
-            task.run();
-            restartTimer();
-        }
-        return getElapsedTicks() >= ticks;
+        return every(ticks,task);
     }
 
     public boolean every(int ticks, Runnable task) {
-        if (getElapsedTicks() >= ticks) {
+        boolean didTimerLapse = getElapsedTicks() >= ticks;
+
+        if (didTimerLapse) {
             task.run();
             restartTimer();
         }
-        return getElapsedTicks() >= ticks;
+        return didTimerLapse;
     }
 }

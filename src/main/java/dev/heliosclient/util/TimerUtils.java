@@ -64,16 +64,19 @@ public class TimerUtils {
 
     // Checks if ms milliseconds have passed since the last reset
     public boolean every(long ms) {
-        if (getElapsedTime() >= ms / 1000.0)
+        boolean didTimerLapse = getElapsedTime() >= ms / 1000.0;
+        if (didTimerLapse)
             resetTimer();
-        return getElapsedTime() >= ms / 1000.0;
+
+        return didTimerLapse;
     }
 
     public boolean every(long ms, Runnable task) {
-        if (getElapsedTimeMS() >= ms) {
+        boolean didTimerLapse = getElapsedTime() >= ms / 1000.0;
+        if (didTimerLapse) {
             task.run();
             resetTimer();
         }
-        return getElapsedTimeMS() >= ms;
+        return didTimerLapse;
     }
 }
