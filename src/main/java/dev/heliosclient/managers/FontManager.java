@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class FontManager implements Listener {
     public static Font[] fonts, iconFonts;
     public static Font[] originalFonts;
-    public static int fontSize = 8;
+    public static int hudFontSize = 8, clientFontSize = 8;
     public static ArrayList<String> fontNames = new ArrayList<>();
     public static FontManager INSTANCE = new FontManager();
 
@@ -44,8 +44,8 @@ public class FontManager implements Listener {
     }
 
     public void registerFonts() {
-        FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
-        FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, 8f);
+        FontRenderers.fontRenderer = new FontRenderer(fonts, hudFontSize);
+        FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, clientFontSize);
         FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 10f);
 
         FontRenderers.Super_Small_fxfontRenderer = new fxFontRenderer(fonts, 4f);

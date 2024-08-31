@@ -6,17 +6,20 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.blocks.ChunkUtils;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.blocks.ChunkUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.ChestBoatEntity;
 import net.minecraft.entity.vehicle.ChestMinecartEntity;
 import net.minecraft.entity.vehicle.HopperMinecartEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.shape.VoxelShape;
 
 import java.awt.*;
@@ -59,7 +62,14 @@ public class StorageESP extends Module_ {
             .onSettingChange(this)
             .build()
     );
-
+    BooleanSetting fade = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Fade when close")
+            .description("Fades out the ESP when you get closer to the storage blocks")
+            .value(false)
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
 
     public StorageESP() {
         super("StorageESP", "Highlights storage blocks", Categories.RENDER);
@@ -112,10 +122,24 @@ public class StorageESP extends Module_ {
     }
 
     private void renderStorageBlock(Color c, BlockPos pos) {
-        int changedColor = ColorUtils.changeAlpha(c, 100).getRGB();
+        double distanceFromPos = mc.player.getBlockPos().getSquaredDistance(pos);
+        int alphaClamp = 100;
+        if(fade.value) {
+            alphaClamp = (int) MathHelper.clamp(150 * (distanceFromPos / 400), 0, 150);
+            if(alphaClamp <= 2)return;
+        }
+
+        int changedColor = ColorUtils.changeAlphaGetInt(c.getRGB(), alphaClamp);
         QuadColor color = QuadColor.single(changedColor);
         LineColor lineColor = LineColor.single(changedColor);
-        VoxelShape shape = mc.world.getBlockState(pos).getOutlineShape(mc.world, pos);
+        VoxelShape shape;
+        BlockState state = mc.world.getBlockState(pos);
+
+        if (state.getBlock() instanceof ChestBlock p) {
+            shape = p.getOutlineShape(state,null,null,null);
+        } else{
+            shape = state.getOutlineShape(mc.world, pos);
+        }
 
         if (shape == null || shape.isEmpty()) return;
 

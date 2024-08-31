@@ -229,7 +229,7 @@ public class BlockUtils {
     }
 
     public static boolean place(BlockPos pos, boolean rotate, boolean clientSideRotation, boolean airPlace, Hand hand) {
-        if (!canPlace(pos, mc.world.getBlockState(pos)))
+        if (!canPlace(pos, mc.world.getBlockState(pos)) || mc.player.getStackInHand(hand) == null  || mc.player.getStackInHand(hand).isEmpty())
             return false;
 
         Vec3d hitPos = Vec3d.ofCenter(pos);

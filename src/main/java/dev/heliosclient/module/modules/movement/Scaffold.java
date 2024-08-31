@@ -342,7 +342,7 @@ public class Scaffold extends Module_ {
         }
 
         if (placeResult) {
-            if (render.value && mc.player.getMainHandStack() != null) {
+            if (render.value) {
                 if (clientColorCycle.value) {
                     GradientBlockRenderer.renderGradientBlock(
                             ColorManager.INSTANCE::getPrimaryGradientStart,

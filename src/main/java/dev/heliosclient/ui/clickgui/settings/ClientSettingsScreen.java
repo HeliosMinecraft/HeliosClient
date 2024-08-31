@@ -86,7 +86,8 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
         navBar.render(drawContext, textRenderer, mouseX, mouseY);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-        FontManager.fontSize = (int) HeliosClient.CLICKGUI.FontSize.value;
+        FontManager.hudFontSize = (int) HeliosClient.CLICKGUI.hudFontSize.value;
+        FontManager.clientFontSize = (int) HeliosClient.CLICKGUI.clientFontSize.value;
     }
 
     @Override

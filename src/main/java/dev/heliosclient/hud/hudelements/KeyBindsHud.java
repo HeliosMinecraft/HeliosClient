@@ -36,11 +36,11 @@ public class KeyBindsHud extends HudElement {
 
             Renderer2D.drawString(drawContext.getMatrices(),text,x + 2,y, ColorManager.INSTANCE.hudColor);
 
-            y += (int) (Renderer2D.getStringHeight(text) + 3);
+            y +=  Math.round(Renderer2D.getStringHeight(text)) + 3;
             height += Math.round(Renderer2D.getStringHeight(text)) + 3;
         }
 
         this.width = width;
-        this.height = Math.max(10, height + 1);
+        this.height = height + 1;
     }
 }

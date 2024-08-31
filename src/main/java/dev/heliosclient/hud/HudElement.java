@@ -42,7 +42,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     protected static final MinecraftClient mc = MinecraftClient.getInstance();
     public String name;
     public String description;
-    public int height = FontManager.fontSize;
+    public int height = FontManager.hudFontSize;
     public int width = 10;
     public int x;
     public int y;

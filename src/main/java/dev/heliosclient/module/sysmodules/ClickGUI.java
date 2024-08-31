@@ -17,6 +17,7 @@ import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
 import org.lwjgl.glfw.GLFW;
@@ -26,7 +27,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.heliosclient.managers.FontManager.fontSize;
 import static dev.heliosclient.managers.FontManager.fonts;
 
 /**
@@ -111,9 +111,20 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
-    public DoubleSetting FontSize = sgMisc.add(new DoubleSetting.Builder()
-            .name("Font Size")
-            .description("Change your FontSize")
+    public DoubleSetting hudFontSize = sgMisc.add(new DoubleSetting.Builder()
+            .name("Hud Font Size")
+            .description("Change your hud's fontSize")
+            .onSettingChange(this)
+            .defaultValue(8.0)
+            .min(1)
+            .max(15)
+            .roundingPlace(1)
+            .shouldRender(() -> FontRenderer.value == 0)
+            .build()
+    );
+    public DoubleSetting clientFontSize = sgMisc.add(new DoubleSetting.Builder()
+            .name("Client Font Size")
+            .description("Change your client's (clickGUI) FontSize")
             .onSettingChange(this)
             .defaultValue(8.0)
             .min(1)
@@ -370,13 +381,20 @@ public class ClickGUI extends Module_ {
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
         pause = Pause.value;
         keybinds = Keybinds.value;
-        fontSize = ((int) FontSize.value);
+        FontManager.hudFontSize = hudFontSize.getInt();
+        FontManager.clientFontSize = clientFontSize.getInt();
 
         //Font changes
         if (HeliosClient.MC.getWindow() != null) {
-            if (setting == FontRenderer || setting == FontSize || setting == loadFonts || setting == Font) {
+            if (setting == FontRenderer || setting == loadFonts || setting == Font) {
                 fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
-                FontRenderers.fontRenderer = new FontRenderer(fonts, fontSize);
+                FontRenderers.fontRenderer = new FontRenderer(fonts, FontManager.hudFontSize);
+                FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, FontManager.clientFontSize);
+                EventManager.postEvent(new FontChangeEvent(fonts));
+            }
+            if(setting == hudFontSize || setting == clientFontSize){
+                FontRenderers.fontRenderer = new FontRenderer(fonts, FontManager.hudFontSize);
+                FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, FontManager.clientFontSize);
                 EventManager.postEvent(new FontChangeEvent(fonts));
             }
 
@@ -408,7 +426,8 @@ public class ClickGUI extends Module_ {
 
         pause = Pause.value;
         keybinds = Keybinds.value;
-        fontSize = ((int) FontSize.value);
+        FontManager.hudFontSize = hudFontSize.getInt();
+        FontManager.clientFontSize = clientFontSize.getInt();
 
         fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
 

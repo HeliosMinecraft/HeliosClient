@@ -9,13 +9,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
-import java.util.List;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Objects;
 
 public class FontLoader {
     private static final String FONTS_FOLDER = "heliosclient/fonts";
     private static final String ICON_FONTS_FOLDER = "heliosclient/fonts/icons";
-    private static final String[] DEFAULT_FONT = {"Minecraft.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf","DComicFont.ttf"};
+    private static final String[] DEFAULT_FONT = {"Minecraftia.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf","DComicFont.ttf"};
     private static final String[] DEFAULT_ICON_FONT = {"fontello.ttf", "icons2.ttf", "icons.ttf"};
     public static Font[] COMICALFONTS = null;
     private static final String COMICAL_FONT_NAME = "DComicFont.ttf";
