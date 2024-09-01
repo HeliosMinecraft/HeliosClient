@@ -199,10 +199,10 @@ public class DiscordRPC {
 
     public void runPresence(Module_ module) throws GameSDKException {
         callbackThread = new Thread(() -> {
-            LOGGER.info("Discord Rich Presence is running!");
+            LOGGER.info("(HeliosClient) Discord Rich Presence is running!");
 
             try (CreateParams params = new CreateParams()) {
-                // Please don't hack me ಥ_ಥ
+                // Please don't hack me :O
                 params.setClientID(1203402546626957373L);
                 params.setFlags(CreateParams.Flags.NO_REQUIRE_DISCORD);
 
@@ -218,6 +218,7 @@ public class DiscordRPC {
                 activity = new Activity();
 
                 updateActivity();
+
                 activity.timestamps().setStart(Instant.now());
 
 
@@ -251,6 +252,7 @@ public class DiscordRPC {
         LOGGER.info("Discord Presence has stopped");
     }
 
+    //Todo: Customisation
     public void updateActivity() {
         if (HeliosClient.MC.player == null) {
             activity.setDetails("Idle");

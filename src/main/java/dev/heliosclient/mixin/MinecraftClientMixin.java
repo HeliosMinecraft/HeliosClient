@@ -1,8 +1,10 @@
 package dev.heliosclient.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.client.ClientStopEvent;
 import dev.heliosclient.event.events.client.OpenScreenEvent;
 import dev.heliosclient.event.events.player.DisconnectEvent;
 import dev.heliosclient.managers.EventManager;
@@ -18,7 +20,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
 import net.minecraft.util.SystemDetails;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +28,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Objects;
 
@@ -61,8 +61,8 @@ public abstract class MinecraftClientMixin {
         }
     }
 
-    @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isItemEnabled(Lnet/minecraft/resource/featuretoggle/FeatureSet;)Z"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void onItemUse(CallbackInfo ci, Hand[] var1, int var2, int var3, Hand hand, ItemStack itemStack) {
+    @Inject(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isItemEnabled(Lnet/minecraft/resource/featuretoggle/FeatureSet;)Z"))
+    private void onItemUse(CallbackInfo ci, @Local ItemStack itemStack) {
         if (Objects.requireNonNull(ModuleManager.get(FastUse.class)).isActive()) {
             itemUseCooldown = ModuleManager.get(FastUse.class).getCoolDown(itemStack);
         }
@@ -76,6 +76,11 @@ public abstract class MinecraftClientMixin {
             if (EventManager.postEvent(event).isCanceled())
                 info.cancel();
         }
+    }
+
+    @Inject(method = "stop", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;info(Ljava/lang/String;)V", shift = At.Shift.AFTER, remap = false))
+    private void onStopping(CallbackInfo ci) {
+        EventManager.postEvent(new ClientStopEvent());
     }
 
     @Inject(method = "hasOutline", at = @At("HEAD"), cancellable = true)

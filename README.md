@@ -35,7 +35,7 @@
   
 ## Installation
 
-- Install both [Fabric](https://fabricmc.net/use/installer/) and [Fabric API](https://modrinth.com/mod/fabric-api) for Minecraft 1.20.4
+- Install [Fabric](https://fabricmc.net/use/installer/) for Minecraft 1.20.4
 - Put this mod into the `.minecraft/mods` folder
 - The default keybind for the clickgui is `RSHIFT`.
 

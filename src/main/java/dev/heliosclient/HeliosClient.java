@@ -2,6 +2,7 @@ package dev.heliosclient;
 
 import dev.heliosclient.addon.AddonManager;
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.client.ClientStopEvent;
 import dev.heliosclient.event.events.heliosclient.FontChangeEvent;
 import dev.heliosclient.event.events.player.DisconnectEvent;
 import dev.heliosclient.event.listener.Listener;
@@ -25,7 +26,6 @@ import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.render.Renderer2D;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -122,6 +122,16 @@ public class HeliosClient implements ModInitializer, Listener {
         HeliosClient.saveConfigHook();
     }
 
+    @SubscribeEvent
+    public void onStop(ClientStopEvent client) {
+        saveConfigHook();
+        if (DiscordRPC.INSTANCE.isRunning) {
+            DiscordRPC.INSTANCE.stopPresence();
+        }
+        CapeManager.capeTextureManager.stopCapeAnimation();
+        HeliosExecutor.shutdown();
+    }
+
     @Override
     public void onInitialize() {
         ConsoleAppender consoleAppender = new ConsoleAppender(CONSOLE);
@@ -161,17 +171,8 @@ public class HeliosClient implements ModInitializer, Listener {
 
         HeliosExecutor.execute(HeliosClient::loadConfig);
 
-        // Save when the client stops
-
-        ClientLifecycleEvents.CLIENT_STOPPING.register((client) -> {
-            saveConfigHook();
-            if (DiscordRPC.INSTANCE.isRunning) {
-                DiscordRPC.INSTANCE.stopPresence();
-            }
-            CapeManager.capeTextureManager.stopCapeAnimation();
-        });
-        //Saving is also handled in MixinCrashReport and ClickGUI.java
-
+        //Saving is handled when the client stops, crashes, the world stops or the player disconnects.
+        //Crash save is handled in MixinCrashReport and configs are saved while switching.
 
         MC.execute(() -> {
             while (MC.getWindow() == null) {

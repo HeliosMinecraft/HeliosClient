@@ -51,7 +51,17 @@ public class ClickGUI extends Module_ {
             .defaultListIndex(0)
             .build()
     );
-
+    public DoubleSetting guiRoundness = sgMisc.add(new DoubleSetting.Builder()
+            .name("ClickGUI roundness")
+            .description("Control the roundness of the click gui")
+            .onSettingChange(this)
+            .defaultValue(2)
+            .min(1)
+            .max(7)
+            .roundingPlace(0)
+            .shouldRender(() -> theme.isOption(Theme.Rounded))
+            .build()
+    );
     //Sorry guys, some of these aren't camel cased.
 
     public CycleSetting ScrollType = sgMisc.add(new CycleSetting.Builder()

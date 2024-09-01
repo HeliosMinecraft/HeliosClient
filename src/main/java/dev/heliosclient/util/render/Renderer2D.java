@@ -842,14 +842,8 @@ public class Renderer2D implements Listener {
         drawRoundedRectangle(matrix4f, x, y, true, true, true, true, width, height, radius, color);
     }
 
-    public static void drawRectangleInternal(Matrix4f matrix4f, BufferBuilder bufferBuilder, float x, float y, float width, float height, float red, float green, float blue, float alpha) {
-        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(red, green, blue, alpha).next();
-    }
 
-    public static void drawRoundedRectangleEfficient(Matrix4f matrix4f, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
+    public static void drawRoundedRectangle(Matrix4f matrix4f, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
         float centerX = x + (width / 2.0f);
         float centerY = y + (height / 2.0f);
 
@@ -871,6 +865,10 @@ public class Renderer2D implements Listener {
 
         float x = 0, y = 0;
 
+
+        RenderSystem.depthMask(false);
+        RenderSystem.setShaderColor(1f,1f,1f,1f);
+        RenderSystem.disableCull();
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -936,12 +934,16 @@ public class Renderer2D implements Listener {
 
         draw();
 
+
         RenderSystem.disableBlend();
+
+        RenderSystem.depthMask(true);
     }
 
 
     /**
      * Draws a filled rounded rectangle by drawing 1 main rectangle, 4 side rectangles, and specified filled quadrants
+     * This is the outdated version of drawing a rounded rectangle and is replaced with {@link #drawRoundedRectangleInternal(Matrix4f, float, float, float, float, float, int, boolean, boolean, boolean, boolean)}
      * <p>
      *
      * @param matrix4f Matrix4f object to draw the rounded rectangle
@@ -956,7 +958,8 @@ public class Renderer2D implements Listener {
      * @param radius   Radius of the quadrants / the rounded rectangle
      * @param color    Color of the rounded rectangle
      */
-    public static void drawRoundedRectangle(Matrix4f matrix4f, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
+    @Deprecated
+    public static void drawRoundedRectangleDeprecated(Matrix4f matrix4f, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
         float red = (float) (color >> 16 & 255) / 255.0F;
         float green = (float) (color >> 8 & 255) / 255.0F;
         float blue = (float) (color & 255) / 255.0F;
@@ -977,26 +980,26 @@ public class Renderer2D implements Listener {
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
         // Draw the main rectangle
-        drawRectangleInternal(matrix4f, bufferBuilder, x + radius, y + radius, width - 2 * radius, height - 2 * radius, red, green, blue, alpha);
+        drawRectangleBufferInternal(matrix4f, bufferBuilder, x + radius, y + radius, width - 2 * radius, height - 2 * radius, red, green, blue, alpha);
 
         // Draw rectangles at the sides
-        drawRectangleInternal(matrix4f, bufferBuilder, x + radius, y, width - 2 * radius, radius, red, green, blue, alpha); // top
-        drawRectangleInternal(matrix4f, bufferBuilder, x + radius, y + height - radius, width - 2 * radius, radius, red, green, blue, alpha); // bottom
-        drawRectangleInternal(matrix4f, bufferBuilder, x, y + radius, radius, height - 2 * radius, red, green, blue, alpha); // left
-        drawRectangleInternal(matrix4f, bufferBuilder, x + width - radius, y + radius, radius, height - 2 * radius, red, green, blue, alpha); //right
+        drawRectangleBufferInternal(matrix4f, bufferBuilder, x + radius, y, width - 2 * radius, radius, red, green, blue, alpha); // top
+        drawRectangleBufferInternal(matrix4f, bufferBuilder, x + radius, y + height - radius, width - 2 * radius, radius, red, green, blue, alpha); // bottom
+        drawRectangleBufferInternal(matrix4f, bufferBuilder, x, y + radius, radius, height - 2 * radius, red, green, blue, alpha); // left
+        drawRectangleBufferInternal(matrix4f, bufferBuilder, x + width - radius, y + radius, radius, height - 2 * radius, red, green, blue, alpha); //right
 
 
         if (!TL || radius < 0) {
-            drawRectangleInternal(matrix4f, bufferBuilder, x, y, radius, radius, red, green, blue, alpha);
+            drawRectangleBufferInternal(matrix4f, bufferBuilder, x, y, radius, radius, red, green, blue, alpha);
         }
         if (!TR || radius < 0) {
-            drawRectangleInternal(matrix4f, bufferBuilder, x + width - radius, y, radius, radius, red, green, blue, alpha);
+            drawRectangleBufferInternal(matrix4f, bufferBuilder, x + width - radius, y, radius, radius, red, green, blue, alpha);
         }
         if (!BL || radius < 0) {
-            drawRectangleInternal(matrix4f, bufferBuilder, x, y + height - radius, radius, radius, red, green, blue, alpha);
+            drawRectangleBufferInternal(matrix4f, bufferBuilder, x, y + height - radius, radius, radius, red, green, blue, alpha);
         }
         if (!BR || radius < 0) {
-            drawRectangleInternal(matrix4f, bufferBuilder, x + width - radius, y + height - radius, radius, radius, red, green, blue, alpha);
+            drawRectangleBufferInternal(matrix4f, bufferBuilder, x + width - radius, y + height - radius, radius, radius, red, green, blue, alpha);
         }
 
         draw();
@@ -1018,6 +1021,12 @@ public class Renderer2D implements Listener {
             drawFilledQuadrant(matrix4f, x + width - radius, y + height - radius, radius, color, 4);
         }
         RenderSystem.disableBlend();
+    }
+    public static void drawRectangleBufferInternal(Matrix4f matrix4f, BufferBuilder bufferBuilder, float x, float y, float width, float height, float red, float green, float blue, float alpha) {
+        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(red, green, blue, alpha).next();
     }
 
     /**

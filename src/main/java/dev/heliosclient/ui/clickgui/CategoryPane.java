@@ -14,7 +14,6 @@ import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
@@ -108,7 +107,7 @@ public class CategoryPane implements Listener {
         height = 4;
         for (ModuleButton button : moduleButtons) {
             maxWidth = Math.max(maxWidth, button.width - 2);
-            height += button.height + 3;
+            height += ModuleButton.height + 3;
         }
 
         if (maxWidth < getWidth() - 2) {
@@ -183,7 +182,7 @@ public class CategoryPane implements Listener {
             Matrix4f matrix = drawContext.getMatrices().peek().getPositionMatrix();
             float scaleY = matrix.m11();
 
-            drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(), 3,ColorManager.INSTANCE.clickGuiPrimary);
+            drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(),  HeliosClient.CLICKGUI.guiRoundness.getInt() + 1,ColorManager.INSTANCE.clickGuiPrimary);
             // Apply the scale factor to the scissor box dimensions
             Renderer2D.enableScissor(x - 20, (int) ((y + categoryNameHeight + 6) * scaleY), width + 40, (int) ((hudBox.getHeight() - 1) * scaleY));
         }
@@ -202,13 +201,13 @@ public class CategoryPane implements Listener {
 
                 MAX_HEIGHT = settingsHeight + MAX_HEIGHT;
 
-                buttonYOffset += m.height + 3;
+                buttonYOffset += ModuleButton.height + 3;
             }
             Renderer2D.disableScissor();
         }
         Renderer2D.stopScaling(drawContext.getMatrices());
 
-        drawRectangleWithShadow(drawContext.getMatrices(), x - 2, y, true, true, true, true, width + 4.5f, categoryNameHeight + 8, 3, 2, ColorUtils.changeAlpha(ModuleManager.get(GUI.class).categoryPaneColors.getColor(), 255).getRGB());
+        drawRectangleWithShadow(drawContext.getMatrices(), x - 2, y, true, true, true, true, width + 4.5f, categoryNameHeight + 8,  HeliosClient.CLICKGUI.guiRoundness.getInt() + 1, HeliosClient.CLICKGUI.guiRoundness.getInt(), ModuleManager.get(GUI.class).categoryPaneColors.getWithAlpha(255).getRGB());
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), category.name, x + (float) (CategoryPane.getWidth() - 4) / 2 - categoryNameWidth / 2.0f, (float) (y + 4), ColorManager.INSTANCE.clickGuiPaneText());
 
@@ -270,7 +269,7 @@ public class CategoryPane implements Listener {
 
     private void drawOutlineGradientBox(Matrix4f matrix4f, float x, float y, float width) {
         if (HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded) {
-            Renderer2D.drawOutlineGradientRoundedBox(matrix4f, x - 1, y + categoryNameHeight, width + 2f, hudBox.getHeight() + 6, 3, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
+            Renderer2D.drawOutlineGradientRoundedBox(matrix4f, x - 1, y + categoryNameHeight, width + 2f, hudBox.getHeight() + 6,  HeliosClient.CLICKGUI.guiRoundness.getInt() + 1, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
         } else {
             Renderer2D.drawOutlineGradientBox(matrix4f, x - 1, y + categoryNameHeight, width + 2f, hudBox.getHeight() + 6, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());
         }

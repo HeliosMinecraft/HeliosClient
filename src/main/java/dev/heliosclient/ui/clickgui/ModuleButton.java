@@ -93,13 +93,13 @@ public class ModuleButton implements Listener {
 
         if (hitBox.contains(mouseX, mouseY)) {
             textY = textY - 1;
-            drawGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y - 1, fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, width, height, 2, 5, blendedColor);
+            drawGradientRectangleWithShadow(drawContext.getMatrices(), x + 1, y - 1, fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, width, height, HeliosClient.CLICKGUI.guiRoundness.getInt(), HeliosClient.CLICKGUI.guiRoundness.getInt() + 3, blendedColor);
         } else {
-            drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y, width, height, 2);
+            drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y, width, height,  HeliosClient.CLICKGUI.guiRoundness.getInt());
         }
         if (settingsOpen && boxHeight >= 4) {
             Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2.0f, y + height + 2, (float) scale);
-            drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorUtils.changeAlpha(fillColorStart, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorEnd, 100), ColorUtils.changeAlpha(fillColorStart, 100), x + 1, y + height, width, boxHeight + 2, 2);
+            drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y + height, width, boxHeight + 2,  HeliosClient.CLICKGUI.guiRoundness.getInt());
             Renderer2D.stopScaling(drawContext.getMatrices());
         }
 

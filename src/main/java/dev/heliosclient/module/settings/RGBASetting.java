@@ -395,6 +395,10 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         updateHandles();
     }
 
+    public Color getWithAlpha(int alpha){
+        return ColorUtils.changeAlpha(getColor(),alpha);
+    }
+
     public Screen getParentScreen() {
         return parentScreen;
     }

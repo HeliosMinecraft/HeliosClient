@@ -325,15 +325,8 @@ public class NameTags extends Module_ {
                 builder.append(" ").append(entry.getLatency()).append("ms");
             }
         }
-            float dataHeight;
-            float dataWidth;
-            if(Renderer2D.isVanillaRenderer()){
-                dataHeight = mc.textRenderer.fontHeight + 4f;
-                dataWidth = mc.textRenderer.getWidth(builder.toString()) +   mc.textRenderer.getWidth(builder.toString()) / 2.5f;
-            }else{
-                dataHeight = FontRenderers.Large_fxfontRenderer.getStringHeight(builder.toString());
-                dataWidth = FontRenderers.Large_fxfontRenderer.getStringWidth(builder.toString());
-            }
+            float dataHeight = Renderer2D.getCustomStringHeight(builder.toString(),FontRenderers.Large_fxfontRenderer);
+            float dataWidth = Renderer2D.getCustomStringWidth(builder.toString(),FontRenderers.Large_fxfontRenderer);
 
             float halfDataWidth = dataWidth / 2.0f;
 
@@ -358,7 +351,7 @@ public class NameTags extends Module_ {
                 //Draw the string we need if vanilla fontrenderer is not selected
                 if(!Renderer2D.isVanillaRenderer()){
                     int textColor = team.value ? ModuleManager.get(Teams.class).getActualTeamColor(entity) : Color.WHITE.getRGB();
-                    FontRenderers.Large_fxfontRenderer.drawString(stack, builder.toString(), -(dataWidth / 2.0f) - 0.9f, (-entity.getHeight() - entityYOff) + (dataHeight + 1f) / 5.0f, textColor);
+                    FontRenderers.Large_fxfontRenderer.drawString(stack, builder.toString(), -halfDataWidth - 0.9f, -entity.getHeight() - entityYOff + (3f + (showBar ? 0 : 1.4f))/2.0f, textColor);
                 }
             });
 
