@@ -30,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
@@ -57,7 +56,7 @@ public abstract class GameRendererMixin {
 
 
     // MeteorClient.com
-    @Inject(method = "renderWorld", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = {"ldc=hand"}), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+    @Inject(method = "renderWorld", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = {"ldc=hand"}))
     private void render(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
         camera = client.gameRenderer.getCamera();
 
@@ -66,7 +65,7 @@ public abstract class GameRendererMixin {
         GradientBlockRenderer.renderGradientBlocks();
     }
 
-    @Inject(method = "getBasicProjectionMatrix", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;mul(Lorg/joml/Matrix4fc;)Lorg/joml/Matrix4f;"), cancellable = true,remap = false)
+    @Inject(method = "getBasicProjectionMatrix", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;mul(Lorg/joml/Matrix4fc;)Lorg/joml/Matrix4f;"), cancellable = true)
     private void getBasicProjectionMatrix$ChangeAspectRatio(double fov, CallbackInfoReturnable<Matrix4f> cir) {
         AspectRatio ratio = ModuleManager.get(AspectRatio.class);
 
