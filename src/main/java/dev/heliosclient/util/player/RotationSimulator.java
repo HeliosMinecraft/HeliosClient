@@ -41,6 +41,8 @@ public class RotationSimulator implements Listener {
 
     @SubscribeEvent
     public void tick(TickEvent.PLAYER event) {
+        RotationUtils.timerSinceLastRotation.increment();
+
         if (currentRotation != null) {
             currentRotation.update();
 

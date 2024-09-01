@@ -254,6 +254,8 @@ public class Scaffold extends Module_ {
                     break;
                 }
             }
+        } else if(mc.player.getMainHandStack().isEmpty() || blocks.getSelectedEntries().stream().noneMatch(block -> block.asItem() == mc.player.getMainHandStack().getItem())){
+            return;
         }
         if (itemSlot == -1) {
             //Toggle maybe?

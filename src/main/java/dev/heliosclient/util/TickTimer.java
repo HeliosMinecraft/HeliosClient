@@ -11,6 +11,11 @@ public class TickTimer {
     public TickTimer() {
     }
 
+    public TickTimer(boolean start) {
+        if(start)
+           startTicking();
+    }
+
     public void startTicking() {
         if (hasTimerStarted) return;
         ticks = 0;

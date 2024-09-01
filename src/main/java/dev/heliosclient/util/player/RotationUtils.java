@@ -1,7 +1,7 @@
 package dev.heliosclient.util.player;
 
+import dev.heliosclient.util.TickTimer;
 import dev.heliosclient.util.render.Renderer3D;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.hit.HitResult;
@@ -13,7 +13,10 @@ import org.jetbrains.annotations.Nullable;
 import static dev.heliosclient.util.render.Renderer3D.mc;
 
 public class RotationUtils {
+    //Incremented in rotation simulator
+    public static final TickTimer timerSinceLastRotation = new TickTimer(true);
     static float prevYaw, prevPitch;
+    public static float serverYaw, serverPitch;
 
     public static void lookAt(Entity entity, LookAtPos lookAtPos) {
         lookAt(lookAtPos.positionGetter.getPosition(entity));
@@ -103,6 +106,9 @@ public class RotationUtils {
 
 
     public static void rotate(double yaw, double pitch, boolean clientSide, @Nullable Runnable task) {
+        if(prevYaw != yaw && prevPitch != pitch && clientSide){
+            timerSinceLastRotation.restartTimer();
+        }
         prevYaw = mc.player.getYaw(mc.getTickDelta());
         prevPitch = mc.player.getPitch(mc.getTickDelta());
 
@@ -110,12 +116,20 @@ public class RotationUtils {
         mc.player.setYaw((float) yaw);
 
         if (clientSide) {
+            mc.player.renderYaw = (float) yaw;
+            mc.player.renderPitch = (float) pitch;
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) yaw, (float) pitch, mc.player.isOnGround()));
             if (task != null)
                 task.run();
+            setServerRotations((float) yaw, (float) pitch);
             mc.player.setYaw(prevYaw);
             mc.player.setPitch(prevPitch);
         }
+    }
+
+    public static void setServerRotations(float yaw, float pitch){
+        serverYaw = yaw;
+        serverPitch = pitch;
     }
 
     public enum LookAtPos {
