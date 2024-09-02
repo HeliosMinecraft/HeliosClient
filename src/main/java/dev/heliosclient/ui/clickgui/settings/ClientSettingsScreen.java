@@ -51,17 +51,20 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
         );
     }
 
+    @Override
+    public void onDisplayed() {
+        super.onDisplayed();
+        adjustWindowHeight();
+    }
 
     @Override
-    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        if (this.client.world == null) {
-            super.renderBackgroundTexture(drawContext);
-        }
+    public void resize(MinecraftClient client, int width, int height) {
+        super.resize(client, width, height);
 
-        if(GUI.coolVisuals()){
-            PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(),mouseX,mouseY);
-        }
+        adjustWindowHeight();
+    }
 
+    private void adjustWindowHeight(){
         windowHeight = 50;
         for (SettingGroup settingGroup : module.settingGroups) {
             float groupNameHeight = settingGroup.getGroupNameHeight();
@@ -73,6 +76,18 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
                 windowHeight += setting.getHeight() + 1;
             }
             windowHeight += Math.round(groupNameHeight + 4);
+        }
+    }
+
+
+    @Override
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        if (this.client.world == null) {
+            super.renderBackgroundTexture(drawContext);
+        }
+
+        if(GUI.coolVisuals()){
+            PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(),mouseX,mouseY);
         }
 
         window.setWindowHeight(windowHeight);

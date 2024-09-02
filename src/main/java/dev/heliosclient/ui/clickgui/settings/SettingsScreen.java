@@ -11,6 +11,7 @@ import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -45,6 +46,34 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
                 }));
     }
 
+    @Override
+    public void onDisplayed() {
+        super.onDisplayed();
+        adjustWindowHeight();
+    }
+
+    @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        super.resize(client, width, height);
+
+        adjustWindowHeight();
+    }
+
+    private void adjustWindowHeight(){
+        windowHeight = 50;
+        for (SettingGroup settingGroup : module.settingGroups) {
+            float groupNameHeight = settingGroup.getGroupNameHeight();
+            windowHeight += Math.round(groupNameHeight + 12);
+            if (!settingGroup.shouldRender()) continue;
+            for (Setting<?> setting : settingGroup.getSettings()) {
+                if (!setting.shouldRender()) continue;
+                setting.quickSettings = false;
+                windowHeight += setting.getHeight() + 1;
+            }
+            windowHeight += Math.round(groupNameHeight + 4);
+        }
+    }
+
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
@@ -54,18 +83,6 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
 
         if(GUI.coolVisuals()){
             PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(),mouseX,mouseY);
-        }
-
-        windowHeight = 50;
-        for (SettingGroup settingGroup : module.settingGroups) {
-            windowHeight += Math.round(settingGroup.getGroupNameHeight() + 13);
-            if (!settingGroup.shouldRender()) continue;
-            for (Setting<?> setting : settingGroup.getSettings()) {
-                if (!setting.shouldRender()) continue;
-                setting.quickSettings = false;
-                windowHeight += setting.getHeight() + 1;
-            }
-            windowHeight += 8;
         }
 
         window.setWindowHeight(windowHeight);

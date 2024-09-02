@@ -75,7 +75,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         this.brightnessSaturationBoxWidth = boxWidth;
         this.brightnessSaturationBoxHeight = boxHeight;
 
-        updateHandles();
+        updateHandles(true);
         alpha = defaultColor.getAlpha() / 255f;
         alphaHandleY = Math.round((1.0f - alpha) * (float) boxHeight);
 
@@ -89,10 +89,6 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         this.y = y;
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 4, -1);
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, value.getRGB());
-
-        if (rainbow) {
-            value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), value.getAlpha());
-        }
     }
 
     public void renderSetting(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
@@ -109,7 +105,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         int value3 = hoveredOverBrightnessSaturationBox(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
 
         if (rainbow) {
-            updateHandles();
+            updateHandles(false);
         }
         this.gradientBoxX = x + offsetX;
         this.gradientBoxY = y + offsetY;
@@ -209,15 +205,18 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, boxWidth + 2, boxHeight + 2, 3, 1, value3);
     }
 
-    public void updateHandles() {
+    public void updateHandles(boolean brightAndSat) {
         float[] hsbvals = Color.RGBtoHSB(value.getRed(), value.getGreen(), value.getBlue(), null);
         hue = hsbvals[0];
-        saturation = hsbvals[1];
-        brightness = hsbvals[2];
         handleX = Math.min((int) (hue * boxWidth), boxWidth);
         handleY = Math.min((int) ((1 - saturation) * gradientBoxHeight), gradientBoxHeight);
-        shadeHandleX = Math.min((int) (brightness * boxWidth), boxWidth);
-        shadeHandleY = Math.min((int) ((1 - saturation) * boxHeight), boxHeight);
+
+        if(brightAndSat) {
+            saturation = hsbvals[1];
+            brightness = hsbvals[2];
+            shadeHandleX = Math.min((int) (brightness * boxWidth), boxWidth);
+            shadeHandleY = Math.min((int) ((1 - saturation) * boxHeight), boxHeight);
+        }
     }
 
 
@@ -265,7 +264,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
 
             value = new Color(red, green, blue, (int) (alpha * 255));
             isPicking = !isPicking;
-            updateHandles();
+            updateHandles(true);
             alpha = value.getAlpha() / 255f;
         }
 
@@ -290,7 +289,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
             alpha = 1.0f - alphaHandleY / (float) boxHeight;
         }
         if (rainbow) {
-            updateHandles();
+            updateHandles(false);
         } else {
             value = Color.getHSBColor(hue, saturation, brightness);
         }
@@ -302,7 +301,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
             if (ColorUtils.isHexColor(hexInput.getValue())) {
                 try {
                     value = ColorUtils.hexToColor(hexInput.getValue());
-                    updateHandles();
+                    updateHandles(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                     // Something went wrong
@@ -316,7 +315,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             value = defaultValue;
             rainbow = defaultRainbow;
-            updateHandles();
+            updateHandles(true);
             alphaHandleY = Math.round((1.0f - alpha) * (float) boxHeight);
             alpha = value.getAlpha() / 255f;
         }
@@ -367,7 +366,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
         if (rainbow) {
-            value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(), value.getAlpha());
+            value = ColorUtils.changeAlpha(ColorUtils.getRainbowColor(saturation,brightness), value.getAlpha());
         }
     }
 
@@ -384,7 +383,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
             value = defaultValue;
             rainbow = defaultRainbow;
             HeliosClient.LOGGER.error("{} is null, Setting loaded to default", this.getSaveName());
-            updateHandles();
+            updateHandles(true);
             return;
         }
 
@@ -392,7 +391,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
 
         value = ColorUtils.intToColor(MathUtils.d2iSafe(list.get(0)));
         rainbow = MathUtils.d2iSafe(list.get(1)) == 1;
-        updateHandles();
+        updateHandles(true);
     }
 
     public Color getWithAlpha(int alpha){

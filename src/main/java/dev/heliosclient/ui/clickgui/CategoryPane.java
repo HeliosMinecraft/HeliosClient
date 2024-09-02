@@ -177,14 +177,9 @@ public class CategoryPane implements Listener {
             if (gui.categoryBorder.value) {
                 drawOutlineGradientBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width);
             }
-
-            // Calculate the scale factor from the MatrixStack
-            Matrix4f matrix = drawContext.getMatrices().peek().getPositionMatrix();
-            float scaleY = matrix.m11();
-
             drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y + categoryNameHeight + 6, false, false, true, true, width + 2f, hudBox.getHeight(),  HeliosClient.CLICKGUI.guiRoundness.getInt() + 1,ColorManager.INSTANCE.clickGuiPrimary);
             // Apply the scale factor to the scissor box dimensions
-            Renderer2D.enableScissor(x - 20, (int) ((y + categoryNameHeight + 6) * scaleY), width + 40, (int) ((hudBox.getHeight() - 1) * scaleY));
+            Renderer2D.enableScissor(x - 20, (int) ((y + categoryNameHeight + 6)), width + 40, (int) ((hudBox.getHeight() - 1)));
         }
 
         if (collapsed) {

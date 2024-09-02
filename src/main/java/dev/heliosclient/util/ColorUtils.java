@@ -1,13 +1,9 @@
 package dev.heliosclient.util;
 
 import dev.heliosclient.HeliosClient;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.util.GlAllocationUtils;
 import net.minecraft.util.math.random.Random;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
@@ -137,8 +133,16 @@ public class ColorUtils {
      * @return Current rainbow color.
      */
     public static Color getRainbowColor() {
-        float hue = (System.currentTimeMillis() % ((int) HeliosClient.CLICKGUI.RainbowSpeed.value * 1000)) / ((int) HeliosClient.CLICKGUI.RainbowSpeed.value * 1000.0f);
-        return Color.getHSBColor(hue, 1.0f, 1.0f);
+        return getRainbowColor(1.0f,1.0f);
+    }
+    /**
+     * Rainbow cycle with the provided brightness and saturation
+     *
+     * @return Current rainbow color.
+     */
+    public static Color getRainbowColor(float saturation, float brightness) {
+        float hue = (System.currentTimeMillis() % (HeliosClient.CLICKGUI.getRainbowSpeed() * 1000)) / (HeliosClient.CLICKGUI.getRainbowSpeed() * 1000.0f);
+        return Color.getHSBColor(hue, saturation, brightness);
     }
 
     /**
@@ -148,7 +152,7 @@ public class ColorUtils {
      */
     public static Color getRainbowColor2() {
         float hueOffset = 0.1f;
-        float hue = ((System.currentTimeMillis() % ((int) HeliosClient.CLICKGUI.RainbowSpeed.value * 1000)) / ((int) HeliosClient.CLICKGUI.RainbowSpeed.value * 1000.0f)) + hueOffset;
+        float hue = (System.currentTimeMillis() % (HeliosClient.CLICKGUI.getRainbowSpeed() * 1000)) / (HeliosClient.CLICKGUI.getRainbowSpeed() * 1000.0f) + hueOffset;
         hue += (int) hue;
         return Color.getHSBColor(hue, 1.0f, 1.0f);
     }
@@ -269,21 +273,6 @@ public class ColorUtils {
             e.printStackTrace();
             return false;
         }
-    }
-
-    public static Color getColorAtPixel(double mouseX, double mouseY) {
-        Framebuffer framebuffer = HeliosClient.MC.getFramebuffer();
-        int x = (int) (mouseX * framebuffer.textureWidth / HeliosClient.MC.getWindow().getScaledWidth());
-        int y = (int) ((HeliosClient.MC.getWindow().getScaledHeight() - mouseY) * framebuffer.textureHeight / HeliosClient.MC.getWindow().getScaledHeight());
-
-        ByteBuffer buffer = GlAllocationUtils.allocateByteBuffer(4);
-        GL11.glReadPixels(x, y, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-        int red = buffer.get(0) & 0xFF;
-        int green = buffer.get(1) & 0xFF;
-        int blue = buffer.get(2) & 0xFF;
-        int alpha = buffer.get(3) & 0xFF;
-
-        return new Color(red, green, blue, alpha);
     }
 
     public static float getSaturation(Color color) {

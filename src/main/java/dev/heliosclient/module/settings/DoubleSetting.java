@@ -19,11 +19,12 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class DoubleSetting extends Setting<Double> {
-    private final double min, max;
+    public final double min, max;
     private final int roundingPlace;
     private final InputBox inputBox;
     public double value;
     boolean sliding = false;
+    static int lighterDarkGray = ColorUtils.changeAlpha(Color.DARK_GRAY, 105).getRGB();
 
     public DoubleSetting(String name, String description, ISettingChange ISettingChange, double value, double min, double max, int roundingPlace, BooleanSupplier shouldRender, double defaultValue) {
         super(shouldRender, defaultValue);
@@ -41,9 +42,9 @@ public class DoubleSetting extends Setting<Double> {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        int defaultColor = ColorManager.INSTANCE.defaultTextColor();
+        int defaultTColor = ColorManager.INSTANCE.defaultTextColor();
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 2, defaultColor);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 2, defaultTColor);
         //I dont understand these calculations.
         double diff = Math.min(100, Math.max(0, (mouseX - x) / 1.9));
 
@@ -65,11 +66,13 @@ public class DoubleSetting extends Setting<Double> {
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, 188, 2, 1, 0xFFAAAAAA);
 
         int scaledValue = (int) ((value - min) / (max - min) * 188) + 2;
-        // Slider background
+        // Slider colored background
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, scaledValue, 2, 1, ColorManager.INSTANCE.clickGuiSecondary());
         // Slider
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 14f, 2, 6, 1, 0xFFFFFFFF);
-        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19f, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY, 105).getRGB());
+
+
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19f, 2, 1, lighterDarkGray);
 
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
@@ -115,7 +118,7 @@ public class DoubleSetting extends Setting<Double> {
 
         //Slider Bar which moves and cartoony shadow
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 14, 2, 6, 1, 0xFFFFFFFF);
-        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19, 2, 1, ColorUtils.changeAlpha(Color.DARK_GRAY, 155).getRGB());
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + scaledValue, y + 19, 2, 1, lighterDarkGray);
         if (hovered(mouseX, mouseY)) {
             hovertimer++;
         } else {
@@ -144,8 +147,10 @@ public class DoubleSetting extends Setting<Double> {
 
     @Override
     public void mouseReleased(double mouseX, double mouseY, int button) {
+        if(sliding) {
+            postSettingChange();
+        }
         sliding = false;
-        postSettingChange();
     }
 
     @Override

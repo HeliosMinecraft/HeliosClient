@@ -32,11 +32,16 @@ import java.util.Map;
  * Class for creating HudElements for HUD
  *
  * <h4>Position is stored using this method:</h4><br>
- * There are 3 imaginary lines on each axis. For y-axis, one is on top of the screen, center, bottom. Similarly, for x-axis they are placed on left, center and right.<br>
- * The HUD element stores on each axis to which line it is closest to. This is stored in the posX and posY variable. Element also stores the distance to this line in pixels in the distanceX and distance Y variables. These are capped so the elements can`t go off the screen. These values aren't changed at all while not dragging ensuring no shifts happening.<br>
- * This approach ensures that when resizing the elements on screen don't overlap much and don't shift around. unless they are touched in the editor.
+ * There are `[NUMBER_OF_LINES]` (imaginary lines) on each axis. The screen is divided on each axis (x,y) in the count of lines.<br>
+ * The HUD element stores on each axis to which section of the lines it lies to, <br>
+ * (For example if the 3rd line in x axis is present at 30 pixels and the second line is at 20 pixels,
+ * and the hud element is present at 25 pixels then the line chosen will be 3rd line [The spacing is controlled by number of lines]).
+ * <br>
+ * This is stored in the posX and posY variable. Element also stores the distance to this line in pixels in the distanceX and distance Y variables.
+ * These are capped so the elements can`t go off the screen. These values aren't changed at all while not dragging ensuring no shifts happening.<br>
+ * This approach ensures that when resizing the elements on screen don't overlap much and don't shift around, unless they are touched in the editor.
  *
- * <h4>Warning: Makes sure the element is centered along the x and y position. If this is not met they will go off-screen and hit-boxes will be broken.</h4>
+ * <h4>Warning: Makes sure the element is drawn with its top-left vertex as the element's x and y position. If this is not met they will go off-screen and hit-boxes will be broken.</h4>
  */
 public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     protected static final MinecraftClient mc = MinecraftClient.getInstance();
@@ -65,7 +70,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
 
     //This variable is used to control the number of imaginary lines to use, to
     //anchor the hud elements during resize, as stated in the class comment.
-    public static final int NUMBER_OF_LINES = 100;
+    public static final int NUMBER_OF_LINES = 120;
 
     // Default settings
     // This is a lot of complete customisation.
@@ -164,7 +169,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
      */
     public void renderEditor(DrawContext drawContext, TextRenderer textRenderer, int mouseX, int mouseY) {
         // Get right line to align to
-
         double posYInterval = (double) drawContext.getScaledWindowHeight() / (NUMBER_OF_LINES);
         double posXInterval = (double) drawContext.getScaledWindowWidth() / (NUMBER_OF_LINES);
 
@@ -190,36 +194,11 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             y = newY;
 
 
-            for (int i = 0; i < NUMBER_OF_LINES; i++) {
-                if (x < posXInterval * i) {
-                    posX = i;
-                    break;
-                }
-            }
+            posX = (int) (x / posXInterval);
+            posY = (int) (y / posYInterval);
 
-            for (int i = 0; i < NUMBER_OF_LINES; i++) {
-                if (y < posYInterval * i) {
-                    posY = i;
-                    break;
-                }
-            }
-
-            // Calculate and store distances from the lines
-            if (posX == 0) {
-                distanceX = Math.max(x, 0);
-            } else if (posX == NUMBER_OF_LINES) {
-                distanceX = Math.max(drawContext.getScaledWindowWidth() - x, this.width);
-            } else {
-                distanceX = (int) Math.min(x - posXInterval * posX, posXInterval - x % posXInterval);
-            }
-
-            if (posY == 0) {
-                distanceY = Math.max(y, 0);
-            } else if (posY == NUMBER_OF_LINES) {
-                distanceY = Math.max(drawContext.getScaledWindowHeight() - y, this.height);
-            } else {
-                distanceY = (int) Math.min(y - posYInterval * posY, posYInterval - y % posYInterval);
-            }
+            distanceX = (int) (x % posXInterval);
+            distanceY = (int) (y % posYInterval);
         }
 
         // Move to right position according to pos and distance variables
@@ -255,7 +234,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         //Renders element
         renderElement(drawContext, textRenderer);
 
-        // Set the hudBox values after the render element incase any change of width/height occurs
+        // Set the hudBox values after the render element in-case any change of width/height occurs
         setHudBox();
     }
 
@@ -274,8 +253,8 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         //Skip if in F3 menu or hud is hidden
         if (HeliosClient.MC.options.hudHidden || HeliosClient.MC.getDebugHud().shouldShowDebugHud()) return;
 
-        double posYInterval = (double) drawContext.getScaledWindowHeight() / (NUMBER_OF_LINES);
-        double posXInterval = (double) drawContext.getScaledWindowWidth() / (NUMBER_OF_LINES);
+        double posYInterval = (double) drawContext.getScaledWindowHeight() / NUMBER_OF_LINES;
+        double posXInterval = (double) drawContext.getScaledWindowWidth() / NUMBER_OF_LINES;
 
         // Move to right position according to pos and distance variables
         if (posX == 0) {

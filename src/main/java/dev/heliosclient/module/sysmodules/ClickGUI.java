@@ -147,10 +147,9 @@ public class ClickGUI extends Module_ {
             .name("Rainbow/Gradient speed")
             .description("Speed of the rainbow and gradients throughout the client")
             .onSettingChange(this)
-            .value(14.0)
             .max(20)
             .min(1)
-            .defaultValue(10.0)
+            .defaultValue(14.0)
             .roundingPlace(0)
             .build()
     );
@@ -443,6 +442,11 @@ public class ClickGUI extends Module_ {
 
         FontManager.INSTANCE.registerFonts();
     }
+
+    public int getRainbowSpeed(){
+        return (int) Math.max(RainbowSpeed.max -  RainbowSpeed.getInt(),1);
+    }
+
     public static boolean shouldGlowMousePointer(){
         if(HeliosClient.CLICKGUI != null){
             return HeliosClient.CLICKGUI.glowMousePointer.value;

@@ -148,7 +148,6 @@ public class ClickGUIScreen extends Screen {
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Middle Click - Open QuickSettings", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
             FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (fontHeight) - 2, -1);
         }
-
         Renderer2D.scaleAndPosition(drawContext.getMatrices(),0,0,width,height,scale);
 
         for (CategoryPane category : categoryPanes) {

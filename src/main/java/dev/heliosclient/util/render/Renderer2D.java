@@ -125,8 +125,10 @@ public class Renderer2D implements Listener {
     }
 
     public static void enableScissor(int x, int y, int width, int height) {
-        double scaleFactor = HeliosClient.MC.getWindow().getScaleFactor();
+        enableScissor(x,y,width,height,mc.getWindow().getScaleFactor());
+    }
 
+    public static void enableScissor(int x, int y, int width, int height, double scaleFactor) {
         int scissorX = (int) (x * scaleFactor);
         int scissorY = (int) (HeliosClient.MC.getWindow().getHeight() - ((y + height) * scaleFactor));
         int scissorWidth = (int) (width * scaleFactor);
@@ -1067,6 +1069,11 @@ public class Renderer2D implements Listener {
         RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getFramebufferWidth() / mc.getWindow().getScaleFactor()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), vertexSorter);
     }
 
+    public static void customScaledProjection(float scale) {
+        vertexSorter = RenderSystem.getVertexSorting();
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth() / scale, mc.getWindow().getFramebufferHeight() / scale, 0, 1000, 21000), VertexSorter.BY_Z);
+    }
+
     /**
      * Draws a rounded rectangle with a shadow in a bad way
      *
@@ -1185,7 +1192,6 @@ public class Renderer2D implements Listener {
 
         RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
 
-        RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
