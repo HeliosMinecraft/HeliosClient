@@ -34,7 +34,7 @@ import java.util.Map;
  * <h4>Position is stored using this method:</h4><br>
  * There are `[NUMBER_OF_LINES]` (imaginary lines) on each axis. The screen is divided on each axis (x,y) in the count of lines.<br>
  * The HUD element stores on each axis to which section of the lines it lies to, <br>
- * (For example if the 3rd line in x axis is present at 30 pixels and the second line is at 20 pixels,
+ * (For example if the 3rd line in x-axis is present at 30 pixels and the second line is at 20 pixels,
  * and the hud element is present at 25 pixels then the line chosen will be 3rd line [The spacing is controlled by number of lines]).
  * <br>
  * This is stored in the posX and posY variable. Element also stores the distance to this line in pixels in the distanceX and distance Y variables.

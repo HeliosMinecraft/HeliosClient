@@ -34,7 +34,7 @@ public class ProfileUtils {
         return UUID.fromString(getUUID(profileName));
     }
 
-    private static String insertHyphensToUUID(String uuid) {
+    public static String insertHyphensToUUID(String uuid) {
         return uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32);
     }
 

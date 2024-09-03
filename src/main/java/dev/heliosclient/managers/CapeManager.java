@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.mixin.AbstractClientPlayerEntityMixin;
 import dev.heliosclient.module.modules.misc.CapeModule;
 import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.util.ColorUtils;
@@ -13,11 +12,8 @@ import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.cape.CapeTextureManager;
 import dev.heliosclient.util.cape.ProfileUtils;
 import dev.heliosclient.util.fontutils.FontLoader;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import org.apache.http.client.HttpResponseException;
 
@@ -29,7 +25,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -117,6 +115,7 @@ public class CapeManager {
         }
     }
 
+    /*
     private static Int2ObjectOpenHashMap<NativeImage> parseAnimatedCape(NativeImage img) {
         Int2ObjectOpenHashMap<NativeImage> animatedCape = new Int2ObjectOpenHashMap<>();
         int totalFrames = img.getHeight() / (img.getWidth() / 2);
@@ -131,6 +130,8 @@ public class CapeManager {
         }
         return animatedCape;
     }
+
+     */
 
 
     /**

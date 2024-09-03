@@ -6,10 +6,13 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 
+import java.util.List;
+
 
 public class ConsoleAppender extends AbstractAppender {
     ConsoleScreen screen;
     String previousMessage = null;
+    int duplicateCount = 1;
 
     public ConsoleAppender(ConsoleScreen consoleScreen) {
         super("ConsoleAppender", null, null);
@@ -42,7 +45,7 @@ public class ConsoleAppender extends AbstractAppender {
             message = ColorUtils.darkRed + message + ColorUtils.reset;
         }
 
-        if (event.getLoggerName().contains("net.minecraft") || event.getLoggerName().contains("com.mojang")) {
+        if (event.getLoggerName().contains("net.minecraft") || event.getLoggerName().contains("com.mojang") || event.getLoggerName().contains("minecraft")) {
             message = ColorUtils.darkGreen + "[Minecraft] " + ColorUtils.reset + message;
         } else if (event.getLoggerName().equalsIgnoreCase("HeliosClient")) {
             message = ColorUtils.yellow + "[HeliosClient] " + ColorUtils.reset + message;
@@ -52,9 +55,21 @@ public class ConsoleAppender extends AbstractAppender {
             message = ColorUtils.darkBlue + "[ModMenu] " + ColorUtils.reset + message;
         }
 
+
         // Does not log same messages again to prevent console spam.
-        if (!message.equals(previousMessage)) {
-            // Display messages in console
+        if (message.equals(previousMessage)) {
+            List<String> lines = screen.consoleBox.getlines();
+
+            duplicateCount++;
+            if (!lines.isEmpty()) {
+                String lastLine = lines.get(lines.size() - 1);
+                if (lastLine.contains(" (x")) {
+                    lastLine = lastLine.substring(0, lastLine.lastIndexOf(" (x"));
+                }
+                lines.set(lines.size() - 1, lastLine + " (x" + duplicateCount + ")");
+            }
+        } else {
+            duplicateCount = 1;
             screen.consoleBox.addLine(message);
         }
         previousMessage = message;

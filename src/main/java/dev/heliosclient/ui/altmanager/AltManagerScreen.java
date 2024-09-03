@@ -18,4 +18,8 @@ public class AltManagerScreen extends Screen {
         renderBackgroundTexture(drawContext);
     }
 
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
 }
