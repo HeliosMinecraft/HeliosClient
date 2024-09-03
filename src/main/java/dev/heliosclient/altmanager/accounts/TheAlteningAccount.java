@@ -46,7 +46,7 @@ public class TheAlteningAccount extends Account {
         return getUsername();
     }
 
-    //Original Authors LiquidBounce mc-authLib in kotlin
+    //Original Authors are LiquidBounce mc-authLib in kotlin
     //Similar Wiki for the authserver:  https://wiki.vg/Legacy_Mojang_Authentication
     public static class YggdrasilUserAuthentication {
         private static final String clientIdentifier = UUID.randomUUID().toString();

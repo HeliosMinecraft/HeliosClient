@@ -27,7 +27,14 @@ repositories {
 		}
 	}
 	maven { url "https://maven.terraformersmc.com/releases/" }
-
+	maven {
+		name = "meteor-maven"
+		url = "https://maven.meteordev.org/releases"
+	}
+	maven {
+		name = "meteor-maven-snapshots"
+		url = "https://maven.meteordev.org/snapshots"
+	}
 	mavenCentral()
 	jcenter()
 	maven { url 'https://jitpack.io' }
@@ -63,8 +70,8 @@ dependencies {
 	include modImplementation("com.github.0x3C50:Renderer:aa67e1c979")
 
 
-	// Baritone API
-	modCompileOnly "com.github.wagyourtail:baritone:${project.baritone_version}"
+	// Baritone API from meteor's fork
+	modCompileOnly "meteordevelopment:baritone:1.20.4-SNAPSHOT"
 
 	// LuaJ library
 	modInclude("org.luaj:luaj-jse:3.0.1")
@@ -108,6 +115,12 @@ java {
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
+	}
+
+	manifest {
+		attributes(
+				'Built-by': System.getProperty('user.name'),
+		)
 	}
 }
 
