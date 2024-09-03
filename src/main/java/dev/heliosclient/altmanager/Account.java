@@ -39,7 +39,7 @@ public abstract class Account {
         return this instanceof CrackedAccount || password == null;
     }
 
-    public abstract boolean login();+
+    public abstract boolean login();
     public abstract String getDisplayName();
 
     @Override
