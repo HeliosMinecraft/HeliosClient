@@ -383,12 +383,14 @@ public class NameTags extends Module_ {
                     Renderer2D.drawOutlineGradientRoundedBox(stack.peek().getPositionMatrix(), -(dataWidth / 2.0f) - 2.5f, -1.5f, dataWidth + 3.5f, dataHeight + 2.5f, (float) radius.value, 0.5f, outlineStart.value, outlineEnd.value, outlineEnd.value, outlineStart.value);
                 }
             }
+            //Draw the string we need if vanilla fontrenderer is not selected
+            if(!Renderer2D.isVanillaRenderer()){
+                FontRenderers.Large_fxfontRenderer.drawString(stack, text, -(dataWidth / 2.0f) - 0.87f, -entity.getHeight() - entityYOff + (3f/2.0f), -1);
+            }
         });
 
         if(Renderer2D.isVanillaRenderer()){
-            Renderer3D.drawText(Text.of(text),entityPos.x, (entityPos.y + entity.getHeight() + entityYOff), entityPos.z, adjustedScale,false,-1);
-        }else {
-            Renderer3D.drawText(FontRenderers.Large_fxfontRenderer, text, (float) entityPos.x, (float) (entityPos.y + entity.getHeight() + entityYOff), (float) entityPos.z, -(dataWidth / 2.0f) - 0.87f, 0, adjustedScale, Color.WHITE.getRGB());
+            Renderer3D.drawText(Text.of(text),entityPos.x, (entityPos.y + entity.getHeight() + entityYOff), entityPos.z, adjustedScale + 0.125f,false,-1);
         }
     }
 

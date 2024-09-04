@@ -1,9 +1,7 @@
 package dev.heliosclient.scripting;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.managers.ModuleManager;
-import dev.heliosclient.module.Module_;
 import dev.heliosclient.scripting.libraries.ChatLib;
 import dev.heliosclient.scripting.libraries.PacketLib;
 import dev.heliosclient.scripting.libraries.PlayerLib;
@@ -22,6 +20,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.biome.BiomeKeys;
+import org.jetbrains.annotations.Nullable;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.DebugLib;
@@ -35,6 +34,8 @@ import java.io.Reader;
  */
 public class LuaExecutor {
     private Globals globals;
+    @Nullable
+    public LuaFile luaFile;
 
     /**
      * Constructs a new LuaExecutor with the given Minecraft client, Helios client, and Lua event manager instance.
@@ -52,7 +53,7 @@ public class LuaExecutor {
 
         globals.set("mc", CoerceJavaToLua.coerce(mc));
         globals.set("hc", CoerceJavaToLua.coerce(HeliosClient.INSTANCE));
-        globals.set("CommandManager", CoerceJavaToLua.coerce(CommandManager.class));
+        globals.set("moduleManager", CoerceJavaToLua.coerce(ModuleManager.class));
         globals.set("eventManager", CoerceJavaToLua.coerce(eventManager));
         globals.set("ChatUtils", CoerceJavaToLua.coerce(ChatUtils.class));
         globals.set("InventoryUtils", CoerceJavaToLua.coerce(InventoryUtils.class));
@@ -72,11 +73,6 @@ public class LuaExecutor {
         globals.set("Vec3d", CoerceJavaToLua.coerce(Vec3d.class));
         globals.set("Box", CoerceJavaToLua.coerce(Box.class));
         globals.set("Hand", CoerceJavaToLua.coerce(Hand.class));
-
-
-        for (Module_ module : ModuleManager.getModules()) {
-            globals.set(module.name, CoerceJavaToLua.coerce(module));
-        }
     }
 
     /**
@@ -86,7 +82,10 @@ public class LuaExecutor {
      * @return The loaded Lua script.
      */
     public LuaValue load(Reader reader) {
-        return globals.load(reader, "script");
+        if(luaFile == null){
+            throw new RuntimeException("Load called before LuaFile was initialised");
+        }
+        return globals.load(reader, luaFile.getScriptName());
     }
 
     /**
@@ -105,5 +104,9 @@ public class LuaExecutor {
 
     public void setGlobals(Globals globals) {
         this.globals = globals;
+    }
+
+    public void setLuaFile(LuaFile luaFile) {
+        this.luaFile = luaFile;
     }
 }

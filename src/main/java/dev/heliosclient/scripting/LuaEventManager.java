@@ -61,9 +61,8 @@ public class LuaEventManager {
         }
         if (!unregisteredEvents.isEmpty()) {
             HeliosClient.LOGGER.warn("Warning: Unregistered events for Lua file {}: {}", luaFile.getName(), unregisteredEvents);
-            ChatUtils.sendHeliosMsg(ColorUtils.yellow + "Warning: Unregistered events for Lua file " + ColorUtils.aqua + luaFile.getName() + ColorUtils.yellow + ": " + unregisteredEvents);
+            ChatUtils.sendHeliosMsg(ColorUtils.yellow + "Warning: Unregistered events for Lua file " + ColorUtils.aqua + luaFile.getName() + ColorUtils.darkMagenta + ": " + unregisteredEvents);
             ChatUtils.sendHeliosMsg(ColorUtils.yellow + "The above event listeners were removed automatically. Please remove them manually in the code during `onStop()` call for the better!");
-
         }
     }
 
@@ -105,7 +104,7 @@ public class LuaEventManager {
                     Varargs varargs = listener.invoke(event);
                     status = varargs.arg1();
                     result = varargs.arg(2);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     HeliosClient.LOGGER.error("Error while invoking Lua function", e);
                     ChatUtils.sendHeliosMsg("Error while invoking LuaFunction: " + e.getMessage());
                 }

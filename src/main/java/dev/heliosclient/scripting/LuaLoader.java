@@ -33,6 +33,10 @@ public class LuaLoader {
      * @param luaFile The Lua file to load.
      */
     public void load(LuaFile luaFile) {
+        if (luaFile.isLoaded()) {
+            ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "Script is already loaded: " + ColorUtils.blue + luaFile.getAbsolutePath());
+            return;
+        }
         try {
             Reader reader = luaFile.getReader();
             LuaValue chunk = luaFile.getExecutor().load(reader);
@@ -52,6 +56,7 @@ public class LuaLoader {
             }
 
         } catch (FileNotFoundException e) {
+            luaFile.isLoaded = false;
             throw new RuntimeException(e);
         }
     }
@@ -65,6 +70,11 @@ public class LuaLoader {
      * @param file The Lua file to close.
      */
     public void close(LuaFile file) {
+        if (!file.isLoaded()) {
+            ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "Script not loaded: " + ColorUtils.blue + file.getAbsolutePath());
+            return;
+        }
+
         try {
             LuaValue onStopFunction = file.getExecutor().getFunction("onStop");
             if (onStopFunction.isfunction()) {
@@ -76,6 +86,9 @@ public class LuaLoader {
 
             file.getReader().close();
 
+            //Call the Garbage collector to collect any leftover garbage by the script. Might cause lag or crash if unused properly
+            System.gc();
+
             file.isLoaded = false;
             ChatUtils.sendHeliosMsg(ColorUtils.green + "Closed LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + file.getScriptName() + ColorUtils.gray + "]");
             if (HeliosClient.shouldSendNotification() && ModuleManager.get(NotificationModule.class).scriptNotifications.value) {
@@ -85,6 +98,7 @@ public class LuaLoader {
             // Clear all event listeners for the Lua file
             LuaEventManager.INSTANCE.clearListeners(file);
         } catch (IOException e) {
+            file.isLoaded = false;
             throw new RuntimeException(e);
         }
     }

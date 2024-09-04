@@ -105,7 +105,6 @@ public class PlayerUtils {
         return item instanceof BowItem ||  item instanceof CrossbowItem || item instanceof SnowballItem || item instanceof EggItem;
     }
 
-
     public static boolean isSprinting(PlayerEntity player) {
         return player.isSprinting();
     }

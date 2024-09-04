@@ -11,6 +11,7 @@ public class LuaFile extends File {
     private final LuaExecutor executor;
     public boolean isLoaded = false;
     public int bindKey = -1;
+    BufferedReader reader = null;
     /**
      * Managed in {@link  dev.heliosclient.managers.KeybindManager#keyPressedEvent(KeyPressedEvent)}
      */
@@ -25,6 +26,7 @@ public class LuaFile extends File {
     public LuaFile(String path, LuaExecutor luaExecutor) {
         super(path);
         this.executor = luaExecutor;
+        this.executor.setLuaFile(this);
     }
 
     public boolean isLoaded() {
@@ -38,9 +40,15 @@ public class LuaFile extends File {
      * @throws FileNotFoundException If the Lua script file does not exist.
      */
     public Reader getReader() throws FileNotFoundException {
-        return new BufferedReader(new FileReader(this));
+        try {
+            if (reader == null || !reader.ready()) {
+                reader = new BufferedReader(new FileReader(this));
+            }
+        } catch (IOException e) {
+            reader = new BufferedReader(new FileReader(this));
+        }
+        return reader;
     }
-
     /**
      * Retrieves a Buffered reader for the Lua script file.
      *
@@ -48,7 +56,14 @@ public class LuaFile extends File {
      * @throws FileNotFoundException If the Lua script file does not exist.
      */
     public BufferedReader getBufferedReader() throws FileNotFoundException {
-        return new BufferedReader(new FileReader(this));
+        try {
+            if (reader == null || !reader.ready()) {
+                reader = new BufferedReader(new FileReader(this));
+            }
+        } catch (IOException e) {
+            reader = new BufferedReader(new FileReader(this));
+        }
+        return reader;
     }
 
     public File getFile() {
@@ -102,5 +117,13 @@ public class LuaFile extends File {
             }
         }
         return text.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof LuaFile lf){
+            return super.equals(obj) || lf.getExecutor() == this.getExecutor();
+        }
+        return super.equals(obj);
     }
 }

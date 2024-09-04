@@ -31,7 +31,7 @@ public class LuaScriptManager {
     public static void reloadScript(LuaFile luaFile) {
         if (luaFiles.contains(luaFile)) {
             int index = luaFiles.indexOf(luaFile);
-            if (luaFile.isLoaded) {
+            if (luaFile.isLoaded()) {
                 INSTANCE.closeScript(luaFile);
             }
             luaFiles.set(index, luaLoader.getScript(luaFile));

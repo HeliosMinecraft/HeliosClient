@@ -34,7 +34,7 @@ public class ExpThrower extends Module_ {
         addSettingGroup(sgGeneral);
 
         addQuickSetting(feetEXP);
-
+        addQuickSetting(swapBack);
     }
 
     @Override
