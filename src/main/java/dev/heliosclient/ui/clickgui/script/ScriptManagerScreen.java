@@ -1,9 +1,10 @@
-package dev.heliosclient.ui.clickgui;
+package dev.heliosclient.ui.clickgui.script;
 
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
+import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.gui.tables.Table;
 import dev.heliosclient.ui.clickgui.gui.tables.TableEntry;
@@ -39,6 +40,7 @@ public class ScriptManagerScreen extends Screen {
     //private int numRows = 4; // Number of rows (adjust as needed)
   //  private int numColumns = 4; // Number of columns (adjust as needed)
     private int scrollOffset = 0, maxScroll;
+    static int lightBlack = ColorUtils.changeAlphaGetInt(0xFF000000, 165);
     //private int entryWidth, entryHeight;
 
     private Table scriptTable = new Table();
@@ -141,12 +143,14 @@ public class ScriptManagerScreen extends Screen {
 
         //Draw rounded background behind for the buttons.
         float buttonSectionWidth = managerWidth * 0.18f;
-        Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(), startX + 5, 60, buttonSectionWidth, 48 + 22, 3, ColorUtils.changeAlpha(new Color(0xFF000000, true), 165).getRGB());
+        int lastButtonY = 134;
+        Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(), startX + 5, 60, buttonSectionWidth, lastButtonY - 30, 3, lightBlack);
         // Renderer2D.drawRectangleWithShadow(context.getMatrices(), 175, 50, 1f, scaledHeight - 98, Color.BLACK.brighter().brighter().getRGB(), 4);
 
         //Draw Side buttons
         drawButton(context, startX + 12, 66, "Local Scripts", "\uF15D", mouseX, mouseY);
         drawButton(context, startX + 12, 100, "Cloud Scripts", "\uEA37", mouseX, mouseY);
+        drawButton(context, startX + 12, 134, "Force close all",  ColorUtils.gold + "\uF1AF", mouseX, mouseY);
 
 
         Renderer2D.drawOutlineRoundedBox(context.getMatrices().peek().getPositionMatrix(), startX - 1, 31, scaledWidth - 200 + 2, scaledHeight - 78, 3, 0.8f, darkerGray.getRGB());
@@ -170,7 +174,7 @@ public class ScriptManagerScreen extends Screen {
         // Enable scissor for scrolling
         float startEntryX = startX + (managerWidth * 0.20f) - 2;
 
-        Renderer2D.enableScissor((int) (startEntryX), 50, managerWidth + 50, managerHeight - 20);
+        Renderer2D.enableScissor((int) (startEntryX), 50, managerWidth + 50, mc.getWindow().getScaledHeight() - 98);
 
         // Render script entries
         for(List<TableEntry> row: scriptTable.table){
@@ -197,7 +201,7 @@ public class ScriptManagerScreen extends Screen {
         Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, 60, 70, 4, 0.7f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientStart());
         FontRenderers.Ultra_Large_iconRenderer.drawString(drawContext.getMatrices(), "\uF0F6", x + 19, y + 12, Color.WHITE.getRGB());
 
-        Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientStart(), x, y + 58, 60, 12, 4, false, false, true, true);
+        Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientStart(), x, y + 58, 60, 12, 3, false, false, true, true);
 
         //Name
         FontRenderers.Mid_fxfontRenderer.drawString(drawContext.getMatrices(), file.getScriptName(), x + 30 - FontRenderers.Mid_fxfontRenderer.getStringWidth(file.getScriptName()) / 2.0f, y + 43f, Color.WHITE.getRGB());
@@ -247,12 +251,16 @@ public class ScriptManagerScreen extends Screen {
         return isMouseOver(mouseX, mouseY, scaledWidth - 125, 33, 15, 15);
     }
 
+
     public boolean hoveredOverLocalScripts(double mouseX, double mouseY) {
         return isMouseOver(mouseX, mouseY, startX + 12, 66, managerWidth * 0.18f - 15, 20);
     }
 
     public boolean hoveredOverCloudScripts(double mouseX, double mouseY) {
         return isMouseOver(mouseX, mouseY, startX + 12, 100, managerWidth * 0.18f - 15, 20);
+    }
+    public boolean hoveredOverForceCloseAll(double mouseX, double mouseY) {
+        return isMouseOver(mouseX, mouseY, startX + 12, 134, managerWidth * 0.18f - 15, 20);
     }
 
     public boolean hoveredOverFileState(double mouseX, double mouseY, double entryX, double entryY) {
@@ -297,6 +305,7 @@ public class ScriptManagerScreen extends Screen {
                     if (hoveredOverRefreshFile(mouseX, mouseY, scriptEntry.getX(), scriptEntry.getY())) {
                         LuaScriptManager.reloadScript(file);
                     }
+
                     if (hoveredOverBind(mouseX, mouseY, file, scriptEntry.getX(), scriptEntry.getY())) {
                         file.setListening(true);
                         isListening = true;
@@ -314,6 +323,12 @@ public class ScriptManagerScreen extends Screen {
         if (hoveredOverCloudScripts(mouseX, mouseY)) {
             showLocalScripts = false;
             SoundUtils.playInstanceSound(SoundUtils.CLICK_SOUNDEVENT);
+        }
+        if (hoveredOverForceCloseAll(mouseX, mouseY)) {
+            SoundUtils.playInstanceSound(SoundUtils.TING_SOUNDEVENT,100,2f);
+            for(LuaFile luaFile: LuaScriptManager.luaFiles){
+                LuaScriptManager.INSTANCE.closeScript(luaFile);
+            }
         }
         if (hoveredOverRefreshAll(mouseX, mouseY)) {
             LuaScriptManager.getScripts();

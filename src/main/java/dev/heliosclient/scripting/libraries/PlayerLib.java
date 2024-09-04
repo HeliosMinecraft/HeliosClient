@@ -54,7 +54,9 @@ public class PlayerLib extends TwoArgFunction {
         library.set("lookAtEntity", new lookAtEntity());
         library.set("lookAtVec3d", new lookAtVec3d());
 
-        env.set("PlayerLib", library);
+        env.set("playerLib", library);
+        env.get("package").get("loaded").set("playerLib", library);
+
         return library;
     }
 

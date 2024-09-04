@@ -1,6 +1,7 @@
 package dev.heliosclient.scripting;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.CommandManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.scripting.libraries.ChatLib;
@@ -51,6 +52,7 @@ public class LuaExecutor {
 
         globals.set("mc", CoerceJavaToLua.coerce(mc));
         globals.set("hc", CoerceJavaToLua.coerce(HeliosClient.INSTANCE));
+        globals.set("CommandManager", CoerceJavaToLua.coerce(CommandManager.class));
         globals.set("eventManager", CoerceJavaToLua.coerce(eventManager));
         globals.set("ChatUtils", CoerceJavaToLua.coerce(ChatUtils.class));
         globals.set("InventoryUtils", CoerceJavaToLua.coerce(InventoryUtils.class));
@@ -70,6 +72,7 @@ public class LuaExecutor {
         globals.set("Vec3d", CoerceJavaToLua.coerce(Vec3d.class));
         globals.set("Box", CoerceJavaToLua.coerce(Box.class));
         globals.set("Hand", CoerceJavaToLua.coerce(Hand.class));
+
 
         for (Module_ module : ModuleManager.getModules()) {
             globals.set(module.name, CoerceJavaToLua.coerce(module));

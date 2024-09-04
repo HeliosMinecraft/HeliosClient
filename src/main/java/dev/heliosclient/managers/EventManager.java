@@ -4,14 +4,14 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.LuaEvent;
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.input.KeyPressedEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.scripting.LuaEventManager;
-import dev.heliosclient.util.TimerUtils;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 public class EventManager {
@@ -83,7 +83,7 @@ public class EventManager {
             }
 
             if (event.getClass().isAnnotationPresent(LuaEvent.class) && LuaEventManager.INSTANCE.hasListeners()) {
-                executor.execute(() -> LuaEventManager.INSTANCE.post(event.getClass().getAnnotation(LuaEvent.class).value(), CoerceJavaToLua.coerce(event)));
+               executor.execute(() -> LuaEventManager.INSTANCE.post(event.getClass().getAnnotation(LuaEvent.class).value(), CoerceJavaToLua.coerce(event)));
             }
 
         return event;

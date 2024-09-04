@@ -1,11 +1,5 @@
 package dev.heliosclient.ui.clickgui.gui.tables;
 
-import dev.heliosclient.module.settings.buttonsetting.Button;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -93,8 +87,10 @@ public class Table {
 
                     if (equalDistribution) {
                         entryWidth = tableWidth / entryRow.size();
-                    } else {
+                    } else if(totalWidth >= tableWidth){
                         entryWidth = (entry.getWidth() * tableWidth) / totalWidth;
+                    } else {
+                        entryWidth = entry.getWidth();
                     }
                     entry.setPosition(x, y);
                     entry.setWidth(entryWidth);

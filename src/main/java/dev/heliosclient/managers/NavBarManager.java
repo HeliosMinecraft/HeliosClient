@@ -2,10 +2,10 @@ package dev.heliosclient.managers;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
-import dev.heliosclient.ui.clickgui.settings.ClientSettingsScreen;
-import dev.heliosclient.ui.clickgui.ScriptManagerScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
 import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
+import dev.heliosclient.ui.clickgui.script.ScriptManagerScreen;
+import dev.heliosclient.ui.clickgui.settings.ClientSettingsScreen;
 
 import java.util.ArrayList;
 import java.util.Arrays;

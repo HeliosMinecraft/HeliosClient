@@ -9,8 +9,8 @@ local function startDuping()
 
     -- Get a list of entities within a certain distance from the player
     local entities = PlayerUtils:getEntitiesWithinDistance(mc.player, 150) -- Assuming a distance of 5
-    if entities == nil then
-         ChatLib:sendHeliosMsg("No entities found within distance.")
+    if entities == nil or entities.isEmpty() then
+         chatLib.sendHeliosMsg("No entities found within distance.")
         return false, "No entities nearby"
     end
     -- Iterate over the entities
@@ -18,7 +18,7 @@ local function startDuping()
         local itemFrame = entities:get(i)
 
         -- Check if the entity is an ItemFrameEntity
-        if itemFrame:getType() == EntityType.ITEM_FRAME or itemFrame:getType() == EntityType.GLOW_ITEM_FRAME then
+        if not(itemFrame == nil) and itemFrame:getType() == EntityType.ITEM_FRAME or itemFrame:getType() == EntityType.GLOW_ITEM_FRAME then
             -- The entity is an ItemFrameEntity, you can interact with it here
 
             -- Look at the itemframe
@@ -56,11 +56,11 @@ function onTick()
 end
 
 function onStop()
-    eventManager:unregister("PlayerTick", onTick)
+    eventManager.unregister("PlayerTick", onTick)
 end
 
 function onRun()
-    eventManager:register("PlayerTick", onTick)
+    eventManager.register("PlayerTick", onTick)
 end
 
 function sleep(sec)

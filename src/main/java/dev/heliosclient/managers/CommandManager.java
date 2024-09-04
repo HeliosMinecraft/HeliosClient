@@ -20,6 +20,7 @@ public class CommandManager {
     private final CommandSource COMMAND_SOURCE = new ChatCommandSource(mc);
     private final List<Command> commands = new ArrayList<>();
     private final Map<Class<? extends Command>, Command> commandInstances = new HashMap<>();
+    private static CommandManager INSTANCE;
 
     private CommandManager() {
         add(new VClip());
@@ -32,13 +33,17 @@ public class CommandManager {
         add(new Prefix());
         add(new ReloadScripts());
         add(new LoadScript());
+
         AddonManager.HELIOS_ADDONS.forEach(HeliosAddon::registerCommand);
 
         commands.sort(Comparator.comparing(Command::getName));
     }
 
     public static CommandManager get() {
-        return new CommandManager();
+        if(INSTANCE == null){
+            INSTANCE = new CommandManager();
+        }
+        return INSTANCE;
     }
 
     public void dispatch(String message) throws CommandSyntaxException {

@@ -21,7 +21,8 @@ public class ChatLib extends TwoArgFunction {
         library.set("sendPlayerMsg", new sendPlayerMsg());
         library.set("sendScriptMsg", new sendScriptMsg());
 
-        env.set("ChatLib", library);
+        env.set("chatLib", library);
+        env.get("package").get("loaded").set("chatLib", library);
         return library;
     }
 

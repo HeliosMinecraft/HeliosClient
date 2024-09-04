@@ -400,9 +400,8 @@ public class Renderer2D implements Listener {
 
         drawRectangle(matrix, x, y, width, height, Color.BLACK.getRGB());
 
-        RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
+        RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_DST_ALPHA);
 
-        RenderSystem.enableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -1188,7 +1187,7 @@ public class Renderer2D implements Listener {
         RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
         RenderSystem.colorMask(true, true, true, true);
 
-        drawRoundedRectangle(matrix, x, y, TL, TR, BL, BR, width, height, (int) radius, color1.getRGB());
+        drawRoundedRectangleDeprecated(matrix, x, y, TL, TR, BL, BR, width, height, (int) radius, color1.getRGB());
 
         RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
 

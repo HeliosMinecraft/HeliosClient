@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class Command {
-    protected static MinecraftClient mc;
+    protected static MinecraftClient mc = MinecraftClient.getInstance();
 
     private final String name;
     private final String description;
@@ -28,7 +28,6 @@ public abstract class Command {
         this.name = name;
         this.description = description;
         Collections.addAll(this.aliases, aliases);
-        mc = MinecraftClient.getInstance();
     }
 
     // Helper methods to painlessly infer the CommandSource generic type argument
