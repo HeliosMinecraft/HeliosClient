@@ -49,14 +49,14 @@ public class LuaLoader {
                 ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onRun() function not found for " + ColorUtils.blue + luaFile.getAbsolutePath() + ColorUtils.darkRed + " while loading");
                 HeliosClient.LOGGER.error("onRun() function not found for file: {} while loading", luaFile.getName());
             }
-            luaFile.isLoaded = true;
+            luaFile.setLoaded(true);
             ChatUtils.sendHeliosMsg(ColorUtils.green + "Loaded LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + luaFile.getName() + ColorUtils.gray + "]");
             if (HeliosClient.shouldSendNotification() && ModuleManager.get(NotificationModule.class).scriptNotifications.value) {
                 NotificationManager.addNotification(new InfoNotification(luaFile.getName(), "was loaded!", 1000, SoundUtils.TING_SOUNDEVENT));
             }
 
         } catch (FileNotFoundException e) {
-            luaFile.isLoaded = false;
+            luaFile.setLoaded(false);
             throw new RuntimeException(e);
         }
     }
@@ -89,7 +89,7 @@ public class LuaLoader {
             //Call the Garbage collector to collect any leftover garbage by the script. Might cause lag or crash if unused properly
             System.gc();
 
-            file.isLoaded = false;
+            file.setLoaded(false);
             ChatUtils.sendHeliosMsg(ColorUtils.green + "Closed LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + file.getScriptName() + ColorUtils.gray + "]");
             if (HeliosClient.shouldSendNotification() && ModuleManager.get(NotificationModule.class).scriptNotifications.value) {
                 NotificationManager.addNotification(new InfoNotification(file.getScriptName(), "was unloaded!", 1000, SoundUtils.TING_SOUNDEVENT));
@@ -98,7 +98,7 @@ public class LuaLoader {
             // Clear all event listeners for the Lua file
             LuaEventManager.INSTANCE.clearListeners(file);
         } catch (IOException e) {
-            file.isLoaded = false;
+            file.setLoaded(false);
             throw new RuntimeException(e);
         }
     }
@@ -141,7 +141,7 @@ public class LuaLoader {
                 .map(file1 -> {
                     LuaFile luaFile = new LuaFile(file1.getPath(), executor);
                     luaFile.setBindKey(file.bindKey);
-                    luaFile.isLoaded = false;
+                    luaFile.setLoaded(false);
                     return luaFile;
                 })
                 .orElse(null);

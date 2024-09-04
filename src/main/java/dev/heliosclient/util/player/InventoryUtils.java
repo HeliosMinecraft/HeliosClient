@@ -269,4 +269,9 @@ public class InventoryUtils {
             HeliosClient.MC.interactionManager.clickSlot(player.currentScreenHandler.syncId, toSlot, 0, toAction, player);
         }
     }
+
+    public static void moveItemPickup(int fromSlot, int toSlot) {
+        moveItem(fromSlot,toSlot,SlotActionType.PICKUP,SlotActionType.PICKUP);
+    }
+
 }

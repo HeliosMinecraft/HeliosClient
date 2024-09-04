@@ -18,8 +18,10 @@ public class LuaScriptManager {
      * Retrieves all Lua scripts.
      */
     public static void getScripts() {
-        luaFiles.addAll(luaLoader.getScripts());
+        luaFiles.forEach(file-> luaLoader.close(file));
+        ChatUtils.sendHeliosMsg(ColorUtils.green + "Closed all scripts");
 
+        luaFiles.addAll(luaLoader.getScripts());
         ChatUtils.sendHeliosMsg(ColorUtils.green + "Reloaded all scripts successfully");
     }
 

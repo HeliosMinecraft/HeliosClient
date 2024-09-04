@@ -18,7 +18,7 @@
 </details>  
 <details>
  <summary>Click to show the previous GUI</summary>
-  <p>Previous clickgui as of commit #199 (0758e8c)</p>
+  <p>Previous click-gui as of commit #199 (0758e8c)</p>
     <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/heliosclientgui.png?raw=true" alt="Prev Click GUI">
 </details>
 <details>
@@ -31,15 +31,15 @@
 1. Clone this repository
 2. Run:
    - Windows (CMD): `gradlew build`
-   - Linux/MacOS/Windows (Powershell): `./gradlew build`
+   - Linux/macOS/Windows (Powershell): `./gradlew build`
   
 ## Installation
 
 - Install [Fabric](https://fabricmc.net/use/installer/) for Minecraft 1.20.4
 - Put this mod into the `.minecraft/mods` folder
-- The default keybind for the clickgui is `RSHIFT`.
+- The default keybind for the click-gui is `RSHIFT`.
 
-***Note: In future we may require [Satin API](https://modrinth.com/mod/satin-api) for shaders (or it will be packedged together)***
+***Note: In future we may require [Satin API](https://modrinth.com/mod/satin-api) for shaders (or it will be packaged together)***
 
 
 ## Submitting a Bug
@@ -71,7 +71,7 @@ Thanks to all the people who helped to make this project what it is now, especia
 
 ## Thanks to
 
-- [MoonlightMeadowns](https://github.com/kawaiizenbo/MoonlightMeadows) made by [KawaiiZenbo](https://github.com/kawaiizenbo) for serving as base project.
+- [MoonlightMeadows](https://github.com/kawaiizenbo/MoonlightMeadows) made by [Kawaiizenbo](https://github.com/kawaiizenbo) for serving as base project.
 - [Trouser-Streak](https://github.com/etianl/Trouser-Streak) for finding the Palette Exploit.
 - Many other clients for serving as a base for inspiration. (Like Meteor-Client, BleachHack, TH Recode, Old 3arth4ck, LiquidBounce)
 - [0x3C50](https://github.com/0x3C50/Renderer) for the Renderer library (especially the FontRenderer).

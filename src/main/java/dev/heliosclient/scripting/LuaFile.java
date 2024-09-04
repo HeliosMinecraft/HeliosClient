@@ -9,7 +9,7 @@ import java.io.*;
  */
 public class LuaFile extends File {
     private final LuaExecutor executor;
-    public boolean isLoaded = false;
+    private boolean isLoaded = false;
     public int bindKey = -1;
     BufferedReader reader = null;
     /**
@@ -31,6 +31,10 @@ public class LuaFile extends File {
 
     public boolean isLoaded() {
         return isLoaded;
+    }
+
+    public void setLoaded(boolean loaded) {
+        isLoaded = loaded;
     }
 
     /**
