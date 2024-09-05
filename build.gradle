@@ -71,7 +71,7 @@ dependencies {
 
 
 	// Baritone API from meteor's fork
-	modCompileOnly "meteordevelopment:baritone:1.20.4-SNAPSHOT"
+	modCompileOnly "meteordevelopment:baritone:${project.baritone_version}"
 
 	// LuaJ library
 	modInclude("org.luaj:luaj-jse:3.0.1")

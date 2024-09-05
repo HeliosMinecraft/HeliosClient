@@ -51,8 +51,10 @@ public class Renderer2D implements Listener {
     public static Renderer2D INSTANCE = new Renderer2D();
     public static DrawContext drawContext;
     public static Renderers renderer = Renderers.CUSTOM;
-    public static HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
+    public static final HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
+    private static final HashMap<String, BufferBuilder> roundedRectangleCache = new HashMap<>();
     public static VertexSorter vertexSorter;
+
 
     static {
         for (int i = 0; i < 36; i++) {
@@ -402,6 +404,8 @@ public class Renderer2D implements Listener {
 
         RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_DST_ALPHA);
 
+        RenderSystem.enableBlend();
+
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -455,6 +459,7 @@ public class Renderer2D implements Listener {
             g.fillRect(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2));
             g.dispose();
             GaussianBlur op = new GaussianBlur(blurRadius);
+
             BufferedImage blurred = op.applyFilter(original, null);
             shadowCache.put(identifier, new BlurredShadow(blurred));
             return;
@@ -490,7 +495,7 @@ public class Renderer2D implements Listener {
         } else {
             BufferedImage original = new BufferedImage(shadowWidth, shadowHeight, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = original.createGraphics();
-            g.setColor(new Color(-1));
+            g.setColor(Color.WHITE);
             g.fillOval(blurRadius, blurRadius, diameter, diameter); // Draw a circle instead of a rectangle
             g.dispose();
             GaussianBlur op = new GaussianBlur(blurRadius);
@@ -850,21 +855,18 @@ public class Renderer2D implements Listener {
 
         drawRoundedRectangleInternal(matrix4f, centerX, centerY, width, height, radius, color, TL, TR, BL, BR);
     }
-
     public static void drawRoundedRectangleInternal(Matrix4f ma, float cx, float cy, float dx, float dy, float r, int rgba, boolean TL, boolean TR, boolean BL, boolean BR) {
-
-
         float halfWidth = dx * 0.5f;
         float halfHeight = dy * 0.5f;
 
-        int i = 0;
+        int i;
         dx -= r + r;
         dy -= r + r;
 
         float x0 = cx + (0.5f * dx);
         float y0 = cy + (0.5f * dy);
 
-        float x = 0, y = 0;
+        float x = 0, y;
 
 
         RenderSystem.depthMask(false);
@@ -934,7 +936,6 @@ public class Renderer2D implements Listener {
         }
 
         draw();
-
 
         RenderSystem.disableBlend();
 
@@ -1187,12 +1188,13 @@ public class Renderer2D implements Listener {
         RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
         RenderSystem.colorMask(true, true, true, true);
 
-        drawRoundedRectangleDeprecated(matrix, x, y, TL, TR, BL, BR, width, height, (int) radius, color1.getRGB());
+        drawRoundedRectangle(matrix, x, y, TL, TR, BL, BR, width, height, radius, color1.getRGB());
 
         RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
 
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
+        RenderSystem.enableBlend();
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
         bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB()).next();
@@ -1669,6 +1671,15 @@ public class Renderer2D implements Listener {
         }
 
         return lines;
+    }
+
+    public static void drawBottomText(MatrixStack stack,int x,fxFontRenderer fontRenderer, String... textBottomToTop){
+        float fontHeight = getCustomStringHeight(fontRenderer);
+
+        for(int i = 1; i <= textBottomToTop.length; i++){
+            String text = textBottomToTop[i - 1];
+            fontRenderer.drawString(stack, text, x, drawContext.getScaledWindowHeight() - (i * fontHeight) - i * 2, -1);
+        }
     }
 
     @SubscribeEvent

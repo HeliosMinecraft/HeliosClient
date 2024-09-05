@@ -3,7 +3,6 @@ package dev.heliosclient.module.settings;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.GradientManager;
-import dev.heliosclient.module.settings.buttonsetting.Button;
 import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.ui.clickgui.gui.tables.Table;
 import dev.heliosclient.ui.clickgui.gui.tables.TableEntry;
@@ -11,13 +10,12 @@ import dev.heliosclient.ui.clickgui.settings.GradientSettingScreen;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import dev.heliosclient.util.render.Renderer2D;
-import dev.heliosclient.util.render.Renderer3D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-;
+
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.BooleanSupplier;
 
 public class GradientSetting extends ParentScreenSetting<GradientManager.Gradient> {
@@ -202,7 +200,7 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     }
 
     public static class GradientEntry implements TableEntry{
-        public double x,y,width = 50;
+        public double x,y,width = 62;
         public final GradientManager.Gradient gradient;
 
         public GradientEntry(GradientManager.Gradient gradient) {

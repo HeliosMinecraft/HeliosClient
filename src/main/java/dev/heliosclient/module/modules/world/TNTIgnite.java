@@ -98,7 +98,7 @@ public class TNTIgnite extends Module_ {
                     if (flintAndSteelSlot != -1 && mc.player.getInventory().selectedSlot != flintAndSteelSlot) {
                         hasSwitched = InventoryUtils.swapToSlot(flintAndSteelSlot, swapBack.value);
                     } else if (flintAndSteelSlot == -1) {
-                        ChatUtils.sendHeliosMsg(ColorUtils.darkRed +"Flint and Steel not found in hotbar, disabling...");
+                        ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "Flint and Steel not found in hotbar, disabling...");
                         toggle();
                         return;
                     }

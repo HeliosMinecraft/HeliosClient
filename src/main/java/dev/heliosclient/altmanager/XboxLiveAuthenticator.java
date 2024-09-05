@@ -13,6 +13,7 @@ import java.util.Map;
 
 /**
  * Using <a href="https://mojang-api-docs.gapple.pw/authentication/msa">Authentication Docs</a>
+ * Untested
  */
 public class XboxLiveAuthenticator {
     private static final String XBOX_LIVE_AUTH_URL = "https://user.auth.xboxlive.com/user/authenticate";

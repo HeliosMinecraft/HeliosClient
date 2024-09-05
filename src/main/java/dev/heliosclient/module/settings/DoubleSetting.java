@@ -95,13 +95,13 @@ public class DoubleSetting extends Setting<Double> {
 
         String trimmedName = FontRenderers.Small_fxfontRenderer.trimToWidth(name,moduleWidth - 12);
         FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), trimmedName, x + 2, y + 2, ColorManager.INSTANCE.defaultTextColor());
-        double diff = Math.min(moduleWidth - 10, Math.max(0, (mouseX - x)));
+        double diff = Math.min(moduleWidth - 4, Math.max(0, (mouseX - x)));
 
         if (sliding) {
             if (diff <= 0) {
                 value = min;
             } else {
-                value = MathUtils.round(((diff / (moduleWidth - 10)) * (max - min) + min), roundingPlace);
+                value = MathUtils.round(((diff / (moduleWidth - 4)) * (max - min) + min), roundingPlace);
             }
             postSettingChange();
         }
@@ -109,11 +109,11 @@ public class DoubleSetting extends Setting<Double> {
 
         //Draw the value beside the name
         String valueString = "" + MathUtils.round(value, roundingPlace);
-        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), valueString, (x + moduleWidth - 10) - FontRenderers.Small_fxfontRenderer.getStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), valueString, (x + moduleWidth - 4) - FontRenderers.Small_fxfontRenderer.getStringWidth(valueString), y + 2, ColorManager.INSTANCE.defaultTextColor());
 
         //Draw the slider itself and the background fill
-        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, moduleWidth - 8, 2, 1, 0xFFAAAAAA);
-        int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 10)) + 2;
+        Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, moduleWidth - 4, 2, 1, 0xFFAAAAAA);
+        int scaledValue = (int) ((value - min) / (max - min) * (moduleWidth - 4)) + 2;
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 2, y + 16, scaledValue, 2, 1, 0xFF55FFFF);
 
         //Slider Bar which moves and cartoony shadow

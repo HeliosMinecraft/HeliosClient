@@ -48,13 +48,15 @@ public abstract class MixinChatHud {
     @Shadow
     public abstract int getWidth();
 
+    @Shadow protected abstract boolean isChatFocused();
+
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHudLine$Visible;addedTime()I"))
     public void getChatLineIndex(CallbackInfo ci, @Local(ordinal = 13) int chatLineIndex) {
         this.chatLineIndex = chatLineIndex;
     }
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;isChatHidden()Z",shift = At.Shift.AFTER))
     public void onRender$GUICoolVisuals(DrawContext context, int currentTick, int mouseX, int mouseY,CallbackInfo ci) {
-        if(GUI.coolVisualsChatHud()){
+        if(this.isChatFocused() && GUI.coolVisualsChatHud()){
             PolygonMeshPatternRenderer.INSTANCE.render(context.getMatrices(),mouseX,mouseY);
         }
     }

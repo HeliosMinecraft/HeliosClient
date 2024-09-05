@@ -119,7 +119,7 @@ public class HeliosClient implements ModInitializer, Listener {
 
     @SubscribeEvent
     public void onDisconnect(DisconnectEvent client) {
-        HeliosClient.saveConfigHook();
+        HeliosClient.saveConfig();
     }
 
     @SubscribeEvent

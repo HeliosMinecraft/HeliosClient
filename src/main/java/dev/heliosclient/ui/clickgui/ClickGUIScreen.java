@@ -91,8 +91,8 @@ public class ClickGUIScreen extends Screen {
         }
     }
 
-    private void updateScale(float speed, boolean close){
-        if(ModuleManager.get(GUI.class).bounceAnimation.value) {
+    private void updateScale(float speed, boolean close) {
+        if (ModuleManager.get(GUI.class).bounceAnimation.value) {
             long currentTime = System.currentTimeMillis();
             if (close) {
                 this.scale -= speed * Easing.ease(EasingType.BOUNCE_OUT, MathHelper.clamp((currentTime - timeOnOpen) / 1500f, 0, 1));
@@ -104,9 +104,9 @@ public class ClickGUIScreen extends Screen {
                 this.scale += speed * Easing.ease(EasingType.CUBIC_IN, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1));
             }
             this.scale = MathHelper.clamp(this.scale, 0.0f, 1f);
-        }else{
+        } else {
             this.scale = 1.0f;
-            if(shouldClose){
+            if (shouldClose) {
                 super.close();
             }
         }
@@ -131,24 +131,26 @@ public class ClickGUIScreen extends Screen {
         GUI gui = ModuleManager.get(GUI.class);
         Renderer2D.setDrawContext(drawContext);
 
-        updateScale((float) HeliosClient.CLICKGUI.animationSpeed.value,shouldClose);
+        updateScale((float) HeliosClient.CLICKGUI.animationSpeed.value, shouldClose);
         if (this.client.world == null) {
             super.renderBackgroundTexture(drawContext);
-        }else if(gui.background.value){
-            Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), 0,0,width,height, ColorUtils.changeAlphaGetInt(ColorManager.INSTANCE.getPrimaryGradientStart().getRGB(), 50),ColorUtils.changeAlphaGetInt(ColorManager.INSTANCE.getPrimaryGradientEnd().getRGB(),50), Renderer2D.Direction.LEFT_RIGHT);
+        } else if (gui.background.value) {
+            Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), 0, 0, width, height, ColorUtils.changeAlphaGetInt(ColorManager.INSTANCE.getPrimaryGradientStart().getRGB(), 50), ColorUtils.changeAlphaGetInt(ColorManager.INSTANCE.getPrimaryGradientEnd().getRGB(), 50), Renderer2D.Direction.LEFT_RIGHT);
         }
 
-        if(gui.coolVisuals.value) {
+        if (gui.coolVisuals.value) {
             PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(), mouseX, mouseY);
         }
 
         if (HeliosClient.CLICKGUI.ScreenHelp.value) {
-            float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
-            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Toggle Module", 2, drawContext.getScaledWindowHeight() - (3 * fontHeight) - 3 * 2, -1);
-            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Middle Click - Open QuickSettings", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
-            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (fontHeight) - 2, -1);
+            Renderer2D.drawBottomText(drawContext.getMatrices(), 2, FontRenderers.Super_Small_fxfontRenderer,
+                    "Right Click - Open Settings",
+                    "Middle Click - Open QuickSettings",
+                    "Left Click - Toggle Module",
+                    "Ctrl + S - Search instantly"
+            );
         }
-        Renderer2D.scaleAndPosition(drawContext.getMatrices(),0,0,width,height,scale);
+        Renderer2D.scaleAndPosition(drawContext.getMatrices(), 0, 0, width, height, scale);
 
         for (CategoryPane category : categoryPanes) {
             category.y += scrollY * 10;

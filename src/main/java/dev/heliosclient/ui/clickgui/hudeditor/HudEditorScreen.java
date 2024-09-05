@@ -31,20 +31,20 @@ import java.util.List;
 import java.util.Map;
 
 public class HudEditorScreen extends Screen implements Listener {
+    private static final long SCROLL_TIMEOUT = 2000; // 2 seconds
     public static HudEditorScreen INSTANCE = new HudEditorScreen();
     private final List<HudElement> selectedElements = new ArrayList<>();
+    private final Map<String, Object> copiedSettings = new HashMap<>();
+    private final int defaultSnapSize = 120;
+    private final Color LIGHT_YELLOW = new Color(223, 248, 89, 121);
     float thickness = 0.5f; // Thickness of the alignment lines
     float threshold = 1; // Threshold between two HudBoxes for the alignment lines to show.
+    Animation fadeAnimation = new Animation(EasingType.LINEAR_IN);
     // Variables to track the drag state and initial position
     private boolean isDragging = false;
     private HudBox dragBox = null;
-    private final Map<String, Object> copiedSettings = new HashMap<>();
-    private final int defaultSnapSize = 120;
     private boolean isScrolling;
-    Animation fadeAnimation = new Animation(EasingType.LINEAR_IN);
-    private final Color LIGHT_YELLOW = new Color(223, 248, 89, 121);
-    private TimerUtils scrollTimer = new TimerUtils();
-    private static final long SCROLL_TIMEOUT = 2000; // 2 seconds
+    private final TimerUtils scrollTimer = new TimerUtils();
 
     private HudEditorScreen() {
         super(Text.of("Hud editor"));
@@ -58,6 +58,11 @@ public class HudEditorScreen extends Screen implements Listener {
     @Override
     public void onDisplayed() {
         super.onDisplayed();
+
+        for(HudElement e: HudManager.INSTANCE.hudElements){
+            e.selected = false;
+        }
+
         selectedElements.clear();
         scrollTimer.startTimer();
     }
@@ -78,13 +83,14 @@ public class HudEditorScreen extends Screen implements Listener {
         }
 
         if (HeliosClient.CLICKGUI.ScreenHelp.value) {
-            float fontHeight = Renderer2D.getCustomStringHeight(FontRenderers.Super_Small_fxfontRenderer);
-            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Shift + Scroll - To increase/decrease snap size", 2, drawContext.getScaledWindowHeight() - (6 * fontHeight) - 6 * 2, -1);
-            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Ctrl- C/V - To Copy/Paste HudElement properties", 2, drawContext.getScaledWindowHeight() - (5 * fontHeight) - 5 * 2, -1);
-            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Left Click - Select Element", 2, drawContext.getScaledWindowHeight() - (4 * fontHeight) - 4 * 2, -1);
-            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Right Click - Open Settings", 2, drawContext.getScaledWindowHeight() - (3 * fontHeight) - 3 * 2, -1);
-            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Delete / Backspace - Remove Element", 2, drawContext.getScaledWindowHeight() - (2 * fontHeight) - 2 * 2, -1);
-            FontRenderers.Super_Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Hold Shift Key - Enable Snapping", 2, drawContext.getScaledWindowHeight() - fontHeight - 2, -1);
+            Renderer2D.drawBottomText(drawContext.getMatrices(), 2, FontRenderers.Super_Small_fxfontRenderer,
+                    "Hold Shift Key - Enable Snapping",
+                    "Delete / Backspace - Remove Element",
+                    "Right Click - Open Settings",
+                    "Left Click - Select Element",
+                    "Ctrl- C/V - To Copy/Paste HudElement properties",
+                    "Shift + Scroll - To increase/decrease snap size"
+            );
         }
 
         checkAlignmentAndDrawLines(drawContext);
@@ -98,8 +104,8 @@ public class HudEditorScreen extends Screen implements Listener {
         }
 
         //Fade out every SCROLL_TIMEOUT ms
-        scrollTimer.every(SCROLL_TIMEOUT,()-> {
-            if(fadeAnimation.getInterpolatedAlpha() > 0.7f) {
+        scrollTimer.every(SCROLL_TIMEOUT, () -> {
+            if (fadeAnimation.getInterpolatedAlpha() > 0.7f) {
                 fadeAnimation.startFading(false);
             }
         });
@@ -109,8 +115,8 @@ public class HudEditorScreen extends Screen implements Listener {
         float textHeight = Renderer2D.getFxStringHeight(sizeChangeText);
         float x = this.width / 2f - textWidth / 2f;
         float y = this.height - textHeight * 2f;
-        AnimationUtils.drawFadingAndPoppingBoxBetter(Renderer2D.drawContext,fadeAnimation,x - 2,y - 2,textWidth + 4,textHeight + 4,LIGHT_YELLOW.getRGB(),true,3f);
-        AnimationUtils.drawFadingAndPoppingText(Renderer2D.drawContext,fadeAnimation,sizeChangeText,x,y,-1,true);
+        AnimationUtils.drawFadingAndPoppingBoxBetter(Renderer2D.drawContext, fadeAnimation, x - 2, y - 2, textWidth + 4, textHeight + 4, LIGHT_YELLOW.getRGB(), true, 3f);
+        AnimationUtils.drawFadingAndPoppingText(Renderer2D.drawContext, fadeAnimation, sizeChangeText, x, y, -1, true);
 
         HudManager.INSTANCE.renderEditor(drawContext, textRenderer, mouseX, mouseY);
         HudCategoryPane.INSTANCE.render(drawContext, textRenderer, mouseX, mouseY, delta);
@@ -281,7 +287,8 @@ public class HudEditorScreen extends Screen implements Listener {
             if (element.selected && isPaste(keyCode) && !copiedSettings.isEmpty()) {
                 for (SettingGroup settingGroup : element.settingGroups) {
                     for (Setting<?> setting : settingGroup.getSettings()) {
-                        if (!setting.shouldSaveAndLoad() || !copiedSettings.containsKey(setting.getSaveName())) continue;
+                        if (!setting.shouldSaveAndLoad() || !copiedSettings.containsKey(setting.getSaveName()))
+                            continue;
 
                         setting.loadFromFile(copiedSettings);
                     }

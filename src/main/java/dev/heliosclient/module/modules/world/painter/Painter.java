@@ -166,7 +166,6 @@ public class Painter extends Module_ {
             .description("Locks canvas to the current set direction and position or unlocks the canvas to return to normal")
             .build()
     );
-
     KeyBind lockCanvasKey = sgGeneral.add(new KeyBind.Builder()
             .name("Lock Canvas Key")
             .description("Keybind to lock canvas")
@@ -245,6 +244,7 @@ public class Painter extends Module_ {
             .shouldRender(() -> !useBlockMapColor.value)
             .build()
     );
+
     private int ticksPassed = 0;
 
     public Painter() {
@@ -291,10 +291,10 @@ public class Painter extends Module_ {
     @SubscribeEvent
     public void keyPressedEvent(KeyPressedEvent e) {
         if (e.getKey() == lockCanvasKey.value) {
-            if (!isLocked) {
-                lock();
-            } else {
+            if (isLocked) {
                 unlock();
+            } else {
+                lock();
             }
         }
     }
@@ -307,16 +307,14 @@ public class Painter extends Module_ {
         loadCanvas();
     }
 
-
-
     private void loadCanvas(){
         if (structure.getOption() == Structure.Custom && painterFile == null) {
             ChatUtils.sendHeliosMsg("Paint file has not been selected! Toggling off...");
             toggle();
-        } else if(painterFile != null){
-            CANVAS_MAP = PainterFileParser.parseFile(painterFile);
-        }else {
+        } else if(painterFile == null){
             CANVAS_MAP = PainterFileParser.parseString(((Structure)structure.getOption()).structureString);
+        }else {
+            CANVAS_MAP = PainterFileParser.parseFile(painterFile);
         }
     }
 
@@ -340,7 +338,7 @@ public class Painter extends Module_ {
 
                     //Experimental, if a block is supposed to be an air, but it is not, then try to break it
                     if ((block == Blocks.AIR || block == Blocks.CAVE_AIR) && !mc.world.isAir(pos) && BlockUtils.canBreak(pos, state)) {
-                        int fastestTool = InventoryUtils.getFastestTool(state, true);
+                        int fastestTool = InventoryUtils.getFastestTool(state, false);
                         //Slot may be -1
                         if (fastestTool != -1 || forceBreak.value) {
                             InventoryUtils.swapToSlot(fastestTool, false);
