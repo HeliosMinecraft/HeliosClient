@@ -5,14 +5,12 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.hud.HudElementList;
-import dev.heliosclient.managers.CategoryManager;
-import dev.heliosclient.managers.CommandManager;
-import dev.heliosclient.managers.HudManager;
-import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.system.Friend;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
@@ -20,6 +18,7 @@ import dev.heliosclient.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -48,6 +47,7 @@ public class Config {
 
         otherConfigManager = new ConfigManager(HeliosClient.SAVE_FOLDER.getAbsolutePath(), "config");
         otherConfigManager.createAndAdd("hud");
+        otherConfigManager.createAndAdd("friends");
 
 
         //  loadConfigManagers();
@@ -64,6 +64,7 @@ public class Config {
 
         otherConfigManager.save(true);
         otherConfigManager.getSubConfig("hud").save(true);
+        otherConfigManager.getSubConfig("friends").save(true);
         moduleConfigManager.save(true);
     }
 
@@ -71,12 +72,14 @@ public class Config {
         writeClientConfig();
         writeHudConfig();
         writeModuleConfig();
+        writeFriendConfig();
     }
 
     public void load() {
         loadClientConfigModules();
         loadHudElements();
         loadModules();
+        loadFriendConfig();
 
         if (ClickGUIScreen.INSTANCE == null) {
             ClickGUIScreen.INSTANCE = new ClickGUIScreen();
@@ -116,6 +119,13 @@ public class Config {
             otherConfigManager.getSubConfig("hud").save(true);
         } else {
             otherConfigManager.getSubConfig("hud").load();
+        }
+
+        if (otherConfigManager.checkIfEmpty("friends")) {
+            writeFriendConfig();
+            otherConfigManager.getSubConfig("friends").save(true);
+        } else {
+            otherConfigManager.getSubConfig("friends").load();
         }
     }
 
@@ -195,7 +205,7 @@ public class Config {
     }
 
     /**
-     * Gets the configuration for the client.
+     * Gets the hud configuration for the client.
      */
     public void writeHudConfig() {
         try {
@@ -213,6 +223,29 @@ public class Config {
             pane.put("elements", hudElements.isEmpty() ? new HashMap<>() : hudElements);
 
             otherConfigManager.getSubConfig("hud").getWriteData().put("hudElements", pane);
+        } catch (Exception e) {
+            LOGGER.error("Error occurred while getting Hud config.", e);
+        }
+    }
+    public void writeFriendConfig() {
+        try {
+            List<String> friends = new ArrayList<>();
+
+            for(Friend friend: FriendManager.getFriends()){
+                friends.add(friend.playerName());
+            }
+            otherConfigManager.getSubConfig("friends").getWriteData().put("friends", friends);
+        } catch (Exception e) {
+            LOGGER.error("Error occurred while getting Hud config.", e);
+        }
+    }
+    public void loadFriendConfig() {
+        try {
+            List<String> friends = (List<String>) otherConfigManager.getSubConfig("friends").getReadData().get("friends");
+
+            for(String friend: friends){
+                FriendManager.addFriend(new Friend(friend));
+            }
         } catch (Exception e) {
             LOGGER.error("Error occurred while getting Hud config.", e);
         }

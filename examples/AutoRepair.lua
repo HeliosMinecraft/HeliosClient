@@ -54,7 +54,7 @@ function autoRepair()
     local expThrower = luajava.cast(luajava.bindClass(" dev.heliosclient.module.modules.player.ExpThrower"), module_)
 
     -- Uncomment this line to auto change the swapback setting to true.
-    expThrower.swapBack.value = true
+    --expThrower.swapBack.value = true
 
     if needsRepair and not repairing then
         -- Turn on ExpThrower module

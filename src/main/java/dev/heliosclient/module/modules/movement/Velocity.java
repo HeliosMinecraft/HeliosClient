@@ -89,7 +89,6 @@ public class Velocity extends Module_ {
         super("Velocity", "Cancels knockback and pushes by environment", Categories.MOVEMENT);
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
-
     }
 
     @SubscribeEvent
@@ -103,8 +102,9 @@ public class Velocity extends Module_ {
 
         if ((mc.player.isTouchingWater() || mc.player.isSubmergedInWater() || mc.player.isInLava()) && pauseInWater.value)
             return;
+
         if (event.packet instanceof EntityVelocityUpdateS2CPacket pac) {
-            if (pac.getId() != mc.player.getId()) {
+            if (pac.getId() == mc.player.getId()) {
                 switch ((Mode) mode.getOption()) {
                     case Matrix -> {
                         if (!flag) {
@@ -138,11 +138,13 @@ public class Velocity extends Module_ {
                     ((AccessorExplosionS2CPacket) explosionPac).setVelocityX(0);
                     ((AccessorExplosionS2CPacket) explosionPac).setVelocityY(0);
                     ((AccessorExplosionS2CPacket) explosionPac).setVelocityZ(0);
+                    ccTickCoolDown = -1;
                 }
                 case Custom -> {
                     ((AccessorExplosionS2CPacket) explosionPac).setVelocityX((float) (((AccessorExplosionS2CPacket) explosionPac).getVelocityX() * horizontal.value / 100f));
                     ((AccessorExplosionS2CPacket) explosionPac).setVelocityZ((float) (((AccessorExplosionS2CPacket) explosionPac).getVelocityZ() * horizontal.value / 100f));
                     ((AccessorExplosionS2CPacket) explosionPac).setVelocityY((float) (((AccessorExplosionS2CPacket) explosionPac).getVelocityY() * vertical.value / 100f));
+                    ccTickCoolDown = -1;
                 }
                 case Grim -> {
                     ((AccessorExplosionS2CPacket) explosionPac).setVelocityX(0);
