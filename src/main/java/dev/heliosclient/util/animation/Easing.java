@@ -1,7 +1,5 @@
 package dev.heliosclient.util.animation;
 
-import net.minecraft.util.math.MathHelper;
-
 public class Easing {
     public static float ease(EasingType type, float t) {
         return switch (type) {
@@ -103,6 +101,7 @@ public class Easing {
     public static float bounceOut(float t) {
         float n1 = 7.5625f;
         float d1 = 2.75f;
+
         if (t < 1 / d1) {
             return n1 * t * t;
         } else if (t < 2 / d1) {
@@ -116,6 +115,18 @@ public class Easing {
             return n1 * t * t + 0.984375f;
         }
     }
+
+    public static float bounceOutWithOvershoot(float t) {
+        float overshoot = 1.4f; // Adjust this value to control the overshoot
+
+        float bounce = bounceOut(t);
+        if (t < 0.5f) {
+            return bounce * overshoot;
+        } else {
+            return bounce * (2 - overshoot);
+        }
+    }
+
 
     public static float bounceInOut(float t) {
         if (t < 0.5) {

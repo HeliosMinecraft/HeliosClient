@@ -59,8 +59,8 @@ public class HudElementButton {
             HudManager.INSTANCE.addHudElement(instance);
             HudElement lastHudElement =  HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1);
 
-            lastHudElement.posX = HudElement.NUMBER_OF_LINES/2 - 1;
-            lastHudElement.posY = HudElement.NUMBER_OF_LINES/2 - 1;
+            lastHudElement.posX = (HeliosClient.MC.getWindow().getScaledWidth()/2) % HudElement.NUMBER_OF_LINES;
+            lastHudElement.posY = (HeliosClient.MC.getWindow().getScaledHeight()/2) % HudElement.NUMBER_OF_LINES;
             lastHudElement.distanceX = (HeliosClient.MC.getWindow().getScaledWidth() - lastHudElement.width)/2;
             lastHudElement.distanceY =  (HeliosClient.MC.getWindow().getScaledHeight() - lastHudElement.height)/2;
             lastHudElement.x = (HeliosClient.MC.getWindow().getScaledWidth() - lastHudElement.width)/2;

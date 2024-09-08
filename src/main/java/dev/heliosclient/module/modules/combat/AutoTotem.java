@@ -69,7 +69,7 @@ public class AutoTotem extends Module_ {
 
     int totemCount = 0;
     private final TickTimer timer = new TickTimer();
-    boolean lastNoTotemNotified = false;
+    boolean lastNoTotemNotified = false, didTotemPop = false;
 
     public AutoTotem() {
         super("AutoTotem","Automatically holds a totem in your hand", Categories.COMBAT);
@@ -103,7 +103,6 @@ public class AutoTotem extends Module_ {
     public void onTick(TickEvent.WORLD event) {
         if(!HeliosClient.shouldUpdate()) return;
 
-
         totemCount = InventoryUtils.getItemCountInInventory(Items.TOTEM_OF_UNDYING);
         if(totemCount > 0){
             lastNoTotemNotified = false;
@@ -111,8 +110,9 @@ public class AutoTotem extends Module_ {
                if(mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING || mc.player.playerScreenHandler != mc.player.currentScreenHandler){
                    return;
                }
-               if(always.value || isPlayerLow()) {
+               if(always.value || isPlayerLow() || didTotemPop) {
                    doAutoTotem();
+                   didTotemPop = false;
 
                    if(log.value){
                        ChatUtils.sendHeliosMsg("Restocked Totem, Totems left: " + InventoryUtils.getItemCountInInventory(Items.TOTEM_OF_UNDYING));
@@ -132,7 +132,7 @@ public class AutoTotem extends Module_ {
             return;
         }
 
-        //if is hotbar then swap item with offhand super fast.
+        //if is hotbar then swap item with offhand super-fast.
         if(itemSlot >= 0 && itemSlot < 9){
             InventoryUtils.swapToSlot(itemSlot,true);
             mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
@@ -151,6 +151,7 @@ public class AutoTotem extends Module_ {
         if(e.packet instanceof EntityStatusS2CPacket packet){
             if(packet.getStatus() != 35 || packet.getEntity(mc.world) != mc.player) return;
 
+            didTotemPop = true;
             timer.setTicks(delay.getInt());
         }
     }

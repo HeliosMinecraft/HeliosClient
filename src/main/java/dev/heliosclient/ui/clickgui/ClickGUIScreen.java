@@ -95,13 +95,13 @@ public class ClickGUIScreen extends Screen {
         if (ModuleManager.get(GUI.class).bounceAnimation.value) {
             long currentTime = System.currentTimeMillis();
             if (close) {
-                this.scale -= speed * Easing.ease(EasingType.BOUNCE_OUT, MathHelper.clamp((currentTime - timeOnOpen) / 1500f, 0, 1));
+                this.scale -= speed * Easing.ease(EasingType.BOUNCE_OUT, MathHelper.clamp((currentTime - timeOnOpen) / 2000f, 0, 1));
                 if (this.scale <= 0.0) {
                     super.close();
                     shouldClose = false;
                 }
             } else {
-                this.scale += speed * Easing.ease(EasingType.CUBIC_IN, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1));
+                this.scale += speed * Easing.ease(EasingType.QUADRATIC_IN, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1));
             }
             this.scale = MathHelper.clamp(this.scale, 0.0f, 1f);
         } else {

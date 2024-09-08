@@ -18,7 +18,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 import net.minecraft.registry.tag.EntityTypeTags;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
@@ -47,6 +46,13 @@ public class DamageUtils implements Listener {
      * @see LivingEntity#computeFallDamage(float, float)
      */
     public static float calcFallDamage(LivingEntity entity){
+      return calcFallDamage(entity,entity.fallDistance);
+    }
+    /**
+     * Directly taken from with some changes:
+     * @see LivingEntity#computeFallDamage(float, float)
+     */
+    public static float calcFallDamage(LivingEntity entity, float fallDistance){
         if (entity.hasStatusEffect(StatusEffects.SLOW_FALLING) || entity.hasStatusEffect(StatusEffects.LEVITATION)) return 0;
 
         if (entity.getType().isIn(EntityTypeTags.FALL_DAMAGE_IMMUNE)) {
@@ -54,9 +60,9 @@ public class DamageUtils implements Listener {
         } else {
             StatusEffectInstance statusEffectInstance = entity.getStatusEffect(StatusEffects.JUMP_BOOST);
             float f = statusEffectInstance == null ? 0.0F : (float)(statusEffectInstance.getAmplifier() + 1);
-            
-            float fallDamageBeforeRedu = HeliosClient.MC.player.fallDistance - 3.0F - f;
-            
+
+            float fallDamageBeforeRedu = fallDistance - 3.0F - f;
+
             return (float) Math.ceil(calculateReductions(fallDamageBeforeRedu,entity,entity.getDamageSources().fall()));
         }
     }

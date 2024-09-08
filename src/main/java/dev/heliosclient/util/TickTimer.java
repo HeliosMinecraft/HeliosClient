@@ -54,11 +54,11 @@ public class TickTimer {
 
     // Checks if ticks have passed since the last reset
     public boolean every(int ticks) {
-        boolean didTimerLapse = getElapsedTicks() >= ticks;
-        if (didTimerLapse) {
+        if (getElapsedTicks() >= ticks) {
             restartTimer();
+            return true;
         }
-        return didTimerLapse;
+        return false;
     }
 
 

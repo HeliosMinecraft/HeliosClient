@@ -1182,6 +1182,12 @@ public class Renderer2D implements Listener {
      * @param radius Radius of the quadrants / the rounded gradient rectangle
      */
     public static void drawRoundedGradientRectangle(Matrix4f matrix, Color color1, Color color2, Color color3, Color color4, float x, float y, float width, float height, float radius, boolean TL, boolean TR, boolean BL, boolean BR) {
+        //Draw a single rounded rectangle for same colors
+        if(color1 == color2 && color2 == color3 && color3 == color4){
+            drawRoundedRectangle(matrix, x, y, TL, TR, BL, BR, width, height, radius, color1.getRGB());
+            return;
+        }
+
         RenderSystem.enableBlend();
         RenderSystem.colorMask(false, false, false, true);
         RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);

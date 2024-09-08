@@ -1,11 +1,12 @@
 package dev.heliosclient.hud.hudelements;
 
+import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.heliosclient.FontChangeEvent;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
-import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.CycleSetting;
-import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.managers.FontManager;
+import dev.heliosclient.module.settings.*;
+import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
@@ -31,6 +32,17 @@ public class ArmorHud extends HudElement {
             .defaultListOption(Bar)
             .build()
     );
+    private final DoubleSetting textSize = sgSettings.add(new DoubleSetting.Builder()
+            .name("Text Size")
+            .description("Size of the durability shown")
+            .min(1)
+            .max(10)
+            .defaultValue(4d)
+            .onSettingChange(this)
+            .roundingPlace(1)
+            .shouldRender(()-> !damageMode.isOption(Bar))
+            .build()
+    );
     private final BooleanSetting damageModeAbove = sgSettings.add(new BooleanSetting.Builder()
             .name("DamageMode Above")
             .description("Shows damage of the armor above the item")
@@ -46,6 +58,8 @@ public class ArmorHud extends HudElement {
             .build()
     );
 
+    fxFontRenderer cFontRenderer;
+
     public ArmorHud() {
         super(DATA);
         addSettingGroup(sgSettings);
@@ -54,10 +68,31 @@ public class ArmorHud extends HudElement {
         this.height =  20 * 4 + 4;
         this.renderBg.setValue(true);
         this.rounded.setValue(true);
+
     }
+
+    @Override
+    public void onSettingChange(Setting<?> setting) {
+        super.onSettingChange(setting);
+
+        if(setting == textSize){
+            this.cFontRenderer = new fxFontRenderer(FontManager.fonts,textSize.getFloat());
+        }
+    }
+    @SubscribeEvent
+    public void onFontChange(FontChangeEvent e){
+        if(mc.getWindow() == null) return;
+
+        this.cFontRenderer = new fxFontRenderer(e.getFonts(),textSize.getFloat());
+    }
+
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         super.renderElement(drawContext, textRenderer);
+        if(cFontRenderer == null){
+            this.cFontRenderer = new fxFontRenderer(FontManager.fonts,textSize.getFloat());
+        }
+
         ItemStack helmet, chestplate, leggings, boots;
 
         if(isInHudEditor && mc.player == null){
@@ -74,11 +109,11 @@ public class ArmorHud extends HudElement {
             return;
         }
 
-        int x = this.x;
+        int x = this.x + 1;
         int y = this.y;
 
         if(this.damageModeAbove.value){
-            y = y + 3;
+            y = y + 4;
         }
 
         drawContext.drawItem(helmet,x,y);
@@ -118,9 +153,9 @@ public class ArmorHud extends HudElement {
 
     private int getDamageBarY(int orgY){
         if(damageModeAbove.value){
-            return orgY - 2;
+            return damageMode.isOption(Bar) ? orgY - 2 : orgY - (int) Renderer2D.getCustomStringHeight(cFontRenderer);
         } else{
-            return orgY + 16;
+            return damageMode.isOption(Bar) ? orgY + 16 : orgY + 12 + (int) Renderer2D.getCustomStringHeight(cFontRenderer);
         }
     }
 
@@ -147,15 +182,16 @@ public class ArmorHud extends HudElement {
 
     private void drawText(DrawContext context,String text, int x, int y,int color){
         if(!Renderer2D.isVanillaRenderer()){
-            x += Math.round(16.25 - FontRenderers.Super_Small_fxfontRenderer.getStringWidth(text))/2f;
-            FontRenderers.Super_Small_fxfontRenderer.drawString(context.getMatrices(),text,x,y - 0.1f,color);
+            x += Math.round(16.25 -cFontRenderer.getStringWidth(text))/2f;
+            cFontRenderer.drawString(context.getMatrices(),text,x,y - 0.1f,color);
         }else{
+            float scale = textSize.getFloat() * 0.5f;
             context.getMatrices().push();
-            context.getMatrices().scale(0.5f,0.5f,1);
-            x += (18 - (mc.textRenderer.getWidth(text) * 0.5f))/2f;
+            context.getMatrices().scale(scale,scale,1);
+            x += (18 - (mc.textRenderer.getWidth(text) * scale))/2f;
 
-            float scaledX = (x / 0.5f);
-            float scaledY = (y / 0.5f);
+            float scaledX = (x / scale);
+            float scaledY = (y / scale);
             context.drawText(mc.textRenderer,text,(int)scaledX,(int)scaledY - 1,color,false);
             context.getMatrices().pop();
         }

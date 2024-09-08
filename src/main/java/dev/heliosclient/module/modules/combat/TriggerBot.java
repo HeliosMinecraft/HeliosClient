@@ -188,13 +188,13 @@ public class TriggerBot extends Module_ {
     }
 
     public boolean shouldAttack() {
-        float baseTimer = (!smartDelay.value) ? attackDelay.getFloat() : 0.5f;
+        float baseTimer = (!smartDelay.value) ? attackDelay.getInt() : 0.5f;
         if (tpsSync.get()) baseTimer = baseTimer / (TickRate.INSTANCE.getTPS() / 20);
 
         if (smartDelay.value) {
             return mc.player.getAttackCooldownProgress(baseTimer) >= 1;
         } else {
-            return timer.incrementAndEvery((int) baseTimer);
+            return baseTimer == 0 || timer.incrementAndEvery((int) baseTimer);
         }
     }
 
