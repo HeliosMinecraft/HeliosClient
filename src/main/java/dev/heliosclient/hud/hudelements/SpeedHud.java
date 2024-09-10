@@ -16,7 +16,8 @@ public class SpeedHud extends HudElement {
         super(DATA);
         this.width = 40;
         this.height = Math.round(Renderer2D.getStringHeight());
-    }    public static HudElementData<SpeedHud> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second", SpeedHud::new);
+    }
+    public static HudElementData<SpeedHud> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second", SpeedHud::new);
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
@@ -24,7 +25,7 @@ public class SpeedHud extends HudElement {
         String text = "Speed: ";
         String value = ColorUtils.gray + MathUtils.round(moveSpeed(), 2);
         this.width = Math.round(Renderer2D.getStringWidth(text + value));
-        Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x + 1, this.y, ColorManager.INSTANCE.hudColor);
+        Renderer2D.drawString(drawContext.getMatrices(), text + value, this.x, this.y, ColorManager.INSTANCE.hudColor);
     }
 
     private double moveSpeed() {

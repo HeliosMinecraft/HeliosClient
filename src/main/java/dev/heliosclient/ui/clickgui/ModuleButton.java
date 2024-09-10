@@ -77,6 +77,7 @@ public class ModuleButton implements Listener {
 
         if (!shouldRender) return;
 
+        GUI gui = ModuleManager.get(GUI.class);
         if (hitBox.contains(mouseX, mouseY)) {
             hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 20);
         } else {
@@ -85,8 +86,8 @@ public class ModuleButton implements Listener {
         // Get the width and height of the module name
         int moduleNameHeight = (int) Renderer2D.getFxStringHeight(module.name) - 1;
 
-        Color fillColorStart = module.isActive() ? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(ModuleManager.get(GUI.class).buttonColor.getColor(), 100);
-        Color fillColorEnd = module.isActive() ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(ModuleManager.get(GUI.class).buttonColor.getColor(), 100);
+        Color fillColorStart = module.isActive() && !gui.textHighlight.value? ColorManager.INSTANCE.primaryGradientStart : ColorUtils.changeAlpha(gui.buttonColor.getColor(), 100);
+        Color fillColorEnd = module.isActive() && !gui.textHighlight.value ? ColorManager.INSTANCE.primaryGradientEnd : ColorUtils.changeAlpha(gui.buttonColor.getColor(), 100);
         Color blendedColor = ColorUtils.blend(fillColorStart, fillColorEnd, 1 / 2f);
 
         int textY = y + (height - moduleNameHeight) / 2;
@@ -101,6 +102,10 @@ public class ModuleButton implements Listener {
             Renderer2D.scaleAndPosition(drawContext.getMatrices(), x + width / 2.0f, y + height + 2, (float) scale);
             drawGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), fillColorStart, fillColorEnd, fillColorEnd, fillColorStart, x + 1, y + height, width, boxHeight + 2,  HeliosClient.CLICKGUI.guiRoundness.getInt());
             Renderer2D.stopScaling(drawContext.getMatrices());
+        }
+        
+        if(module.isActive() && gui.textHighlight.value) {
+            Renderer2D.drawBlurredShadow(drawContext.getMatrices(), x + 2, textY, Renderer2D.getFxStringWidth(module.name) + 1, moduleNameHeight, 9, ColorManager.INSTANCE.primaryGradientStart);
         }
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor());

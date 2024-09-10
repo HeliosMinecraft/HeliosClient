@@ -81,6 +81,8 @@ public class SettingsScreen extends AbstractSettingScreen implements IWindowCont
             super.renderBackgroundTexture(drawContext);
         }
 
+        adjustWindowHeight();
+
         if(GUI.coolVisuals()){
             PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(),mouseX,mouseY);
         }

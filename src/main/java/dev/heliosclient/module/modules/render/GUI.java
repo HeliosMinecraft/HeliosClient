@@ -79,6 +79,13 @@ public class GUI extends Module_ {
             .defaultValue(new Color(17, 18, 19, 100))
             .build()
     );
+    public BooleanSetting textHighlight = sgColors.add(new BooleanSetting.Builder()
+            .name("Module text highlight when active")
+            .description("If this is on, then instead of the whole button, only the text will be highlighted with a glow if the module is on.")
+            .value(false)
+            .onSettingChange(this)
+            .build()
+    );
     public BooleanSetting categoryBorder = sgColors.add(new BooleanSetting.Builder()
             .name("Category Border")
             .description("Render the border around category")
@@ -133,6 +140,7 @@ public class GUI extends Module_ {
             .description("Number of points")
             .min(10)
             .max(400)
+            .value(75d)
             .defaultValue(75)
             .roundingPlace(0)
             .shouldRender(()->coolVisuals.value)
@@ -161,6 +169,17 @@ public class GUI extends Module_ {
             .onSettingChange(this)
             .build()
     );
+    public DoubleSetting mouseForce = sgVisuals.add(new DoubleSetting.Builder()
+            .name("Force Multiplier of the mouse")
+            .description("The force multiplier applied by the mouse on the mesh so they move faster")
+            .min(0)
+            .max(5)
+            .defaultValue(1.3)
+            .roundingPlace(1)
+            .shouldRender(()->coolVisuals.value)
+            .onSettingChange(this)
+            .build()
+    );
 
     public GUI() {
         super("GUI", "The HeliosClient GUI settings.", Categories.RENDER);
@@ -183,6 +202,7 @@ public class GUI extends Module_ {
             PolygonMeshPatternRenderer.INSTANCE.maskGradient = gradientType.get();
             PolygonMeshPatternRenderer.INSTANCE.radius = (float) dotRadius.value;
             PolygonMeshPatternRenderer.INSTANCE.MAX_DISTANCE = (float) lineMaxLength.value;
+            PolygonMeshPatternRenderer.INSTANCE.MOUSE_FORCE_MULTIPLIER = mouseForce.getFloat();
 
             if(setting == polygonPoints){
                 PolygonMeshPatternRenderer.INSTANCE.setNumOfPoints(polygonPoints.getInt());
@@ -198,6 +218,7 @@ public class GUI extends Module_ {
         PolygonMeshPatternRenderer.INSTANCE.maskGradient = gradientType.get();
         PolygonMeshPatternRenderer.INSTANCE.radius = (float) dotRadius.value;
         PolygonMeshPatternRenderer.INSTANCE.MAX_DISTANCE = (float) lineMaxLength.value;
+        PolygonMeshPatternRenderer.INSTANCE.MOUSE_FORCE_MULTIPLIER = mouseForce.getFloat();
         PolygonMeshPatternRenderer.INSTANCE.setNumOfPoints(polygonPoints.getInt());
     }
 

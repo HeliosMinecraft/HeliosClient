@@ -48,12 +48,12 @@ To submit a bug open an issue in this repository. Before doing so please assure 
 
 ## Known issues
 - Buggy modules like Tick-Shift, PacketMine.
-- Incomplete modules like Phase.
+- Incomplete modules like Phase, Fucker, InventoryTweaks.
 - ~~HudElements don't resize to their proper locations sometimes.~~
 - Scripting System (WIP).
 - Lack of combat and some important utility modules.
 - No Baritone Integration
-- No AltManager
+- ~~No AltManager~~  No AltManager GUI
 - Lack of commands
 - Lack of shaders (Neither of the current contributors know much good about GLSL)
 

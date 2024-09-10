@@ -87,9 +87,10 @@ public class ClickGUI extends Module_ {
             .name("ModuleButton Height")
             .description("ModuleButton Height for the ClickGUI")
             .onSettingChange(this)
-            .defaultValue(16)
             .max(50)
             .min(1)
+            .defaultValue(16)
+            .value(16d)
             .roundingPlace(0)
             .build()
     );
@@ -413,7 +414,7 @@ public class ClickGUI extends Module_ {
         }
 
         //Config changes
-        if (setting == switchConfigs) {
+        if (setting == switchConfigs && switchConfigs.getOption() != null) {
             // Change the file name we want to load
             HeliosClient.CONFIG.writeModuleConfig();
             HeliosClient.CONFIG.moduleConfigManager.switchConfig(switchConfigs.getOption().toString(), true);

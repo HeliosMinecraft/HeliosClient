@@ -150,9 +150,7 @@ public class HeliosClient implements ModInitializer, Listener {
 
         registerListeners();
 
-        LOGGER.info("Downloading and extracting Discord Native Library-2.5.6...");
         DiscordRPC.INSTANCE.init();
-        LOGGER.info("Downloading Completed...");
 
         LuaScriptManager.getScripts();
 

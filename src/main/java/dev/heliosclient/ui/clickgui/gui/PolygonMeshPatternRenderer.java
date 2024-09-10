@@ -13,6 +13,7 @@ public class PolygonMeshPatternRenderer {
     private int NUM_POINTS = 75;
     private Point[] points = new Point[NUM_POINTS];
     public float MAX_DISTANCE = 75.0f;
+    public float MOUSE_FORCE_MULTIPLIER = 1f;
     public float radius = 2f;
     public GradientManager.Gradient maskGradient = GradientManager.getGradient("Linear2D");
 
@@ -80,6 +81,7 @@ public class PolygonMeshPatternRenderer {
             float dy = y - mouseY;
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
             float force = Math.max(0, 100 - distance) / 5000;
+            force *= MOUSE_FORCE_MULTIPLIER;
 
             xSpeed += force * dx / distance;
             ySpeed += force * dy / distance;
