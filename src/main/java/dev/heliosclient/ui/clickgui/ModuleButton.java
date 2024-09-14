@@ -105,7 +105,7 @@ public class ModuleButton implements Listener {
         }
         
         if(module.isActive() && gui.textHighlight.value) {
-            Renderer2D.drawBlurredShadow(drawContext.getMatrices(), x + 2, textY, Renderer2D.getFxStringWidth(module.name) + 1, moduleNameHeight, 9, ColorManager.INSTANCE.primaryGradientStart);
+            Renderer2D.drawBlurredShadow(drawContext.getMatrices(), x + 2, textY, Renderer2D.getFxStringWidth(module.name) + 2, moduleNameHeight + 1, 9,ColorUtils.changeAlpha(ColorManager.INSTANCE.primaryGradientStart,125));
         }
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), module.name, x + 3, textY, ColorManager.INSTANCE.defaultTextColor());

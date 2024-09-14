@@ -8,7 +8,7 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.EntityUtils;
+import dev.heliosclient.util.entity.EntityUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.entity.Entity;

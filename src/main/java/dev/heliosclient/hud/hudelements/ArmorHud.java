@@ -1,5 +1,6 @@
 package dev.heliosclient.hud.hudelements;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.heliosclient.FontChangeEvent;
 import dev.heliosclient.hud.HudElement;
@@ -75,7 +76,7 @@ public class ArmorHud extends HudElement {
     public void onSettingChange(Setting<?> setting) {
         super.onSettingChange(setting);
 
-        if(setting == textSize){
+        if(setting == textSize && HeliosClient.shouldUpdate()){
             this.cFontRenderer = new fxFontRenderer(FontManager.fonts,textSize.getFloat());
         }
     }

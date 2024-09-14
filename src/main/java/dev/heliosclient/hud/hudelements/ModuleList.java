@@ -70,7 +70,7 @@ public class ModuleList extends HudElement implements Listener {
             .shouldRender(() -> background.value)
             .build());
     private final BooleanSetting glow = sgSettings.add(new BooleanSetting.Builder()
-            .name("Render Glow")
+            .name("Render-Glow")
             .description("Renders a glow behind the text depending on the color of text")
             .onSettingChange(this)
             .defaultValue(false)

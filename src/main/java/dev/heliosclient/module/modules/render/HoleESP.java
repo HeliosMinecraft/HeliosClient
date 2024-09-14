@@ -1,6 +1,7 @@
 package dev.heliosclient.module.modules.render;
 
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.render.Render3DEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -12,13 +13,12 @@ import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 
-import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static dev.heliosclient.util.blocks.HoleUtils.HoleType.*;
 
 public class HoleESP extends Module_ {
-    static Color TRANSPARENT_BLUE = new Color(0, 30, 175, 179);
     SettingGroup sgGeneral = new SettingGroup("General");
     BooleanSetting throughWalls = sgGeneral.add(new BooleanSetting.Builder()
             .name("ThroughWalls")
@@ -32,7 +32,7 @@ public class HoleESP extends Module_ {
             .name("Hole Range")
             .description("Maximum distance of the hole to the player")
             .min(3)
-            .max(100)
+            .max(40)
             .value(20d)
             .defaultValue(20d)
             .roundingPlace(0)
@@ -134,8 +134,8 @@ public class HoleESP extends Module_ {
             .description("Start of the gradient.")
             .onSettingChange(this)
             .rainbow(false)
-            .value(ColorUtils.changeAlpha(ColorUtils.hexToColor("#1dfb00"), 123))
-            .defaultValue(ColorUtils.changeAlpha(ColorUtils.hexToColor("#1dfb00"), 123))
+            .value(ColorUtils.hexToColor("#1dfb00", 123))
+            .defaultValue(ColorUtils.hexToColor("#1dfb00", 123))
             .shouldRender(() -> setColorCycle.getOption() == SAFE)
             .build()
     );
@@ -144,8 +144,8 @@ public class HoleESP extends Module_ {
             .description("End of the gradient.")
             .onSettingChange(this)
             .rainbow(false)
-            .value(ColorUtils.changeAlpha(ColorUtils.hexToColor("#4bfb83"), 3))
-            .defaultValue(ColorUtils.changeAlpha(ColorUtils.hexToColor("#4bfb83"), 3))
+            .value(ColorUtils.hexToColor("#4bfb83", 3))
+            .defaultValue(ColorUtils.hexToColor("#4bfb83", 3))
             .shouldRender(() -> setColorCycle.getOption() == SAFE)
             .build()
     );
@@ -154,8 +154,8 @@ public class HoleESP extends Module_ {
             .description("Start of the gradient.")
             .onSettingChange(this)
             .rainbow(false)
-            .value(ColorUtils.changeAlpha(ColorUtils.hexToColor("#ff6d00"), 142))
-            .defaultValue(ColorUtils.changeAlpha(ColorUtils.hexToColor("#ff6d00"), 142))
+            .value(ColorUtils.hexToColor("#ff6d00", 142))
+            .defaultValue(ColorUtils.hexToColor("#ff6d00", 142))
             .shouldRender(() -> setColorCycle.getOption() == UNSAFE)
             .build()
     );
@@ -164,8 +164,8 @@ public class HoleESP extends Module_ {
             .description("End of the gradient.")
             .onSettingChange(this)
             .rainbow(false)
-            .value(ColorUtils.changeAlpha(ColorUtils.hexToColor("#fb9804"), 3))
-            .defaultValue(ColorUtils.changeAlpha(ColorUtils.hexToColor("#fb9804"), 3))
+            .value(ColorUtils.hexToColor("#fb9804", 3))
+            .defaultValue(ColorUtils.hexToColor("#fb9804", 3))
             .shouldRender(() -> setColorCycle.getOption() == UNSAFE)
             .build()
     );
@@ -174,8 +174,8 @@ public class HoleESP extends Module_ {
             .description("Start of the gradient.")
             .onSettingChange(this)
             .rainbow(false)
-            .value(ColorUtils.changeAlpha(ColorUtils.hexToColor("#ff0000"), 145))
-            .defaultValue(ColorUtils.changeAlpha(ColorUtils.hexToColor("#ff0000"), 145))
+            .value(ColorUtils.hexToColor("#ff0000", 145))
+            .defaultValue(ColorUtils.hexToColor("#ff0000", 145))
             .shouldRender(() -> setColorCycle.getOption() == DANGER)
             .build()
     );
@@ -184,11 +184,13 @@ public class HoleESP extends Module_ {
             .description("End of the gradient.")
             .onSettingChange(this)
             .rainbow(false)
-            .value(ColorUtils.changeAlpha(ColorUtils.hexToColor("#fb794b"), 7))
-            .defaultValue(ColorUtils.changeAlpha(ColorUtils.hexToColor("#fb794b"), 7))
+            .value(ColorUtils.hexToColor("#f80000", 7))
+            .defaultValue(ColorUtils.hexToColor("#f80000", 7))
             .shouldRender(() -> setColorCycle.getOption() == DANGER)
             .build()
     );
+
+
 
     public HoleESP() {
         super("HoleESP", "Displays holes in your area", Categories.RENDER);
@@ -197,24 +199,29 @@ public class HoleESP extends Module_ {
 
         addQuickSettings(sgGeneral.getSettings());
         addQuickSettings(sgColor.getSettings());
+    }
 
+    List<HoleUtils.HoleInfo> holes = new ArrayList<>();
+
+    @SubscribeEvent
+    public void onTick(TickEvent.PLAYER event) {
+        holes = HoleUtils.getHoles((int) holeRange.value, (int) holeRangeVertical.value).stream().toList();
     }
 
     @SubscribeEvent
     public void onRender3d(Render3DEvent event) {
         if (throughWalls.value)
             Renderer3D.renderThroughWalls();
+
         QuadColor.CardinalDirection direction = gradientDirection.getOption().equals("Down") ? QuadColor.CardinalDirection.SOUTH : QuadColor.CardinalDirection.NORTH;
 
-        for (HoleUtils.HoleInfo info : HoleUtils.getHoles((int) holeRange.value, (int) holeRangeVertical.value)) {
+        for (HoleUtils.HoleInfo info : holes) {
             if (!renderSelf.value && mc.player.getBlockPos().isWithinDistance(info.holePosition, 1d)) {
                 continue;
             }
 
-            //Contract and offset so that it does not fight for Z level with block textures.
-            Box box = new Box(info.holePosition);
-            double ogMaxY = box.maxY;
-            box = box.contract(0.005f, 0f, 0.005f).offset(0, 0.005f, 0).withMaxY(ogMaxY + height.value);
+            // Use the box from HoleInfo
+            Box box = info.holeBox.withMaxY(info.holeBox.maxY + height.value);
 
             if (info.holeType == SAFE) {
                 renderHole(QuadColor.gradient(safeColorStart.value.getRGB(), safeColorEnd.value.getRGB(), direction), QuadColor.single(safeColorStart.value.getRGB()), box);
@@ -225,13 +232,11 @@ public class HoleESP extends Module_ {
             if (info.holeType == DANGER) {
                 renderHole(QuadColor.gradient(dangerColorStart.value.getRGB(), dangerColorEnd.value.getRGB(), direction), QuadColor.single(dangerColorStart.value.getRGB()), box);
             }
-            if (info.holeType == SIZED) {
-                //Renderer3D.drawBoxFill(box, QuadColor.single(TRANSPARENT_BLUE.getRGB()), Direction.UP,Direction.NORTH,Direction.SOUTH,Direction.EAST,Direction.WEST);
-            }
         }
         if (throughWalls.value)
             Renderer3D.stopRenderingThroughWalls();
     }
+
 
     private void renderHole(QuadColor fillColor, QuadColor lineColor, Box box) {
         Direction[] excludeDirs = new Direction[2];

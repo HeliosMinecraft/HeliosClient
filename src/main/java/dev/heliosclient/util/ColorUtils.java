@@ -296,6 +296,14 @@ public class ColorUtils {
                 Integer.valueOf(hex.substring(5, 7), 16)
         );
     }
+    public static Color hexToColor(String hex, int alpha) {
+        return new Color(
+                Integer.valueOf(hex.substring(1, 3), 16),
+                Integer.valueOf(hex.substring(3, 5), 16),
+                Integer.valueOf(hex.substring(5, 7), 16),
+                alpha
+        );
+    }
 
     public static Color blend(Color color1, Color color2, float fraction) {
         int r = (int) (color1.getRed() * (1 - fraction) + color2.getRed() * fraction);

@@ -5,7 +5,7 @@ import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.util.blocks.BlockUtils;
-import dev.heliosclient.util.EntityUtils;
+import dev.heliosclient.util.entity.EntityUtils;
 import net.minecraft.util.math.BlockPos;
 
 /**

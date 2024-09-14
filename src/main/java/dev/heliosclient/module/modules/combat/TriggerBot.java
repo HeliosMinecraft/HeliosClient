@@ -235,10 +235,11 @@ public class TriggerBot extends Module_ {
         super.onSettingChange(setting);
 
 
+        //TODO: Use ray-casting instead of this unholy finding.
         targetFinder.setRange(range.value);
         targetFinder.setFilter(entity -> {
 
-            //Apply to all entities (like end crystal, TNT, etc.)
+            //Apply to all entities (like end crystal, TNT, armor-stands etc.)
             boolean A = entities.getSelectedEntries().contains(entity.getType()) &&
                     PlayerUtils.isPlayerLookingAtEntity(mc.player, entity, range.value) &&
                     entity.isAlive() &&
@@ -248,11 +249,7 @@ public class TriggerBot extends Module_ {
 
             //Apply to only living entities
             if (entity instanceof LivingEntity e) {
-                B = entities.getSelectedEntries().contains(entity.getType()) &&
-                        PlayerUtils.isPlayerLookingAtEntity(mc.player, entity, range.value) &&
-                        entity.isAlive() &&
-                        entity.isAttackable() &&
-                        !isTeamMate(e) &&
+                B = !isTeamMate(e) &&
                         !isFriend(e) &&
                         !isInvisible(e) &&
                         !AntiBot.isBot(e);

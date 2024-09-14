@@ -13,6 +13,8 @@ public class BlockIterator implements Iterator<BlockPos> {
     private final int verticalRadius;
     private int x, y, z;
 
+    BlockPos.Mutable mut = new BlockPos.Mutable();
+
     public BlockIterator(PlayerEntity player, int horizontalRadius, int verticalRadius) {
         this.player = player;
         this.world = player.getWorld();
@@ -30,24 +32,27 @@ public class BlockIterator implements Iterator<BlockPos> {
 
     @Override
     public BlockPos next() {
-        BlockPos nextPos = player.getBlockPos().add(x, y, z);
-        while (!world.isChunkLoaded(nextPos.getX() >> 4, nextPos.getZ() >> 4)) {
-            if (++x > horizontalRadius) {
-                x = -horizontalRadius;
-                if (++z > horizontalRadius) {
-                    z = -horizontalRadius;
-                    y++;
+        while (y <= world.getTopY() && y >= world.getBottomY()) {
+            mut.set(player.getBlockPos().add(x, y, z));
+            if (world.isChunkLoaded(mut.getX() >> 4, mut.getZ() >> 4)) {
+                if (++x > horizontalRadius) {
+                    x = -horizontalRadius;
+                    if (++z > horizontalRadius) {
+                        z = -horizontalRadius;
+                        y++;
+                    }
+                }
+                return mut.toImmutable();
+            } else {
+                if (++x > horizontalRadius) {
+                    x = -horizontalRadius;
+                    if (++z > horizontalRadius) {
+                        z = -horizontalRadius;
+                        y++;
+                    }
                 }
             }
-            nextPos = player.getBlockPos().add(x, y, z);
         }
-        if (++x > horizontalRadius) {
-            x = -horizontalRadius;
-            if (++z > horizontalRadius) {
-                z = -horizontalRadius;
-                y++;
-            }
-        }
-        return nextPos;
+        return mut.toImmutable();
     }
 }

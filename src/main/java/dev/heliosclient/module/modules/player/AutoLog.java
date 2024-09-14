@@ -10,7 +10,7 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.EntityUtils;
+import dev.heliosclient.util.entity.EntityUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;

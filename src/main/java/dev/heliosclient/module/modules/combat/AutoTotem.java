@@ -14,6 +14,7 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.TickTimer;
+import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -53,15 +54,21 @@ public class AutoTotem extends Module_ {
     );
     BooleanSetting log = sgGeneral.add(new BooleanSetting.Builder()
             .name("Notify")
-            .description("Notifies when we restock a totem or there is no totems left")
+            .description("Notifies when you restock a totem or there are no totems left")
             .defaultValue(false)
             .onSettingChange(this)
             .build()
     );
-
+    BooleanSetting predictDamage = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Predict Damage")
+            .description("Will try to predict the damage you will take and auto totem")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
     KeyBind totemSwitchKey = sgGeneral.add(new KeyBind.Builder()
             .name("Totem Switch Key")
-            .description("When you press this key, the module will automatically switch to a totem")
+            .description("When you press this key, you will automatically switch to a totem")
             .value(KeyBind.none())
             .onSettingChange(this)
             .build()
@@ -157,7 +164,7 @@ public class AutoTotem extends Module_ {
     }
 
     private boolean isPlayerLow(){
-        return mc.player.getHealth() + mc.player.getAbsorptionAmount() <= healthThreshold.value;
+        return mc.player.getHealth() + mc.player.getAbsorptionAmount() - (predictDamage.value? DamageUtils.calculateDamageByEnv() : 0)  <= healthThreshold.value;
     }
 
     @Override

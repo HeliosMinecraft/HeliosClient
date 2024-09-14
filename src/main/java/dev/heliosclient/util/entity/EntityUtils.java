@@ -1,5 +1,6 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.entity;
 
+import dev.heliosclient.HeliosClient;
 import net.minecraft.block.BedBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -9,6 +10,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class EntityUtils {
@@ -39,6 +41,17 @@ public class EntityUtils {
                 .stream()
                 .min((entity1, entity2) -> Float.compare(entity1.distanceTo(player), entity2.distanceTo(player)))
                 .orElse(null);
+    }
+
+    public static List<Entity> getAllOfType(float radius, EntityType... entities) {
+        return HeliosClient.MC.world.getOtherEntities(HeliosClient.MC.player, new Box(HeliosClient.MC.player.getBlockPos()).expand(radius), entity -> {
+            for (EntityType e : entities) {
+                if (e == entity.getType()) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 
     public static BlockPos getNearestBed(World world, PlayerEntity player, int radius) {

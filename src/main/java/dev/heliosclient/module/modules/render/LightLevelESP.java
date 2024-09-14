@@ -15,17 +15,26 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.LightType;
 
-import java.awt.*;
-
 public class LightLevelESP extends Module_ {
     SettingGroup sgGeneral = new SettingGroup("General");
     DoubleSetting range = sgGeneral.add(new DoubleSetting.Builder()
-            .name("Range")
-            .description("Range to check light levels")
+            .name("Horizontal Range")
+            .description("Horizontal Range to check light levels")
             .min(0f)
             .max(50f)
             .value(10d)
             .defaultValue(10d)
+            .roundingPlace(0)
+            .onSettingChange(this)
+            .build()
+    );
+    DoubleSetting vRange = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Vertical Range")
+            .description("Vertical Range to check light levels")
+            .min(0f)
+            .max(10)
+            .value(4d)
+            .defaultValue(4d)
             .roundingPlace(0)
             .onSettingChange(this)
             .build()
@@ -38,13 +47,9 @@ public class LightLevelESP extends Module_ {
 
     }
 
-    int RED_LOW = ColorUtils.changeAlpha(Color.RED,100).getRGB();
-    int GREEN_LOW = ColorUtils.changeAlpha(Color.GREEN,100).getRGB();
-    int YELLOW_LOW = ColorUtils.changeAlpha(Color.YELLOW,100).getRGB();
-
     @SubscribeEvent
     public void onRender3d(Render3DEvent event) {
-        BlockIterator iterator = new BlockIterator(mc.player, (int) range.value, 4);
+        BlockIterator iterator = new BlockIterator(mc.player, (int) range.value, vRange.getInt());
         while (iterator.hasNext()) {
             BlockPos pos = iterator.next();
 
@@ -54,14 +59,11 @@ public class LightLevelESP extends Module_ {
 
             int lightLevel = mc.world.getLightLevel(LightType.BLOCK, pos);
 
-            if (lightLevel < 4) {
-                renderTop(pos, RED_LOW); // Red for very dark
-            } else if (lightLevel < 8) {
-                renderTop(pos, GREEN_LOW); // Orange for moderately dark
-            } else if (lightLevel < 12) {
-                renderTop(pos, YELLOW_LOW); // Yellow for moderately lit
-            }
-            //Nothing for well lit
+            float ratio = (float) lightLevel/mc.world.getMaxLightLevel();
+            int red = (int) (255 * (1 - ratio));
+            int green = (int) (255 * ratio);
+            int color = ColorUtils.rgbaToInt(red,green,0,100);
+            renderTop(pos,color);
         }
     }
 

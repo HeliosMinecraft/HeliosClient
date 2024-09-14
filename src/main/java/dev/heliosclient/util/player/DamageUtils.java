@@ -4,11 +4,18 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.player.PlayerJoinEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.modules.movement.NoFall;
 import dev.heliosclient.system.mixininterface.IExplosion;
+import dev.heliosclient.util.blocks.ChunkUtils;
+import dev.heliosclient.util.entity.EntityUtils;
+import net.minecraft.block.entity.BedBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -19,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.SwordItem;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
 
@@ -28,6 +36,9 @@ public class DamageUtils implements Listener {
     public static DamageUtils INSTANCE = new DamageUtils();
     static ExplosionBehavior behavior = new ExplosionBehavior();
     private static Explosion explosion;
+
+    //Explosion power
+    public static int BED_POWER = 5, CRYSTAL_POWER = 6;
 
     public static double calculateBedBlastDamage(Vec3d bedLocation, LivingEntity target) {
         if (target instanceof PlayerEntity && ((PlayerEntity) target).getAbilities().creativeMode) return 0;
@@ -159,6 +170,28 @@ public class DamageUtils implements Listener {
         swordDamage = (float) calculateReductions(swordDamage, target, HeliosClient.MC.world.getDamageSources().playerAttack(attacker));
 
         return swordDamage;
+    }
+
+    public static float calculateDamageByEnv(){
+        float totalDamage = 0;
+
+        for(Entity e: EntityUtils.getAllOfType(CRYSTAL_POWER + 2, EntityType.END_CRYSTAL)){
+            double crystalDamage = calculateCrystalDamage(e.getPos(),HeliosClient.MC.player);
+            totalDamage = (float) Math.max(crystalDamage,totalDamage);
+        }
+
+        if (!HeliosClient.MC.world.getDimensionEntry().matchesKey(DimensionTypes.OVERWORLD)) {
+            for(BlockEntity blockEntity : ChunkUtils.getBlockEntityStreamInChunks().filter(bE -> bE instanceof BedBlockEntity).toList()) {
+                float damage = (float) calculateBedBlastDamage(blockEntity.getPos().toCenterPos(),HeliosClient.MC.player);
+                totalDamage = Math.max(damage,totalDamage);
+            }
+        }
+
+        if(!ModuleManager.get(NoFall.class).isActive()){
+            totalDamage = Math.max(calcFallDamage(HeliosClient.MC.player),totalDamage);
+        }
+
+        return totalDamage;
     }
 
     @SubscribeEvent

@@ -19,7 +19,7 @@ public abstract class MixinKeyboardInput extends Input {
 
     @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/input/KeyboardInput;sneaking:Z", shift = At.Shift.AFTER), allow = 1)
     private void onTick(boolean slowDown, float slowDownFactor, CallbackInfo ci) {
-        KeyboardInputEvent event = new KeyboardInputEvent(movementSideways, movementForward, pressingForward, pressingBack, pressingLeft, pressingRight, jumping, sneaking);
+        KeyboardInputEvent event = new KeyboardInputEvent(pressingForward, pressingBack, pressingLeft, pressingRight, jumping, sneaking);
         EventManager.postEvent(event);
 
         if(event.isCanceled()){
@@ -30,6 +30,7 @@ public abstract class MixinKeyboardInput extends Input {
 
             this.movementForward = getMovementMultiplier(this.pressingForward, this.pressingBack);
             this.movementSideways = getMovementMultiplier(this.pressingLeft, this.pressingRight);
+
 
             this.jumping = event.jumping;
             this.sneaking = event.sneaking;
