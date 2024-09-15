@@ -13,7 +13,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class KeyBindsHud extends HudElement {
-    public static HudElementData<KeyBindsHud> DATA = new HudElementData<>("KeybindsHUD", "Shows the modules with keybinds", KeyBindsHud::new);
+    public static HudElementData<KeyBindsHud> DATA = new HudElementData<>("Keybinds", "Shows the modules with keybinds", KeyBindsHud::new);
 
     public KeyBindsHud() {
         super(DATA);

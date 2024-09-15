@@ -4,6 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.mixin.AccessorMinecraftClient;
 import dev.heliosclient.util.render.Renderer3D;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.Input;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -24,11 +25,17 @@ import static dev.heliosclient.util.ColorUtils.blend;
 public class PlayerUtils {
     public static MinecraftClient mc = MinecraftClient.getInstance();
 
+    public static boolean isPressingMovementButton() {
+        Input input = mc.player.input;
+        return input.pressingForward || input.pressingBack || input.pressingLeft || input.pressingRight;
+    }
+
     public static boolean canSeeEntity(Entity entity) {
         Vec3d playerEyePos = mc.player.getEyePos();
         Box entityBox = entity.getBoundingBox();
         return mc.player.getWorld().raycast(new RaycastContext(playerEyePos, entityBox.getCenter(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
     }
+
     public static boolean isPlayerAtEdge(double edgeThreshold) {
         Vec3d playerPos = Renderer3D.getInterpolatedPosition(mc.player);
         BlockPos blockPos = mc.player.getBlockPos();
@@ -71,6 +78,7 @@ public class PlayerUtils {
     public static boolean hasHorizontalCollision(Vec3d pos) {
         return mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(pos.subtract(mc.player.getPos()))).iterator().hasNext();
     }
+
     public static boolean willFallMoreThanFiveBlocks(Vec3d pos) {
         BlockPos blockPos = BlockPos.Mutable.ofFloored(pos);
         for (int i = 0; i < 5; i++) {
@@ -81,6 +89,7 @@ public class PlayerUtils {
         }
         return true;
     }
+
     public static boolean isPlayerLookingAtEntity(PlayerEntity player, Entity target, double maxDistance) {
         Vec3d eyePos = player.getEyePos();
         double squaredDist = Math.pow(maxDistance, 2);
@@ -94,15 +103,16 @@ public class PlayerUtils {
         return false;
     }
 
-    public static boolean hasWeaponInHand(PlayerEntity player){
-        if(player.getMainHandStack() == null) return false;
+    public static boolean hasWeaponInHand(PlayerEntity player) {
+        if (player.getMainHandStack() == null) return false;
         Item item = player.getMainHandStack().getItem();
-        return item instanceof SwordItem ||  item instanceof AxeItem ||  item instanceof TridentItem  /* || item instanceof MaceItem*/;
+        return item instanceof SwordItem || item instanceof AxeItem || item instanceof TridentItem  /* || item instanceof MaceItem*/;
     }
-    public static boolean hasRangedWeaponInHand(PlayerEntity player){
-        if(player.getMainHandStack() == null) return false;
+
+    public static boolean hasRangedWeaponInHand(PlayerEntity player) {
+        if (player.getMainHandStack() == null) return false;
         Item item = player.getMainHandStack().getItem();
-        return item instanceof BowItem ||  item instanceof CrossbowItem || item instanceof SnowballItem || item instanceof EggItem;
+        return item instanceof BowItem || item instanceof CrossbowItem || item instanceof SnowballItem || item instanceof EggItem;
     }
 
     public static boolean isSprinting(PlayerEntity player) {
@@ -116,6 +126,7 @@ public class PlayerUtils {
     public static double getDistanceToBlockPos(PlayerEntity player, BlockPos pos) {
         return Math.sqrt(player.getBlockPos().getSquaredDistance(pos));
     }
+
     public static double getSquaredDistanceToBP(BlockPos pos) {
         return mc.player.getBlockPos().getSquaredDistance(pos);
     }

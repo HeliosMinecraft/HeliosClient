@@ -8,12 +8,12 @@ import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class BooleanSetting extends Setting<Boolean> {
@@ -110,12 +110,8 @@ public class BooleanSetting extends Setting<Boolean> {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if (MAP.get(getSaveName()) == null) {
-            value = defaultValue;
-            return;
-        }
-        value = (boolean) MAP.get(getSaveName());
+    public void loadFromFile(MapReader map) {
+        value =  map.getBoolean(getSaveName(),defaultValue);
     }
 
     public static class Builder extends SettingBuilder<Builder, Boolean, BooleanSetting> {

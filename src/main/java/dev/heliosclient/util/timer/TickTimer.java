@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.timer;
 
 public class TickTimer {
     private int ticks = 0;

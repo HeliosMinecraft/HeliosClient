@@ -63,7 +63,7 @@ public class CategoryPane implements Listener {
             ModuleButton mb = new ModuleButton(m, parentScreen);
             moduleButtons.add(mb);
             maxWidth = Math.max(maxWidth, mb.width - 2);
-            height += mb.height + 3;
+            height += ModuleButton.height + 3;
         }
         if (maxWidth < getWidth() - 2) {
             maxWidth = getWidth() - 2;

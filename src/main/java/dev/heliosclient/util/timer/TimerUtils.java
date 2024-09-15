@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.timer;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

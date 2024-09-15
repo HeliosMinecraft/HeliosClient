@@ -7,7 +7,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.StringSetting;
-import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.inputbox.InputBox;
 import net.minecraft.network.packet.BrandCustomPayload;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
 import net.minecraft.network.packet.c2s.common.ResourcePackStatusC2SPacket;

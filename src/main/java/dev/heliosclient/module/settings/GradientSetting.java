@@ -9,13 +9,16 @@ import dev.heliosclient.ui.clickgui.gui.tables.TableEntry;
 import dev.heliosclient.ui.clickgui.settings.GradientSettingScreen;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.List;
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 public class GradientSetting extends ParentScreenSetting<GradientManager.Gradient> {
@@ -182,16 +185,15 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        super.loadFromFile(MAP);
+    public void loadFromFile(MapReader map) {
+        String mapVal = map.getString(getSaveName(),GradientManager.getKeyForGradient(defaultValue));
 
-        Object mapVal = MAP.get(getSaveName());
-
-        if(mapVal instanceof String){
-            this.value = GradientManager.getGradient(mapVal.toString());
-        }else{
+        if(mapVal == null){
             this.value = defaultValue;
+            return;
         }
+
+        this.value = GradientManager.getGradient(mapVal.toString());
     }
 
     @Override

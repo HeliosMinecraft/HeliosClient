@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.misc;
 
 import java.lang.reflect.Method;
 

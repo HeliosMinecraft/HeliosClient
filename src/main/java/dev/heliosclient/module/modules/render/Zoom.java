@@ -8,7 +8,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.TimerUtils;
+import dev.heliosclient.util.timer.TimerUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import net.minecraft.util.math.MathHelper;

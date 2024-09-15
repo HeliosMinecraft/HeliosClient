@@ -54,7 +54,7 @@ public class ClickGUIScreen extends Screen {
 
         categoryPanes.clear();
 
-        Object panesObject = HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().getReadData().get("panes");
+        Object panesObject = HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().get("panes",Map.class);
         if (panesObject instanceof Map<?, ?> panePos) {
             CategoryManager.getCategories().forEach((s, category) -> {
                 Object categoryObject = panePos.get(category.name);
@@ -101,9 +101,9 @@ public class ClickGUIScreen extends Screen {
                     shouldClose = false;
                 }
             } else {
-                this.scale += speed * Easing.ease(EasingType.QUADRATIC_IN, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1));
+                this.scale += speed * Easing.ease(EasingType.QUADRATIC_IN, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1f));
             }
-            this.scale = MathHelper.clamp(this.scale, 0.0f, 1f);
+            this.scale = MathHelper.clamp(this.scale, 0.0f, 1.4f);
         } else {
             this.scale = 1.0f;
             if (shouldClose) {

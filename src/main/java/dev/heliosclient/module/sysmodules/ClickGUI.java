@@ -13,11 +13,11 @@ import dev.heliosclient.ui.clickgui.ModuleButton;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
-import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
+import dev.heliosclient.util.inputbox.InputBox;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
 import org.lwjgl.glfw.GLFW;
@@ -35,7 +35,7 @@ import static dev.heliosclient.managers.FontManager.fonts;
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
-    private final SettingGroup sgConfig = new SettingGroup("Config");
+    private final SettingGroup sgConfig = new SettingGroup("SubConfig");
     public SettingGroup sgMisc = new SettingGroup("Misc");
     public SettingGroup sgTooltip = new SettingGroup("ToolTip");
     public SettingGroup sgGeneral = new SettingGroup("General");
@@ -273,7 +273,7 @@ public class ClickGUI extends Module_ {
             .build()
     );
     public CycleSetting switchConfigs = sgConfig.add(new CycleSetting.Builder()
-            .name("Switch Module Config")
+            .name("Switch Module SubConfig")
             .description("Change your module config")
             .value(HeliosClient.CONFIG.moduleConfigManager.getConfigNames())
             .defaultListIndex(0)
@@ -282,7 +282,7 @@ public class ClickGUI extends Module_ {
             .build()
     );
     public StringSetting configPath = sgConfig.add(new StringSetting.Builder()
-            .name("Save Config Path")
+            .name("Save SubConfig Path")
             .description("Saves current config to that path. It only saves there for temporary purposes, otherwise it selects the default HeliosClient directory")
             .value(HeliosClient.CONFIG.otherConfigManager.getCurrentConfig().getConfigFile().getParent())
             .defaultValue(HeliosClient.CONFIG.otherConfigManager.getCurrentConfig().getConfigFile().getParent())
@@ -349,7 +349,7 @@ public class ClickGUI extends Module_ {
 
             switchConfigs.options = HeliosClient.CONFIG.getModuleConfigManager().getConfigNames();
         });
-        config.addButton("Save Config", 1, 0, () -> {
+        config.addButton("Save SubConfig", 1, 0, () -> {
             File pathFile = new File(configPath.value);
             if (!pathFile.exists() || !pathFile.isDirectory() || !FileUtils.doesFileInPathExist(configPath.value)) {
                 AnimationUtils.addErrorToast(ColorUtils.red + "Invalid Save Path. Path should be a valid directory", true, 2000);
@@ -366,17 +366,17 @@ public class ClickGUI extends Module_ {
 
             HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().setConfigFile(pathFile);
             HeliosClient.CONFIG.writeModuleConfig();
-            boolean saveSuccessful = HeliosClient.CONFIG.moduleConfigManager.save(false);
+            boolean saveSuccessful = HeliosClient.CONFIG.moduleConfigManager.save();
             HeliosClient.CONFIG.moduleConfigManager.getCurrentConfig().setConfigFile(prevConfigFile);
 
             if (saveSuccessful) {
-                AnimationUtils.addInfoToast(ColorUtils.green + "Config was saved successfully", true, 2000);
+                AnimationUtils.addInfoToast(ColorUtils.green + "SubConfig was saved successfully", true, 2000);
             } else {
-                AnimationUtils.addErrorToast(ColorUtils.red + "Config could not be saved: ", true, 2000);
+                AnimationUtils.addErrorToast(ColorUtils.red + "SubConfig could not be saved: ", true, 2000);
             }
 
         });
-        config.addButton("Load Config", 1, 1, HeliosClient::loadModulesOnly);
+        config.addButton("Load SubConfig", 1, 1, HeliosClient::loadModulesOnly);
 
         EventManager.register(this);
     }
@@ -413,7 +413,7 @@ public class ClickGUI extends Module_ {
             }
         }
 
-        //Config changes
+        //SubConfig changes
         if (setting == switchConfigs && switchConfigs.getOption() != null) {
             // Change the file name we want to load
             HeliosClient.CONFIG.writeModuleConfig();

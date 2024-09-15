@@ -10,7 +10,7 @@ import java.util.List;
 
 public class NotificationModule extends Module_ {
     private final SettingGroup sgNotifications = new SettingGroup("Notifications");
-    private final SettingGroup sgConfig = new SettingGroup("Config");
+    private final SettingGroup sgConfig = new SettingGroup("SubConfig");
     public BooleanSetting moduleNotification = sgNotifications.add(new BooleanSetting.Builder()
             .name("Module Info")
             .description("Whether to show module state.")

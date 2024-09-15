@@ -19,10 +19,12 @@ import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.*;
+
 
 /**
  * Template for modules.
@@ -287,8 +289,8 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if(MAP == null) {
+    public void loadFromFile(MapReader map) {
+        if(map == null) {
             HeliosClient.LOGGER.error("Null map passed while loading Module: {}", this.name);
             return;
         }
@@ -300,8 +302,8 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
                 //Any error caught should not cause the whole config system to fail to load.
                 //Hopefully
                 try {
-                    setting.loadFromFile(MAP);
-                } catch (Exception e) {
+                    setting.loadFromFile(map);
+                } catch (Throwable e) {
                     e.printStackTrace();
                     continue;
                 }

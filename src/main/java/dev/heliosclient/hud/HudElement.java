@@ -16,6 +16,7 @@ import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -469,9 +470,10 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
+    @SuppressWarnings("unchecked")
+    public void loadFromFile(MapReader map) {
         //Hope it saves as double and not any other.
-        List<Double> obj = (List<Double>) MAP.get("dimensions");
+        List<Double> obj = (List<Double>) map.getAs("dimensions",List.class);
         this.x = MathUtils.d2iSafe(obj.get(0));
         this.y = MathUtils.d2iSafe(obj.get(1));
         this.width = MathUtils.d2iSafe(obj.get(2));

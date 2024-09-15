@@ -3,10 +3,11 @@ package dev.heliosclient.module.settings;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.inputbox.InputBox;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -15,7 +16,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class DoubleSetting extends Setting<Double> {
@@ -164,12 +164,8 @@ public class DoubleSetting extends Setting<Double> {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if (MAP.get(getSaveName()) == null) {
-            value = defaultValue;
-        } else {
-            value = (double) MAP.get(getSaveName());
-        }
+    public void loadFromFile(MapReader map) {
+        value = map.getDouble(getSaveName(),defaultValue);
         postSettingChange();
     }
 

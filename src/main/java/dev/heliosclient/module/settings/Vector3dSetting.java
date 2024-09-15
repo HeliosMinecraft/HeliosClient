@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import static dev.heliosclient.util.fontutils.FontRenderers.Small_fxfontRenderer;
+import dev.heliosclient.util.misc.MapReader;
 
 public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
     private final DoubleSetting xSet;
@@ -129,14 +130,15 @@ public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if (MAP.get(getSaveName()) == null) {
+    @SuppressWarnings("unchecked")
+    public void loadFromFile(MapReader map) {
+        if (!map.has(getSaveName())) {
             this.xSet.setValue(defaultValue.x);
             this.ySet.setValue(defaultValue.y);
             this.zSet.setValue(defaultValue.z);
             value = defaultValue;
         } else {
-            List<Double> vec3 = (List<Double>) MAP.get(getSaveName());
+            List<Double> vec3 = (List<Double>) map.getAs(getSaveName(),List.class);
             this.xSet.setValue(vec3.get(0));
             this.ySet.setValue(vec3.get(1));
             this.zSet.setValue(vec3.get(2));

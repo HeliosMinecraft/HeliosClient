@@ -11,7 +11,7 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.StringListSetting;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.inputbox.InputBox;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;

@@ -2,7 +2,7 @@ package dev.heliosclient.managers;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +25,9 @@ public class GradientManager {
 
     @Nullable
     public static String getKeyForGradient(Gradient gradient) {
+        if(gradient == null){
+            return null;
+        }
         for (Map.Entry<String, Gradient> entry : gradients.entrySet()) {
             if (entry.getValue().equals(gradient)) {
                 return entry.getKey();

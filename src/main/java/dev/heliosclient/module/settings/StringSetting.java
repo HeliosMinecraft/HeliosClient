@@ -1,15 +1,15 @@
 package dev.heliosclient.module.settings;
 
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.inputbox.InputBox;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class StringSetting extends Setting<String> {
@@ -69,12 +69,8 @@ public class StringSetting extends Setting<String> {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if (MAP.get(getSaveName()) == null) {
-            value = defaultValue;
-            return;
-        }
-        value = (String) MAP.get(getSaveName());
+    public void loadFromFile(MapReader map) {
+        value = map.getString(getSaveName(),defaultValue);
         inputBox.setValue(value);
     }
 

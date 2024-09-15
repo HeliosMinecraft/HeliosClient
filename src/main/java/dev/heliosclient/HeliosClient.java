@@ -21,10 +21,10 @@ import dev.heliosclient.ui.clickgui.ConsoleScreen;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.SoundUtils;
-import dev.heliosclient.util.TimerUtils;
 import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.render.Renderer2D;
+import dev.heliosclient.util.timer.TimerUtils;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static dev.heliosclient.managers.FontManager.fonts;
@@ -55,9 +56,9 @@ public class HeliosClient implements ModInitializer, Listener {
     public static void loadConfig() {
         load(config -> {
             config.loadEverything();
-            LOGGER.info("Loading Config complete in: {}s", configTimer.getElapsedTime());
+            LOGGER.info("Loading SubConfig complete in: {}s", configTimer.getElapsedTime());
 
-            String configSelectedAsSaved = (String) config.otherConfigManager.getCurrentConfig().getReadData().get(CLICKGUI.switchConfigs.getSaveName());
+            String configSelectedAsSaved = (String) config.otherConfigManager.getCurrentConfig().get("settings", Map.class).get(CLICKGUI.switchConfigs.getSaveName());
             if (configSelectedAsSaved != null) {
                 //We are loading at the earliest before the user can make changes so no need to save.
                 config.getModuleConfigManager().switchConfig(configSelectedAsSaved, false);
@@ -101,7 +102,7 @@ public class HeliosClient implements ModInitializer, Listener {
         LOGGER.info("Saving all configs... \t Info: Current module config being saved \"{}\"", CONFIG.moduleConfigManager.getCurrentConfig().getName());
         configTimer.startTimer();
         CONFIG.saveEverything();
-        LOGGER.info("Saving Config complete in: {}s", configTimer.getElapsedTime());
+        LOGGER.info("Saving SubConfig complete in: {}s", configTimer.getElapsedTime());
         if (shouldSendNotification() && ModuleManager.get(NotificationModule.class).clientNotification.value) {
             NotificationManager.addNotification(new InfoNotification("Saving Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }

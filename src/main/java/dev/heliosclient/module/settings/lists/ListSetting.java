@@ -7,6 +7,7 @@ import dev.heliosclient.ui.clickgui.settings.ListSettingsScreen;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -17,7 +18,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 
@@ -195,14 +195,20 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if(MAP.get(getSaveName()) instanceof String stringVal && stringVal.equalsIgnoreCase("all")){
+    public void loadFromFile(MapReader map) {
+        if(!map.has(getSaveName())) {
+            selectedEntries.clear();
+            selectedEntries.addAll(defaultSelectedEntries);
+            return;
+        }
+
+        if(map.getString(getSaveName(),"null").equalsIgnoreCase("all")){
             selectedEntries.clear();
             selectedEntries.addAll(value);
             return;
         }
 
-        List<Object> tomlSelectedItem = (List<Object>) MAP.get(getSaveName());
+        List<Object> tomlSelectedItem = (List<Object>) map.getAs(getSaveName(),List.class);
 
         selectedEntries.clear();
         if (tomlSelectedItem != null) {
@@ -218,5 +224,6 @@ public abstract class ListSetting<T extends Object> extends ParentScreenSetting<
         } else {
             selectedEntries.addAll(defaultSelectedEntries);
         }
+
     }
 }

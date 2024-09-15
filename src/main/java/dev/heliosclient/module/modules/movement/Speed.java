@@ -8,6 +8,8 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.system.mixininterface.IVec3d;
+import dev.heliosclient.util.player.PlayerUtils;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -24,12 +26,13 @@ public class Speed extends Module_ {
             .defaultListOption(Modes.OnGround)
             .build()
     );
-    BooleanSetting alwaysJump = sgGeneral.add(new BooleanSetting.Builder()
-            .name("Always Jump")
-            .description("Jumps always when strafing. Otherwise it will only jump when specific conditions are met")
+
+    BooleanSetting strict = sgGeneral.add(new BooleanSetting.Builder()
+            .name("More Strict")
+            .description("Strict movement and sprinting for strafing")
             .onSettingChange(this)
-            .value(true)
-            .shouldRender(()->speedMode.getOption() == Modes.Strafe)
+            .value(false)
+            .shouldRender(()->speedMode.isOption(Modes.StrictStrafe))
             .build()
     );
     BooleanSetting whileSneaking = sgGeneral.add(new BooleanSetting.Builder()
@@ -77,14 +80,28 @@ public class Speed extends Module_ {
 
                 double vel = Math.abs(mc.player.getVelocity().getX()) + Math.abs(mc.player.getVelocity().getZ());
 
-                if(alwaysJump.value && mc.player.isOnGround()){
-                    mc.player.jump();
-                }
-
                 if (vel >= 0.12 && mc.player.isOnGround()) {
                     mc.player.updateVelocity(vel >= 0.3 ? 0.0f : 0.15f, new Vec3d(mc.player.sidewaysSpeed, 0, mc.player.forwardSpeed));
                     mc.player.jump();
                 }
+        } else if (speedMode.getOption() == Modes.StrictStrafe) {
+                if (!PlayerUtils.isPressingMovementButton() || (strict.value && PlayerUtils.isMoving(mc.player))) {
+                    ((IVec3d) e.getMovement()).heliosClient$setXZ(0,0);
+                    return;
+                }
+
+                if (!mc.player.isSprinting() && !strict.value) {
+                   mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+                }
+
+                double prevX = e.getMovement().x * (1.0 - speed.value/speed.max);
+                double prevZ = e.getMovement().z * (1.0 - speed.value/speed.max);
+                double useSpeed = mc.player.getVelocity().horizontalLength() * (speed.value/speed.max);
+
+                double angle = Math.toRadians(mc.player.getYaw(mc.getTickDelta()));
+                double x = (-Math.sin(angle) * useSpeed) + prevX;
+                double z = (Math.cos(angle) * useSpeed) + prevZ;
+                ((IVec3d) e.getMovement()).heliosClient$setXZ(x,z);
         }
         // OnGround Mode
         else if (speedMode.getOption() == Modes.OnGround) {
@@ -143,6 +160,7 @@ public class Speed extends Module_ {
     public enum Modes {
         OnGround,
         Strafe,
+        StrictStrafe,
         Bhop,
         Leap,
         SprintBoost,

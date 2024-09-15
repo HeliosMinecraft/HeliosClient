@@ -13,9 +13,9 @@ import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.TickTimer;
 import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.InventoryUtils;
+import dev.heliosclient.util.timer.TickTimer;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
@@ -117,7 +117,7 @@ public class AutoTotem extends Module_ {
                if(mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING || mc.player.playerScreenHandler != mc.player.currentScreenHandler){
                    return;
                }
-               if(always.value || isPlayerLow() || didTotemPop) {
+               if(always.value || didTotemPop || isPlayerLow()) {
                    doAutoTotem();
                    didTotemPop = false;
 
@@ -164,7 +164,7 @@ public class AutoTotem extends Module_ {
     }
 
     private boolean isPlayerLow(){
-        return mc.player.getHealth() + mc.player.getAbsorptionAmount() - (predictDamage.value? DamageUtils.calculateDamageByEnv() : 0)  <= healthThreshold.value;
+        return mc.player.getHealth() + mc.player.getAbsorptionAmount() - (predictDamage.value ? DamageUtils.calculateDamageByEnv() : 0)  <= healthThreshold.value;
     }
 
     @Override

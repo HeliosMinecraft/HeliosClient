@@ -5,6 +5,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -13,7 +14,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
@@ -240,12 +240,17 @@ public class DropDownSetting extends Setting<Integer> {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if (MAP.get(getSaveName()) == null) {
+    public void loadFromFile(MapReader map) {
+        if (!shouldSaveOrLoad) {
+            return;
+        }
+        String mapGet = map.getString(getSaveName(),null);
+
+        if(mapGet == null){
             value = defaultValue;
             return;
         }
-        String mapGet = MAP.get(getSaveName()).toString().trim();
+        mapGet = mapGet.trim();
 
         for (Object object :
                 options) {

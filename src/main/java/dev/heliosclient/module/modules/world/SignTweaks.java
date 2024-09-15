@@ -9,7 +9,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.StringListSetting;
-import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.inputbox.InputBox;
 import net.minecraft.block.entity.SignBlockEntity;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.network.packet.c2s.play.UpdateSignC2SPacket;

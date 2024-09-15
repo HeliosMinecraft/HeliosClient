@@ -191,6 +191,8 @@ public class DamageUtils implements Listener {
             totalDamage = Math.max(calcFallDamage(HeliosClient.MC.player),totalDamage);
         }
 
+        System.out.println(totalDamage);
+
         return totalDamage;
     }
 

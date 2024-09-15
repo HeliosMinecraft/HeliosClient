@@ -1,6 +1,6 @@
 package dev.heliosclient.util.entity;
 
-import dev.heliosclient.util.SortMethod;
+import dev.heliosclient.util.misc.SortMethod;
 import dev.heliosclient.util.player.PlayerUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;

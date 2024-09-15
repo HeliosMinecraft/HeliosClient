@@ -1,7 +1,8 @@
 package dev.heliosclient.module.settings;
 
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.util.InputBox;
+import dev.heliosclient.util.inputbox.InputBox;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -9,7 +10,6 @@ import net.minecraft.client.gui.DrawContext;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class StringListSetting extends Setting<String[]> {
@@ -106,15 +106,15 @@ public class StringListSetting extends Setting<String[]> {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        super.loadFromFile(MAP);
-        if (MAP.get(getSaveName()) == null) {
+    @SuppressWarnings("unchecked")
+    public void loadFromFile(MapReader map) {
+        if (!map.has(getSaveName())) {
             value = defaultValue;
             return;
         }
         int a;
         inputBoxes.clear();
-        List<String> list = (List<String>) MAP.get(getSaveName());
+        List<String> list = (List<String>) map.getAs(getSaveName(),List.class);
         value = new String[list.size()];
         for (a = 0; a < list.size(); a++) {
             inputBoxes.add(new InputBox(160, 12, list.get(a), characterLimit, inputMode));

@@ -12,12 +12,13 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
-import dev.heliosclient.util.TimerUtils;
 import dev.heliosclient.util.animation.Animation;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
+import dev.heliosclient.util.timer.TimerUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -28,13 +29,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class HudEditorScreen extends Screen implements Listener {
     private static final long SCROLL_TIMEOUT = 2000; // 2 seconds
     public static HudEditorScreen INSTANCE = new HudEditorScreen();
     private final List<HudElement> selectedElements = new ArrayList<>();
-    private final Map<String, Object> copiedSettings = new HashMap<>();
+    private final MapReader copiedSettings = new MapReader(new HashMap<>());
     private final int defaultSnapSize = 120;
     private final Color LIGHT_YELLOW = new Color(223, 248, 89, 121);
     float thickness = 0.5f; // Thickness of the alignment lines
@@ -71,7 +71,7 @@ public class HudEditorScreen extends Screen implements Listener {
     public void close() {
         super.close();
         selectedElements.clear();
-        copiedSettings.clear();
+        copiedSettings.map().clear();
         isDragging = false;
         dragBox = null;
     }
@@ -279,15 +279,15 @@ public class HudEditorScreen extends Screen implements Listener {
             }
 
             if (element.selected && isCopy(keyCode) && !copied) {
-                element.saveSettingsToMap(copiedSettings);
+                element.saveSettingsToMap(copiedSettings.map());
                 copied = true;
                 continue;
             }
 
-            if (element.selected && isPaste(keyCode) && !copiedSettings.isEmpty()) {
+            if (element.selected && isPaste(keyCode) && !copiedSettings.map().isEmpty()) {
                 for (SettingGroup settingGroup : element.settingGroups) {
                     for (Setting<?> setting : settingGroup.getSettings()) {
-                        if (!setting.shouldSaveAndLoad() || !copiedSettings.containsKey(setting.getSaveName()))
+                        if (!setting.shouldSaveAndLoad() || !copiedSettings.has(setting.getSaveName()))
                             continue;
 
                         setting.loadFromFile(copiedSettings);

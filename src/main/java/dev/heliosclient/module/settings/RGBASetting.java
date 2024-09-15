@@ -7,10 +7,11 @@ import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.settings.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
+import dev.heliosclient.util.inputbox.InputBox;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -24,7 +25,6 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class RGBASetting extends ParentScreenSetting<Color> implements Listener {
@@ -378,16 +378,16 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if (MAP.get(this.getSaveName()) == null) {
+    public void loadFromFile(MapReader map) {
+        List<?> list = (List<?>) map.getAs(this.getSaveName(),List.class);
+
+        if (list == null) {
             value = defaultValue;
             rainbow = defaultRainbow;
             HeliosClient.LOGGER.error("{} is null, Setting loaded to default", this.getSaveName());
             updateHandles(true);
             return;
         }
-
-        List<?> list = (List<?>) MAP.get(this.getSaveName());
 
         value = ColorUtils.intToColor(MathUtils.d2iSafe(list.get(0)));
         rainbow = MathUtils.d2iSafe(list.get(1)) == 1;

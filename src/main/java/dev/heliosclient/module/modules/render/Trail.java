@@ -9,7 +9,7 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.TickTimer;
+import dev.heliosclient.util.timer.TickTimer;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.LineColor;
@@ -106,6 +106,8 @@ public class Trail extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
+        ticksToAdd.restartTimer();
+        ticksToRemove.restartTimer();
         if (mc.player != null)
             lines.push(mc.player.getPos());
     }
@@ -113,6 +115,8 @@ public class Trail extends Module_ {
     @Override
     public void onDisable() {
         super.onDisable();
+        ticksToAdd.resetTimer();
+        ticksToRemove.resetTimer();
         if (clearOnDisable.value)
             lines.clear();
     }

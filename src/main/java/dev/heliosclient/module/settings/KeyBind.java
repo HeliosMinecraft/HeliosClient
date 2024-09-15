@@ -4,9 +4,9 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.KeyboardUtils;
-import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -14,7 +14,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 public class KeyBind extends Setting<Integer> {
@@ -138,18 +137,13 @@ public class KeyBind extends Setting<Integer> {
 
     @Override
     public Object saveToFile(List<Object> objectList) {
-
         //The actual key code.
         return value;
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if (MAP.get(this.getSaveName()) == null) {
-            value = defaultValue;
-            return;
-        }
-        value = MathUtils.d2iSafe(MAP.get(this.getSaveName()));
+    public void loadFromFile(MapReader map) {
+        value = map.getInt(this.getSaveName(),defaultValue);
     }
 
     @Override

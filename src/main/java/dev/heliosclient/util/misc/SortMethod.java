@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.misc;
 
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.entity.Entity;

@@ -10,7 +10,12 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
 import dev.heliosclient.system.UniqueID;
 import dev.heliosclient.system.config.Config;
-import dev.heliosclient.util.*;
+import dev.heliosclient.util.ChatUtils;
+import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.FileUtils;
+import dev.heliosclient.util.inputbox.InputBox;
+import dev.heliosclient.util.misc.MapReader;
+import dev.heliosclient.util.timer.TickTimer;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.client.realms.gui.screen.DisconnectedRealmsScreen;
 import net.minecraft.util.math.random.Random;
@@ -201,10 +206,10 @@ public class Spammer extends Module_ {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        super.loadFromFile(MAP);
+    public void loadFromFile(MapReader map) {
+        super.loadFromFile(map);
 
-        String filePath = (String) MAP.get("File");
+        String filePath = map.getString("File",null);
         if(filePath == null || filePath.equals("unknown")) return;
         spamFile = new File(filePath);
 

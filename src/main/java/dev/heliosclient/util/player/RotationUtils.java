@@ -1,7 +1,7 @@
 package dev.heliosclient.util.player;
 
-import dev.heliosclient.util.TickTimer;
 import dev.heliosclient.util.render.Renderer3D;
+import dev.heliosclient.util.timer.TickTimer;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.hit.HitResult;

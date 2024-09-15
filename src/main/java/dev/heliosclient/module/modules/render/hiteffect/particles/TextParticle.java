@@ -2,7 +2,7 @@ package dev.heliosclient.module.modules.render.hiteffect.particles;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.modules.render.hiteffect.HitEffectParticle;
-import dev.heliosclient.util.TimerUtils;
+import dev.heliosclient.util.timer.TimerUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.Renderer3D;

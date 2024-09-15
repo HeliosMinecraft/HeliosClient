@@ -9,8 +9,8 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.ColorUtils;
-import dev.heliosclient.util.InputBox;
 import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.inputbox.InputBox;
 
 import java.util.List;
 

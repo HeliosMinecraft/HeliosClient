@@ -17,6 +17,7 @@ public class SpeedHud extends HudElement {
         this.width = 40;
         this.height = Math.round(Renderer2D.getStringHeight());
     }
+
     public static HudElementData<SpeedHud> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second", SpeedHud::new);
 
     @Override

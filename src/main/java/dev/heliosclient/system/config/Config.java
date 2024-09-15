@@ -14,7 +14,7 @@ import dev.heliosclient.system.Friend;
 import dev.heliosclient.ui.clickgui.CategoryPane;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudCategoryPane;
-import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.misc.MapReader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.heliosclient.HeliosClient.LOGGER;
+
 
 /**
  * This is the actual class that manages every config of HeliosClient
@@ -41,16 +42,12 @@ public class Config {
     public void init() {
         ModuleManager.init();
 
-        //Assume that client config file has a key saved with name "config" which represents the config name we were using
-        //String defaultFileName = otherConfigManager.getReadData().get("config");
+        // In HeliosClient.java, we switch to the config which was last chosen in the client-config.
         moduleConfigManager = new ConfigManager(HeliosClient.SAVE_FOLDER.getAbsolutePath() + "/modules", "modules");
 
         otherConfigManager = new ConfigManager(HeliosClient.SAVE_FOLDER.getAbsolutePath(), "config");
         otherConfigManager.createAndAdd("hud");
         otherConfigManager.createAndAdd("friends");
-
-
-        //  loadConfigManagers();
     }
 
     public void loadEverything() {
@@ -62,10 +59,10 @@ public class Config {
     public void saveEverything() {
         writeConfigData();
 
-        otherConfigManager.save(true);
-        otherConfigManager.getSubConfig("hud").save(true);
-        otherConfigManager.getSubConfig("friends").save(true);
-        moduleConfigManager.save(true);
+        otherConfigManager.save();
+        otherConfigManager.getSubConfig("hud").save();
+        otherConfigManager.getSubConfig("friends").save();
+        moduleConfigManager.save();
     }
 
     public void writeConfigData() {
@@ -81,17 +78,12 @@ public class Config {
         loadModules();
         loadFriendConfig();
 
-        if (ClickGUIScreen.INSTANCE == null) {
-            ClickGUIScreen.INSTANCE = new ClickGUIScreen();
-        } else {
-            ClickGUIScreen.INSTANCE.reset();
-        }
+        initClickGUIScreen();
     }
 
     public boolean nullCheck(){
         return moduleConfigManager == null || otherConfigManager  == null;
     }
-
 
     public void loadConfigManagers() {
         //Loads default config if any of the files are empty
@@ -99,7 +91,7 @@ public class Config {
         if (otherConfigManager.checkIfEmpty()) {
             LOGGER.warn("Client config is empty!");
             writeClientConfig();
-            otherConfigManager.save(true);
+            otherConfigManager.save();
         } else {
             otherConfigManager.load();
         }
@@ -107,30 +99,30 @@ public class Config {
         if (moduleConfigManager.checkIfEmpty()) {
             LOGGER.warn("Module config is empty!");
             writeDefaultModuleConfig();
-            moduleConfigManager.save(true);
+            moduleConfigManager.save();
         } else {
-            LOGGER.info("Loading Module Config \"{}\"",moduleConfigManager.getCurrentConfig().getName());
+            LOGGER.info("Loading Module SubConfig \"{}\"",moduleConfigManager.getCurrentConfig().getName());
             moduleConfigManager.load();
         }
 
         if (otherConfigManager.checkIfEmpty("hud")) {
             LOGGER.warn("HUD config is empty!");
             writeHudConfig();
-            otherConfigManager.getSubConfig("hud").save(true);
+            otherConfigManager.getSubConfig("hud").save();
         } else {
             otherConfigManager.getSubConfig("hud").load();
         }
 
         if (otherConfigManager.checkIfEmpty("friends")) {
             writeFriendConfig();
-            otherConfigManager.getSubConfig("friends").save(true);
+            otherConfigManager.getSubConfig("friends").save();
         } else {
             otherConfigManager.getSubConfig("friends").load();
         }
     }
 
     public void loadModules() {
-        Map<String, Object> panesMap = cast(moduleConfigManager.getCurrentConfig().getReadData().get("panes"));
+        MapReader panesMap = new MapReader(moduleConfigManager.getCurrentConfig().get("panes",Map.class));
         // This is the file structure //
         //     panes                  //
         //       |                    //
@@ -138,7 +130,9 @@ public class Config {
         //       |                    //
         //     modules                // - 1 loop
         //       |                    //
-        // module settings            // - 2 loops
+        // module settings            // - 2 loops (setting groups and the setting list)
+
+        // Very space efficient ik.
 
         // I should get a darwin award for this
 
@@ -147,12 +141,11 @@ public class Config {
         CategoryManager.getCategories().forEach((s, category) -> {
             if (category == Categories.SEARCH) return;
 
-
-            if (panesMap != null && panesMap.containsKey(category.name)) {
-                Map<String, Object> trashMap = cast(panesMap.get(category.name));
+            if (panesMap.map() != null && panesMap.has(category.name)) {
+                MapReader trashMap = panesMap.getMap(category.name);
 
                 for (Module_ m : ModuleManager.getModulesByCategory(category)) {
-                    m.loadFromFile(cast(trashMap.get(m.name.replace(" ",""))));
+                    m.loadFromFile(trashMap.getMap(m.name.replace(" ","")));
                 }
             }
         });
@@ -164,20 +157,24 @@ public class Config {
     }
 
     public void loadClientConfigModules() {
-        Map<String, Object> configMap = otherConfigManager.getCurrentConfig().getReadData();
-
-        CommandManager.prefix = (String) configMap.get("prefix");
+        MapReader mapReader = new MapReader(otherConfigManager.getCurrentConfig().getReadData());
+        CommandManager.prefix =  mapReader.getString("prefix",".");
 
         LOGGER.info("Loading Client Settings... ");
-        Map<String, Object> settingsMap = cast(configMap.get("settings"));
+        MapReader settingsMap = mapReader.getMap("settings");
 
         for (SettingGroup settingGroup : HeliosClient.CLICKGUI.settingGroups) {
             for (Setting<?> setting : settingGroup.getSettings()) {
                 if (!setting.shouldSaveAndLoad()) continue;
 
                 if (setting.name != null) {
-                    if (settingsMap != null)
-                        setting.loadFromFile(settingsMap);
+                    try {
+                        if (settingsMap != null)
+                            setting.loadFromFile(settingsMap);
+                    }catch (Throwable e){
+                        e.printStackTrace();
+                        continue;
+                    }
 
                     if (setting.iSettingChange != null && setting != HeliosClient.CLICKGUI.FontRenderer) {
                         setting.iSettingChange.onSettingChange(setting);
@@ -186,6 +183,14 @@ public class Config {
             }
         }
         LOGGER.info("Loading Client Settings Complete");
+    }
+
+    public void initClickGUIScreen(){
+        if (ClickGUIScreen.INSTANCE == null) {
+            ClickGUIScreen.INSTANCE = new ClickGUIScreen();
+        } else {
+            ClickGUIScreen.INSTANCE.reset();
+        }
     }
 
     public void writeClientConfig() {
@@ -279,23 +284,19 @@ public class Config {
         LOGGER.info("Loading Hud Elements... ");
 
         HudManager.INSTANCE.hudElements.clear();
-        Map<String, Object> hudElementsPaneMap = getHudElementsPaneMap();
-        if (hudElementsPaneMap != null) {
-            HudCategoryPane.INSTANCE.x = MathUtils.o2iSafe(hudElementsPaneMap.get("x"));
-            HudCategoryPane.INSTANCE.y = MathUtils.o2iSafe(hudElementsPaneMap.get("y"));
-            if(hudElementsPaneMap.containsKey("collapsed")) {
-                HudCategoryPane.INSTANCE.collapsed = (boolean) hudElementsPaneMap.get("collapsed");
-            }
+        MapReader hudElementsPaneMap = new MapReader(getHudElementsPaneMap());
+        if (hudElementsPaneMap.map() != null) {
+            HudCategoryPane.INSTANCE.x = hudElementsPaneMap.getInt("x",0);
+            HudCategoryPane.INSTANCE.y = hudElementsPaneMap.getInt("y",0);
+            HudCategoryPane.INSTANCE.collapsed = hudElementsPaneMap.getBoolean("collapsed",false);
 
-            Map<String, Object> hudElementsMap = cast(hudElementsPaneMap.get("elements"));
+            MapReader hudElementsMap = hudElementsPaneMap.getMap("elements");
             if (hudElementsMap != null) {
-                hudElementsMap.forEach(this::loadHudElement);
+                hudElementsMap.map().forEach((str, obj)-> this.loadHudElement(str,hudElementsMap.getMap(str)));
             }
         }
 
-
-
-        loadHudElementSettings();
+        loadHudElementSettings(hudElementsPaneMap);
 
         HudCategoryPane.INSTANCE.updateAllCount();
 
@@ -306,46 +307,45 @@ public class Config {
         return cast(otherConfigManager.getSubConfig("hud").getReadData().get("hudElements"));
     }
 
-    private void loadHudElement(String string, Object object) {
-        Map<String, Object> elementMap = cast(object);
-        if (elementMap.containsKey("name")) {
-            HudElementData<?> hudElementData = HudElementList.INSTANCE.elementDataMap.get((String) elementMap.get("name"));
+    private void loadHudElement(String id, MapReader map) {
+        if (map != null && map.has("name")) {
+            HudElementData<?> hudElementData = HudElementList.INSTANCE.elementDataMap.get(map.getString("name",null));
             if(hudElementData != null) {
                 HudElement hudElement = hudElementData.create();
                 if (hudElement != null) {
                     try {
-                        hudElement.loadFromFile(elementMap);
-                        hudElement.id.setUniqueID(string);
+                        hudElement.loadFromFile(map);
+                        hudElement.id.setUniqueID(id);
                         HudManager.INSTANCE.addHudElement(hudElement);
                     } catch (Exception e) {
                         LOGGER.error("An error occurred while loading hud element {}", hudElement.name);
                     }
                 }
             }else{
-                LOGGER.error("HudElement data was not found for {}", elementMap.get("name"));
+                LOGGER.error("HudElement data was not found for {}", id);
             }
         }
     }
 
-    public void loadHudElementSettings() {
-        Map<String, Object> hudElementsPaneMap = getHudElementsPaneMap();
+    public void loadHudElementSettings(MapReader hudElementsPaneMap) {
         if (hudElementsPaneMap != null) {
-            Map<String, Object> hudElementsMap = cast(hudElementsPaneMap.get("elements"));
+            MapReader hudElementsMap = hudElementsPaneMap.getMap("elements");
             if (hudElementsMap != null) {
-                hudElementsMap.forEach(this::loadHudElementSettings);
+                hudElementsMap.map().forEach((str, obj)->{
+                    this.loadHudElementSettings(str,hudElementsMap.getMap(str));
+                });
             }
         }
     }
 
-    private void loadHudElementSettings(String string, Object object) {
-        Map<String, Object> elementMap = cast(object);
+    private void loadHudElementSettings(String string, MapReader mapReader) {
         for (HudElement element : HudManager.INSTANCE.hudElements) {
             if (string.equals(element.id.uniqueID)) {
                 for (SettingGroup settingGroup : element.settingGroups) {
                     for (Setting<?> setting : settingGroup.getSettings()) {
                         if (!setting.shouldSaveAndLoad()) continue;
 
-                        setting.loadFromFile(elementMap);
+                        setting.loadFromFile(mapReader);
                     }
                 }
             }

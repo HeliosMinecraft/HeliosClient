@@ -10,7 +10,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.modules.world.Timer;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.SortMethod;
+import dev.heliosclient.util.misc.SortMethod;
 import dev.heliosclient.util.entity.TargetUtils;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.RotationUtils;

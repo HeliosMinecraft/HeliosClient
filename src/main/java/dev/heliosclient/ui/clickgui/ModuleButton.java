@@ -78,6 +78,7 @@ public class ModuleButton implements Listener {
         if (!shouldRender) return;
 
         GUI gui = ModuleManager.get(GUI.class);
+
         if (hitBox.contains(mouseX, mouseY)) {
             hoverAnimationTimer = Math.min(hoverAnimationTimer + 1, 20);
         } else {

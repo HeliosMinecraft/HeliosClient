@@ -1,7 +1,6 @@
 package dev.heliosclient.util.animation;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.toasts.ErrorToast;
 import dev.heliosclient.util.animation.toasts.InfoToast;
@@ -9,6 +8,7 @@ import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * Unstable to use now.
@@ -27,6 +27,11 @@ public class AnimationUtils {
         if (HeliosClient.MC.getToastManager() != null && toast != null) {
             HeliosClient.MC.getToastManager().add(toast);
         }
+    }
+
+    public static float calculateOvershoot(float t, float overshootFactor) {
+        float overshoot = --t * t * ((overshootFactor + 1) * t + overshootFactor) + 1;
+        return MathHelper.clamp(overshoot, 0, overshootFactor);
     }
 
     public static float lerp(float point1, float point2, float alpha) {

@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.inputbox;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
@@ -8,6 +8,7 @@ import dev.heliosclient.event.events.input.KeyPressedEvent;
 import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
+import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;

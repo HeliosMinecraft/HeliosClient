@@ -9,14 +9,13 @@ import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
@@ -335,7 +334,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
+    public void loadFromFile(MapReader map) {
     }
 
     public int getWidthCompact() {

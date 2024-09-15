@@ -4,14 +4,15 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
+
 
 public class ColorSetting extends Setting<Integer> {
     public int r;
@@ -248,12 +249,8 @@ public class ColorSetting extends Setting<Integer> {
     }
 
     @Override
-    public void loadFromFile(Map<String, Object> MAP) {
-        if (MAP.get(getSaveName()) == null) {
-            value = defaultValue;
-            return;
-        }
-        value = (int) MAP.get(getSaveName());
+    public void loadFromFile(MapReader map) {
+        value = map.getInt(getSaveName(),defaultValue);
     }
 
     public static class Builder extends SettingBuilder<Builder, Integer, ColorSetting> {
