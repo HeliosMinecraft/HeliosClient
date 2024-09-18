@@ -259,6 +259,10 @@ public class DoubleSetting extends Setting<Double> {
             this.defaultValue = (double) val;
             return this;
         }
+        public Builder value(float val) {
+            this.value = (double) val;
+            return this;
+        }
 
         @Override
         public DoubleSetting build() {

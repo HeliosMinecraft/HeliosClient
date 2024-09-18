@@ -2,6 +2,7 @@ package dev.heliosclient.module.settings;
 
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.GradientManager;
 import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.ui.clickgui.gui.tables.Table;
@@ -53,7 +54,7 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
 
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 4, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor);
 
         // Draw a '🖋' button next to the text
         nameWidth = Renderer2D.getFxStringWidth(name);
@@ -128,7 +129,7 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth), x + 2, y + 4, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth), x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor);
 
         // Draw a '🖋' button next to the text
         nameWidth = Renderer2D.getFxStringWidth(FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth));

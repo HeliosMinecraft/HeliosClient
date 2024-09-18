@@ -42,6 +42,7 @@ public class ScriptManagerScreen extends Screen {
     private int scrollOffset = 0, maxScroll;
     static int lightBlack = ColorUtils.changeAlphaGetInt(0xFF000000, 165);
     //private int entryWidth, entryHeight;
+    private static final int SCROLLBAR_WIDTH = 3;
 
     private Table scriptTable = new Table();
 
@@ -173,6 +174,7 @@ public class ScriptManagerScreen extends Screen {
     public void drawLocalScriptEntries(DrawContext context, int mouseX, int mouseY) {
         // Enable scissor for scrolling
         float startEntryX = startX + (managerWidth * 0.20f) - 2;
+        int visibleHeight = managerHeight - 18; // Subtract header height
 
         Renderer2D.enableScissor((int) (startEntryX), 50, managerWidth + 50, mc.getWindow().getScaledHeight() - 98);
 
@@ -180,7 +182,9 @@ public class ScriptManagerScreen extends Screen {
         for(List<TableEntry> row: scriptTable.table){
             for (TableEntry entry : row) {
                 if (entry instanceof ScriptEntry scriptEntry) {
-                    drawScript(context, (float) scriptEntry.getX(),  (float) scriptEntry.getY(), mouseX, mouseY, scriptEntry.getLuaFile());
+                    if (scriptEntry.getY() + scriptEntry.getHeight() > 50 && scriptEntry.getY() < 50 + visibleHeight) {
+                        scriptEntry.renderScript(context, (float) scriptEntry.getX(), (float) scriptEntry.getY(), mouseX, mouseY);
+                    }
                 }
             }
         }
@@ -188,46 +192,55 @@ public class ScriptManagerScreen extends Screen {
         Renderer2D.disableScissor();
 
         // Draw scrollbar
+
+        drawScrollbar(context);
+
+        /*
         int scrollbarX = startX + managerWidth + 5;
         int scrollbarY = 50;
         float scrollbarHeight = maxScroll > 0 ? (int) (Math.pow(70 + 10, 2) * 2 / maxScroll) : 0;
         float scrollbarPosition = maxScroll > 0 ? scrollbarY + (scaledHeight - 100 - scrollbarHeight) * scrollOffset / maxScroll : scrollbarY; // Position of the scrollbar depends on the current scroll offset
         Renderer2D.drawRectangleWithShadow(context.getMatrices(), scrollbarX, scrollbarPosition, 1.5f, scrollbarHeight, Color.BLACK.brighter().brighter().getRGB(), 2);
+
+         */
     }
 
-    public void drawScript(DrawContext drawContext, float x, float y, int mouseX, int mouseY, LuaFile file) {
-        //Icon
-        Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), x, y, 60, 70, 4, 4, ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary().darker().darker().darker(), 169).getRGB());
-        Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, 60, 70, 4, 0.7f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientStart());
-        FontRenderers.Ultra_Large_iconRenderer.drawString(drawContext.getMatrices(), "\uF0F6", x + 19, y + 12, Color.WHITE.getRGB());
+    private void drawScrollbar(DrawContext context) {
+        int scrollbarX = startX + managerWidth + 5;
+        int scrollbarY = 50;
+        int scrollbarHeight = managerHeight - 18; // Subtract header height
 
-        Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientStart(), x, y + 58, 60, 12, 3, false, false, true, true);
+        // Draw scrollbar background
+        Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(),
+                scrollbarX, scrollbarY, SCROLLBAR_WIDTH, scrollbarHeight,2,
+                lightBlack);
 
-        //Name
-        FontRenderers.Mid_fxfontRenderer.drawString(drawContext.getMatrices(), file.getScriptName(), x + 30 - FontRenderers.Mid_fxfontRenderer.getStringWidth(file.getScriptName()) / 2.0f, y + 43f, Color.WHITE.getRGB());
+        if (maxScroll > 0) {
+            float scrollPercentage = (float) scrollOffset / maxScroll;
+            int handleHeight = Math.max(20, scrollbarHeight * scrollbarHeight / (scrollbarHeight + maxScroll));
+            int handleY = scrollbarY + (int) ((scrollbarHeight - handleHeight) * scrollPercentage);
 
-        //Bind
-        String bindKey = KeyboardUtils.translateShort(file.bindKey).toUpperCase();
-        if (file.isListeningForBind) {
-            bindKey = "Set";
+            // Draw scrollbar handle
+            Renderer2D.drawRoundedRectangle(context.getMatrices().peek().getPositionMatrix(),
+                    scrollbarX, handleY, SCROLLBAR_WIDTH, handleHeight,2,
+                    Color.BLACK.getRGB());
         }
-        Renderer2D.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(), x + 4, y + 60, FontRenderers.Small_fxfontRenderer.getStringWidth(bindKey) + 3, 8, 2, Color.BLACK.getRGB(), 100, 1, 1);
-        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), bindKey, x + 4.9f, y + 60.5f, Color.WHITE.getRGB());
+    }
 
-        //File state (loaded/unloaded)
-        drawOnOffButton(drawContext, x + 26, y + 60, file.isLoaded());
-        //Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),xModified + 10, y + 60,FontRenderers.Small_fxfontRenderer.getStringWidth(file.isLoaded? "DISABLE":"ENABLE") + 3,7,2,Color.BLACK.getRGB());
-        //FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(),file.isLoaded? "DISABLE":"ENABLE",xModified + 10,y + 60.5f, file.isLoaded? Color.RED.getRGB() : Color.GREEN.getRGB());
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (button == 0 && mouseX >= startX + managerWidth && mouseX <= startX + managerWidth + 5 + SCROLLBAR_WIDTH * 2) {
+            int scrollbarY = 50;
+            int scrollbarHeight = managerHeight - 18;
 
-        //Refresh / Reload
-        Renderer2D.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(), x + 45f, y + 59.5f, FontRenderers.Small_iconRenderer.getStringWidth("\uEA75") + 2, 8, 2, Color.BLACK.getRGB(), 100, 1, 1);
-        FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uEA1D", x + 46f, y + 60.5f, Color.WHITE.getRGB());
-
-        if (isMouseOver(mouseX, mouseY, x, y, 60, 70)) {
-            //Edit
-            Renderer2D.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(), x + 46f, y + 3f, FontRenderers.Small_iconRenderer.getStringWidth("\uEAF3") + 2, 8, 2, Color.WHITE.getRGB(), 100, 1, 1);
-            FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uEAF3", x + 47f, y + 3.5f, Color.BLACK.getRGB());
+            if (mouseY >= scrollbarY && mouseY <= scrollbarY + scrollbarHeight) {
+                float scrollPercentage = (float) (mouseY - scrollbarY) / scrollbarHeight;
+                scrollOffset = (int) (maxScroll * scrollPercentage);
+                scrollOffset = MathHelper.clamp(scrollOffset, 0, maxScroll);
+                return true;
+            }
         }
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     private void addTableEntries(){
@@ -237,20 +250,24 @@ public class ScriptManagerScreen extends Screen {
         managerHeight = scaledHeight - 80;
 
         scriptTable = new Table();
-        for (LuaFile luaFile: LuaScriptManager.luaFiles) {
-            scriptTable.addEntry(new ScriptEntry(luaFile),managerWidth * 0.88 - 15);
+
+        if(showLocalScripts) {
+            for (LuaFile luaFile : LuaScriptManager.luaFiles) {
+                scriptTable.addEntry(new ScriptEntry(luaFile), managerWidth * 0.88 - 15);
+            }
         }
     }
 
     public void calculateTable() {
         float startEntryX = startX + (managerWidth * 0.20f) + 10;
-        maxScroll = (int) Math.ceil(scriptTable.adjustTableLayout(startEntryX, 65,managerWidth * 0.8 - 15,false));
+        float availableWidth = managerWidth * 0.8f - 10 * 2 - SCROLLBAR_WIDTH;
+        int totalHeight = (int) Math.round(scriptTable.adjustTableLayout(startEntryX, 65, availableWidth, false)) + 10;
+        maxScroll = Math.max(0, totalHeight - (managerHeight - 18));
     }
 
     public boolean hoveredOverRefreshAll(double mouseX, double mouseY) {
         return isMouseOver(mouseX, mouseY, scaledWidth - 125, 33, 15, 15);
     }
-
 
     public boolean hoveredOverLocalScripts(double mouseX, double mouseY) {
         return isMouseOver(mouseX, mouseY, startX + 12, 66, managerWidth * 0.18f - 15, 20);
@@ -261,23 +278,6 @@ public class ScriptManagerScreen extends Screen {
     }
     public boolean hoveredOverForceCloseAll(double mouseX, double mouseY) {
         return isMouseOver(mouseX, mouseY, startX + 12, 134, managerWidth * 0.18f - 15, 20);
-    }
-
-    public boolean hoveredOverFileState(double mouseX, double mouseY, double entryX, double entryY) {
-        return isMouseOver(mouseX, mouseY, entryX + 26, entryY + 60, 16, 8);
-    }
-
-    public boolean hoveredOverRefreshFile(double mouseX, double mouseY, double entryX, double entryY) {
-        return isMouseOver(mouseX, mouseY, entryX + 45f, entryY + 59.5f, 4 + FontRenderers.Small_iconRenderer.getStringWidth("\uEA75"), 8);
-    }
-
-    public boolean hoveredOverEditFile(double mouseX, double mouseY, double entryX, double entryY) {
-        return isMouseOver(mouseX, mouseY, entryX + 46f, entryY + 3f, 4 + FontRenderers.Small_iconRenderer.getStringWidth("\uEAF3"), 8);
-    }
-
-    public boolean hoveredOverBind(double mouseX, double mouseY, LuaFile file, double entryX, double entryY) {
-        String bindKeyName = KeyboardUtils.translateShort(file.bindKey).toUpperCase();
-        return isMouseOver(mouseX, mouseY, entryX + 5f, entryY + 60f, FontRenderers.Small_fxfontRenderer.getStringWidth(bindKeyName) + 3, 7.4f);
     }
 
     @Override
@@ -294,7 +294,7 @@ public class ScriptManagerScreen extends Screen {
             for (TableEntry entry : row) {
                 if (entry instanceof ScriptEntry scriptEntry) {
                     LuaFile file = scriptEntry.getLuaFile();
-                    if (hoveredOverFileState(mouseX, mouseY, scriptEntry.getX(), scriptEntry.getY())) {
+                    if (scriptEntry.hoveredOverFileState(mouseX, mouseY)) {
                         SoundUtils.playInstanceSound(SoundUtils.CLICK_SOUNDEVENT);
                         if (file.isLoaded()) {
                             LuaScriptManager.INSTANCE.closeScript(file);
@@ -302,15 +302,15 @@ public class ScriptManagerScreen extends Screen {
                             LuaScriptManager.INSTANCE.loadScript(file);
                         }
                     }
-                    if (hoveredOverRefreshFile(mouseX, mouseY, scriptEntry.getX(), scriptEntry.getY())) {
+                    if (scriptEntry.hoveredOverRefreshFile(mouseX, mouseY)) {
                         LuaScriptManager.reloadScript(file);
                     }
 
-                    if (hoveredOverBind(mouseX, mouseY, file, scriptEntry.getX(), scriptEntry.getY())) {
+                    if (scriptEntry.hoveredOverBind(mouseX, mouseY, file)) {
                         file.setListening(true);
                         isListening = true;
                     }
-                    if (hoveredOverEditFile(mouseX, mouseY, scriptEntry.getX(), scriptEntry.getY())) {
+                    if (scriptEntry.hoveredOverEditFile(mouseX, mouseY)) {
                         //Todo
                     }
                 }
@@ -322,6 +322,9 @@ public class ScriptManagerScreen extends Screen {
         }
         if (hoveredOverCloudScripts(mouseX, mouseY)) {
             showLocalScripts = false;
+
+            // Cloud entries to be added yet
+            addTableEntries();
             SoundUtils.playInstanceSound(SoundUtils.CLICK_SOUNDEVENT);
         }
         if (hoveredOverForceCloseAll(mouseX, mouseY)) {
@@ -372,16 +375,16 @@ public class ScriptManagerScreen extends Screen {
     }
 
     public class ScriptEntry implements TableEntry {
-        private final LuaFile luaFile;
-        private double x;
-        private double y;
+        private final LuaFile file;
+        private double entryX;
+        private double entryY;
 
         public ScriptEntry(LuaFile luaFile) {
-            this.luaFile = luaFile;
+            this.file = luaFile;
         }
 
         public LuaFile getLuaFile() {
-            return luaFile;
+            return file;
         }
 
         @Override
@@ -396,19 +399,175 @@ public class ScriptManagerScreen extends Screen {
 
         @Override
         public void setPosition(double x, double y) {
-            this.x = x;
-            this.y = y;
+            this.entryX = x;
+            this.entryY = y;
         }
 
         @Override
         public void setWidth(double width) {}
 
         public double getX() {
-            return x;
+            return entryX;
+        }
+
+        public boolean hoveredOverFileState(double mouseX, double mouseY) {
+            return isMouseOver(mouseX, mouseY, entryX + 26, getY() + 60, 16, 8);
+        }
+
+        public boolean hoveredOverRefreshFile(double mouseX, double mouseY) {
+            return isMouseOver(mouseX, mouseY, entryX + 45f, getY() + 59.5f, 4 + FontRenderers.Small_iconRenderer.getStringWidth("\uEA75"), 8);
+        }
+
+        public boolean hoveredOverEditFile(double mouseX, double mouseY) {
+            return isMouseOver(mouseX, mouseY, entryX + 46f, getY() + 3f, 4 + FontRenderers.Small_iconRenderer.getStringWidth("\uEAF3"), 8);
+        }
+
+        public boolean hoveredOverBind(double mouseX, double mouseY, LuaFile file) {
+            String bindKeyName = KeyboardUtils.translateShort(file.bindKey).toUpperCase();
+            return isMouseOver(mouseX, mouseY, entryX + 5f, getY() + 60f, FontRenderers.Small_fxfontRenderer.getStringWidth(bindKeyName) + 3, 7.4f);
+        }
+
+        public void renderScript(DrawContext drawContext, float x, float y, int mouseX, int mouseY){
+            float width = 60;
+            float height = 70;
+
+            Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(),
+                    x, y, width, height,
+                    4, 4,
+                    ColorUtils.changeAlpha(ColorManager.INSTANCE.ClickGuiPrimary().darker().darker(), 169).getRGB()
+            );
+
+            //Separating line
+            Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(),
+                    x, y, width,4.5f + Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer), 4,10,
+                    Color.DARK_GRAY.darker().darker().darker().getRGB(),
+                    Color.BLACK.getRGB(),
+                    true,true,false,false
+            );
+
+            Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x, y, width, height, 4, 0.7f,
+                    ColorManager.INSTANCE.getPrimaryGradientStart(),
+                    ColorManager.INSTANCE.getPrimaryGradientEnd(),
+                    ColorManager.INSTANCE.getPrimaryGradientEnd(),
+                    ColorManager.INSTANCE.getPrimaryGradientStart()
+            );
+
+            //Smaller Icon, in the future, different icons should be supported for different types of scripts.
+            FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF0F6", x + 3, y + 3, Color.WHITE.getRGB());
+
+            Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
+                    ColorManager.INSTANCE.getPrimaryGradientStart(),
+                    ColorManager.INSTANCE.getPrimaryGradientEnd(),
+                    ColorManager.INSTANCE.getPrimaryGradientEnd(),
+                    ColorManager.INSTANCE.getPrimaryGradientStart(),
+                    x, y + 58, width, 12, 3, false, false, true, true
+            );
+
+            //Name
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), file.getScriptName(),
+                    x + ((width + 1)/2.0f) - FontRenderers.Small_fxfontRenderer.getStringWidth(file.getScriptName()) / 2.0f,
+                    y + 4,
+                    Color.WHITE.getRGB()
+            );
+
+            //Separating line
+        /*
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
+                x, y + 4.5f + Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer), width,0.7f,
+                ColorManager.INSTANCE.getPrimaryGradientStart().getRGB()
+        );
+
+         */
+
+            //Author
+            String author = "author245252";
+            author = FontRenderers.Small_fxfontRenderer.trimToWidth(author,width/2 - 1);
+
+            //Check if the author name matches the orignal auth
+            if(!author.equals("author245252")){
+                if(isMouseOver(mouseX,mouseY,x + 3,y + 7, FontRenderers.Small_fxfontRenderer.getStringWidth(author) + 1,FontRenderers.Small_fxfontRenderer.getStringHeight(author) + 1)){
+                    //Display org author here:
+                    Tooltip.tooltip.changeText("author245252");
+                }
+            }
+
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), author,
+                    x + 3,
+                    y + 6 + Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer),
+                    Color.MAGENTA.getRGB()
+            );
+
+
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(),   "v1.0.0",
+                    x + width - FontRenderers.Small_fxfontRenderer.getStringWidth("v1.0.0") - 3,
+                    y + 6 + Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer),
+                    Color.GRAY.getRGB()
+            );
+
+            String desc = "Standard Description of script";
+            float yOff = 16 + Renderer2D.getCustomStringHeight(FontRenderers.Small_fxfontRenderer);
+            for(String str: Renderer2D.wrapText(desc, Math.round(width - 4),FontRenderers.Small_fxfontRenderer)) {
+                FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), str,
+                        x + width/2.0f - FontRenderers.Small_fxfontRenderer.getStringWidth(str)/2.0f,
+                        y + yOff,
+                        Color.LIGHT_GRAY.getRGB()
+                );
+                yOff += FontRenderers.Small_fxfontRenderer.getStringHeight(str) + 1;
+            }
+
+            //Bind
+            String bindKey = KeyboardUtils.translateShort(file.bindKey).toUpperCase();
+            if (file.isListeningForBind) {
+                bindKey = "Set"; //I think we should change this to "..."
+            }
+            Renderer2D.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
+                    x + 4,
+                    y + 60,
+                    FontRenderers.Small_fxfontRenderer.getStringWidth(bindKey) + 3,
+                    8,
+                    2,
+                    Color.BLACK.getRGB(),
+                    100, 1, 1
+            );
+
+            FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), bindKey, x + 4.9f, y + 60.5f, Color.WHITE.getRGB());
+
+            //File state (loaded/unloaded)
+            drawOnOffButton(drawContext, x + 26, y + 60, file.isLoaded());
+            //Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),xModified + 10, y + 60,FontRenderers.Small_fxfontRenderer.getStringWidth(file.isLoaded? "DISABLE":"ENABLE") + 3,7,2,Color.BLACK.getRGB());
+            //FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(),file.isLoaded? "DISABLE":"ENABLE",xModified + 10,y + 60.5f, file.isLoaded? Color.RED.getRGB() : Color.GREEN.getRGB());
+
+            //Refresh / Reload
+            Renderer2D.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
+                    x + 45,
+                    y + 59.5f,
+                    FontRenderers.Small_iconRenderer.getStringWidth("\uEA75") + 2,
+                    8,
+                    2,
+                    Color.BLACK.getRGB(),
+                    100, 1, 1
+            );
+
+            FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uEA1D", x + 46, y + 60.5f, Color.WHITE.getRGB());
+
+            if (isMouseOver(mouseX, mouseY, x, y, 60, 70)) {
+                //Edit
+                Renderer2D.drawRoundedRectangleWithShadowBadWay(drawContext.getMatrices().peek().getPositionMatrix(),
+                        x + 46,
+                        y + 3,
+                        FontRenderers.Small_iconRenderer.getStringWidth("\uEAF3") + 2,
+                        8,
+                        2,
+                        Color.WHITE.getRGB(),
+                        100, 1, 1
+                );
+
+                FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uEAF3", x + 47f, y + 3.5f, Color.BLACK.getRGB());
+            }
         }
 
         public double getY() {
-            return y - ScriptManagerScreen.this.scrollOffset;
+            return entryY - ScriptManagerScreen.this.scrollOffset;
         }
     }
 }

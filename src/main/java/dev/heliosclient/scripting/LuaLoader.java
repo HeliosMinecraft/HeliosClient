@@ -44,7 +44,12 @@ public class LuaLoader {
 
             LuaValue onRunFunction = luaFile.getExecutor().getFunction("onRun");
             if (onRunFunction.isfunction()) {
-                onRunFunction.call();
+                try {
+                    onRunFunction.call();
+                }catch (Throwable e){
+                    ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "Error caught while calling the onRun() function: " + e.getMessage());
+                    HeliosClient.LOGGER.error("Error caught while calling the onRun() function...", e);
+                }
             } else {
                 ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onRun() function not found for " + ColorUtils.blue + luaFile.getAbsolutePath() + ColorUtils.darkRed + " while loading");
                 HeliosClient.LOGGER.error("onRun() function not found for file: {} while loading", luaFile.getName());
@@ -78,7 +83,12 @@ public class LuaLoader {
         try {
             LuaValue onStopFunction = file.getExecutor().getFunction("onStop");
             if (onStopFunction.isfunction()) {
-                onStopFunction.call();
+                try {
+                    onStopFunction.call();
+                }catch (Throwable e){
+                    ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "Error caught while calling the onStop() function: " + e.getMessage());
+                    HeliosClient.LOGGER.error("Error caught while calling the onStop() function...", e);
+                }
             } else {
                 ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "onStop() function not found for " + ColorUtils.blue + file.getAbsolutePath() + ColorUtils.darkRed + " while closing");
                 HeliosClient.LOGGER.error("onStop() function not found for file: {} while closing", file.getAbsolutePath());

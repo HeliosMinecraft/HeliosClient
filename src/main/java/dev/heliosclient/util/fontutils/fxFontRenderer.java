@@ -1,11 +1,15 @@
 package dev.heliosclient.util.fontutils;
 
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
 
+/**
+ * fx means Fixed, originally was made for rendering with fixed sizes.
+ */
 public class fxFontRenderer extends FontRenderer {
 
     /**
@@ -24,6 +28,8 @@ public class fxFontRenderer extends FontRenderer {
      * @param text  The text to trim.
      * @param width The maximum width of the rendered text.
      * @return The trimmed text.
+     *
+     * @see dev.heliosclient.util.render.Renderer2D#wrapText(String, int, fxFontRenderer) , int)
      */
     public String trimToWidth(String text, float width) {
         float textWidth = this.getStringWidth(text);
@@ -39,8 +45,13 @@ public class fxFontRenderer extends FontRenderer {
         }
     }
 
-    public void drawString(MatrixStack matrixStack, String text, float x, float y, int color) {
+    public void drawString(MatrixStack matrixStack, String text, float x, float y, float scale, int color) {
+        Renderer2D.scaleAndPosition(matrixStack,x,y,scale);
+        this.drawString(matrixStack,text,x,y,color);
+        Renderer2D.stopScaling(matrixStack);
+    }
 
+    public void drawString(MatrixStack matrixStack, String text, float x, float y, int color) {
         int r = 256 - ColorUtils.getRed(color);
         int g = 256 - ColorUtils.getGreen(color);
         int b = 256 - ColorUtils.getBlue(color);
@@ -60,7 +71,10 @@ public class fxFontRenderer extends FontRenderer {
         int b = 256 - ColorUtils.getBlue(color);
         int a = 256 - ColorUtils.getAlpha(color);
 
-        super.drawCenteredString(stack, s, x, y, r, g, b, a);
+        try {
+            super.drawCenteredString(stack, s, x, y, r, g, b, a);
+        } catch (NullPointerException ignored) {
+        }
     }
 
 }

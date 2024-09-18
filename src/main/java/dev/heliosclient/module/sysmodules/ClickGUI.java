@@ -55,6 +55,7 @@ public class ClickGUI extends Module_ {
             .name("ClickGUI roundness")
             .description("Control the roundness of the click gui")
             .onSettingChange(this)
+            .value(2d)
             .defaultValue(2)
             .min(1)
             .max(7)

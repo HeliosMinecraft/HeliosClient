@@ -145,7 +145,9 @@ public class CategoryPane implements Listener {
     }
 
     public void removeModules() {
-        moduleButtons.clear();
+        if(!moduleButtons.isEmpty())
+            moduleButtons.clear();
+
         height = 4;
         maxWidth = 0;
     }

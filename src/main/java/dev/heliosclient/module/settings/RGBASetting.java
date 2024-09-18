@@ -4,6 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.ui.clickgui.settings.RGBASettingScreen;
 import dev.heliosclient.util.ColorUtils;
@@ -80,6 +81,20 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         alphaHandleY = Math.round((1.0f - alpha) * (float) boxHeight);
 
         hexInput = new InputBox(50, 11, ColorUtils.colorToHex(value), 7, InputBox.InputMode.ALL);
+        hexInput.enterTask = ()->{
+            if (ColorUtils.isHexColor(hexInput.getValue().trim())) {
+                try {
+                    value = ColorUtils.hexToColor(hexInput.getValue().trim());
+                    updateHandles(true);
+                    return true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                    // Something went wrong
+                }
+            }
+            return true;
+        };
     }
 
     @Override
@@ -87,7 +102,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
         this.x = x;
         this.y = y;
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 4, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor());
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, value.getRGB());
     }
 
@@ -97,7 +112,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
 
 
         // Draw the name of setting and the value of the color we have set
-        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 3, y + 2, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 3, y + 2, ColorManager.INSTANCE.defaultTextColor());
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 170, y + 2, 15, 15, 2, value.getRGB());
 
         int value1 = hoveredOverGradientBox(mouseX, mouseY) ? Color.DARK_GRAY.getRGB() : Color.BLACK.brighter().getRGB();
@@ -135,10 +150,10 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
         FontRenderers.Mid_iconRenderer.drawString(drawContext.getMatrices(), "\uF1FB", x + offsetX + Renderer2D.getFxStringWidth("Rainbow ") + 6.5f, y + offsetY + gradientBoxHeight + 6.5f, isPicking ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
         //Render the texts
-        Renderer2D.drawFixedString(drawContext.getMatrices(), "Alpha: " + value.getAlpha(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 9, -1);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), "Red: " + value.getRed(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 18, -1);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), "Green: " + value.getGreen(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 27, -1);
-        Renderer2D.drawFixedString(drawContext.getMatrices(), "Blue: " + value.getBlue(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 36, -1);
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Alpha: " + value.getAlpha(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 9, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Red: " + value.getRed(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 18, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Green: " + value.getGreen(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 27, ColorManager.INSTANCE.defaultTextColor());
+        Renderer2D.drawFixedString(drawContext.getMatrices(), "Blue: " + value.getBlue(), gradientBoxX, y + offsetY + gradientBoxHeight + Renderer2D.getFxStringHeight() + 36, ColorManager.INSTANCE.defaultTextColor());
 
         // Draw the handles
         Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), gradientBoxX + handleX, gradientBoxY + handleY, 1, -1);
@@ -195,7 +210,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
 
         Renderer2D.drawOutlineRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), x - 1, y - 1, sliderWidth + 2, boxHeight + 2, 1, 1, value3);
 
-        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Alpha", x - 5, y + boxHeight + 2, -1); // Below the alpha slider
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), "Alpha", x - 5, y + boxHeight + 2, ColorManager.INSTANCE.defaultTextColor()); // Below the alpha slider
     }
 
     public void drawBrightnessSaturationBox(DrawContext drawContext, int x, int y, float hue, int value3) {
@@ -243,7 +258,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
-        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 1, -1);
+        FontRenderers.Small_fxfontRenderer.drawString(drawContext.getMatrices(), name.substring(0, Math.min(12, name.length())) + "...", x + 3, y + 1, ColorManager.INSTANCE.defaultTextColor());
         Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 71, y + 1, 10, 10, 2, value.getRGB());
     }
 
@@ -298,9 +313,9 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
 
     public void keyPress(int keyCode) {
         if ((keyCode == GLFW.GLFW_KEY_KP_ENTER || keyCode == GLFW.GLFW_KEY_ENTER) && hexInput.isFocused()) {
-            if (ColorUtils.isHexColor(hexInput.getValue())) {
+            if (ColorUtils.isHexColor(hexInput.getValue().trim())) {
                 try {
-                    value = ColorUtils.hexToColor(hexInput.getValue());
+                    value = ColorUtils.hexToColor(hexInput.getValue().trim());
                     updateHandles(true);
                 } catch (Exception e) {
                     e.printStackTrace();

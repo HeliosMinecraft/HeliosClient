@@ -22,6 +22,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public class InputBox implements Listener {
@@ -38,6 +39,9 @@ public class InputBox implements Listener {
     protected boolean selecting = false;
     protected boolean selectedAll = false;
     protected Screen screen;
+
+    /** This supplier is called before the user un-focuses the inputbox (by pressing enter), if false is returned then it won't un-focus. */
+    public Supplier<Boolean> enterTask = ()->true;
 
     public InputBox(int width, int height, String value, int characterLimit, InputMode inputMode) {
         this.width = width;
@@ -81,7 +85,9 @@ public class InputBox implements Listener {
                 }
                 case GLFW.GLFW_KEY_ENTER,
                      GLFW.GLFW_KEY_KP_ENTER -> {
+                    if(enterTask.get()){
                     focused = false;
+                    }
                 }
             }
         }

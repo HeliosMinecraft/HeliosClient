@@ -260,14 +260,8 @@ public class ColorUtils {
      * @return Boolean value if the string is color encoded or not
      */
     public static boolean isHexColor(String value) {
-        if (value.startsWith("#")) {
-            value = value.substring(1);
-        }
-        if (value.length() != 6) {
-            return false;
-        }
         try {
-            Color.decode("#" + value);
+            Color.decode(value);
             return true;
         } catch (NumberFormatException e) {
             e.printStackTrace();

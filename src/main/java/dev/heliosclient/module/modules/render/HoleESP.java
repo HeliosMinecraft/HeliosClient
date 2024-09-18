@@ -28,6 +28,14 @@ public class HoleESP extends Module_ {
             .onSettingChange(this)
             .build()
     );
+    BooleanSetting quads = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Show Quad holes")
+            .description("Shows quad holes (4 block holes). May drain fps.")
+            .value(false)
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
     DoubleSetting holeRange = sgGeneral.add(new DoubleSetting.Builder()
             .name("Hole Range")
             .description("Maximum distance of the hole to the player")
@@ -190,8 +198,6 @@ public class HoleESP extends Module_ {
             .build()
     );
 
-
-
     public HoleESP() {
         super("HoleESP", "Displays holes in your area", Categories.RENDER);
         addSettingGroup(sgGeneral);
@@ -205,7 +211,7 @@ public class HoleESP extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        holes = HoleUtils.getHoles((int) holeRange.value, (int) holeRangeVertical.value).stream().toList();
+        holes = HoleUtils.getHoles((int) holeRange.value, (int) holeRangeVertical.value,quads.value).stream().toList();
     }
 
     @SubscribeEvent
@@ -216,7 +222,7 @@ public class HoleESP extends Module_ {
         QuadColor.CardinalDirection direction = gradientDirection.getOption().equals("Down") ? QuadColor.CardinalDirection.SOUTH : QuadColor.CardinalDirection.NORTH;
 
         for (HoleUtils.HoleInfo info : holes) {
-            if (!renderSelf.value && mc.player.getBlockPos().isWithinDistance(info.holePosition, 1d)) {
+            if (!renderSelf.value && info.holeBox.intersects(mc.player.getBoundingBox().contract(0.2f))) {
                 continue;
             }
 
