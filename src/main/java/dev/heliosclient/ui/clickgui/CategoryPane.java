@@ -20,6 +20,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -48,6 +49,10 @@ public class CategoryPane implements Listener {
     List<ModuleButton> moduleButtons;
     int categoryNameHeight = 2 , categoryNameWidth = 2;
     private int scrollOffset = 0;
+    private double targetScrollOffset = 0;
+    private double currentScrollOffset = 0;
+    private double scrollVelocity = 0;
+    private long lastScrollTime = 0;
 
 
     public CategoryPane(Category category, int initialX, int initialY, boolean collapsed, Screen parentScreen) {
@@ -85,7 +90,6 @@ public class CategoryPane implements Listener {
     }
 
     public void addModule(List<Module_> moduleS) {
-
         for (Module_ module : moduleS) {
             boolean exists = false;
             for (ModuleButton button : moduleButtons) {
@@ -132,6 +136,25 @@ public class CategoryPane implements Listener {
         if (scale > 1.0f) {
             scale = 1.0f;
         }
+        // Smooth scrolling
+        double scrollDiff = targetScrollOffset - currentScrollOffset;
+        double scrollStep = scrollDiff * (HeliosClient.CLICKGUI.scrollingSmoothness.value/5.0d); //Smoothness value. Ajdust it for better
+        currentScrollOffset += scrollStep;
+
+        // Apply momentum
+        long currentTime = System.currentTimeMillis();
+        double timeDelta = (currentTime - lastScrollTime) / 1000.0;
+        lastScrollTime = currentTime;
+
+        currentScrollOffset += scrollVelocity * timeDelta;
+        scrollVelocity *= Math.pow(0.95, timeDelta * 60); // Decay factor
+
+        // Ensure scroll offset stays within bounds
+        currentScrollOffset = MathHelper.clamp(currentScrollOffset, 0,height - hudBox.getHeight());
+        targetScrollOffset = MathHelper.clamp(targetScrollOffset, 0,height - hudBox.getHeight());
+
+        // Update the actual scroll offset
+        scrollOffset = (int) currentScrollOffset;
     }
 
 
@@ -173,6 +196,12 @@ public class CategoryPane implements Listener {
             y = mouseY - startY;
         }
 
+        if(HeliosClient.CLICKGUI.ScrollType.isOption(ClickGUI.ScrollTypes.OLD)) {
+            scrollOffset = 0;
+            targetScrollOffset = 0;
+            scrollVelocity = 0;
+        }
+
         Renderer2D.scaleAndPosition(drawContext.getMatrices(), (x + (width + 5) / 2.0f), (float) (y + categoryNameHeight + 6), (float) scale);
 
         if (!collapsed && height >= 10) {
@@ -189,7 +218,7 @@ public class CategoryPane implements Listener {
         } else {
             int buttonYOffset = y + 10 + categoryNameHeight - scrollOffset;
             for (ModuleButton m : moduleButtons) {
-                boolean shouldModuleRender = buttonYOffset > y + 5;
+                boolean shouldModuleRender = buttonYOffset > y + 5 && buttonYOffset < y + hudBox.getHeight() + categoryNameHeight;
 
                 m.render(drawContext, mouseX, mouseY, x, buttonYOffset, maxWidth, shouldModuleRender);
 
@@ -297,9 +326,14 @@ public class CategoryPane implements Listener {
 
     public void mouseScrolled(int mouseX, int mouseY, double amount) {
         if (hoveredOverModules(mouseX, mouseY) && ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.NEW) {
-            // Scroll this pane by changing the scroll offset
-            scrollOffset += (int) (amount * HeliosClient.CLICKGUI.ScrollSpeed.value);
-            scrollOffset = Math.max(scrollOffset,0);
+            // Update target scroll offset
+            targetScrollOffset -= amount * HeliosClient.CLICKGUI.ScrollSpeed.value;
+            targetScrollOffset = MathHelper.clamp(targetScrollOffset, 0,height - hudBox.getHeight());
+
+            // Add to velocity (for momentum)
+            scrollVelocity -= amount * HeliosClient.CLICKGUI.ScrollSpeed.value * 0.5;
+
+            lastScrollTime = System.currentTimeMillis();
         }
     }
 

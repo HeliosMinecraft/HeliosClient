@@ -318,6 +318,7 @@ public class ScriptManagerScreen extends Screen {
         }
         if (hoveredOverLocalScripts(mouseX, mouseY)) {
             showLocalScripts = true;
+            addTableEntries();
             SoundUtils.playInstanceSound(SoundUtils.CLICK_SOUNDEVENT);
         }
         if (hoveredOverCloudScripts(mouseX, mouseY)) {
