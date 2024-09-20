@@ -150,8 +150,8 @@ public class CategoryPane implements Listener {
         scrollVelocity *= Math.pow(0.95, timeDelta * 60); // Decay factor
 
         // Ensure scroll offset stays within bounds
-        currentScrollOffset = MathHelper.clamp(currentScrollOffset, 0,height - hudBox.getHeight());
-        targetScrollOffset = MathHelper.clamp(targetScrollOffset, 0,height - hudBox.getHeight());
+        currentScrollOffset = MathHelper.clamp(currentScrollOffset, 0, hudBox.getHeight());
+        targetScrollOffset = MathHelper.clamp(targetScrollOffset, 0, hudBox.getHeight());
 
         // Update the actual scroll offset
         scrollOffset = (int) currentScrollOffset;
@@ -224,8 +224,8 @@ public class CategoryPane implements Listener {
 
                 int settingsHeight = m.renderSettings(drawContext, x, buttonYOffset, mouseX, mouseY, textRenderer);
                 buttonYOffset += settingsHeight;
+                MAX_HEIGHT += settingsHeight;
 
-                MAX_HEIGHT = settingsHeight + MAX_HEIGHT;
 
                 buttonYOffset += ModuleButton.height + 3;
             }
@@ -328,7 +328,7 @@ public class CategoryPane implements Listener {
         if (hoveredOverModules(mouseX, mouseY) && ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.NEW) {
             // Update target scroll offset
             targetScrollOffset -= amount * HeliosClient.CLICKGUI.ScrollSpeed.value;
-            targetScrollOffset = MathHelper.clamp(targetScrollOffset, 0,height - hudBox.getHeight());
+            targetScrollOffset = MathHelper.clamp(targetScrollOffset, 0,hudBox.getHeight());
 
             // Add to velocity (for momentum)
             scrollVelocity -= amount * HeliosClient.CLICKGUI.ScrollSpeed.value * 0.5;
