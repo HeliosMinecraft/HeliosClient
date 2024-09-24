@@ -12,7 +12,6 @@ import dev.heliosclient.module.modules.movement.*;
 import dev.heliosclient.module.modules.render.Freecam;
 import dev.heliosclient.module.modules.world.BetterPortals;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
@@ -26,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = ClientPlayerEntity.class, priority = 600)
+@Mixin(value = ClientPlayerEntity.class, priority = 620)
 public abstract class ClientPlayerEntityMixin {
 
     @Unique
@@ -37,6 +36,8 @@ public abstract class ClientPlayerEntityMixin {
 
     @Shadow
     protected abstract void sendMovementPackets();
+
+    @Shadow public abstract boolean isSneaking();
 
     @Inject(method = "move", at = @At(value = "HEAD"), cancellable = true)
     public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
@@ -77,6 +78,20 @@ public abstract class ClientPlayerEntityMixin {
     private float onHunger(float constant) {
         if (NoSlow.get().hunger.value && NoSlow.get().isActive()) return -1;
         return constant;
+    }
+
+    @Redirect(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"), require = 0)
+    private boolean tickMovementHook(ClientPlayerEntity player) {
+        if (NoSlow.get().items.value && NoSlow.get().isActive())
+            return false;
+        return player.isUsingItem();
+    }
+
+    @Inject(method = "shouldSlowDown", at = @At("HEAD"), cancellable = true)
+    public void shouldSlowDownHook(CallbackInfoReturnable<Boolean> cir) {
+        if(NoSlow.get().isActive() && (NoSlow.get().sneak.value || NoSlow.get().crawl.value)) {
+            cir.setReturnValue(false);
+        }
     }
 
     @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)

@@ -19,7 +19,16 @@ public class GuiMove extends Module_ {
     }
 
     public boolean dontMove() {
-        return mc.currentScreen == null || mc.currentScreen instanceof AbstractCommandBlockScreen || mc.currentScreen instanceof CreativeInventoryScreen || mc.currentScreen instanceof ChatScreen || mc.currentScreen instanceof AnvilScreen || mc.currentScreen instanceof StructureBlockScreen || mc.currentScreen instanceof SignEditScreen || ClickGUIScreen.INSTANCE.searchBar.isFocused() || mc.currentScreen instanceof AbstractSettingScreen || mc.currentScreen instanceof HudEditorScreen;
+        return mc.currentScreen == null ||
+                mc.currentScreen instanceof AbstractCommandBlockScreen ||
+                mc.currentScreen instanceof CreativeInventoryScreen ||
+                mc.currentScreen instanceof ChatScreen ||
+                mc.currentScreen instanceof AnvilScreen ||
+                mc.currentScreen instanceof StructureBlockScreen ||
+                mc.currentScreen instanceof SignEditScreen ||
+                ClickGUIScreen.INSTANCE.searchBar.isFocused() ||
+                mc.currentScreen instanceof AbstractSettingScreen ||
+                mc.currentScreen instanceof HudEditorScreen;
     }
 
     @SubscribeEvent

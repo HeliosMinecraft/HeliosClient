@@ -211,8 +211,6 @@ public class ModuleList extends HudElement implements Listener {
         int yOffset = this.y; // Start rendering from this.y
 
         for (Module_ m : enabledModules) {
-            if (!m.showInModulesList.value) continue;
-
             String info = m.getInfoString();
 
             float nameWidth = Renderer2D.getStringWidth(m.name) + getInfoStringWidth(info);
@@ -239,11 +237,12 @@ public class ModuleList extends HudElement implements Listener {
                 }
             }
 
-            if (sideLines.value)
+            if (sideLines.value) {
                 // Draw a vertical separator line
                 Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
                         x - 2.3f + width, yOffset, 2,
                         Math.round(Renderer2D.getStringHeight()) + 3, colorToRenderIn.getRGB());
+            }
 
             // Draw the module name
             Renderer2D.drawString(drawContext.getMatrices(), m.name,
@@ -282,6 +281,7 @@ public class ModuleList extends HudElement implements Listener {
     @SubscribeEvent
     public void update(TickEvent.CLIENT event) {
         enabledModules = ModuleManager.getEnabledModules();
+        enabledModules.removeIf(module -> !module.showInModulesList.value);
         enabledModules.sort(getComparator());
 
 

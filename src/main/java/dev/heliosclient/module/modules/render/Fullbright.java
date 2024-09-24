@@ -37,7 +37,8 @@ public class Fullbright extends Module_ {
             .max(7.0)
             .shouldRender(() -> mode.value == 0)
             .roundingPlace(0)
-            .build());
+            .build()
+    );
 
     public Fullbright() {
         super("Fullbright", "Allows you to see in the dark.", Categories.RENDER);

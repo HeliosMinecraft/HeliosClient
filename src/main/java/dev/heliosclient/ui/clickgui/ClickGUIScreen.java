@@ -98,6 +98,7 @@ public class ClickGUIScreen extends Screen {
                 this.scale -= speed * Easing.ease(EasingType.BOUNCE_OUT, MathHelper.clamp((currentTime - timeOnOpen) / 2000f, 0, 1));
                 if (this.scale <= 0.0) {
                     super.close();
+                    searchBar.setText("");
                     shouldClose = false;
                 }
             } else {
@@ -214,7 +215,12 @@ public class ClickGUIScreen extends Screen {
 
     @Override
     public void close() {
-        shouldClose = true;
+        if(ModuleManager.get(GUI.class).bounceAnimation.value) {
+            shouldClose = true;
+        }else{
+            searchBar.setText("");
+            super.close();
+        }
     }
 
     @Override

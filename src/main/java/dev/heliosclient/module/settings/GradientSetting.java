@@ -37,11 +37,18 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
         this.iSettingChange = iSettingChange;
         gradientList = GradientManager.getAllGradientsNames();
 
+        checkGradientAvailability();
+    }
+    private void checkGradientAvailability(){
         if(defaultValue == null){
             Optional<String> optional = gradientList.stream().findFirst();
-            optional.ifPresent(s -> this.value = GradientManager.getGradient(s));
+            optional.ifPresent(s ->{
+                this.value = GradientManager.getGradient(s);
+                this.defaultValue = value;
+            });
         }
     }
+
     public void createTable(double width){
         gradientTable = new Table();
 
@@ -53,6 +60,7 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
+        checkGradientAvailability();
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor);
 
@@ -129,6 +137,8 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
     @Override
     public void renderCompact(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.renderCompact(drawContext, x, y, mouseX, mouseY, textRenderer);
+        checkGradientAvailability();
+
         Renderer2D.drawFixedString(drawContext.getMatrices(), FontRenderers.fxfontRenderer.trimToWidth(name, moduleWidth), x + 2, y + 4, ColorManager.INSTANCE.defaultTextColor);
 
         // Draw a '🖋' button next to the text
@@ -158,7 +168,6 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
 
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
-        super.mouseClicked(mouseX, mouseY, button);
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             if(defaultValue != null) {
                 this.value = defaultValue;
@@ -196,7 +205,6 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
 
         this.value = GradientManager.getGradient(mapVal.toString());
     }
-
     @Override
     public void setValue(GradientManager.Gradient value) {
         this.value = value;

@@ -26,7 +26,6 @@ repositories {
 			includeGroupByRegex 'dev\\.onyxstudios.*'
 		}
 	}
-	maven { url "https://maven.terraformersmc.com/releases/" }
 	maven {
 		name = "meteor-maven"
 		url = "https://maven.meteordev.org/releases"
@@ -75,9 +74,6 @@ dependencies {
 
 	// LuaJ library
 	modInclude("org.luaj:luaj-jse:3.0.1")
-
-	// ModMenu
-	modApi "com.terraformersmc:modmenu:${project.modmenu_version}"
 
 	// Discord GameSDK
 	modInclude('com.github.JnCrMx:discord-game-sdk4j:v0.5.5')

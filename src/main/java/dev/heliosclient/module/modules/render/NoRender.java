@@ -47,6 +47,14 @@ public class NoRender extends Module_ {
         return ModuleManager.get(NoRender.class);
     }
 
+    public static boolean enchantGlint(){
+        if(!get().isActive()){
+            return true;
+        }
+
+        return get().noEnchantGlint.value;
+    }
+
     @SubscribeEvent
     public void onParticle(ParticleEvent event) {
         if (event.parameters.getType() == ParticleTypes.RAIN && noWeather.value) {

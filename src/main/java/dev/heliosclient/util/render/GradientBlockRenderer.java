@@ -3,8 +3,10 @@ package dev.heliosclient.util.render;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.ApiStatus;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -52,7 +54,7 @@ public class GradientBlockRenderer {
                 exclude
         );
 
-        gradientBlockBoxMap.put(gb, new Box(pos).expand(0.005f));
+        gradientBlockBoxMap.put(gb, new Box(pos).expand(0.001f));
         gradientBlocks.add(gb);
     }
 

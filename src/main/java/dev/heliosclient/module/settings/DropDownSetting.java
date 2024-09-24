@@ -46,7 +46,7 @@ public class DropDownSetting extends Setting<Integer> {
         this(name, description, iSettingChange, Arrays.asList(options), value, shouldRender, defaultValue, optionsTooltips);
     }
 
-    public void setOptions(List options) {
+    public void setOptions(List<?> options) {
         this.options = options;
         for (Object option : options) {
             maxOptionWidth = Math.max(maxOptionWidth, Math.round(Renderer2D.getFxStringWidth(option.toString())));

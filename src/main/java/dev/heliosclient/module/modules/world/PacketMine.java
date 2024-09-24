@@ -4,35 +4,37 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.block.BeginBreakingBlockEvent;
 import dev.heliosclient.event.events.render.Render3DEvent;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.BooleanSetting;
-import dev.heliosclient.module.settings.DoubleSetting;
-import dev.heliosclient.module.settings.RGBASetting;
-import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.blocks.BlockUtils;
+import dev.heliosclient.module.modules.render.BreakIndicator;
+import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import dev.heliosclient.util.render.Renderer3D;
-import dev.heliosclient.util.render.color.QuadColor;
+import net.minecraft.block.BlockState;
+import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
+import static dev.heliosclient.module.modules.render.BreakIndicator.IndicateType.Highlight;
 
 public class PacketMine extends Module_ {
     private final SettingGroup sgGeneral = new SettingGroup("General");
-    private final SettingGroup sgRender = new SettingGroup("Render");
-    private final Map<BlockPos, Direction> blocks = new HashMap<>();
-    private final Map<BlockPos, Double> progressMap = new HashMap<>();
-    private final Map<BlockPos, Integer> timerMap = new HashMap<>();
-    private final Map<BlockPos, Boolean> miningMap = new HashMap<>();
+    private final SettingGroup sgRender = new SettingGroup("Break Render");
+
+    private final MiningQueue miningQueue = new MiningQueue();
 
     private final DoubleSetting delay = sgGeneral.add(new DoubleSetting.Builder()
             .name("Delay")
@@ -47,7 +49,27 @@ public class PacketMine extends Module_ {
             .name("Rotate")
             .description("Rotates to look at the block before mining it")
             .defaultValue(false)
+            .value(false)
             .onSettingChange(this)
+            .build()
+    );
+    private final BooleanSetting reattempt = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Re-attempt")
+            .description("If a block fails to get mined, then should we attempt to re break it again? This may break the block")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
+    private final DoubleSetting maxReattempts = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Max Re-attempts")
+            .description("The max number of attempts to mine a block before discarding it.")
+            .onSettingChange(this)
+            .value(2)
+            .defaultValue(2)
+            .min(2)
+            .max(10)
+            .shouldRender(() -> reattempt.value)
+            .roundingPlace(0)
             .build()
     );
     private final BooleanSetting autoSwitch = sgGeneral.add(new BooleanSetting.Builder()
@@ -65,31 +87,55 @@ public class PacketMine extends Module_ {
             .shouldRender(() -> autoSwitch.value)
             .build()
     );
-    BooleanSetting outline = sgRender.add(new BooleanSetting.Builder()
-            .name("Outline")
-            .description("Draw outline of blocks")
-            .value(true)
-            .defaultValue(true)
+    private final CycleSetting type = sgRender.add(new CycleSetting.Builder()
+            .name("Indicator Type")
+            .description("Type of break indication")
             .onSettingChange(this)
+            .value(List.of(BreakIndicator.IndicateType.values()))
+            .defaultListOption(Highlight)
             .build()
     );
-    BooleanSetting fill = sgRender.add(new BooleanSetting.Builder()
-            .name("Fill")
-            .description("Draw side fill of blocks")
-            .value(false)
+    private final BooleanSetting gradientBool = sgRender.add(new BooleanSetting.Builder()
+            .name("Use a gradient")
+            .description("Whether to use gradient or not")
             .defaultValue(false)
+            .value(false)
             .onSettingChange(this)
+            .shouldRender(() -> type.getOption() == Highlight)
             .build()
     );
-    RGBASetting color = sgRender.add(new RGBASetting.Builder()
-            .name("Color")
-            .value(ColorUtils.changeAlpha(Color.WHITE, 125))
-            .defaultValue(ColorUtils.changeAlpha(Color.WHITE, 125))
+    private final GradientSetting gradient = sgRender.add(new GradientSetting.Builder()
+            .name("Gradient Value")
+            .description("The gradient to use")
             .onSettingChange(this)
+            .defaultValue("Rainbow")
+            .shouldRender(() -> type.getOption() == Highlight && gradientBool.value)
             .build()
     );
-    private boolean swapped, shouldUpdateSlot;
+    private final DoubleSetting alpha = sgRender.add(new DoubleSetting.Builder()
+            .name("Gradient Alpha/Opacity")
+            .description("Desired alpha (opacity) value of the gradients")
+            .onSettingChange(this)
+            .value(150)
+            .defaultValue(150)
+            .min(0)
+            .max(255)
+            .shouldRender(() -> type.getOption() == Highlight && gradientBool.value)
+            .roundingPlace(0)
+            .build()
+    );
+    private final RGBASetting highlightColor = sgRender.add(new RGBASetting.Builder()
+            .name("Highlight color")
+            .description("Color of the highlight")
+            .defaultValue(Color.WHITE)
+            .value(Color.WHITE)
+            .onSettingChange(this)
+            .rainbow(true)
+            .shouldRender(() -> type.getOption() == Highlight && !gradientBool.value)
+            .build()
+    );
 
+    private boolean swapped, shouldUpdateSlot;
 
     public PacketMine() {
         super("PacketMine", "Mines blocks via packets and allows you to mine several blocks in queue", Categories.WORLD);
@@ -98,7 +144,6 @@ public class PacketMine extends Module_ {
 
         addQuickSettings(sgGeneral.getSettings());
         addQuickSettings(sgRender.getSettings());
-
     }
 
     @Override
@@ -109,103 +154,155 @@ public class PacketMine extends Module_ {
     @Override
     public void onDisable() {
         super.onDisable();
-        blocks.clear();
-
         if (mc.interactionManager != null)
             mc.interactionManager.syncSelectedSlot();
+
+        miningQueue.clear();
     }
 
     @SubscribeEvent
     public void onStartBreakingBlock(BeginBreakingBlockEvent event) {
         if (!BlockUtils.canBreak(event.getPos(), mc.world.getBlockState(event.getPos()))) return;
 
-        event.setCanceled(true);
+        event.cancel();
         swapped = false;
 
-        if (!isMiningBlock(event.getPos())) {
-            blocks.put(event.getPos(), event.getDir());
-        }
+        miningQueue.add(event.getPos(), event.getDir());
     }
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        blocks.entrySet().removeIf(blockPosDirectionEntry -> shouldRemove(blockPosDirectionEntry.getKey(), blockPosDirectionEntry.getValue()));
-
         if (shouldUpdateSlot) {
             mc.interactionManager.syncSelectedSlot();
             shouldUpdateSlot = false;
         }
 
-        if (!blocks.isEmpty()) {
-            Optional<Map.Entry<BlockPos, Direction>> firstBlockAndDirection = blocks.entrySet().stream().findFirst();
-            Map.Entry<BlockPos, Direction> entry = firstBlockAndDirection.get();
-            mineBlock(entry.getKey(), entry.getValue());
-        }
+        miningQueue.update();
 
         if (!swapped && autoSwitch.value && (!mc.player.isUsingItem() || !notOnUse.value)) {
-            for (BlockPos blockPos : blocks.keySet()) {
-                if (isBlockReady(blockPos)) {
-                    int slot = InventoryUtils.getFastestTool(mc.world.getBlockState(blockPos), false);
-                    if (slot == -1 || mc.player.getInventory().selectedSlot == slot) continue;
-                    mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-                    shouldUpdateSlot = true;
-                    swapped = true;
-                    break;
-                }
-            }
+            switchIfNeeded(miningQueue.getNextBlock());
         }
-    }
-
-    private boolean isBlockReady(BlockPos pos) {
-        return progressMap.getOrDefault(pos, 0.0) >= 1;
-    }
-
-    private void mineBlock(BlockPos pos, Direction direction) {
-        if (rotate.value) {
-            RotationUtils.rotate((float) RotationUtils.getYaw(pos), (float) RotationUtils.getPitch(pos), false, () -> sendMinePackets(pos, direction));
-        } else {
-            sendMinePackets(pos, direction);
-        }
-
-        int slot = InventoryUtils.getFastestTool(mc.world.getBlockState(pos), false);
-
-        progressMap.put(pos, progressMap.getOrDefault(pos, 0.0) + BlockUtils.calcBlockBreakingDelta(mc.world.getBlockState(pos), mc.player.getInventory().getStack(slot != -1 ? slot : mc.player.getInventory().selectedSlot)));
-    }
-
-
-    public boolean isMiningBlock(BlockPos pos) {
-        return blocks.containsKey(pos);
     }
 
     private boolean shouldRemove(BlockPos pos, Direction direction) {
-        return mc.world.getBlockState(pos).isAir() ||
-                mc.player.getEyePos().subtract(0.5, 0, 0.5f).distanceTo(pos.add(direction.getOffsetX(), direction.getOffsetY(), direction.getOffsetZ()).toCenterPos()) > mc.interactionManager.getReachDistance();
+        boolean isGettingRemoved = mc.world.getBlockState(pos).isAir() ||
+                                    mc.player.getEyePos()
+                                            .subtract(0.5, 0, 0.5f)
+                                            .distanceTo(pos.offset(direction).toCenterPos()) > mc.interactionManager.getReachDistance();
+
+        if (isGettingRemoved) {
+            mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, pos, direction));
+            mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+        }
+
+        return isGettingRemoved;
     }
 
-    private void sendMinePackets(BlockPos pos, Direction direction) {
-        if (timerMap.getOrDefault(pos, (int) delay.value) <= 0) {
-            if (!miningMap.getOrDefault(pos, false)) {
-                mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, direction));
-                mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, direction));
-                miningMap.put(pos, true);
-            }
-        } else {
-            timerMap.put(pos, timerMap.getOrDefault(pos, (int) delay.value) - 1);
-        }
+    private void switchIfNeeded(BlockPos pos) {
+        if (pos == null) return;
+        int bestSlot = InventoryUtils.getFastestTool(mc.world.getBlockState(pos),false);
+        if (bestSlot == -1 || mc.player.getInventory().selectedSlot == bestSlot) return;
+        mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(bestSlot));
+        swapped = true;
+        shouldUpdateSlot = true;
     }
 
     @SubscribeEvent
     public void render3d(Render3DEvent event) {
-        for (BlockPos pos : blocks.keySet()) {
-            QuadColor color = QuadColor.single(this.color.value.getRGB());
-            if (outline.value && fill.value) {
-                Renderer3D.drawBoxBoth(pos, color, 1.2f);
-            } else if (outline.value) {
-                Renderer3D.drawBoxOutline(pos, color, 1.2f);
-            } else if (fill.value) {
-                Renderer3D.drawBoxFill(pos, color);
+        Renderer3D.renderThroughWalls();
+        miningQueue.getBlocks().forEach((pos,info)->{
+            BlockState state = mc.world.getBlockState(pos);
+            VoxelShape shape = state.getOutlineShape(mc.world, pos);
+            if (shape == null || shape.isEmpty()) return;
+
+            int start = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getStartGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+            int end = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getEndGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+
+            ModuleManager.get(BreakIndicator.class).renderIndicator(shape.getBoundingBox().expand(0.001f).offset(pos), (float) info.progress, (BreakIndicator.IndicateType) type.getOption(),start,end);
+        });
+        Renderer3D.stopRenderingThroughWalls();
+    }
+
+    private class MiningQueue {
+        private final LinkedHashMap<BlockPos, MiningInfo> queue = new LinkedHashMap<>();
+
+        void add(BlockPos pos, Direction dir) {
+            queue.put(pos, new MiningInfo(dir));
+        }
+
+        void update() {
+            queue.entrySet().removeIf(entry -> shouldRemove(entry.getKey(),entry.getValue().direction));
+            BlockPos nextBlock = getNextBlock();
+            if(nextBlock == null) return;
+
+            MiningInfo info = queue.get(nextBlock);
+
+            //Sometimes the blocks dont get mined but the calculated progress is 1.. So we attempt to mine it again from scratch.
+            if(info.progress >= 1.0f && !mc.world.getBlockState(nextBlock).isAir() && reattempt.value){
+                mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, nextBlock, info.direction));
+                mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                if(info.attempts > maxReattempts.getInt()){
+                    queue.remove(nextBlock);
+                    return;
+                }
+
+                info.restart();
+            }
+
+            mine(nextBlock, info);
+        }
+
+        void clear() {
+            queue.clear();
+        }
+
+        BlockPos getNextBlock() {
+            return queue.keySet().stream()
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        Map<BlockPos, MiningInfo> getBlocks() {
+            return queue;
+        }
+
+        private void mine(BlockPos pos, MiningInfo info) {
+            if (rotate.get()) {
+                RotationUtils.rotate((float) RotationUtils.getYaw(pos), (float) RotationUtils.getPitch(pos), true, () -> sendMinePackets(pos,info));
+            } else {
+                sendMinePackets(pos, info);
+            }
+            int slot = InventoryUtils.getFastestTool(mc.world.getBlockState(pos),false);
+            info.progress += BlockUtils.calcBlockBreakingDelta(mc.world.getBlockState(pos),mc.player.getInventory().getStack(slot != -1 ? slot : mc.player.getInventory().selectedSlot));
+        }
+
+        private void sendMinePackets(BlockPos pos, MiningInfo info) {
+            if (info.timer <= 0 && !info.started) {
+                mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, info.direction));
+                mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, pos, info.direction));
+                info.started = true;
+            } else {
+                info.timer--;
             }
         }
     }
 
+    private class MiningInfo {
+        Direction direction;
+        double progress;
+        int timer;
+        boolean started;
+        int attempts;
+        MiningInfo(Direction dir) {
+            this.direction = dir;
+            restart();
+        }
+
+        void restart() {
+            this.progress = 0.0;
+            this.timer = delay.getInt();
+            this.started = false;
+            this.attempts++;
+        }
+    }
 }

@@ -3,8 +3,6 @@ package dev.heliosclient.module;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
-import dev.heliosclient.event.events.player.PlayerMotionEvent;
-import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
@@ -37,12 +35,12 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public Set<SettingGroup> settingGroups;
     public Set<Setting<?>> quickSettings;
     public boolean settingsOpen = false;
-    public SettingGroup sgbind = new SettingGroup("Bind");
+    public SettingGroup sgBind = new SettingGroup("Bind");
 
     /**
      * Setting indicating if chat feedback for this module should be shown. Don't remove, that will cause crash.
      */
-    public BooleanSetting chatFeedback = sgbind.add(new BooleanSetting.Builder()
+    public BooleanSetting chatFeedback = sgBind.add(new BooleanSetting.Builder()
             .name("Enable chat feedback")
             .description("Toggles feedback in chat.")
             .onSettingChange(this)
@@ -53,7 +51,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     /**
      * Setting that will tell module list if it should be shown. Don't remove, that will cause crash.
      */
-    public BooleanSetting showInModulesList = sgbind.add(new BooleanSetting.Builder()
+    public BooleanSetting showInModulesList = sgBind.add(new BooleanSetting.Builder()
             .name("Show in Modules List")
             .description("If this module should show up in Module List.")
             .onSettingChange(this)
@@ -64,7 +62,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     /**
      * Key-bind setting. Don't remove, that will cause crash.
      */
-    public KeyBind keyBind = sgbind.add(new KeyBind.Builder()
+    public KeyBind keyBind = sgBind.add(new KeyBind.Builder()
             .name("Keybind")
             .description("Key to toggle this module.")
             .onSettingChange(this)
@@ -75,7 +73,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     /**
      * Key-bind setting. Don't remove, that will cause crash.
      */
-    public BooleanSetting toggleOnBindRelease = sgbind.add(new BooleanSetting.Builder()
+    public BooleanSetting toggleOnBindRelease = sgBind.add(new BooleanSetting.Builder()
             .name("Toggle On Bind Release")
             .description("Toggle on if key is being held and off if key is released")
             .onSettingChange(this)
@@ -87,7 +85,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     /**
      * Value indicating if module is enabled. Don't remove, that will cause crash.
      */
-    public BooleanSetting active = sgbind.add(new BooleanSetting.Builder()
+    public BooleanSetting active = sgBind.add(new BooleanSetting.Builder()
             .name("Active")
             .description("State of this module.")
             .onSettingChange(this)
@@ -157,7 +155,6 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public void onEnable() {
         active.value = true;
         if (chatFeedback.value) {
-            assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was enabled.");
         }
         EventManager.register(this);
@@ -176,17 +173,9 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public void onDisable() {
         active.value = false;
         if (chatFeedback.value) {
-            assert mc.player != null;
             ChatUtils.sendHeliosMsg(this.name + " was disabled.");
         }
         EventManager.unregister(this);
-    }
-
-    /**
-     * Called on player motion.
-     */
-    @SubscribeEvent
-    public void onMotion(PlayerMotionEvent event) {
     }
 
     /**
@@ -194,13 +183,6 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
      */
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT event) {
-    }
-
-    /**
-     * Called on render.
-     */
-    @SubscribeEvent
-    public void render(RenderEvent event) {
     }
 
     /**
@@ -220,7 +202,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
     public void sendNotification(boolean enabled) {
         String description = enabled ? "was enabled!" : "was disabled!";
 
-        if (ModuleManager.get(NotificationModule.class).moduleNotification.value && HeliosClient.shouldSendNotification()) {
+        if (ModuleManager.get(NotificationModule.class).displayModuleNotification()) {
             NotificationManager.addNotification(new InfoNotification(this.name, description, 2000, SoundUtils.TING_SOUNDEVENT, enabled ? 1f : 0.5f));
         }
     }
@@ -245,7 +227,7 @@ public abstract class Module_ implements Listener, ISettingChange, ISaveAndLoad 
      * Called on load. Override to remove default settings.
      */
     public void onLoad() {
-        addSettingGroup(sgbind);
+        addSettingGroup(sgBind);
     }
 
     public String getNameWithInfo() {

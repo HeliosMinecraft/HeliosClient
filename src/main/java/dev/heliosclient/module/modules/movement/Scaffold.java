@@ -134,13 +134,6 @@ public class Scaffold extends Module_ {
             .defaultValue(false)
             .build()
     );
-    BooleanSetting clientSide = sgPlace.add(new BooleanSetting.Builder()
-            .name("ClientSide rotation")
-            .onSettingChange(this)
-            .defaultValue(true)
-            .shouldRender(() -> rotate.value)
-            .build()
-    );
     /* Switch */
     BooleanSetting autoSwitch = sgSwitch.add(new BooleanSetting.Builder()
             .name("AutoSwitch")
@@ -338,9 +331,9 @@ public class Scaffold extends Module_ {
 
 
         if (autoSwitch.value) {
-            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value, clientSide.value, itemSlot, silentSwitch.value);
+            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value, true, itemSlot, silentSwitch.value);
         } else {
-            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value,  clientSide.value);
+            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value,  true);
         }
 
         if (placeResult) {

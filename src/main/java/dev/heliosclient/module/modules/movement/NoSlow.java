@@ -11,7 +11,7 @@ public class NoSlow extends Module_ {
 
     public BooleanSetting items = sgGeneral.add(new BooleanSetting.Builder()
             .name("Items")
-            .description("Should item use slow you down?")
+            .description("Should item use slow you down? (any item like food, bow, crossbow, trident,shield, etc.)")
             .onSettingChange(this)
             .defaultValue(true)
             .build()
@@ -48,12 +48,26 @@ public class NoSlow extends Module_ {
             .name("Fluid drag")
             .description("Should fluid push slow you down?")
             .onSettingChange(this)
-            .defaultValue(true)
+            .defaultValue(false)
             .build()
     );
     public BooleanSetting hunger = sgGeneral.add(new BooleanSetting.Builder()
             .name("Hunger")
             .description("Should hunger push slow you down?")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .build()
+    );
+    public BooleanSetting sneak = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Sneak")
+            .description("Should sneaking slow you down?")
+            .onSettingChange(this)
+            .defaultValue(true)
+            .build()
+    );
+    public BooleanSetting crawl = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Crawl")
+            .description("Should crawling slow you down?")
             .onSettingChange(this)
             .defaultValue(true)
             .build()
@@ -64,7 +78,6 @@ public class NoSlow extends Module_ {
         super("NoSlow", "Removes slowness due to some actions or blocks", Categories.MOVEMENT);
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
-
     }
 
     public static NoSlow get() {

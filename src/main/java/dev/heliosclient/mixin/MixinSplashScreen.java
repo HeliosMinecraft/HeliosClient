@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 
 import static dev.heliosclient.util.render.textures.ClientTexture.CLIENT_LOGO_TEXTURE;
 
-@Mixin(value = SplashOverlay.class, priority = 3000)
+@Mixin(value = SplashOverlay.class, priority = 3001)
 public abstract class MixinSplashScreen {
 
     @Unique

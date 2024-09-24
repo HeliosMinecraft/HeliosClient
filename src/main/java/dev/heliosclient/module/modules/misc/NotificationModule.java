@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules.misc;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -89,6 +90,10 @@ public class NotificationModule extends Module_ {
     public void onDisable() {
         super.onDisable();
         NotificationManager.INSTANCE.clear();
+    }
+
+    public boolean displayModuleNotification(){
+        return HeliosClient.shouldSendNotification() && moduleNotification.value;
     }
 
     @Override

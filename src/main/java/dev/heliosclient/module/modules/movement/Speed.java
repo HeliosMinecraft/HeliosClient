@@ -32,7 +32,7 @@ public class Speed extends Module_ {
             .description("Strict movement and sprinting for strafing")
             .onSettingChange(this)
             .value(false)
-            .shouldRender(()->speedMode.isOption(Modes.StrictStrafe))
+            .shouldRender(()-> speedMode.isOption(Modes.StrictStrafe))
             .build()
     );
     BooleanSetting whileSneaking = sgGeneral.add(new BooleanSetting.Builder()
@@ -94,9 +94,9 @@ public class Speed extends Module_ {
                    mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
                 }
 
-                double prevX = e.getMovement().x * (1.0 - speed.value/speed.max);
-                double prevZ = e.getMovement().z * (1.0 - speed.value/speed.max);
-                double useSpeed = mc.player.getVelocity().horizontalLength() * (speed.value/speed.max);
+                double prevX = e.getMovement().x * (1.0 - speed.value/10.1);
+                double prevZ = e.getMovement().z * (1.0 - speed.value/10.1);
+                double useSpeed = mc.player.getVelocity().horizontalLength() * (speed.value/10.0);
 
                 double angle = Math.toRadians(mc.player.getYaw(mc.getTickDelta()));
                 double x = (-Math.sin(angle) * useSpeed) + prevX;

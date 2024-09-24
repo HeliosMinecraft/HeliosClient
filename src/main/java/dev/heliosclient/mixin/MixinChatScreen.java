@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = ChatScreen.class, priority = 1001)
+@Mixin(value = ChatScreen.class, priority = 100)
 public abstract class MixinChatScreen {
     @Shadow
     protected TextFieldWidget chatField;

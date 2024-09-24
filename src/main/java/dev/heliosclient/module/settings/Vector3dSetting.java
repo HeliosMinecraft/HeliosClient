@@ -1,8 +1,10 @@
 package dev.heliosclient.module.settings;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.system.mixininterface.IVec3d;
 import dev.heliosclient.util.interfaces.ISettingChange;
+import dev.heliosclient.util.misc.MapReader;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -10,11 +12,9 @@ import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import static dev.heliosclient.util.fontutils.FontRenderers.Small_fxfontRenderer;
-import dev.heliosclient.util.misc.MapReader;
 
 public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
     private final DoubleSetting xSet;
@@ -137,6 +137,7 @@ public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
             this.ySet.setValue(defaultValue.y);
             this.zSet.setValue(defaultValue.z);
             value = defaultValue;
+            HeliosClient.LOGGER.error("{} has no Vec3d values... defaulting", this.name);
         } else {
             List<Double> vec3 = (List<Double>) map.getAs(getSaveName(),List.class);
             this.xSet.setValue(vec3.get(0));
@@ -148,9 +149,9 @@ public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
 
     @Override
     public Object saveToFile(List<Object> objectList) {
-        objectList.add(xSet.value);
-        objectList.add(ySet.value);
-        objectList.add(zSet.value);
+        objectList.add(xSet.get());
+        objectList.add(ySet.get());
+        objectList.add(zSet.get());
 
         return objectList;
     }
@@ -188,7 +189,7 @@ public class Vector3dSetting extends Setting<Vec3d> implements ISettingChange {
 
     @Override
     public void setValue(Vec3d value) {
-        super.setValue(value);
+        this.value = value;
     }
 
     public static class Builder extends SettingBuilder<Builder, Vec3d, Vector3dSetting> {

@@ -54,56 +54,40 @@ public class RotationUtils {
     }
 
     public static double getYaw(double targetX, double targetZ) {
-        double dx = targetX - mc.player.getX();
-        double dz = targetZ - mc.player.getZ();
+        double dx = targetX - mc.player.getEyePos().getX();
+        double dz = targetZ - mc.player.getEyePos().getZ();
+        float yaw = (float) Math.toDegrees(Math.atan2(dz, dx)) - 90F;
 
-        return Math.toDegrees(Math.atan2(dz, dx)) - 90;
+        return MathHelper.wrapDegrees(yaw);
     }
 
     public static double getYaw(Vec3d target) {
-        double dx = target.getX() - mc.player.getX();
-        double dz = target.getZ() - mc.player.getZ();
-
-        return Math.toDegrees(Math.atan2(dz, dx)) - 90;
+        return getYaw(target.getX(),target.getZ());
     }
 
     public static double getYaw(BlockPos target) {
-        double dx = target.getX() - mc.player.getX();
-        double dz = target.getZ() - mc.player.getZ();
-
-        return Math.toDegrees(Math.atan2(dz, dx)) - 90;
+       return getYaw(target.getX(),target.getZ());
     }
 
     public static double getPitch(double targetX, double targetY, double targetZ) {
-        double dx = targetX - mc.player.getX();
-        double dy = targetY - mc.player.getEyeY(); // account for the player's eye height
-        double dz = targetZ - mc.player.getZ();
+        double dx = targetX - mc.player.getEyePos().getX();
+        double dy = targetY - mc.player.getEyePos().getY();
+        double dz = targetZ - mc.player.getEyePos().getZ();
 
         double distanceXZ = Math.sqrt(dx * dx + dz * dz);
+        float pitch = (float) -Math.toDegrees(Math.atan2(dy, distanceXZ));
 
-        return -Math.toDegrees(Math.atan2(dy, distanceXZ));
+
+        return MathHelper.wrapDegrees(pitch);
     }
 
     public static double getPitch(BlockPos target) {
-        double dx = target.getX() - mc.player.getX();
-        double dy = target.getY() - mc.player.getEyeY(); // account for the player's eye height
-        double dz = target.getZ() - mc.player.getZ();
-
-        double distanceXZ = Math.sqrt(dx * dx + dz * dz);
-
-        return -Math.toDegrees(Math.atan2(dy, distanceXZ));
+       return getPitch(target.getX(),target.getY(),target.getZ());
     }
 
     public static double getPitch(Vec3d target) {
-        double dx = target.getX() - mc.player.getX();
-        double dy = target.getY() - mc.player.getEyeY(); // account for the player's eye height
-        double dz = target.getZ() - mc.player.getZ();
-
-        double distanceXZ = Math.sqrt(dx * dx + dz * dz);
-
-        return -Math.toDegrees(Math.atan2(dy, distanceXZ));
+        return getPitch(target.getX(),target.getY(),target.getZ());
     }
-
 
     public static void rotate(double yaw, double pitch, boolean clientSide, @Nullable Runnable task) {
         if(prevYaw != yaw && prevPitch != pitch && clientSide){
@@ -114,6 +98,12 @@ public class RotationUtils {
 
         mc.player.setPitch((float) pitch);
         mc.player.setYaw((float) yaw);
+        mc.player.setHeadYaw(mc.player.getYaw());
+        mc.player.prevPitch = mc.player.getPitch();
+        mc.player.prevYaw = mc.player.getYaw();
+        mc.player.prevHeadYaw =  mc.player.headYaw;
+        mc.player.bodyYaw =  mc.player.headYaw;
+        mc.player.prevBodyYaw =  mc.player.bodyYaw;
 
         if (clientSide) {
             mc.player.renderYaw = (float) yaw;

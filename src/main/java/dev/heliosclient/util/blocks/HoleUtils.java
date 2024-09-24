@@ -197,24 +197,14 @@ public class HoleUtils {
     }
 
     private static HoleInfo getHoleType(World world, BlockPos pos, Set<BlockPos> checkedPositions, boolean quadChecker) {
-        if (!world.getBlockState(pos).isAir() || !world.getBlockState(pos.up()).isAir() || checkedPositions.contains(pos)) {
+        if (!world.getBlockState(pos).isAir() || !world.getBlockState(pos.up()).isAir() || !world.getBlockState(pos.up(2)).isAir() || checkedPositions.contains(pos)) {
             return null;
-        }
-
-
-        if (quadChecker && isQuad(pos, world,checkedPositions)) {
-            //System.out.println("QUAD: " + pos);
-
-            //Return a box containing all the four poses.
-            BlockPos start = pos.offset(airOffset[0][0]).offset(airOffset[0][1]);
-            checkedPositions.add(pos);
-
-            return new HoleInfo(HoleType.UNSAFE, pos, new Box(pos).union(new Box(start)).contract(0.005f, 0f, 0.005f).offset(0, 0.005f, 0));
         }
 
         checkedPositions.add(pos);
 
         HoleType hT = null;
+        boolean quadChecked = false;
 
         int obsidian = 0, bedrock = 0, air = 0;
         BlockPos doubleStart = null;
@@ -232,7 +222,19 @@ public class HoleUtils {
                 obsidian++;
             } else if (block == Blocks.BEDROCK) {
                 bedrock++;
-            } else if (block == Blocks.AIR) {
+            } else if (block == Blocks.AIR && world.isAir(newPos.offset(Direction.UP))) {
+                if (quadChecker && (obsidian + bedrock == 2) && !quadChecked) {
+                    if (isQuad(pos, world, checkedPositions)) {
+                        //Return a box containing all the four poses.
+                        BlockPos start = pos.offset(airOffset[0][0]).offset(airOffset[0][1]);
+                        checkedPositions.add(pos);
+
+                        //Any quad hole should be unsafe no matter how protected it is.
+                        return new HoleInfo(HoleType.UNSAFE, pos, new Box(pos).union(new Box(start)).contract(0.005f, 0f, 0.005f).offset(0, 0.005f, 0));
+                    }
+                    quadChecked = true;
+                }
+
                 int coveringBlocks = 0;
                 for (Direction dir1 : Direction.values()) {
                     if (dir1 == Direction.UP || dir.getOpposite() == dir1) continue;

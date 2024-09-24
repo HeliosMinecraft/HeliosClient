@@ -6,9 +6,7 @@ import dev.heliosclient.mixin.AccessorClientPlayerInteractionManager;
 import dev.heliosclient.mixin.AccessorWorldRenderer;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
-import dev.heliosclient.module.settings.CycleSetting;
-import dev.heliosclient.module.settings.RGBASetting;
-import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.module.settings.*;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
@@ -36,6 +34,35 @@ public class BreakIndicator extends Module_ {
             .defaultListOption(Highlight)
             .build()
     );
+    BooleanSetting gradientBool = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Use a gradient")
+            .description("Whether to use gradient or not")
+            .defaultValue(false)
+            .value(false)
+            .onSettingChange(this)
+            .shouldRender(() -> type.getOption() == Highlight)
+            .build()
+    );
+    GradientSetting gradient = sgGeneral.add(new GradientSetting.Builder()
+            .name("Gradient Value")
+            .description("The gradient to use")
+            .onSettingChange(this)
+            .defaultValue("Rainbow")
+            .shouldRender(() -> type.getOption() == Highlight && gradientBool.value)
+            .build()
+    );
+    DoubleSetting alpha = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Gradient Alpha/Opacity")
+            .description("Desired alpha (opacity) value of the gradients")
+            .onSettingChange(this)
+            .value(150)
+            .defaultValue(150)
+            .min(0)
+            .max(255)
+            .shouldRender(() -> type.getOption() == Highlight && gradientBool.value)
+            .roundingPlace(0)
+            .build()
+    );
     RGBASetting highlightColor = sgGeneral.add(new RGBASetting.Builder()
             .name("Highlight color")
             .description("Color of the highlight")
@@ -43,7 +70,7 @@ public class BreakIndicator extends Module_ {
             .value(Color.WHITE)
             .onSettingChange(this)
             .rainbow(true)
-            .shouldRender(() -> type.getOption() == Highlight)
+            .shouldRender(() -> type.getOption() == Highlight && !gradientBool.value)
             .build()
     );
 
@@ -70,8 +97,10 @@ public class BreakIndicator extends Module_ {
             BlockState state = mc.world.getBlockState(currentBreakingPos);
             VoxelShape shape = state.getOutlineShape(mc.world, currentBreakingPos);
             if (shape == null || shape.isEmpty()) return;
+            int start = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getStartGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+            int end = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getEndGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
 
-            renderIndicator(shape.getBoundingBox().expand(0.005f).offset(currentBreakingPos), selfBreakingProgress);
+            renderIndicator(shape.getBoundingBox().expand(0.001f).offset(currentBreakingPos), selfBreakingProgress/10.0f, (IndicateType) type.getOption(),start,end);
         }
 
         breakingInfos.forEach((integer, info) -> {
@@ -84,23 +113,25 @@ public class BreakIndicator extends Module_ {
             VoxelShape shape = state.getOutlineShape(mc.world, pos);
 
             if (shape == null || shape.isEmpty()) return;
+            int start = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getStartGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+            int end = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getEndGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
 
-            renderIndicator(shape.getBoundingBox().expand(0.005f).offset(pos), breakProgress + 1);
+            renderIndicator(shape.getBoundingBox().expand(0.001f).offset(pos), (float) (breakProgress + 1) / 10, (IndicateType) type.getOption(),start,end);
         });
         Renderer3D.stopRenderingThroughWalls();
     }
 
-    public void renderIndicator(Box box, float breakingProg) {
-        if (IndicateType.values()[type.value] == Highlight) {
-            Renderer3D.drawBoxFill(box, QuadColor.single(highlightColor.value.getRGB()));
+    public void renderIndicator(Box box, float breakingProg,IndicateType type, int start, int end) {
+        if (type == Highlight) {
+            QuadColor color = QuadColor.gradient(start,end, QuadColor.CardinalDirection.DIAGONAL_LEFT);
 
-        } else if (IndicateType.values()[type.value] == Stretch) {
-            Box stretchedBox = shrinkBoxExtreme(box).stretch(0,0,breakingProg/10.0);
-            Renderer3D.drawBoxBoth(stretchedBox, QuadColor.single(getColor((int)breakingProg)), 1f);
-
-        } else if (IndicateType.values()[type.value] == Contract) {
-            Box shrunkBox = box.expand(breakingProg / 20.0 - 1.0);
-            Renderer3D.drawBoxBoth(shrunkBox, QuadColor.single(getColor((int)breakingProg)), 1f);
+            Renderer3D.drawBoxFill(box, color);
+        } else if (type == Stretch) {
+            Box stretchedBox = shrinkBoxExtreme(box).stretch(0,0,breakingProg);
+            Renderer3D.drawBoxBoth(stretchedBox, QuadColor.single(getColor(breakingProg)), 1f);
+        } else if (type == Contract) {
+            Box shrunkBox = box.expand((breakingProg / 2) - 1.0);
+            Renderer3D.drawBoxBoth(shrunkBox, QuadColor.single(getColor(breakingProg)), 1f);
         }
     }
 
@@ -109,8 +140,8 @@ public class BreakIndicator extends Module_ {
         return new Box(box.minX,box.minY,box.minZ,box.maxX,box.maxY,box.minZ);
     }
 
-    public int getColor(int breakingPos) {
-        return breakingPos > 5 ? (breakingPos > 8 ? get(Color.GREEN) : get(Color.YELLOW)) : breakingPos > 3 ? get(Color.ORANGE) : get(Color.RED);
+    public int getColor(float breakingPos) {
+        return breakingPos > 0.5 ? (breakingPos > 0.8 ? get(Color.GREEN) : get(Color.YELLOW)) : breakingPos > 0.3 ? get(Color.ORANGE) : get(Color.RED);
     }
 
     public int get(Color c) {

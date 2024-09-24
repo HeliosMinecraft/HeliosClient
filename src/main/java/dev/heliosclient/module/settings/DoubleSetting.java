@@ -216,7 +216,8 @@ public class DoubleSetting extends Setting<Double> {
         return (int) value;
     }
 
-    public void setValue(double value) {
+    @Override
+    public void setValue(Double value) {
         this.value = value;
     }
 

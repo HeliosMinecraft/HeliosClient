@@ -108,7 +108,7 @@ public class ColorSetting extends Setting<Integer> {
 
     @Override
     public void setValue(Integer value) {
-        super.setValue(value);
+        this.value = value;
     }
 
     @Override

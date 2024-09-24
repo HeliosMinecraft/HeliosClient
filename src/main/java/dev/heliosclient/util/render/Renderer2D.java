@@ -218,10 +218,31 @@ public class Renderer2D implements Listener {
      * @param color    Color of the rectangle
      */
     public static void drawOutlineBox(Matrix4f matrix4f, float x, float y, float width, float height, float thickness, int color) {
-        drawRectangle(matrix4f, x, y, width, thickness, color);
-        drawRectangle(matrix4f, x, y + height - thickness, width, thickness, color);
-        drawRectangle(matrix4f, x, y + thickness, thickness, height - thickness * 2, color);
-        drawRectangle(matrix4f, x + width - thickness, y + thickness, thickness, height - thickness * 2, color);
+       drawOutlineBox(matrix4f,x,y,width,height,thickness,true,true,true,true,color);
+    }
+    /**
+     * Draws a singular outline rectangle on screen with the given parameters.
+    */
+    public static void drawOutlineBox(Matrix4f matrix4f, float x, float y, float width, float height, float thickness,boolean TOP,boolean BOTTOM, boolean LEFT,boolean RIGHT, int color) {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        float red = (float) (color >> 16 & 255) / 255.0F;
+        float green = (float) (color >> 8 & 255) / 255.0F;
+        float blue = (float) (color & 255) / 255.0F;
+        float alpha = (float) (color >> 24 & 255) / 255.0F;
+
+        if(TOP) drawRectangleBufferInternal(matrix4f,bufferBuilder, x - thickness, y, width + thickness*2, -thickness, red,green,blue,alpha);
+        if(BOTTOM) drawRectangleBufferInternal(matrix4f,bufferBuilder, x - thickness, y + height, width + thickness*2, thickness, red,green,blue,alpha);
+        if(LEFT) drawRectangleBufferInternal(matrix4f,bufferBuilder, x, y, -thickness, height, red,green,blue,alpha);
+        if(RIGHT) drawRectangleBufferInternal(matrix4f,bufferBuilder, x + width, y, thickness, height, red,green,blue,alpha);
+
+        draw();
+
+        RenderSystem.disableBlend();
     }
 
     /**
@@ -1253,7 +1274,7 @@ public class Renderer2D implements Listener {
         return bufferBuilder;
     }
 
-    static void draw() {
+    public static void draw() {
         draw(Tessellator.getInstance().getBuffer());
     }
 

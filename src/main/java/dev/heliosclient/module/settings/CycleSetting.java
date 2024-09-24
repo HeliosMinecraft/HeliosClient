@@ -137,6 +137,11 @@ public class CycleSetting extends Setting<Integer> {
     }
 
     @Override
+    public void setValue(Integer value) {
+        this.value = value;
+    }
+
+    @Override
     public Object saveToFile(List<Object> objectList) {
         if (options.isEmpty() || options.size() - 1 < value) {
             return "";

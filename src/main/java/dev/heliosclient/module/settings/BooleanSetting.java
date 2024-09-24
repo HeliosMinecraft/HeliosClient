@@ -101,7 +101,7 @@ public class BooleanSetting extends Setting<Boolean> {
 
     @Override
     public void setValue(Boolean value) {
-        super.setValue(value);
+        this.value = value;
     }
 
     @Override

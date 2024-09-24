@@ -99,7 +99,7 @@ public class AutoTotem extends Module_ {
 
     @SubscribeEvent
     public void onKey(KeyPressedEvent e){
-        if(e.getKey() == totemSwitchKey.value){
+        if(e.getKey() == totemSwitchKey.value && mc.currentScreen == null){
             doAutoTotem();
             timer.restartTimer();
         }
@@ -118,10 +118,10 @@ public class AutoTotem extends Module_ {
                    return;
                }
                if(always.value || didTotemPop || isPlayerLow()) {
-                   doAutoTotem();
+                   boolean status = doAutoTotem();
                    didTotemPop = false;
 
-                   if(log.value){
+                   if(log.value && status){
                        ChatUtils.sendHeliosMsg("Restocked Totem, Totems left: " + InventoryUtils.getItemCountInInventory(Items.TOTEM_OF_UNDYING));
                    }
                }
@@ -132,11 +132,11 @@ public class AutoTotem extends Module_ {
         }
     }
 
-    public void doAutoTotem(){
+    public boolean doAutoTotem(){
         boolean offhandHasItem = !mc.player.getOffHandStack().isEmpty();
         int itemSlot = InventoryUtils.findItemInInventory(Items.TOTEM_OF_UNDYING);
-        if(itemSlot == -1 || itemSlot == InventoryUtils.OFFHAND){
-            return;
+        if(itemSlot == -1 || itemSlot == InventoryUtils.OFFHAND || mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING){
+            return false;
         }
 
         //if is hotbar then swap item with offhand super-fast.
@@ -151,6 +151,7 @@ public class AutoTotem extends Module_ {
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,itemSlot,0,SlotActionType.PICKUP,mc.player);
             }
         }
+        return true;
     }
 
     @SubscribeEvent
