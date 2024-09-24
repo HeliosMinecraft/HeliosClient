@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.BooleanSupplier;
 
+/**
+ * The keybind setting only provides a way to get key codes which the user has selected. On its own, it does not perform anything when the key is pressed.
+ */
 public class KeyBind extends Setting<Integer> {
     public static boolean listeningKey = false;
     public static boolean listeningMouse = false;
@@ -144,11 +147,6 @@ public class KeyBind extends Setting<Integer> {
     @Override
     public void loadFromFile(MapReader map) {
         value = map.getInt(this.getSaveName(),defaultValue);
-    }
-
-    @Override
-    public void mouseReleased(double mouseX, double mouseY, int button) {
-        super.mouseReleased(mouseX, mouseY, button);
     }
 
     public static class Builder extends SettingBuilder<Builder, Integer, KeyBind> {

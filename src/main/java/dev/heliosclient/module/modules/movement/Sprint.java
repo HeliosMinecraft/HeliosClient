@@ -41,7 +41,7 @@ public class Sprint extends Module_ {
         if(!strictMode.value){
             return mc.currentScreen == null;
         }
-        return mc.player.forwardSpeed > 0.00f &&
+        return (mc.player.forwardSpeed != 0 || mc.player.sidewaysSpeed != 0) &&
                 !mc.player.horizontalCollision &&
                 !mc.player.isTouchingWater() &&
                 !mc.player.isSubmergedInWater() &&

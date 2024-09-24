@@ -47,7 +47,7 @@
 To submit a bug open an issue in this repository. Before doing so please assure yourself that the issues isn't already listed under [Known issues](#known-issues).
 
 ## Known issues
-- Buggy modules like Tick-Shift, PacketMine.
+- Buggy modules like Tick-Shift.
 - Incomplete modules like Phase, Fucker, InventoryTweaks.
 - ~~HudElements don't resize to their proper locations sometimes.~~
 - Scripting System (WIP).

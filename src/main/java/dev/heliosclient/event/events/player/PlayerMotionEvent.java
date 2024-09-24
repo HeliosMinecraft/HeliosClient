@@ -3,6 +3,7 @@ package dev.heliosclient.event.events.player;
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.LuaEvent;
+import dev.heliosclient.system.mixininterface.IVec3d;
 import net.minecraft.entity.MovementType;
 import net.minecraft.util.math.Vec3d;
 
@@ -23,5 +24,9 @@ public class PlayerMotionEvent extends Event {
 
     public Vec3d getMovement() {
         return movement;
+    }
+
+    public IVec3d modifyMovement(){
+        return (IVec3d)movement;
     }
 }

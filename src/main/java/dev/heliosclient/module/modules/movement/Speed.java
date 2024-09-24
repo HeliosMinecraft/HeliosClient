@@ -66,7 +66,7 @@ public class Speed extends Module_ {
     @SubscribeEvent
     @SuppressWarnings("all")
     public void onMotion(PlayerMotionEvent e) {
-        if (mc.options.sneakKey.isPressed() && !whileSneaking.value)
+        if ((mc.options.sneakKey.isPressed() && !whileSneaking.value) || mc.getCameraEntity() != mc.player)
             return;
 
         // Strafe Mode
@@ -94,14 +94,18 @@ public class Speed extends Module_ {
                    mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
                 }
 
-                double prevX = e.getMovement().x * (1.0 - speed.value/10.1);
-                double prevZ = e.getMovement().z * (1.0 - speed.value/10.1);
-                double useSpeed = mc.player.getVelocity().horizontalLength() * (speed.value/10.0);
+            double prevX = e.getMovement().x * speed.value;
+            double prevZ = e.getMovement().z * speed.value;
+            double useSpeed = mc.player.getVelocity().horizontalLength() * (speed.value / 10.0);
 
-                double angle = Math.toRadians(mc.player.getYaw(mc.getTickDelta()));
-                double x = (-Math.sin(angle) * useSpeed) + prevX;
-                double z = (Math.cos(angle) * useSpeed) + prevZ;
-                ((IVec3d) e.getMovement()).heliosClient$setXZ(x,z);
+            double angle = Math.toRadians(mc.player.getYaw(mc.getTickDelta()));
+            double forward = mc.player.input.movementForward;
+            double strafe = mc.player.input.movementSideways;
+
+            double x = (-Math.sin(angle) * forward + Math.cos(angle) * strafe) * useSpeed + prevX;
+            double z = (Math.cos(angle) * forward + Math.sin(angle) * strafe) * useSpeed + prevZ;
+
+            e.modifyMovement().heliosClient$setXZ(x, z);
         }
         // OnGround Mode
         else if (speedMode.getOption() == Modes.OnGround) {

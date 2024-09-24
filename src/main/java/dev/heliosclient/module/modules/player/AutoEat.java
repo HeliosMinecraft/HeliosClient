@@ -122,7 +122,9 @@ public class AutoEat extends Module_ {
         if ((isEating && !shouldEat()) || mc.player.getInventory().getStack(bestFoodSlot) == null) {
             isEating = false;
             mc.options.useKey.setPressed(false);
-            InventoryUtils.swapBackHotbar();
+
+            if(bestFoodSlot != InventoryUtils.OFFHAND)
+               InventoryUtils.swapBackHotbar();
         }
     }
 

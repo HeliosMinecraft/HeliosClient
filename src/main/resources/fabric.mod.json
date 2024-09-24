@@ -30,8 +30,7 @@
     "fabricloader": ">=0.15.0",
     "fabric-api": "*",
     "minecraft": "~1.20",
-    "java": ">=17",
-    "modmenu": ">=9.0.0"
+    "java": ">=17"
   },
   "suggests": {
     "ModMenu": "*"
