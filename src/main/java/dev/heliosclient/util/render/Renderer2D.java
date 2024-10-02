@@ -1746,5 +1746,4 @@ public class Renderer2D implements Listener {
             RenderSystem.setShaderTexture(0, id);
         }
     }
-
 }

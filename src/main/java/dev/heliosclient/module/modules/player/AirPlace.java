@@ -40,6 +40,17 @@ public class AirPlace extends Module_ {
             .roundingPlace(0)
             .build()
     );
+    DoubleSetting range = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Range")
+            .description("Range of the air place")
+            .onSettingChange(this)
+            .min(0)
+            .max(5d)
+            .defaultValue(3d)
+            .value(3d)
+            .roundingPlace(0)
+            .build()
+    );
 
     public AirPlace() {
         super("AirPlace", "Allows you to place blocks in air", Categories.PLAYER);
@@ -61,7 +72,7 @@ public class AirPlace extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        hitResult = mc.getCameraEntity().raycast(mc.interactionManager.getReachDistance(), 0, false);
+        hitResult = mc.getCameraEntity().raycast(range.value, 0, false);
 
         if (!mc.options.useKey.isPressed()) return;
 

@@ -27,11 +27,10 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(GameRenderer.class)
+@Mixin(value = GameRenderer.class,priority = 1002)
 public abstract class GameRendererMixin {
 
     @Shadow
@@ -134,17 +133,21 @@ public abstract class GameRendererMixin {
         }
     }
 
-    @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;raycast(DFZ)Lnet/minecraft/util/hit/HitResult;"))
-    private HitResult redirectCrosshairTargetValue(Entity entity, double maxDistance, float tickDelta, boolean includeFluids) {
-        if (ModuleManager.get(LiquidInteract.class).isActive()) {
-            HitResult result = entity.raycast(maxDistance, tickDelta, includeFluids);
-            if (result.getType() != HitResult.Type.MISS) return result;
+    @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;raycast(DFZ)Lnet/minecraft/util/hit/HitResult;", shift = At.Shift.AFTER), cancellable = true)
+    private void injectUpdateTargetedEntity(float tickDelta, CallbackInfo ci) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        Entity entity = client.getCameraEntity();
+        if (entity != null && client.world != null) {
+            double d = client.interactionManager.getReachDistance();
+            HitResult result = entity.raycast(d, tickDelta, false);
 
-            return entity.raycast(maxDistance, tickDelta, true);
+            if (ModuleManager.get(LiquidInteract.class).isActive() && result.getType() == HitResult.Type.MISS) {
+                result = entity.raycast(d, tickDelta, true);
+            }
+
+            client.crosshairTarget = result;
         }
-        return entity.raycast(maxDistance, tickDelta, includeFluids);
     }
-
 
     @ModifyExpressionValue(method = "renderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;lerp(FFF)F"))
     private float applyCameraTransformationsMathHelperLerpProxy(float original) {

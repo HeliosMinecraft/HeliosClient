@@ -29,6 +29,7 @@ public class HudElementList {
         registerElement(SpeedHud.DATA);
         registerElement(Ping.DATA);
         registerElement(Tps.DATA);
+        registerElement(ScaffoldCount.DATA);
 
         AddonManager.HELIOS_ADDONS.forEach(HeliosAddon::registerHudElementData);
     }

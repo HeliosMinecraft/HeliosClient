@@ -312,6 +312,7 @@ public class ScriptManagerScreen extends Screen {
                     }
                     if (scriptEntry.hoveredOverEditFile(mouseX, mouseY)) {
                         //Todo
+                        mc.setScreen(new TestScriptEditorScreen(file));
                     }
                 }
             }

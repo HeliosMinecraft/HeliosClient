@@ -2,7 +2,6 @@ package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.mixin.AccessorMinecraftClient;
-import dev.heliosclient.util.render.Renderer3D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.entity.Entity;
@@ -36,29 +35,33 @@ public class PlayerUtils {
         return mc.player.getWorld().raycast(new RaycastContext(playerEyePos, entityBox.getCenter(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
     }
 
-    public static boolean isPlayerAtEdge(double edgeThreshold) {
-        Vec3d playerPos = Renderer3D.getInterpolatedPosition(mc.player);
-        BlockPos blockPos = mc.player.getBlockPos();
+    public static boolean isPlayerNearEdge(double threshold) {
+        BlockPos playerPos = mc.player.getBlockPos();
+        Box playerBox = mc.player.getBoundingBox();
 
-        // Get the player's position within the block
-        double offsetX = playerPos.x - blockPos.getX();
-        double offsetZ = playerPos.z - blockPos.getZ();
+        // Check the edges of the block the player is standing on
+        BlockPos[] edgePositions = {
+                playerPos.north(), playerPos.south(), playerPos.east(), playerPos.west(),
+                playerPos.north().up(), playerPos.south().up(), playerPos.east().up(), playerPos.west().up()
+        };
 
-        // Check if the player is near the edge of the block
-        boolean nearEdgeX = offsetX < edgeThreshold || offsetX > (1 - edgeThreshold);
-        boolean nearEdgeZ = offsetZ < edgeThreshold || offsetZ > (1 - edgeThreshold);
-
-        // Check if the block next to the edge is air or something the player can fall through
-        /*
-        if (nearEdgeX || nearEdgeZ) {
-            BlockPos edgeBlockPos = blockPos.add(nearEdgeX ? (offsetX < edgeThreshold ? -1 : 1) : 0, 0, nearEdgeZ ? (offsetZ < edgeThreshold ? -1 : 1) : 0);
-            BlockState edgeBlockState = mc.world.getBlockState(edgeBlockPos);
-            return edgeBlockState.isAir() || !edgeBlockState.isSolid();
+        for (BlockPos edgePos : edgePositions) {
+            if (isEdgeEmpty(edgePos, playerBox, threshold)) {
+                return true;
+            }
         }
-        
-         */
+        return false;
+    }
 
-        return nearEdgeX || nearEdgeZ;
+    private static boolean isEdgeEmpty(BlockPos edgePos, Box playerBox, double threshold) {
+        Box edgeBox = new Box(edgePos);
+        return mc.world.isAir(edgePos) && !playerBox.intersects(edgeBox) && isWithinThreshold(playerBox, edgeBox, threshold);
+    }
+
+    private static boolean isWithinThreshold(Box playerBox, Box edgeBox, double threshold) {
+        return playerBox.minX - edgeBox.maxX <= threshold || edgeBox.minX - playerBox.maxX <= threshold ||
+                playerBox.minY - edgeBox.maxY <= threshold || edgeBox.minY - playerBox.maxY <= threshold ||
+                playerBox.minZ - edgeBox.maxZ <= threshold || edgeBox.minZ - playerBox.maxZ <= threshold;
     }
 
 

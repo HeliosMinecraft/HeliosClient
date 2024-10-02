@@ -21,7 +21,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SystemDetails;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,8 +38,6 @@ public abstract class MinecraftClientMixin {
 
     @Shadow
     private int itemUseCooldown;
-
-    @Shadow @Final private Window window;
 
     @Shadow public abstract Window getWindow();
 

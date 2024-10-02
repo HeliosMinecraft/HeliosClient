@@ -11,21 +11,24 @@ import dev.heliosclient.module.modules.render.ViewModel;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffectUtil;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(LivingEntity.class)
+@Mixin(value = LivingEntity.class, priority = 1001)
 public abstract class MixinLivingEntity extends Entity {
 
     @Shadow
@@ -50,6 +53,10 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Shadow
     protected abstract void jump();
+
+    @Shadow public abstract boolean hasStatusEffect(StatusEffect effect);
+
+    @Shadow @Nullable public abstract StatusEffectInstance getStatusEffect(StatusEffect effect);
 
     @Inject(method = "isClimbing", at = @At(value = "HEAD"), cancellable = true)
     public void setClimbing(CallbackInfoReturnable<Boolean> cir) {
@@ -99,11 +106,20 @@ public abstract class MixinLivingEntity extends Entity {
             ci.cancel();
         }
     }
+    @Inject(method = "getHandSwingDuration",at = @At("HEAD"),cancellable = true)
+    private void on$GetHandSwingDuration(CallbackInfoReturnable<Integer> cir) {
+        if ((Object) this != HeliosClient.MC.player) return;
 
+        int constant = 6;
+        if(ModuleManager.get(ViewModel.class).isActive() && HeliosClient.MC.options.getPerspective().isFirstPerson()){
+            constant =  ModuleManager.get(ViewModel.class).swingSpeed.getInt();
+        }
 
-    @ModifyConstant(method = "getHandSwingDuration", constant = @Constant(intValue = 6))
-    private int onGetHandSwingDuration(int constant) {
-        if ((Object) this != HeliosClient.MC.player) return constant;
-        return ModuleManager.get(ViewModel.class).isActive() && HeliosClient.MC.options.getPerspective().isFirstPerson() ? (int) ModuleManager.get(ViewModel.class).swingSpeed.value : constant;
+        if (StatusEffectUtil.hasHaste(LivingEntity.class.cast(this))) {
+            cir.setReturnValue(constant - (1 + StatusEffectUtil.getHasteAmplifier(LivingEntity.class.cast(this))));
+        } else {
+            cir.setReturnValue(hasStatusEffect(StatusEffects.MINING_FATIGUE) ? constant + (1 + getStatusEffect(StatusEffects.MINING_FATIGUE).getAmplifier()) * 2 : constant);
+        }
+        cir.cancel();
     }
 }

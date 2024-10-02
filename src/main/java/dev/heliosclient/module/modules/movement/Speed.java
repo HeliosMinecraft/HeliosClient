@@ -95,7 +95,7 @@ public class Speed extends Module_ {
                 }
 
             double prevX = e.getMovement().x * speed.value;
-            double prevZ = e.getMovement().z * speed.value;
+            double prevZ = e.getMovement().z * speed.value * 1.001;
             double useSpeed = mc.player.getVelocity().horizontalLength() * (speed.value / 10.0);
 
             double angle = Math.toRadians(mc.player.getYaw(mc.getTickDelta()));
@@ -141,6 +141,7 @@ public class Speed extends Module_ {
                 mc.player.setSprinting(true);
             }
         }
+        // Funny funky modes, guaranteed to work on 0.01% servers
         // Leap Mode
         else if (speedMode.getOption() == Modes.Leap) {
             if (mc.options.jumpKey.isPressed()) {
@@ -160,6 +161,10 @@ public class Speed extends Module_ {
         }
     }
 
+    @Override
+    public String getInfoString() {
+        return speedMode.getOption().toString();
+    }
 
     public enum Modes {
         OnGround,

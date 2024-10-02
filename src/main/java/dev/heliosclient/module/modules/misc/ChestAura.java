@@ -13,7 +13,6 @@ import dev.heliosclient.util.blocks.ChunkUtils;
 import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.block.entity.*;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -86,10 +85,7 @@ public class ChestAura extends Module_ {
         if (result == ActionResult.SUCCESS) {
             containersOpened.add(blockEntity);
             if (!autoSteal.value) {
-                if (mc.currentScreen != null)
-                    mc.currentScreen.close();
-
-                mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(mc.player.currentScreenHandler.syncId));
+                mc.player.closeHandledScreen();
             }
         }
     }
@@ -113,8 +109,7 @@ public class ChestAura extends Module_ {
                     moveItemQuickMove(i);
                 }
 
-                mc.currentScreen.close();
-                mc.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(genericContainerScreenHandler.syncId));
+                mc.player.closeHandledScreen();
                 isStealing = false;
             });
         }

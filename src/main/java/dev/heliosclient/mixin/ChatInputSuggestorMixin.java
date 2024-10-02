@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.concurrent.CompletableFuture;
 
-@Mixin(ChatInputSuggestor.class)
+@Mixin(value = ChatInputSuggestor.class, priority = 2000)
 public abstract class ChatInputSuggestorMixin {
 
     @Shadow

@@ -2,6 +2,7 @@ package dev.heliosclient.module.modules.movement;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.hud.hudelements.ScaffoldCount;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -31,6 +32,8 @@ public class Scaffold extends Module_ {
     private final SettingGroup sgPlace = new SettingGroup("Place");
     private final SettingGroup sgSwitch = new SettingGroup("Switch");
     private final SettingGroup sgRender = new SettingGroup("Render");
+    private final SettingGroup sgBlockCount = new SettingGroup("Block Count Render");
+
     private final BlockPos.Mutable blockPos = new BlockPos.Mutable();
     /* General */
     BlockListSetting blocks = sgGeneral.add(new BlockListSetting.Builder()
@@ -183,6 +186,7 @@ public class Scaffold extends Module_ {
             .shouldRender(() -> !clientColorCycle.value)
             .build()
     );
+
     private int counter = 0;
 
     public Scaffold() {
@@ -213,9 +217,9 @@ public class Scaffold extends Module_ {
             }
         }
 
-        if(onEdge.value && !PlayerUtils.isPlayerAtEdge(edgeThreshold.value))return;
-
         if (blocks.getSelectedEntries().isEmpty()) return;
+
+        if(onEdge.value && !PlayerUtils.isPlayerNearEdge(edgeThreshold.value) && mc.player.upwardSpeed == 0.0f)return;
 
         Vec3d nextPos = mc.player.getPos().add(mc.player.getVelocity());
 
@@ -323,6 +327,9 @@ public class Scaffold extends Module_ {
 
     private boolean placeBlockPos(BlockPos pos, int itemSlot) {
         boolean placeResult = false;
+        if(!BlockUtils.canPlace(pos)){
+            return false;
+        }
 
         if (counter >= blocksPerTick.value) {
             counter = 0;
@@ -331,8 +338,10 @@ public class Scaffold extends Module_ {
 
 
         if (autoSwitch.value) {
+            ScaffoldCount.setScaffoldStack(mc.player.getInventory().getStack(itemSlot));
             placeResult = BlockUtils.place(pos, airPlace.value, rotate.value, true, itemSlot, silentSwitch.value);
         } else {
+            ScaffoldCount.setScaffoldStack(mc.player.getInventory().getMainHandStack());
             placeResult = BlockUtils.place(pos, airPlace.value, rotate.value,  true);
         }
 

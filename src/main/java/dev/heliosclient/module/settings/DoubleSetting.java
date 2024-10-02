@@ -227,7 +227,7 @@ public class DoubleSetting extends Setting<Double> {
         int roundingPlace;
 
         public Builder() {
-            super(0.0D);
+            super(null);
         }
 
         public Builder onSettingChange(ISettingChange ISettingChange) {
@@ -267,6 +267,12 @@ public class DoubleSetting extends Setting<Double> {
 
         @Override
         public DoubleSetting build() {
+            if (value == null && defaultValue == null) {
+                throw new IllegalArgumentException();
+            }
+            if (value == null) {
+                value = defaultValue;
+            }
             if (defaultValue == null) {
                 defaultValue = value;
             }

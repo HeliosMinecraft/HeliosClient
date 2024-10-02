@@ -5,6 +5,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.event.events.player.PostMovementUpdatePlayerEvent;
+import dev.heliosclient.event.events.player.SendMovementPacketEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
@@ -21,6 +22,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -36,8 +38,6 @@ public abstract class ClientPlayerEntityMixin {
 
     @Shadow
     protected abstract void sendMovementPackets();
-
-    @Shadow public abstract boolean isSneaking();
 
     @Inject(method = "move", at = @At(value = "HEAD"), cancellable = true)
     public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
@@ -60,6 +60,16 @@ public abstract class ClientPlayerEntityMixin {
         if (ModuleManager.get(Scaffold.class).isActive() && ModuleManager.get(Scaffold.class).down.value) info.setReturnValue(false);
 
         if (ModuleManager.get(AutoSneak.class).isActive() && ModuleManager.get(AutoSneak.class).packet.value) info.setReturnValue(true);
+    }
+
+    @Inject(method = "sendMovementPackets", at = @At(value = "HEAD"))
+    private void onSendMovementPacketsPRE(CallbackInfo ci) {
+        EventManager.postEvent(new SendMovementPacketEvent.PRE());
+    }
+
+    @Inject(method = "sendMovementPackets", at = @At(value = "TAIL"))
+    private void onSendMovementPacketsPOST(CallbackInfo ci) {
+        EventManager.postEvent(new SendMovementPacketEvent.POST());
     }
 
     @ModifyExpressionValue(method = "sendMovementPackets", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isSneaking()Z"))
@@ -110,8 +120,8 @@ public abstract class ClientPlayerEntityMixin {
         }
     }
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendMovementPackets()V", shift = At.Shift.BEFORE), cancellable = true)
-    private void PostUpdateHook(CallbackInfo info) {
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;sendMovementPackets()V", shift = At.Shift.AFTER,opcode = 1), cancellable = true)
+    private void postUpdateHook(CallbackInfo info) {
         if (doNotTickSelf) {
             return;
         }
@@ -131,9 +141,19 @@ public abstract class ClientPlayerEntityMixin {
         }
     }
 
-    @Redirect(method = "updateNausea", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;"))
-    private Screen updateNausea$setcurrentScreen(MinecraftClient client) {
-        if (ModuleManager.get(BetterPortals.class).isActive()) return null;
-        return client.currentScreen;
+    @ModifyArg(
+            method = "updateNausea",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"
+            ),
+            index = 0
+    )
+    private Screen modifySetScreenArg(Screen screen) {
+        if (ModuleManager.get(BetterPortals.class).isActive()) {
+            return MinecraftClient.getInstance().currentScreen;
+        }
+        return screen;
     }
+
 }

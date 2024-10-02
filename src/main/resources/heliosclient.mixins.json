@@ -74,6 +74,7 @@
     "MixinInGameOverlayRenderer",
     "MixinItemRenderer",
     "MixinKeyboardInput",
+    "MixinLightmapTextureManager",
     "MixinParticleManager",
     "MixinRenderTickCounter",
     "MixinScreen",

@@ -7,17 +7,16 @@ import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.interfaces.ISimpleOption;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Fullbright extends Module_ {
     private final SettingGroup sgGeneral = new SettingGroup("General");
 
-    List<String> modes = new ArrayList<>(List.of("Gamma", "Night Vision"));
+    List<String> modes = List.of("Gamma", "Night Vision");
+
     CycleSetting mode = sgGeneral.add(new CycleSetting.Builder()
             .name("Mode")
             .description("Fullbright mode to apply")
@@ -53,7 +52,6 @@ public class Fullbright extends Module_ {
     public void onEnable() {
         super.onEnable();
         if (mode.value == 0 && mc.player != null) {
-            ((ISimpleOption<Double>) (Object) mc.options.getGamma()).heliosClient$setValueUnrestricted(gamma.value);
             mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
         } else if (mc.player != null && mode.value == 1) {
             mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 254, true, false, false));
@@ -65,7 +63,6 @@ public class Fullbright extends Module_ {
         super.onSettingChange(setting);
         if (active.value) {
             if (mode.value == 0 && mc.player != null) {
-                ((ISimpleOption<Double>) (Object) mc.options.getGamma()).heliosClient$setValueUnrestricted(gamma.value);
                 mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
             } else if (mc.player != null && mode.value == 1) {
                 mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 1000, 254, true, false, false));
@@ -76,8 +73,14 @@ public class Fullbright extends Module_ {
     @Override
     public void onDisable() {
         super.onDisable();
-        mc.options.getGamma().setValue(1.0);
         if (mc.player != null)
             mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
+    }
+
+    public float getGamma(float originalVal){
+        if(mode.value == 0){
+            return gamma.getFloat();
+        }
+        return originalVal;
     }
 }

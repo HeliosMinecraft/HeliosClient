@@ -7,19 +7,24 @@ import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
+import java.util.List;
 
 public class Radar extends HudElement {
     private static int RADAR_SIZE = 100; // Size of the radar in pixels
     private static int MAX_DISTANCE = 25; // Maximum entity distance
+    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
+
     public SettingGroup sgRadarSettings = new SettingGroup("General");
     public SettingGroup sgRadarColors = new SettingGroup("Colors");
     public DoubleSetting distance = sgRadarSettings.add(new DoubleSetting.Builder()
@@ -32,7 +37,26 @@ public class Radar extends HudElement {
             .value(25.0D)
             .onSettingChange(this)
             .build()
-    );    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
+    );
+    public DropDownSetting drawingMode = sgRadarSettings.add(new DropDownSetting.Builder()
+            .name("Drawing Mode")
+            .description("Mode of drawing entities on the radar")
+            .defaultValue(List.of(DrawingMode.values()))
+            .defaultListOption(DrawingMode.DOT)
+            .onSettingChange(this)
+            .build()
+    );
+    public DoubleSetting drawingScale = sgRadarSettings.add(new DoubleSetting.Builder()
+            .name("Scale of the drawn entities")
+            .description("Scale of the drawn entities, specifically for text or Face mode")
+            .min(0.1)
+            .max(2f)
+            .roundingPlace(1)
+            .defaultValue(0.5f)
+            .value(0.5f)
+            .onSettingChange(this)
+            .build()
+    );
     public DoubleSetting size = sgRadarSettings.add(new DoubleSetting.Builder()
             .name("Size")
             .description("Radar size")
@@ -92,6 +116,14 @@ public class Radar extends HudElement {
             .onSettingChange(this)
             .build()
     );
+    public RGBASetting yourColor = sgRadarColors.add(new RGBASetting.Builder()
+            .name("Your Color")
+            .description("Color of you in the radar")
+            .defaultValue(Color.CYAN)
+            .value(Color.CYAN)
+            .onSettingChange(this)
+            .build()
+    );
     public RGBASetting playerColor = sgRadarColors.add(new RGBASetting.Builder()
             .name("Player")
             .description("Color of players in radar")
@@ -147,6 +179,7 @@ public class Radar extends HudElement {
 
         this.width = (int) size.value;
         this.height = (int) size.value;
+        renderBg.setValue(true);
     }
 
     @Override
@@ -156,16 +189,12 @@ public class Radar extends HudElement {
         RADAR_SIZE = this.width;
 
         super.renderElement(drawContext, textRenderer);
-
         if (mc.player == null || mc.world == null) {
             return;
         }
 
         int centerX = x + RADAR_SIZE / 2;
         int centerY = y + RADAR_SIZE / 2;
-
-        renderBg.value = true;
-        rounded.value = true;
 
         Vec3d playerPos = mc.player.getPos();
 
@@ -175,7 +204,9 @@ public class Radar extends HudElement {
             }
             Vec3d entityPos = entity.getPos();
             // Ignore the Y-level difference
-            double distance = playerPos.distanceTo(new Vec3d(entityPos.x, playerPos.y, entityPos.z));
+            double dx = playerPos.x - entityPos.x;
+            double dz = playerPos.z - entityPos.z;
+            double distance = Math.sqrt(dx*dx + dz*dz);
 
             if (distance <= MAX_DISTANCE) {
                 // Calculate the entity's position on the radar
@@ -190,10 +221,35 @@ public class Radar extends HudElement {
                     radius = 1.5f;
                 }
                 if (entity == mc.player) {
-                    FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF123", x2 - 1.5f, y2 - 1.2f, color);
-                } else {
-                    // Draw a dot for the entity
-                    Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), x2, y2, radius, color);
+                    FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF18B", x2 - 1.5f, y2 - 1.2f, yourColor.value.getRGB());
+                }else {
+                    switch ((DrawingMode) drawingMode.getOption()) {
+                        case DOT -> Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), x2, y2, radius, color);
+                        case FIRST_LETTER -> {
+                            float scaledX = x2/drawingScale.getFloat();
+                            float scaledY = y2/drawingScale.getFloat();
+                            drawContext.getMatrices().push();
+                            drawContext.getMatrices().scale(drawingScale.getFloat(),drawingScale.getFloat(),1f);
+
+                            String text = entity.getType().getUntranslatedName().substring(0,1);
+
+                            drawContext.drawText(mc.textRenderer,text, (int) scaledX, (int) scaledY,color,false);
+                            drawContext.getMatrices().pop();
+                        }
+                        case FACE -> {
+                            EntityRenderer<? super Entity> e = mc.getEntityRenderDispatcher().getRenderer(entity);
+                            if(e != null) {
+                                Identifier texture = e.getTexture(entity);
+
+                                if (texture != null) {
+                                    drawContext.getMatrices().push();
+                                    drawContext.getMatrices().scale(drawingScale.getFloat(), drawingScale.getFloat(), 1f);
+                                    drawContext.drawTexture(texture, (int) (x2 / drawingScale.getFloat() - 8), (int) (y2 / drawingScale.getFloat() - 8), 8, 8, 8, 8, 64, 64);
+                                    drawContext.getMatrices().pop();
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -235,6 +291,9 @@ public class Radar extends HudElement {
         }
         return color;
     }
-
-
+    public enum DrawingMode {
+        DOT,
+        FIRST_LETTER,
+        FACE
+    }
 }

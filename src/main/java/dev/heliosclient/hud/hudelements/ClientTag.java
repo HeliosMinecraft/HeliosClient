@@ -15,6 +15,8 @@ import net.minecraft.client.gui.DrawContext;
 import java.util.List;
 
 public class ClientTag extends HudElement {
+    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
+
     public SettingGroup sgSettings = new SettingGroup("General");
 
     static Texture LOGO = new Texture("icon.png");
@@ -47,8 +49,6 @@ public class ClientTag extends HudElement {
         this.height = Math.round(Renderer2D.getStringHeight());
         addSettingGroup(sgSettings);
     }
-
-    public static HudElementData<ClientTag> DATA = new HudElementData<>("Client Tag", "Shows client watermark", ClientTag::new);
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {

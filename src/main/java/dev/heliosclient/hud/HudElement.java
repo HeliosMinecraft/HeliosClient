@@ -429,6 +429,11 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
         this.width = width;
     }
 
+    public void setSize(int width, int height){
+        this.height = height;
+        this.width = width;
+    }
+
     /**
      * Called when setting gets changed.
      */

@@ -45,7 +45,7 @@ public class ConsoleAppender extends AbstractAppender {
             message = ColorUtils.darkRed + message + ColorUtils.reset;
         }
 
-        if (event.getLoggerName().contains("net.minecraft") || event.getLoggerName().contains("com.mojang") || event.getLoggerName().contains("minecraft")) {
+        if (event.getLoggerName().contains("com.mojang") || event.getLoggerName().contains("minecraft")) {
             message = ColorUtils.darkGreen + "[Minecraft] " + ColorUtils.reset + message;
         } else if (event.getLoggerName().equalsIgnoreCase("HeliosClient")) {
             message = ColorUtils.yellow + "[HeliosClient] " + ColorUtils.reset + message;
@@ -53,12 +53,14 @@ public class ConsoleAppender extends AbstractAppender {
             message = ColorUtils.darkAqua + "[Fabric] " + ColorUtils.reset + message;
         } else if (event.getLoggerName().contains("ModMenu")) {
             message = ColorUtils.darkBlue + "[ModMenu] " + ColorUtils.reset + message;
+        } else if (event.getLoggerName().length() <= 10){
+            message = ColorUtils.gray + "[" + event.getLoggerName() + "]" + ColorUtils.reset + message;
         }
 
 
         // Does not log same messages again to prevent console spam.
         if (message.equals(previousMessage)) {
-            List<String> lines = screen.consoleBox.getlines();
+            List<String> lines = screen.consoleBox.getLines();
 
             duplicateCount++;
             if (!lines.isEmpty()) {

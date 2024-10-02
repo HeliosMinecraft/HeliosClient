@@ -76,7 +76,7 @@ public class BreakIndicator extends Module_ {
 
 
     public BreakIndicator() {
-        super("Break Indicator", "Indicates block breaking", Categories.RENDER);
+        super("Break Indicator", "Indicates block breaking, aka MineESP", Categories.RENDER);
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
     }

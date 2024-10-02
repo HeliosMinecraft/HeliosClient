@@ -114,7 +114,7 @@ public class AutoTotem extends Module_ {
         if(totemCount > 0){
             lastNoTotemNotified = false;
             timer.incrementAndEvery(delay.getInt(),()->{
-               if(mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING || mc.player.playerScreenHandler != mc.player.currentScreenHandler){
+               if(mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING){
                    return;
                }
                if(always.value || didTotemPop || isPlayerLow()) {
@@ -144,12 +144,13 @@ public class AutoTotem extends Module_ {
             InventoryUtils.swapToSlot(itemSlot,true);
             mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
             InventoryUtils.swapBackHotbar();
-        }else {
-            InventoryUtils.moveItem(itemSlot,45, SlotActionType.PICKUP, SlotActionType.PICKUP);
-
+            return true;
+        }else if(mc.player.playerScreenHandler == mc.player.currentScreenHandler){
             if(offhandHasItem){
-                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,itemSlot,0,SlotActionType.PICKUP,mc.player);
+                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,InventoryUtils.OFFHAND,0,SlotActionType.PICKUP,mc.player);
             }
+
+            InventoryUtils.moveItem(itemSlot,InventoryUtils.OFFHAND, SlotActionType.PICKUP, SlotActionType.PICKUP);
         }
         return true;
     }

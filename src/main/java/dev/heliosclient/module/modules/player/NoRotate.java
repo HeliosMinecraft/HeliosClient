@@ -12,11 +12,12 @@ public class NoRotate extends Module_ {
         super("NoRotate", "Tries to overwrite rotation values sent from server to client", Categories.PLAYER);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = SubscribeEvent.Priority.LOW)
     private void onPacketReceive(PacketEvent.RECEIVE event) {
-        if (event.packet instanceof PlayerPositionLookS2CPacket) {
-            ((AccessorPlayerPositionLookS2CPacket) event.packet).setPitch(mc.player.getPitch());
-            ((AccessorPlayerPositionLookS2CPacket) event.packet).setYaw(mc.player.getYaw());
+        if (event.packet instanceof PlayerPositionLookS2CPacket ppl) {
+            AccessorPlayerPositionLookS2CPacket p = (AccessorPlayerPositionLookS2CPacket)ppl;
+            p.setPitch(mc.player.getPitch());
+            p.setYaw(mc.player.getYaw());
         }
     }
 }

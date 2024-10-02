@@ -237,11 +237,13 @@ public class PacketMine extends Module_ {
 
             MiningInfo info = queue.get(nextBlock);
 
-            //Sometimes the blocks dont get mined but the calculated progress is 1.. So we attempt to mine it again from scratch.
+            //Sometimes the blocks dont get mined but the calculated progress is 1. So we attempt to mine it again from scratch.
             if(info.progress >= 1.0f && !mc.world.getBlockState(nextBlock).isAir() && reattempt.value){
                 mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, nextBlock, info.direction));
                 mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                 if(info.attempts > maxReattempts.getInt()){
+                    mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, nextBlock, info.direction));
+                    mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                     queue.remove(nextBlock);
                     return;
                 }

@@ -1,5 +1,6 @@
 package dev.heliosclient.util.player;
 
+import dev.heliosclient.event.events.player.SendMovementPacketEvent;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.timer.TickTimer;
 import net.minecraft.entity.Entity;
@@ -10,17 +11,24 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import static dev.heliosclient.util.render.Renderer3D.mc;
 
 public class RotationUtils {
-    //Incremented in rotation simulator
+    // Incremented in rotation simulator
     public static final TickTimer timerSinceLastRotation = new TickTimer(true);
     static float prevYaw, prevPitch;
     public static float serverYaw, serverPitch;
 
+    // Queue to store rotations
+    private static final Queue<Rotation> rotationQueue = new LinkedList<>();
+
     public static void lookAt(Entity entity, LookAtPos lookAtPos) {
         lookAt(lookAtPos.positionGetter.getPosition(entity));
     }
+
     public static void lookAt(Entity entity) {
         lookAt(LookAtPos.CENTER.positionGetter.getPosition(entity));
     }
@@ -36,9 +44,9 @@ public class RotationUtils {
         mc.player.setHeadYaw(mc.player.getYaw());
         mc.player.prevPitch = mc.player.getPitch();
         mc.player.prevYaw = mc.player.getYaw();
-        mc.player.prevHeadYaw =  mc.player.headYaw;
-        mc.player.bodyYaw =  mc.player.headYaw;
-        mc.player.prevBodyYaw =  mc.player.bodyYaw;
+        mc.player.prevHeadYaw = mc.player.headYaw;
+        mc.player.bodyYaw = mc.player.headYaw;
+        mc.player.prevBodyYaw = mc.player.bodyYaw;
     }
 
     public static void lookAt(Vec3d pos) {
@@ -54,72 +62,129 @@ public class RotationUtils {
     }
 
     public static double getYaw(double targetX, double targetZ) {
-        double dx = targetX - mc.player.getEyePos().getX();
-        double dz = targetZ - mc.player.getEyePos().getZ();
+        double dx = targetX - mc.player.getX();
+        double dz = targetZ - mc.player.getZ();
         float yaw = (float) Math.toDegrees(Math.atan2(dz, dx)) - 90F;
 
         return MathHelper.wrapDegrees(yaw);
     }
 
     public static double getYaw(Vec3d target) {
-        return getYaw(target.getX(),target.getZ());
+        return getYaw(target.getX(), target.getZ());
     }
 
     public static double getYaw(BlockPos target) {
-       return getYaw(target.getX(),target.getZ());
+        return getYaw(target.getX(), target.getZ());
     }
 
     public static double getPitch(double targetX, double targetY, double targetZ) {
-        double dx = targetX - mc.player.getEyePos().getX();
-        double dy = targetY - mc.player.getEyePos().getY();
-        double dz = targetZ - mc.player.getEyePos().getZ();
+        double dx = targetX - mc.player.getX();
+        double dy = targetY - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
+        double dz = targetZ - mc.player.getZ();
 
         double distanceXZ = Math.sqrt(dx * dx + dz * dz);
-        float pitch = (float) -Math.toDegrees(Math.atan2(dy, distanceXZ));
 
+        float pitch = (float) -Math.toDegrees(Math.atan2(dy, distanceXZ));
 
         return MathHelper.wrapDegrees(pitch);
     }
 
     public static double getPitch(BlockPos target) {
-       return getPitch(target.getX(),target.getY(),target.getZ());
+        return getPitch(target.getX(), target.getY(), target.getZ());
     }
 
     public static double getPitch(Vec3d target) {
-        return getPitch(target.getX(),target.getY(),target.getZ());
+        return getPitch(target.getX(), target.getY(), target.getZ());
     }
 
     public static void rotate(double yaw, double pitch, boolean clientSide, @Nullable Runnable task) {
-        if(prevYaw != yaw && prevPitch != pitch && clientSide){
-            timerSinceLastRotation.restartTimer();
-        }
-        prevYaw = mc.player.getYaw(mc.getTickDelta());
+        // Add rotation to the queue
+        rotationQueue.add(new Rotation((float) yaw, (float) pitch, clientSide, task));
+    }
+
+    public static void setServerRotations(float yaw, float pitch) {
+        serverYaw = yaw;
+        serverPitch = pitch;
+        timerSinceLastRotation.restartTimer();
+    }
+
+    private static void setPlayerRotations(float yaw, float pitch){
         prevPitch = mc.player.getPitch(mc.getTickDelta());
+        prevYaw = mc.player.getYaw(mc.getTickDelta());
 
-        mc.player.setPitch((float) pitch);
-        mc.player.setYaw((float) yaw);
-        mc.player.setHeadYaw(mc.player.getYaw());
-        mc.player.prevPitch = mc.player.getPitch();
-        mc.player.prevYaw = mc.player.getYaw();
-        mc.player.prevHeadYaw =  mc.player.headYaw;
-        mc.player.bodyYaw =  mc.player.headYaw;
-        mc.player.prevBodyYaw =  mc.player.bodyYaw;
+        mc.player.setYaw(yaw);
+        mc.player.setPitch(pitch);
+    }
+    private static void resetPlayerRotation(){
+        mc.player.setYaw(prevYaw);
+        mc.player.setPitch(prevPitch);
+    }
 
-        if (clientSide) {
-            mc.player.renderYaw = (float) yaw;
-            mc.player.renderPitch = (float) pitch;
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) yaw, (float) pitch, mc.player.isOnGround()));
-            if (task != null)
-                task.run();
-            setServerRotations((float) yaw, (float) pitch);
-            mc.player.setYaw(prevYaw);
-            mc.player.setPitch(prevPitch);
+    //Called in RotationSimulator
+    public static void onPreSendMovementPacket(SendMovementPacketEvent.PRE event) {
+        if (mc.cameraEntity != mc.player) return;
+
+        // Process the first rotation in the queue
+        if (!rotationQueue.isEmpty()) {
+            Rotation rotation = rotationQueue.peek();
+
+            if(rotation != null) {
+                setServerRotations(rotation.yaw, rotation.pitch);
+                setPlayerRotations(rotation.yaw, rotation.pitch);
+            }
         }
     }
 
-    public static void setServerRotations(float yaw, float pitch){
-        serverYaw = yaw;
-        serverPitch = pitch;
+    //Called in RotationSimulator
+    public static void onPostSendMovementPacket(SendMovementPacketEvent.POST event) {
+        // Process the first rotation in the queue
+        if (!rotationQueue.isEmpty()) {
+            if (mc.cameraEntity == mc.player) {
+                rotationQueue.peek().run();
+
+                resetPlayerRotation();
+            }
+
+            int i = 0;
+            while (!rotationQueue.isEmpty()) {
+                Rotation rotation = rotationQueue.poll();
+                if (rotation != null) {
+                    setServerRotations(rotation.yaw, rotation.pitch);
+                    // If clientSide, change client rotation and send PositionAndLook packet
+                    if (rotation.clientSide)
+                        setPlayerRotations(rotation.yaw, rotation.pitch);
+
+                    mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw, rotation.pitch, mc.player.isOnGround()));
+                    rotation.run();
+
+                    if (rotation.clientSide)
+                        resetPlayerRotation();
+                    i++;
+                }
+            }
+            if(i > 0) {
+                resetPlayerRotation();
+            }
+        }
+    }
+
+    // Static class to store rotation data
+    private static class Rotation {
+        float yaw, pitch;
+        boolean clientSide;
+        @Nullable Runnable task;
+
+        Rotation(float yaw, float pitch, boolean clientSide, @Nullable Runnable task) {
+            this.yaw = yaw;
+            this.pitch = pitch;
+            this.clientSide = clientSide;
+            this.task = task;
+        }
+        public void run(){
+            if(task != null){
+                task.run();
+            }
+        }
     }
 
     public enum LookAtPos {

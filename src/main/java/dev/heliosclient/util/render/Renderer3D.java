@@ -1,13 +1,11 @@
 package dev.heliosclient.util.render;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
-import me.x150.renderer.render.Renderer3d;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
@@ -25,8 +23,6 @@ import java.util.function.Consumer;
 
 /*
 Credits: BleachHack 1.19.4
-
-Todo: Replace this later with original code or not ig
  */
 public class Renderer3D {
     public static boolean renderThroughWalls = false;
@@ -283,21 +279,6 @@ public class Renderer3D {
         int halfWidth = mc.textRenderer.getWidth(text) / 2;
 
         VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
-
-        /*
-        if (fill) {
-            int opacity = (int) (MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25F) * 255.0F) << 24;
-            mc.textRenderer.draw(text, -halfWidth, 0f, 553648127, false, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, opacity, 0xf000f0);
-            immediate.draw();
-        } else {
-            matrices.push();
-            matrices.translate(1, 1, 0);
-            mc.textRenderer.draw(text.copy(), -halfWidth, 0f, 0x202020, false, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, 0, 0xf000f0);
-            immediate.draw();
-            matrices.pop();
-        }
-
-         */
 
         mc.textRenderer.draw(text, -halfWidth, 0f, color, shadow, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, 0, 0xf000f0);
         immediate.draw();

@@ -24,6 +24,16 @@ public class TimerUtils {
         startTime = System.currentTimeMillis();
         hasTimerStarted = true;
     }
+    // Resets the timer
+    public void resetTimer() {
+        startTime = System.currentTimeMillis();
+        hasTimerStarted = false;
+    }
+    // Restarts the timer
+    public void restartTimer() {
+        resetTimer();
+        startTimer();
+    }
 
     //Sets the time
     public void setTime(long time) {
@@ -46,11 +56,6 @@ public class TimerUtils {
         return endTime - startTime;
     }
 
-    // Resets the timer
-    public void resetTimer() {
-        startTime = System.currentTimeMillis();
-        hasTimerStarted = false;
-    }
 
     // Schedules a task to reset the timer every ms milliseconds
     public void scheduleReset(long ms) {

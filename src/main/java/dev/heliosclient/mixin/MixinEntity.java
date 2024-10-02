@@ -8,11 +8,14 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.movement.NoFall;
 import dev.heliosclient.module.modules.movement.NoSlow;
+import dev.heliosclient.module.modules.render.FreeLook;
 import dev.heliosclient.module.modules.render.Freecam;
 import dev.heliosclient.module.modules.render.NoRender;
 import dev.heliosclient.util.entity.FreeCamEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,6 +47,8 @@ public abstract class MixinEntity {
 
     @Shadow
     public abstract void setVelocity(Vec3d velocity);
+
+    @Shadow public abstract void readNbt(NbtCompound nbt);
 
     @Inject(method = "move", at = @At(value = "HEAD"), cancellable = true)
     public void onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
@@ -97,6 +102,8 @@ public abstract class MixinEntity {
 
     @Inject(method = "changeLookDirection", at = @At("HEAD"), cancellable = true)
     private void overrideYaw(double yawChange, double pitchChange, CallbackInfo ci) {
+        FreeLook freeLook = ModuleManager.get(FreeLook.class);
+
         if (ModuleManager.get(Freecam.class).isActive()) {
             this.yaw = this.prevYaw;
             this.pitch = this.prevPitch;
@@ -113,6 +120,16 @@ public abstract class MixinEntity {
 
             return;
         }
+
+        if (freeLook != null && freeLook.isActive()) {
+            freeLook.cameraYaw += (float) (yawChange * freeLook.sensitivity.value/2);
+            freeLook.cameraPitch += (float) (pitchChange * freeLook.sensitivity.value/2);
+
+            freeLook.cameraPitch = MathHelper.clamp(freeLook.cameraPitch, -90.0F, 90.0F);
+            ci.cancel();
+            return;
+        }
+
 
         this.forcedYaw = this.yaw;
         this.forcedPitch = this.pitch;

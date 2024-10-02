@@ -88,6 +88,9 @@ public class ConsoleScreen extends Screen {
                 enterBox.setText("");
             }
         }
+        if (keyCode == GLFW.GLFW_KEY_TAB ) {
+            enterBox.setFocused(true);
+        }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 

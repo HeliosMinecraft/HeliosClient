@@ -119,6 +119,10 @@ public class CategoryPane implements Listener {
         }
     }
 
+    public void addScrollVelocity(float scrollVelocity){
+        this.scrollVelocity += scrollVelocity;
+    }
+
     public void checkMaxHeightValue() {
         if (ClickGUI.ScrollTypes.values()[HeliosClient.CLICKGUI.ScrollType.value] == ClickGUI.ScrollTypes.OLD) {
             MAX_HEIGHT = height;

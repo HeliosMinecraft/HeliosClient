@@ -17,6 +17,7 @@ import net.minecraft.entity.projectile.thrown.ExperienceBottleEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.ActionResult;
@@ -73,6 +74,9 @@ public class BlockUtils {
         if (pos == null || mc.world == null || !World.isValid(pos) || !mc.world.getBlockState(pos).isReplaceable() || !mc.world.isInBuildLimit(pos))
             return false;
         return mc.world.getWorldBorder().contains(pos) && mc.world.canPlace(state, pos, ShapeContext.absent());
+    }
+    public static boolean canPlace(BlockPos pos) {
+        return canPlace(pos,mc.world.getBlockState(pos));
     }
 
     public static boolean breakBlock(BlockPos pos, boolean swing) {
@@ -252,15 +256,14 @@ public class BlockUtils {
 
         ActionResult result = ActionResult.FAIL;
         if (rotate) {
-            RotationUtils.rotate(RotationUtils.getYaw(hitPos), RotationUtils.getPitch(hitPos), clientSideRotation,()-> interactBlock(blockHitResult, neighborBlock, hand));
-            //hmm
-            if(clientSideRotation) {
-                return true;
-            }
+            float yaw =   (float) RotationUtils.getYaw(hitPos);
+            float pitch = (float) RotationUtils.getPitch(hitPos);
+
+            RotationUtils.setServerRotations(yaw,pitch);
+            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, mc.player.isOnGround()));
         }
 
         result = interactBlock(blockHitResult,neighborBlock,hand);
-
 
         return result == ActionResult.SUCCESS;
     }
@@ -292,10 +295,7 @@ public class BlockUtils {
             BlockPos neighbor = blockPos.offset(side);
             BlockState state = mc.world.getBlockState(neighbor);
 
-            // Check if neighbour isn't empty
             if (state.isAir() || isClickable(state.getBlock())) continue;
-
-            // Check if neighbour is a fluid
             if (!state.getFluidState().isEmpty()) continue;
 
             double relevancy = side.getAxis().choose(lookVec.getX(), lookVec.getY(), lookVec.getZ()) * side.getDirection().offset();

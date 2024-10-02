@@ -1,7 +1,7 @@
 package dev.heliosclient.util.player;
 
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.player.SendMovementPacketEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
@@ -40,7 +40,10 @@ public class RotationSimulator implements Listener {
 
 
     @SubscribeEvent
-    public void tick(TickEvent.PLAYER event) {
+    public void preSendMovement(SendMovementPacketEvent.PRE event) {
+        //impossible :0
+        if(mc.player == null) return;
+
         RotationUtils.timerSinceLastRotation.increment();
 
         if (currentRotation != null) {
@@ -50,7 +53,14 @@ public class RotationSimulator implements Listener {
                 clearRotations();
             }
         }
+
+        RotationUtils.onPreSendMovementPacket(event);
     }
+    @SubscribeEvent
+    public void postSendMovement(SendMovementPacketEvent.POST event) {
+        RotationUtils.onPostSendMovementPacket(event);
+    }
+
 
     public void clearRotations() {
         if (currentRotation != null)

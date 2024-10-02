@@ -188,6 +188,11 @@ public class Velocity extends Module_ {
         }
     }
 
+    @Override
+    public String getInfoString() {
+        return mode.getOption().toString();
+    }
+
     public enum Mode {
         Matrix, Cancel, Custom, Grim
     }
