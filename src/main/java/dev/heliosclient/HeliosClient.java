@@ -19,8 +19,8 @@ import dev.heliosclient.system.TickRate;
 import dev.heliosclient.system.config.Config;
 import dev.heliosclient.ui.clickgui.ConsoleScreen;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.render.Renderer2D;
@@ -47,12 +47,15 @@ public class HeliosClient implements ModInitializer, Listener {
     public static final String versionTag = ColorUtils.gray + "v0.dev";
     public static final String MODID = "heliosclient";
     private static final TimerUtils configTimer = new TimerUtils();
+
     public static Config CONFIG = new Config();
     public static AddonManager ADDONMANAGER = new AddonManager();
     public static ClickGUI CLICKGUI;
-    public volatile static ConsoleScreen CONSOLE = new ConsoleScreen();
+    public static ConsoleScreen CONSOLE = new ConsoleScreen();
     public static File SAVE_FOLDER = new File(MC.runDirectory.getPath() + "/heliosclient");
 
+
+    //Methods for saving and loading
     public static void loadConfig() {
         load(config -> {
             config.loadEverything();
@@ -69,12 +72,11 @@ public class HeliosClient implements ModInitializer, Listener {
 
     private static void load(Consumer<Config> consumer) {
         //Record time it took
-
         configTimer.startTimer();
 
         consumer.accept(CONFIG);
 
-        if (shouldSendNotification() && ModuleManager.get(NotificationModule.class).clientNotification.value) {
+        if (shouldSendNotification() && ModuleManager.get(NotificationModule.class).displayClientNotifications()) {
             NotificationManager.addNotification(new InfoNotification("Loading Done", "in: " + configTimer.getElapsedTime() + "s", 1000, SoundUtils.TING_SOUNDEVENT));
         }
 
@@ -126,16 +128,18 @@ public class HeliosClient implements ModInitializer, Listener {
     @SubscribeEvent
     public void onStop(ClientStopEvent client) {
         saveConfigHook();
+
         if (DiscordRPC.INSTANCE.isRunning) {
             DiscordRPC.INSTANCE.stopPresence();
         }
-        CapeManager.capeTextureManager.stopCapeAnimation();
+
         HeliosExecutor.shutdown();
     }
 
     @Override
     public void onInitialize() {
-        ConsoleAppender consoleAppender = new ConsoleAppender(CONSOLE);
+        //Create the console appender
+        ConsoleAppender consoleAppender = new ConsoleAppender(HeliosClient.CONSOLE);
 
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         Configuration config = ctx.getConfiguration();
@@ -145,7 +149,6 @@ public class HeliosClient implements ModInitializer, Listener {
 
         LOGGER.info("Initialising Helios Client...");
 
-        ColorManager.createInstance();
         CONFIG.init();
         CLICKGUI = new ClickGUI();
 
@@ -155,7 +158,6 @@ public class HeliosClient implements ModInitializer, Listener {
 
         LuaScriptManager.getScripts();
 
-
         FontManager.INSTANCE.refresh();
         ADDONMANAGER.loadAddons();
         AddonManager.initializeAddons();
@@ -164,28 +166,16 @@ public class HeliosClient implements ModInitializer, Listener {
         SoundUtils.registerSounds();
         HudElementList.INSTANCE = new HudElementList();
 
-        HeliosExecutor.execute(()->{
-             CapeManager.CAPE_NAMES = CapeManager.loadCapes();
-        });
+        HeliosExecutor.execute(()-> CapeManager.CAPE_NAMES = CapeManager.loadCapes());
 
         HeliosExecutor.execute(HeliosClient::loadConfig);
 
         //Saving is handled when the client stops, crashes, the world stops or the player disconnects.
         //Crash save is handled in MixinCrashReport and configs are saved while switching.
 
-        MC.execute(() -> {
-            while (MC.getWindow() == null) {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    // Cope
-                }
-            }
-            HeliosClient.CLICKGUI.onLoad();
-        });
-
         if (fonts != null)
             EventManager.postEvent(new FontChangeEvent(fonts));
+
     }
 
     public void registerListeners() {

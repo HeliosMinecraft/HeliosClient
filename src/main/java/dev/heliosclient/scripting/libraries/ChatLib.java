@@ -1,15 +1,13 @@
 package dev.heliosclient.scripting.libraries;
 
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 public class ChatLib extends TwoArgFunction {
-    public ChatLib() {
-
-    }
+    public ChatLib() {}
 
     @Override
     public LuaValue call(LuaValue modname, LuaValue env) {
@@ -22,46 +20,48 @@ public class ChatLib extends TwoArgFunction {
         library.set("sendScriptMsg", new sendScriptMsg());
 
         env.set("chatLib", library);
-        env.get("package").get("loaded").set("chatLib", library);
+
+        if (!env.get("package").isnil())
+            env.get("package").get("loaded").set("chatLib", library);
         return library;
     }
 
-    static class sendHeliosMsg extends OneArgFunction {
+    static final class sendHeliosMsg extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendHeliosMsg(textString.tojstring());
             return NIL;
         }
     }
 
-    static class sendMsg extends OneArgFunction {
+    static final class sendMsg extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendMsg(textString.tojstring());
             return NIL;
         }
     }
 
-    static class sendScriptMsg extends TwoArgFunction {
+    static final class sendScriptMsg extends TwoArgFunction {
         public LuaValue call(LuaValue scriptName, LuaValue textString) {
             ChatUtils.sendMsg(ColorUtils.gray + "[" + ColorUtils.darkAqua + scriptName.tojstring() + ColorUtils.gray + "]" + textString.tojstring());
             return NIL;
         }
     }
 
-    static class sendPlayerMsg extends OneArgFunction {
+    static final class sendPlayerMsg extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendPlayerMessage(textString.tojstring());
             return NIL;
         }
     }
 
-    static class sendCommandMsg extends OneArgFunction {
+    static final class sendCommandMsg extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendCommand(textString.tojstring());
             return NIL;
         }
     }
 
-    static class sendCommand extends OneArgFunction {
+    static final class sendCommand extends OneArgFunction {
         public LuaValue call(LuaValue textString) {
             ChatUtils.sendCommand(textString.tojstring());
             return NIL;

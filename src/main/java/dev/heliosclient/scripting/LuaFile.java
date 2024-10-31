@@ -44,14 +44,7 @@ public class LuaFile extends File {
      * @throws FileNotFoundException If the Lua script file does not exist.
      */
     public Reader getReader() throws FileNotFoundException {
-        try {
-            if (reader == null || !reader.ready()) {
-                reader = new BufferedReader(new FileReader(this));
-            }
-        } catch (IOException e) {
-            reader = new BufferedReader(new FileReader(this));
-        }
-        return reader;
+      return getBufferedReader();
     }
     /**
      * Retrieves a Buffered reader for the Lua script file.
@@ -122,6 +115,17 @@ public class LuaFile extends File {
         }
         return text.toString();
     }
+    /**
+     * Rewrites the contents of the Lua file with the provided text.
+     *
+     * @param newText The new content to be written into the file.
+     * @throws IOException If an I/O error occurs.
+     */
+    public void setText(String newText) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(this))) {
+             writer.write(newText);
+        }
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -130,4 +134,5 @@ public class LuaFile extends File {
         }
         return super.equals(obj);
     }
+
 }

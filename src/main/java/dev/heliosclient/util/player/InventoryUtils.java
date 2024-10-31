@@ -1,7 +1,6 @@
 package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.module.settings.Option;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -9,12 +8,9 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
 
-import java.util.ArrayList;
 import java.util.function.Predicate;
 
 public class InventoryUtils {
@@ -217,17 +213,6 @@ public class InventoryUtils {
         }
 
         return bestToolSlot; // Return the fastest tool slot, or -1 if no tools were found
-    }
-
-    public static ArrayList<Option<Item>> getItemNames() {
-        ArrayList<Option<Item>> options = new ArrayList<>();
-        for (Item item : Registries.ITEM) {
-            String itemName = Text.translatable(item.getTranslationKey()).getLiteralString();
-            //Why is this a thing?????????
-            //Why did I add this. When did I add this. Do I have dementia? I think I am going to keep this for now.
-            options.add(new Option<>(itemName, item, false));
-        }
-        return options;
     }
 
     /**

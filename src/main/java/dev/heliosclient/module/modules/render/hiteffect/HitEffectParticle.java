@@ -1,6 +1,6 @@
 package dev.heliosclient.module.modules.render.hiteffect;
 
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;

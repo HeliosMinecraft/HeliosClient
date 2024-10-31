@@ -18,7 +18,7 @@ import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.blocks.ChunkChecker;
 import dev.heliosclient.util.blocks.ChunkUtils;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;

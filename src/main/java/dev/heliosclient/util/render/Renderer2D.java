@@ -7,7 +7,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.entity.DisplayPreviewEntity;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
@@ -32,6 +32,7 @@ import org.lwjgl.opengl.GL40C;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -52,15 +53,17 @@ public class Renderer2D implements Listener {
     public static DrawContext drawContext;
     public static Renderers renderer = Renderers.CUSTOM;
     public static final HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
-    private static final HashMap<String, BufferBuilder> roundedRectangleCache = new HashMap<>();
+    public static final HashMap<Integer, BlurredShadow> outlineShadowCache = new HashMap<>();
     public static VertexSorter vertexSorter;
-
 
     static {
         for (int i = 0; i < 36; i++) {
             float angle = (float) (i * Math.PI / 18);
             cosa[i] = (float) Math.cos(angle);
         }
+    }
+
+    public static void init(){
     }
 
     /**
@@ -208,6 +211,23 @@ public class Renderer2D implements Listener {
     }
 
     /**
+     * Draws a quad with the given positions as vertices on a 2D plane
+     */
+    public static void drawQuad(Matrix4f matrix, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int color) {
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        bufferBuilder.vertex(matrix, x1, y1, 0).color(color).next();
+        bufferBuilder.vertex(matrix, x2, y2, 0).color(color).next();
+        bufferBuilder.vertex(matrix, x3, y3, 0).color(color).next();
+        bufferBuilder.vertex(matrix, x4, y4, 0).color(color).next();
+
+        draw();
+    }
+
+
+    /**
      * Draws a singular outline rectangle on screen with the given parameters
      *
      * @param matrix4f Matrix4f object to draw the rectangle
@@ -223,7 +243,7 @@ public class Renderer2D implements Listener {
     /**
      * Draws a singular outline rectangle on screen with the given parameters.
     */
-    public static void drawOutlineBox(Matrix4f matrix4f, float x, float y, float width, float height, float thickness,boolean TOP,boolean BOTTOM, boolean LEFT,boolean RIGHT, int color) {
+    public static void drawOutlineBox(Matrix4f matrix4f, float x, float y, float width, float height, float thickness, boolean TOP, boolean BOTTOM, boolean LEFT, boolean RIGHT, int color) {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -235,10 +255,10 @@ public class Renderer2D implements Listener {
         float blue = (float) (color & 255) / 255.0F;
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
-        if(TOP) drawRectangleBufferInternal(matrix4f,bufferBuilder, x - thickness, y, width + thickness*2, -thickness, red,green,blue,alpha);
-        if(BOTTOM) drawRectangleBufferInternal(matrix4f,bufferBuilder, x - thickness, y + height, width + thickness*2, thickness, red,green,blue,alpha);
-        if(LEFT) drawRectangleBufferInternal(matrix4f,bufferBuilder, x, y, -thickness, height, red,green,blue,alpha);
-        if(RIGHT) drawRectangleBufferInternal(matrix4f,bufferBuilder, x + width, y, thickness, height, red,green,blue,alpha);
+        if (TOP) drawRectangleBufferInternal(matrix4f, bufferBuilder, x, y - thickness, width, thickness, red, green, blue, alpha);
+        if (BOTTOM) drawRectangleBufferInternal(matrix4f, bufferBuilder, x, y + height, width, thickness, red, green, blue, alpha);
+        if (LEFT) drawRectangleBufferInternal(matrix4f, bufferBuilder, x - thickness, y, thickness, height, red, green, blue, alpha);
+        if (RIGHT) drawRectangleBufferInternal(matrix4f, bufferBuilder, x + width, y, thickness, height, red, green, blue, alpha);
 
         draw();
 
@@ -246,7 +266,17 @@ public class Renderer2D implements Listener {
     }
 
     /**
-     * Draws a outline rounded gradient rectangle
+     * Draws a singular outline rectangle with a blurred shadow
+     */
+    public static void drawOutlineBoxWithShadow(MatrixStack stack, float x, float y, float width, float height, float thickness, boolean TOP, boolean BOTTOM, boolean LEFT, boolean RIGHT, int color, int shadowRadius, Color shadowColor) {
+        drawOutlineBlurredShadow(stack,x,y,width,height,shadowRadius, shadowColor);
+
+        drawOutlineBox(stack.peek().getPositionMatrix(), x,y,width,height,thickness,TOP,BOTTOM,LEFT,RIGHT,color);
+    }
+
+
+    /**
+     * Draws an outline rounded gradient rectangle
      *
      * @param matrix4f Matrix4f object to draw the gradient rectangle
      * @param color1   is applied to the bottom-left vertex (x, y + height).
@@ -260,11 +290,30 @@ public class Renderer2D implements Listener {
      */
     public static void drawOutlineGradientBox(Matrix4f matrix4f, float x, float y, float width, float height, float thickness, Color color1, Color color2, Color color3, Color color4) {
         // Draw the rectangles for the outline with gradient
-        drawGradient(matrix4f, x, y, width, thickness, color1.getRGB(), color2.getRGB(), Direction.LEFT_RIGHT); // Top rectangle
-        drawGradient(matrix4f, x, y + height - thickness, width, thickness, color3.getRGB(), color4.getRGB(), Direction.RIGHT_LEFT); // Bottom rectangle
+        drawGradient(matrix4f, x + thickness, y, width - thickness * 2, thickness, color1.getRGB(), color2.getRGB(), Direction.LEFT_RIGHT); // Top rectangle
+        drawGradient(matrix4f, x + thickness, y + height - thickness, width - thickness * 2, thickness, color3.getRGB(), color4.getRGB(), Direction.RIGHT_LEFT); // Bottom rectangle
 
         drawGradient(matrix4f, x, y, thickness, height, color4.getRGB(), color1.getRGB(), Direction.BOTTOM_TOP); // Left rectangle
         drawGradient(matrix4f, x + width - thickness, y, thickness, height, color2.getRGB(), color3.getRGB(), Direction.TOP_BOTTOM); // Right rectangle
+    }
+    /**
+     * Draws an outline rounded gradient rectangle with a shadow
+     *
+     * @param matrices MatrixStack object to draw the gradient rectangle
+     * @param color1   is applied to the bottom-left vertex (x, y + height).
+     * @param color2   is applied to the bottom-right vertex (x + width, y + height).
+     * @param color3   is applied to the top-right vertex (x + width, y).
+     * @param color4   is applied to the top-left vertex (x, y).
+     * @param x        X pos
+     * @param y        Y pos
+     * @param width    Width of gradient rectangle
+     * @param height   Height of gradient rectangle
+     */
+    public static void drawOutlineGradientBoxWithShadow(MatrixStack matrices, float x, float y, float width, float height, float thickness, Color color1, Color color2, Color color3, Color color4, int shadowRadius, Color shadowColor) {
+        //First draw the shadow
+        drawOutlineBlurredShadow(matrices,x,y,width,height,shadowRadius,shadowColor);
+
+        drawOutlineGradientBox(matrices.peek().getPositionMatrix(), x,y,width,height,thickness,color1,color2,color3,color4);
     }
 
     /**
@@ -388,6 +437,24 @@ public class Renderer2D implements Listener {
         drawArc(matrix4f, x + width - radius, y + height - radius, radius, thickness, color, 0, 90); // Bottom-right arc
         drawArc(matrix4f, x + radius, y + height - radius, radius, thickness, color, 270, 360); // Bottom-left arc
     }
+    /**
+     * Draws an outline rounded rectangle with a shadow
+     *
+     * @param matrices  MatrixStack object to draw the rounded rectangle and shadow
+     * @param x         X pos
+     * @param y         Y pos
+     * @param width     Width of rounded rectangle
+     * @param height    Height of rounded rectangle
+     * @param radius    Radius of the quadrants / the rounded rectangle
+     * @param color     Color of the rounded rectangle
+     * @param thickness thickness of the outline
+     */
+    public static void drawOutlineRoundedBoxWithShadow(MatrixStack matrices, float x, float y, float width, float height, float radius, float thickness, int color, int shadowRadius, Color shadowColor) {
+        //First draw shadow
+        drawOutlineBlurredShadow(matrices,x,y,width,height,shadowRadius,shadowColor,true,radius);
+
+        drawOutlineRoundedBox(matrices.peek().getPositionMatrix(),x,y,width,height,radius,thickness,color);
+    }
 
     public static void drawRainbowGradientRectangle(Matrix4f matrix4f, float x, float y, float width, float height) {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
@@ -464,6 +531,8 @@ public class Renderer2D implements Listener {
      */
 
     public static void drawBlurredShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, Color color) {
+        if(HeliosClient.CLICKGUI.disableGlobalShadows.value) return;
+
         width = width + blurRadius * 2;
         height = height + blurRadius * 2;
         x = x - blurRadius;
@@ -492,6 +561,74 @@ public class Renderer2D implements Listener {
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
     }
+    /**
+     * Draws a singular outline blurred shadow using the GaussianBlur algorithm on screen with the given parameters
+     *
+     * @param matrices   MatrixStack object to draw the blurred shadow
+     * @param x          X position of the blurred shadow
+     * @param y          Y position of the blurred shadow
+     * @param width      Width of the blurred shadow
+     * @param height     Height of the blurred shadow
+     * @param blurRadius blur radius of the shadow for gaussian blur algorithm
+     * @param color      color of the blurred shadow
+     */
+    public static void drawOutlineBlurredShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, Color color, boolean rounded, float radius) {
+        if(HeliosClient.CLICKGUI.disableGlobalShadows.value) return;
+        width = width + blurRadius * 2;
+        height = height + blurRadius * 2;
+        x = x - blurRadius;
+        y = y - blurRadius;
+
+        int identifier = (int) (width * height + width * blurRadius + radius * radius);
+        if (outlineShadowCache.containsKey(identifier)) {
+            outlineShadowCache.get(identifier).bind();
+            RenderSystem.defaultBlendFunc();
+        } else {
+            // Create the original image with a transparent center
+            int radiusR = Math.round(radius);
+            BufferedImage original = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = original.createGraphics();
+            g.setComposite(AlphaComposite.Src);
+            g.setColor(new Color(-1));
+            if (rounded) {
+                g.fillRoundRect(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2), radiusR, radiusR);
+            } else {
+                g.fillRect(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2));
+            }
+            g.dispose();
+
+            // Apply the Gaussian blur
+            GaussianBlur op = new GaussianBlur(blurRadius);
+            BufferedImage blurred = op.applyFilter(original, null);
+
+            // Clear the center of the blurred image to make it transparent
+            g = blurred.createGraphics();
+            g.setComposite(AlphaComposite.Clear);
+            if (rounded) {
+                g.fillRoundRect(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2),radiusR,radiusR);
+            } else {
+                g.fillRect(blurRadius, blurRadius, (int) (width - blurRadius * 2), (int) (height - blurRadius * 2));
+            }
+            g.dispose();
+
+            outlineShadowCache.put(identifier, new BlurredShadow(blurred));
+            return;
+        }
+
+        RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        RenderSystem.enableBlend();
+        renderTexture(matrices, x, y, width, height, 0, 0, width, height, width, height);
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+    }
+
+    /**
+     * This is the same as the previous one but with fewer parameters
+     */
+    public static void drawOutlineBlurredShadow(MatrixStack matrices, float x, float y, float width, float height, int blurRadius, Color color) {
+        drawOutlineBlurredShadow(matrices,x,y,width,height,blurRadius,color,false,0);
+    }
+
 
     /**
      * Draws a circular blurred shadow using the GaussianBlur algorithm on screen with the given parameters
@@ -504,6 +641,8 @@ public class Renderer2D implements Listener {
      * @param blurRadius blur radius of the shadow for gaussian blur algorithm
      */
     public static void drawCircularBlurredShadow(MatrixStack matrices, float xCenter, float yCenter, float radius, Color color, int blurRadius) {
+        if(HeliosClient.CLICKGUI.disableGlobalShadows.value) return;
+
         // Calculate the size of the shadow image
         int diameter = (int) (radius * 2);
         int shadowWidth = diameter + blurRadius * 2;
@@ -741,7 +880,6 @@ public class Renderer2D implements Listener {
         float blue = (float) (color & 255) / 255.0F;
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
-
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
 
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
@@ -829,7 +967,6 @@ public class Renderer2D implements Listener {
         bufferBuilder.vertex(matrix4f, x1, y1, 0).color(color).next();
         bufferBuilder.vertex(matrix4f, x2, y2, 0).color(color).next();
         bufferBuilder.vertex(matrix4f, x3, y3, 0).color(color).next();
-       // bufferBuilder.vertex(matrix4f, x1, y1, 0).color(color).next();
 
         draw();
     }
@@ -1045,6 +1182,7 @@ public class Renderer2D implements Listener {
         }
         RenderSystem.disableBlend();
     }
+
     public static void drawRectangleBufferInternal(Matrix4f matrix4f, BufferBuilder bufferBuilder, float x, float y, float width, float height, float red, float green, float blue, float alpha) {
         bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(red, green, blue, alpha).next();
         bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(red, green, blue, alpha).next();
@@ -1081,18 +1219,25 @@ public class Renderer2D implements Listener {
         drawArc(matrix4f, x + radius, y + height - radius, radius, thickness, color4.getRGB(), 270, 360); // Bottom-left arc
     }
 
-    public static void unscaledProjection() {
-        vertexSorter = RenderSystem.getVertexSorting();
-        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), 0, 1000, 21000), VertexSorter.BY_Z);
-    }
+    /**
+     * Draws an outline rounded gradient rectangle
+     *
+     * @param matrices MatrixStack object to draw the rounded gradient rectangle
+     * @param color1   is applied to the bottom-left vertex (x, y + height).
+     * @param color2   is applied to the bottom-right vertex (x + width, y + height).
+     * @param color3   is applied to the top-right vertex (x + width, y).
+     * @param color4   is applied to the top-left vertex (x, y).
+     * @param x        X pos
+     * @param y        Y pos
+     * @param width    Width of rounded gradient rectangle
+     * @param height   Height of rounded gradient rectangle
+     * @param radius   Radius of the quadrants / the rounded gradient rectangle
+     */
+    public static void drawOutlineGradientRoundedBoxWithShadow(MatrixStack matrices, float x, float y, float width, float height, float radius, float thickness, Color color1, Color color2, Color color3, Color color4, int shadowRadius, Color shadowColor) {
+        //Draw the shadow first
+        drawOutlineBlurredShadow(matrices,x,y,width,height,shadowRadius,shadowColor,true,radius);
 
-    public static void scaledProjection() {
-        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getFramebufferWidth() / mc.getWindow().getScaleFactor()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), vertexSorter);
-    }
-
-    public static void customScaledProjection(float scale) {
-        vertexSorter = RenderSystem.getVertexSorting();
-        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth() / scale, mc.getWindow().getFramebufferHeight() / scale, 0, 1000, 21000), VertexSorter.BY_Z);
+        drawOutlineGradientRoundedBox(matrices.peek().getPositionMatrix(), x,y,width,height,radius,thickness,color1,color2,color3,color4);
     }
 
     /**
@@ -1235,6 +1380,74 @@ public class Renderer2D implements Listener {
 
         RenderSystem.defaultBlendFunc();
     }
+
+    private static List<Color> generateGradientColors(Color[] colors, int steps) {
+        List<Color> gradientColors = new ArrayList<>();
+
+        for (int i = 0; i < colors.length - 1; i++) {
+            Color startColor = colors[i];
+            Color endColor = colors[i + 1];
+
+            for (int j = 0; j < steps; j++) {
+                float ratio = (float) j / (float) steps;
+                int red = (int) (startColor.getRed() * (1 - ratio) + endColor.getRed() * ratio);
+                int green = (int) (startColor.getGreen() * (1 - ratio) + endColor.getGreen() * ratio);
+                int blue = (int) (startColor.getBlue() * (1 - ratio) + endColor.getBlue() * ratio);
+                int alpha = (int) (startColor.getAlpha() * (1 - ratio) + endColor.getAlpha() * ratio);
+
+                gradientColors.add(new Color(red, green, blue, alpha));
+            }
+        }
+
+        // Add the final end color
+        gradientColors.add(colors[colors.length - 1]);
+
+        return gradientColors;
+    }
+
+    public static void drawRoundedGradientRectangle(Matrix4f matrix, Color[] colors, float x, float y, float width, float height, float radius, boolean TL, boolean TR, boolean BL, boolean BR) {
+        // Generate intermediate colors with 10 steps for each transition
+        List<Color> gradientColors = generateGradientColors(colors, 10);
+
+        // Draw a single rounded rectangle for the same colors
+        if (Arrays.stream(colors).allMatch(color -> color.equals(colors[0]))) {
+            drawRoundedRectangle(matrix, x, y, TL, TR, BL, BR, width, height, radius, colors[0].getRGB());
+            return;
+        }
+
+        RenderSystem.enableBlend();
+        RenderSystem.colorMask(false, false, false, true);
+        RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.colorMask(true, true, true, true);
+        drawRoundedRectangle(matrix, x, y, TL, TR, BL, BR, width, height, radius, colors[0].getRGB());
+
+        RenderSystem.blendFunc(GL40C.GL_DST_ALPHA, GL40C.GL_ONE_MINUS_DST_ALPHA);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.enableBlend();
+
+        BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
+        float stepY = y;
+        float stepHeight = height / (gradientColors.size() - 1);  // Ensure proper interpolation steps
+
+        for (int i = 0; i < gradientColors.size() - 1; i++) {
+            Color colorTop = gradientColors.get(i);
+            Color colorBottom = gradientColors.get(i + 1);
+
+            bufferBuilder.vertex(matrix, x, stepY + stepHeight, 0.0F).color(colorBottom.getRGB()).next();
+            bufferBuilder.vertex(matrix, x + width, stepY + stepHeight, 0.0F).color(colorBottom.getRGB()).next();
+            bufferBuilder.vertex(matrix, x + width, stepY, 0.0F).color(colorTop.getRGB()).next();
+            bufferBuilder.vertex(matrix, x, stepY, 0.0F).color(colorTop.getRGB()).next();
+
+            stepY += stepHeight;
+        }
+
+        draw();
+        RenderSystem.disableBlend();
+        RenderSystem.defaultBlendFunc();
+    }
+
 
     /**
      * Draws and masks to a gradient;
@@ -1461,6 +1674,21 @@ public class Renderer2D implements Listener {
         return getFontRenderer() != null ? getFontRenderer().getStringWidth(text) : 0;
     }
 
+    /* ==== Projection ==== */
+
+    public static void unscaledProjection() {
+        vertexSorter = RenderSystem.getVertexSorting();
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), 0, 1000, 21000), VertexSorter.BY_Z);
+    }
+
+    public static void scaledProjection() {
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getFramebufferWidth() / mc.getWindow().getScaleFactor()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), vertexSorter);
+    }
+
+    public static void customScaledProjection(float scale) {
+        vertexSorter = RenderSystem.getVertexSorting();
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth() / scale, mc.getWindow().getFramebufferHeight() / scale, 0, 1000, 21000), VertexSorter.BY_Z);
+    }
 
     /* ==== Drawing Custom Text ==== */
 
@@ -1709,6 +1937,15 @@ public class Renderer2D implements Listener {
         }
     }
 
+    /**
+     *
+     */
+    public void deleteShadowCache(){
+        outlineShadowCache.clear();
+        shadowCache.clear();
+    }
+
+
     @SubscribeEvent
     public void renderEvent(RenderEvent renderEvent) {
         drawContext = renderEvent.getDrawContext();
@@ -1745,5 +1982,10 @@ public class Renderer2D implements Listener {
         public void bind() {
             RenderSystem.setShaderTexture(0, id);
         }
+    }
+
+    public enum RectRenderStyle {
+        ROUNDED,
+        PLAIN
     }
 }

@@ -5,8 +5,8 @@ import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -19,7 +19,7 @@ public class CoordinatesHud extends HudElement {
 
     private final BooleanSetting noXYZ = sgSettings.add(new BooleanSetting.Builder()
             .name("NoXYZ")
-            .description("Does not show the XYZ coordinates")
+            .description("Does not show the XYZ tag")
             .onSettingChange(this)
             .defaultValue(false)
             .build()
@@ -33,7 +33,7 @@ public class CoordinatesHud extends HudElement {
     );
     private final BooleanSetting netherCoords = sgSettings.add(new BooleanSetting.Builder()
             .name("Nether Coords")
-            .description("Shows the coordinates of nether")
+            .description("Shows the current coordinates translated to nether coordinates")
             .onSettingChange(this)
             .defaultValue(false)
             .build()
@@ -59,9 +59,10 @@ public class CoordinatesHud extends HudElement {
             coordY = 0;
             coordZ = 0;
         } else {
-            coordX = (int) MathUtils.round(entityForCoords.getX() / (netherCoords.value ? 8 : 1), 0);
-            coordY = (int) MathUtils.round(entityForCoords.getY() / (netherCoords.value ? 8 : 1), 0);
-            coordZ = (int) MathUtils.round(entityForCoords.getZ() / (netherCoords.value ? 8 : 1), 0);
+            int divideBy = netherCoords.value ? 8 : 1;
+            coordX = (int) MathUtils.round(entityForCoords.getX() / divideBy, 0);
+            coordY = (int) MathUtils.round(entityForCoords.getY() / divideBy, 0);
+            coordZ = (int) MathUtils.round(entityForCoords.getZ() / divideBy, 0);
         }
 
         String x = ColorUtils.gray + coordX + ColorUtils.reset;
@@ -74,7 +75,6 @@ public class CoordinatesHud extends HudElement {
                 (!noXYZ.value ? " Z: " : ", ") + z;
 
         this.width = Math.round(Renderer2D.getStringWidth(text));
-
         this.height = Math.round(Renderer2D.getStringHeight());
 
         Renderer2D.drawString(drawContext.getMatrices(), text, this.x, this.y, ColorManager.INSTANCE.hudColor);

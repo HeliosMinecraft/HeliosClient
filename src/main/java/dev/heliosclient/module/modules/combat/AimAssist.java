@@ -238,7 +238,7 @@ public class AimAssist extends Module_ {
         LivingEntity targetEntity = entity;
 
         if (targetEntity == null) {
-            TargetUtils.getInstance().setSortMethod((SortMethod) sort.getOption());
+            TargetUtils.getInstance().sortMethod((SortMethod) sort.getOption());
             TargetUtils.getInstance().setRange(range);
             targetEntity = (LivingEntity) TargetUtils.getInstance().getNewTargetIfNull(entity1 ->
                     entity1 instanceof LivingEntity e1 &&

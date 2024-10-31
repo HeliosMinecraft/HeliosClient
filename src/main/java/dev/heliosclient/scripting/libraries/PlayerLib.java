@@ -1,7 +1,6 @@
 package dev.heliosclient.scripting.libraries;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.module.settings.Option;
 import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
@@ -21,8 +20,6 @@ import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
-
-import java.util.ArrayList;
 
 public class PlayerLib extends TwoArgFunction {
     private final PlayerEntity player;
@@ -46,7 +43,6 @@ public class PlayerLib extends TwoArgFunction {
         library.set("getEmptySlot", new getEmptySlot());
         library.set("getFastestTool", new getFastestTool());
         library.set("getFastestToolAB", new getFastestToolAntibreak());
-        library.set("getItemNames", new getItemNames());
         library.set("getItemCountInInventory", new getItemCountInInventory());
         library.set("canSwapItem", new canSwapItem());
         library.set("swapBackHotbar", new swapBackHotbar());
@@ -55,7 +51,9 @@ public class PlayerLib extends TwoArgFunction {
         library.set("lookAtVec3d", new lookAtVec3d());
 
         env.set("playerLib", library);
-        env.get("package").get("loaded").set("playerLib", library);
+
+        if (!env.get("package").isnil())
+            env.get("package").get("loaded").set("playerLib", library);
 
         return library;
     }
@@ -154,25 +152,6 @@ public class PlayerLib extends TwoArgFunction {
             LuaValue value = CoerceJavaToLua.coerce(InventoryUtils.getFastestTool(state, antiBreak));
 
             return value;
-        }
-    }
-
-    static class getItemNames extends ZeroArgFunction {
-        public LuaValue call() {
-            ArrayList<Option<Item>> itemNames = InventoryUtils.getItemNames();
-
-            // Create a new Lua table
-            LuaTable luaItemNames = new LuaTable();
-
-            // Populate the Lua table with the item names
-            for (int i = 0; i < itemNames.size(); i++) {
-                Option<Item> option = itemNames.get(i);
-                String itemName = option.getName();
-                luaItemNames.set(i + 1, LuaValue.valueOf(itemName));
-            }
-
-            // Return the Lua table
-            return luaItemNames;
         }
     }
 

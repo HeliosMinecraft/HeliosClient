@@ -21,6 +21,7 @@ public class ScaffoldCount extends HudElement {
     private static final float ANIMATION_DURATION = 0.5f; // Duration of the pop-in/out animation in seconds
     private static final float DISPLAY_DURATION = 2f; // Duration to display the item before popping out. Currently it is 2s
     private final SettingGroup sgSettings = new SettingGroup("Settings");
+
     private final DoubleSetting scale = sgSettings.add(new DoubleSetting.Builder()
             .name("Scale")
             .description("Change the scale")
@@ -32,6 +33,7 @@ public class ScaffoldCount extends HudElement {
             .roundingPlace(2)
             .build()
     );
+
     public ScaffoldCount() {
         super(DATA);
         addSettingGroup(sgSettings);
@@ -40,7 +42,7 @@ public class ScaffoldCount extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
-        if (!SCAFFOLD_STACK.isEmpty()) {
+        if (!SCAFFOLD_STACK.isEmpty() || isInHudEditor) {
             if (!isVisible) {
                 isVisible = true;
                 timer.startTimer();
@@ -52,7 +54,7 @@ public class ScaffoldCount extends HudElement {
             }
 
             // Render the element with animation
-            if (isVisible) {
+            if (isVisible || isInHudEditor) {
                 float scale = Math.min(animationProgress, 1.0f);
                 Renderer2D.scaleAndPosition(drawContext.getMatrices(), x, y, width, height, scale);
                 super.renderElement(drawContext, textRenderer);
@@ -73,14 +75,14 @@ public class ScaffoldCount extends HudElement {
         }
     }
 
-    public void updateProgress(boolean out) {
+    private void updateProgress(boolean out) {
         if (out) {
             animationProgress -= 1.0f / (ANIMATION_DURATION * 20);
         } else {
             animationProgress += 1.0f / (ANIMATION_DURATION * 20);
         }
 
-        animationProgress = MathHelper.clamp(animationProgress, 0, scale.getFloat());
+        animationProgress = MathHelper.clamp(animationProgress, 0, scale.getFloat() + 0.4f);
     }
 
     public static void setScaffoldStack(ItemStack stack) {

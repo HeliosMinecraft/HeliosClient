@@ -48,7 +48,7 @@ public class ClockHud extends HudElement {
         this.width = 14;
         this.height =  20;
         this.renderBg.setValue(true);
-        this.rounded.setValue(true);
+        this.style.setOption(Renderer2D.RectRenderStyle.ROUNDED);
     }
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {

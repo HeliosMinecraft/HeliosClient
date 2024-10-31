@@ -10,8 +10,8 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.entity.FreeCamEntity;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
@@ -262,6 +262,7 @@ public class NameTags extends Module_ {
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
     public void entityLabelRenderEvent(EntityLabelRenderEvent event) {
+        event.setCanceled(false);
         if (event.getEntity() instanceof FreeCamEntity) return;
 
         if (!(event.getEntity() instanceof LivingEntity entity)) return;
@@ -269,14 +270,8 @@ public class NameTags extends Module_ {
         if (entity instanceof PlayerEntity && !players.value) return;
         if (entity instanceof MobEntity && !mobs.value) return;
 
-        if (ignoreArmorStand.value && entity instanceof ArmorStandEntity) {
-            event.setCanceled(false);
-            return;
-        }
-        if (ignoreInvisible.value && entity.isInvisible()) {
-            event.setCanceled(false);
-            return;
-        }
+        if (ignoreArmorStand.value && entity instanceof ArmorStandEntity) return;
+        if (ignoreInvisible.value && entity.isInvisible()) return;
 
         event.setCanceled(true);
 

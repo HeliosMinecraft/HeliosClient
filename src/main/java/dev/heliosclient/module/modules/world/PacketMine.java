@@ -1,5 +1,6 @@
 package dev.heliosclient.module.modules.world;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.block.BeginBreakingBlockEvent;
@@ -9,8 +10,8 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.render.BreakIndicator;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.blocks.BlockUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import dev.heliosclient.util.render.Renderer3D;
@@ -154,33 +155,43 @@ public class PacketMine extends Module_ {
     @Override
     public void onDisable() {
         super.onDisable();
-        if (mc.interactionManager != null)
-            mc.interactionManager.syncSelectedSlot();
+        if (shouldUpdateSlot) {
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
+            shouldUpdateSlot = false;
+        }
 
         miningQueue.clear();
     }
 
     @SubscribeEvent
     public void onStartBreakingBlock(BeginBreakingBlockEvent event) {
-        if (!BlockUtils.canBreak(event.getPos(), mc.world.getBlockState(event.getPos()))) return;
+        if (!BlockUtils.canBreak(event.getPos())) return;
+
+        swapped = false;
 
         event.cancel();
-        swapped = false;
 
         miningQueue.add(event.getPos(), event.getDir());
     }
 
     @SubscribeEvent
-    public void onTick(TickEvent.PLAYER event) {
+    public void onTick(TickEvent.CLIENT.PRE event) {
+        if(!HeliosClient.shouldUpdate()) return;
+
         if (shouldUpdateSlot) {
-            mc.interactionManager.syncSelectedSlot();
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(mc.player.getInventory().selectedSlot));
             shouldUpdateSlot = false;
         }
 
         miningQueue.update();
 
         if (!swapped && autoSwitch.value && (!mc.player.isUsingItem() || !notOnUse.value)) {
-            switchIfNeeded(miningQueue.getNextBlock());
+            miningQueue.queue.forEach((pos,info)->{
+                if(info.progress >= 1.0f) {
+                    switchIfNeeded(miningQueue.getNextBlock());
+                    return;
+                }
+            });
         }
     }
 
@@ -189,7 +200,6 @@ public class PacketMine extends Module_ {
                                     mc.player.getEyePos()
                                             .subtract(0.5, 0, 0.5f)
                                             .distanceTo(pos.offset(direction).toCenterPos()) > mc.interactionManager.getReachDistance();
-
         if (isGettingRemoved) {
             mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, pos, direction));
             mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -237,21 +247,20 @@ public class PacketMine extends Module_ {
 
             MiningInfo info = queue.get(nextBlock);
 
+            mine(nextBlock, info);
+
             //Sometimes the blocks dont get mined but the calculated progress is 1. So we attempt to mine it again from scratch.
             if(info.progress >= 1.0f && !mc.world.getBlockState(nextBlock).isAir() && reattempt.value){
                 mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, nextBlock, info.direction));
                 mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+
                 if(info.attempts > maxReattempts.getInt()){
-                    mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, nextBlock, info.direction));
-                    mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
                     queue.remove(nextBlock);
                     return;
                 }
 
                 info.restart();
             }
-
-            mine(nextBlock, info);
         }
 
         void clear() {
@@ -275,7 +284,7 @@ public class PacketMine extends Module_ {
                 sendMinePackets(pos, info);
             }
             int slot = InventoryUtils.getFastestTool(mc.world.getBlockState(pos),false);
-            info.progress += BlockUtils.calcBlockBreakingDelta(mc.world.getBlockState(pos),mc.player.getInventory().getStack(slot != -1 ? slot : mc.player.getInventory().selectedSlot));
+            info.progress += BlockUtils.calcBlockBreakingDelta(mc.world.getBlockState(pos),slot != -1 ? slot : mc.player.getInventory().selectedSlot);
         }
 
         private void sendMinePackets(BlockPos pos, MiningInfo info) {
@@ -295,6 +304,8 @@ public class PacketMine extends Module_ {
         int timer;
         boolean started;
         int attempts;
+
+
         MiningInfo(Direction dir) {
             this.direction = dir;
             restart();

@@ -42,11 +42,23 @@ public abstract class MinecraftClientMixin {
     @Shadow public abstract Window getWindow();
 
     @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
-    public void onTick(CallbackInfo ci) {
+    public void onTickPre(CallbackInfo ci) {
         TickEvent clientTick = new TickEvent.CLIENT();
         EventManager.postEvent(clientTick);
 
-        if (clientTick.isCanceled()) {
+        TickEvent.CLIENT.PRE clientTickPre = new TickEvent.CLIENT.PRE();
+        EventManager.postEvent(clientTickPre);
+
+        if (clientTick.isCanceled() || clientTickPre.isCanceled()) {
+            ci.cancel();
+        }
+    }
+    @Inject(method = "tick", at = @At(value = "TAIL"), cancellable = true)
+    public void onTickPost(CallbackInfo ci) {
+        TickEvent.CLIENT.POST clientTickPost = new TickEvent.CLIENT.POST();
+        EventManager.postEvent(clientTickPost);
+
+        if (clientTickPost.isCanceled()) {
             ci.cancel();
         }
     }

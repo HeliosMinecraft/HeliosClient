@@ -6,8 +6,8 @@ import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.ui.notification.notifications.InfoNotification;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import org.luaj.vm2.LuaValue;
 
 import java.io.File;
@@ -96,10 +96,10 @@ public class LuaLoader {
 
             file.getReader().close();
 
-            //Call the Garbage collector to collect any leftover garbage by the script. Might cause lag or crash if unused properly
+            //Call the Garbage collector to collect any leftover garbage by the script. Might cause lag or crash
             System.gc();
-
             file.setLoaded(false);
+
             ChatUtils.sendHeliosMsg(ColorUtils.green + "Closed LuaFile" + ColorUtils.gray + " [" + ColorUtils.aqua + file.getScriptName() + ColorUtils.gray + "]");
             if (HeliosClient.shouldSendNotification() && ModuleManager.get(NotificationModule.class).scriptNotifications.value) {
                 NotificationManager.addNotification(new InfoNotification(file.getScriptName(), "was unloaded!", 1000, SoundUtils.TING_SOUNDEVENT));

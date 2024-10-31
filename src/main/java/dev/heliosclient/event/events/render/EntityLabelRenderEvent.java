@@ -2,7 +2,6 @@ package dev.heliosclient.event.events.render;
 
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -28,10 +27,7 @@ public class EntityLabelRenderEvent extends Event {
         return INSTANCE;
     }
 
-    private EntityLabelRenderEvent(){
-
-    }
-
+    private EntityLabelRenderEvent(){}
 
     public Entity getEntity() {
         return INSTANCE.entity;

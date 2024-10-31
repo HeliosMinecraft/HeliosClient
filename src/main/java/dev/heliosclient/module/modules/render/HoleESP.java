@@ -6,8 +6,8 @@ import dev.heliosclient.event.events.render.Render3DEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.blocks.HoleUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.util.math.Box;
@@ -198,6 +198,8 @@ public class HoleESP extends Module_ {
             .build()
     );
 
+    List<HoleUtils.HoleInfo> holes = new ArrayList<>();
+
     public HoleESP() {
         super("HoleESP", "Displays holes in your area", Categories.RENDER);
         addSettingGroup(sgGeneral);
@@ -207,10 +209,10 @@ public class HoleESP extends Module_ {
         addQuickSettings(sgColor.getSettings());
     }
 
-    List<HoleUtils.HoleInfo> holes = new ArrayList<>();
-
     @SubscribeEvent
-    public void onTick(TickEvent.PLAYER event) {
+    public void onTick(TickEvent.WORLD event) {
+        if(mc.player == null) return;
+
         holes = HoleUtils.getHoles((int) holeRange.value, (int) holeRangeVertical.value,quads.value).stream().toList();
     }
 

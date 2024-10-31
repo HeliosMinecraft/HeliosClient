@@ -6,8 +6,8 @@ import dev.heliosclient.command.Command;
 import dev.heliosclient.command.ModuleArgumentType;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeyboardUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.command.CommandSource;
 

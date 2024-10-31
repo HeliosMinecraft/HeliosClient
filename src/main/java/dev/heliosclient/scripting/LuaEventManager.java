@@ -2,7 +2,7 @@ package dev.heliosclient.scripting;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;

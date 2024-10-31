@@ -12,7 +12,7 @@ public class Sprint extends Module_ {
 
     SettingGroup sgGeneral = new SettingGroup("General");
 
-    BooleanSetting strictMode = sgGeneral.add(new BooleanSetting("Strict Mode", "Only sprints when you are moving", this, true));
+    BooleanSetting strictMode = sgGeneral.add(new BooleanSetting("Strict Mode", "Only sprints when you are moving and other checks", this, true));
     BooleanSetting keepSprint = sgGeneral.add(new BooleanSetting("Keep Sprint", "Keeps sprinting even after attacking", this, false));
 
     public Sprint() {
@@ -41,8 +41,9 @@ public class Sprint extends Module_ {
         if(!strictMode.value){
             return mc.currentScreen == null;
         }
+
         return (mc.player.forwardSpeed != 0 || mc.player.sidewaysSpeed != 0) &&
-                !mc.player.horizontalCollision &&
+                (!mc.player.horizontalCollision || mc.player.collidedSoftly) &&
                 !mc.player.isTouchingWater() &&
                 !mc.player.isSubmergedInWater() &&
                 (mc.currentScreen == null || ModuleManager.get(GuiMove.class).isActive());

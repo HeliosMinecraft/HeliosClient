@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface SubscribeEvent {
-    Priority priority() default Priority.NORMAL;
+    Priority priority() default Priority.NORMAL; // Default priority set to NORMAL
 
     enum Priority {
         LOWEST,
@@ -18,6 +18,4 @@ public @interface SubscribeEvent {
         HIGHEST
     }
 }
-
-
 

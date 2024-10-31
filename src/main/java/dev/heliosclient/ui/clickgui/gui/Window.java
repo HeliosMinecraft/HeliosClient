@@ -9,16 +9,15 @@ import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.NavBarManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
 import dev.heliosclient.ui.clickgui.navbar.NavBarItem;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 

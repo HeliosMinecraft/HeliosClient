@@ -2,8 +2,8 @@ package dev.heliosclient.module.settings;
 
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.inputbox.InputBox;
 import dev.heliosclient.util.interfaces.ISettingChange;

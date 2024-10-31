@@ -116,7 +116,7 @@ public class GUI extends Module_ {
     );
     public BooleanSetting background = sgVisuals.add(new BooleanSetting.Builder()
             .name("Background")
-            .description("Draws a very faint background behind the clickGUI with the clickGUI primary color")
+            .description("Draws a very faint background behind the clickGUI with the clickGUI primary color (only visible in game)")
             .value(false)
             .onSettingChange(this)
             .build()

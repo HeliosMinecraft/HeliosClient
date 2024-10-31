@@ -6,9 +6,9 @@ import dev.heliosclient.scripting.libraries.ChatLib;
 import dev.heliosclient.scripting.libraries.PacketLib;
 import dev.heliosclient.scripting.libraries.PlayerLib;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.SoundUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.entity.EntityUtils;
 import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.InventoryUtils;
@@ -24,12 +24,14 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.biome.BiomeKeys;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.DebugLib;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
+import org.luaj.vm2.luajc.LuaJC;
 
 import java.io.Reader;
 
@@ -77,6 +79,8 @@ public class LuaExecutor {
         globals.set("Vec3d", CoerceJavaToLua.coerce(Vec3d.class));
         globals.set("Box", CoerceJavaToLua.coerce(Box.class));
         globals.set("Hand", CoerceJavaToLua.coerce(Hand.class));
+
+        LuaJC.install(globals);
     }
 
     /**
@@ -87,7 +91,7 @@ public class LuaExecutor {
      */
     public LuaValue load(Reader reader) {
         if(luaFile == null){
-            throw new RuntimeException("Load called before LuaFile was initialised");
+            throw new IllegalStateException("LuaFile must be set before loading a script.");
         }
         return globals.load(reader, luaFile.getScriptName());
     }
@@ -110,7 +114,7 @@ public class LuaExecutor {
         this.globals = globals;
     }
 
-    public void setLuaFile(LuaFile luaFile) {
+    public void setLuaFile(@NotNull LuaFile luaFile) {
         this.luaFile = luaFile;
     }
 }

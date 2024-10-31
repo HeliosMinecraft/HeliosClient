@@ -9,24 +9,21 @@ import net.minecraft.util.Identifier;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-//Space complexity  = o(infinite)
 public class CapeTextureManager {
-    public final Map<String, LinkedList<Identifier>> gifCapeTextures = new HashMap<>();
-    private final Map<String, LinkedList<Identifier>> gifElytraTextures = new HashMap<>();
-
-    public final Map<String, Identifier> staticCapeTextures = new HashMap<>();
-    private final Map<String, Identifier> staticElytraTextures = new HashMap<>();
-
-    public final Map<UUID, String> playerCapes = new HashMap<>();
-    private final Map<UUID, Integer> currentFrame = new HashMap<>();
-
-    private Timer timer = new Timer("CapeTextureManager");
+    private final ConcurrentHashMap<String, LinkedList<Identifier>> gifTextures;
+    private final ConcurrentHashMap<String, Identifier> staticTextures;
+    private final ConcurrentHashMap<UUID, CapeData> playerCapes;
 
     public CapeTextureManager() {
-        gifCapeTextures.clear();
-        gifElytraTextures.clear();
+        this.gifTextures = new ConcurrentHashMap<>();
+        this.staticTextures = new ConcurrentHashMap<>();
+        this.playerCapes = new ConcurrentHashMap<>();
+
         this.startCapeAnimation();
     }
 
@@ -34,85 +31,73 @@ public class CapeTextureManager {
         if (capeFile.getName().toLowerCase().endsWith(".gif")) {
             final GifTextureManager gifTextureManager = new GifTextureManager();
             gifTextureManager.registerGifTextures(capeFile, prefix);
-            gifCapeTextures.put(prefix, gifTextureManager.getCapeTextureIdentifiers());
-            gifElytraTextures.put(prefix, gifTextureManager.getElytraTextureIdentifiers());
+            gifTextures.put(prefix + "_cape", gifTextureManager.getCapeTextureIdentifiers());
+            gifTextures.put(prefix + "_elytra", gifTextureManager.getElytraTextureIdentifiers());
             gifTextureManager.discardAll();
         } else {
             NativeImage image = NativeImage.read(stream);
-            HeliosClient.MC.execute(()->{
-                Identifier capeIdentifier =  HeliosClient.MC.getTextureManager().registerDynamicTexture(prefix + "_cape", new NativeImageBackedTexture(CapeManager.parseCape(image)));
-                Identifier elytraIdentifier =  HeliosClient.MC.getTextureManager().registerDynamicTexture(prefix + "_elytra", new NativeImageBackedTexture(image));
-                staticCapeTextures.put(prefix, capeIdentifier);
-                staticElytraTextures.put(prefix, elytraIdentifier);
+            HeliosClient.MC.execute(() -> {
+                Identifier capeIdentifier = HeliosClient.MC.getTextureManager().registerDynamicTexture(prefix + "_cape", new NativeImageBackedTexture(CapeManager.parseCape(image)));
+                Identifier elytraIdentifier = HeliosClient.MC.getTextureManager().registerDynamicTexture(prefix + "_elytra", new NativeImageBackedTexture(image));
+                staticTextures.put(prefix + "_cape", capeIdentifier);
+                staticTextures.put(prefix + "_elytra", elytraIdentifier);
             });
         }
     }
 
-
     public void assignCapeToPlayer(UUID playerUUID, String capeName) {
-        playerCapes.put(playerUUID, capeName);
-        currentFrame.put(playerUUID, 0);
+        playerCapes.put(playerUUID, new CapeData(capeName));
     }
 
-    public Identifier getCurrentCapeTexture(UUID playerUUID) {
-        String capeName = playerCapes.get(playerUUID);
-        if (capeName == null) {
+    public Identifier getCurrentTexture(UUID playerUUID, boolean isElytra) {
+        CapeData capeData = playerCapes.get(playerUUID);
+        if (capeData == null) {
             return CapeManager.DEFAULT_CAPE_TEXTURE;
         }
 
-        if (gifCapeTextures.containsKey(capeName)) {
-            List<Identifier> frames = gifCapeTextures.get(capeName);
-            int frameIndex = currentFrame.get(playerUUID);
-            return frames.get(frameIndex);
-        } else {
-            return staticCapeTextures.getOrDefault(capeName, CapeManager.DEFAULT_CAPE_TEXTURE);
-        }
-    }
-    public Identifier getStaticCapeTexture(String capeName) {
-        return staticCapeTextures.getOrDefault(capeName, CapeManager.DEFAULT_CAPE_TEXTURE);
-    }
 
-    public Identifier getCurrentElytraTexture(UUID playerUUID) {
-        String capeName = playerCapes.get(playerUUID);
-        if (capeName == null) {
-            return CapeManager.DEFAULT_CAPE_TEXTURE;
-        }
+        String textureKey = capeData.capeName + (isElytra ? "_elytra" : "_cape");
+        List<Identifier> frames = gifTextures.get(textureKey);
 
-        if (gifElytraTextures.containsKey(capeName)) {
-            List<Identifier> frames = gifElytraTextures.get(capeName);
-            int frameIndex = currentFrame.get(playerUUID);
-            return frames.get(frameIndex);
+        if (frames != null) {
+            return frames.get(capeData.currentFrame % frames.size());
         } else {
-            return staticElytraTextures.getOrDefault(capeName, CapeManager.DEFAULT_CAPE_TEXTURE);
+            return staticTextures.getOrDefault(textureKey, CapeManager.DEFAULT_CAPE_TEXTURE);
         }
     }
 
     public void cycleCapeTextures() {
-        for (UUID playerUUID : playerCapes.keySet()) {
-            String capeName = playerCapes.get(playerUUID);
-
-            if (gifCapeTextures.containsKey(capeName)) {
-                List<Identifier> frames = gifCapeTextures.get(capeName);
-                int frameIndex = (currentFrame.get(playerUUID) + 1) % frames.size();
-                currentFrame.put(playerUUID, frameIndex);
-            }else if (gifElytraTextures.containsKey(capeName)) {
-                List<Identifier> frames = gifElytraTextures.get(capeName);
-                int frameIndex = (currentFrame.get(playerUUID) + 1) % frames.size();
-                currentFrame.put(playerUUID, frameIndex);
+        playerCapes.forEach((uuid, capeData) -> {
+            List<Identifier> frames = gifTextures.get(capeData.capeName + "_cape");
+            if (frames != null && !frames.isEmpty()) {
+                capeData.currentFrame = (capeData.currentFrame + 1) % frames.size();
             }
-        }
+        });
     }
 
     public void startCapeAnimation() {
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                CapeTextureManager.this.cycleCapeTextures();
+        Thread animationThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                cycleCapeTextures();
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
-        },0,100);
+        });
+        animationThread.setName("CapeAnimationThread");
+        animationThread.setDaemon(true);
+        animationThread.start();
     }
 
-    public void stopCapeAnimation() {
-        timer.cancel();
+    private static class CapeData {
+        String capeName;
+        int currentFrame;
+
+        CapeData(String capeName) {
+            this.capeName = capeName;
+            this.currentFrame = 0;
+        }
     }
 }

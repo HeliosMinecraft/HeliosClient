@@ -95,6 +95,10 @@ public class NotificationModule extends Module_ {
     public boolean displayModuleNotification(){
         return HeliosClient.shouldSendNotification() && moduleNotification.value;
     }
+    public boolean displayClientNotifications(){
+        return HeliosClient.shouldSendNotification() && moduleNotification.value;
+    }
+
 
     @Override
     public void onSettingChange(Setting<?> setting) {

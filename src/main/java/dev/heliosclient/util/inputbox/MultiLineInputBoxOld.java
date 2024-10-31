@@ -8,8 +8,8 @@ import dev.heliosclient.event.events.input.KeyPressedEvent;
 import dev.heliosclient.event.events.input.MouseClickEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.EventManager;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static dev.heliosclient.util.ColorUtils.reset;
+import static dev.heliosclient.util.color.ColorUtils.reset;
 
 public class MultiLineInputBoxOld implements Listener {
     protected final InputBox.InputMode inputMode;

@@ -1,9 +1,9 @@
 package dev.heliosclient.util.animation;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.toasts.ErrorToast;
 import dev.heliosclient.util.animation.toasts.InfoToast;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.toast.Toast;

@@ -6,7 +6,7 @@ import dev.heliosclient.command.Command;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import net.minecraft.command.CommandSource;
 
 public class LoadScript extends Command {

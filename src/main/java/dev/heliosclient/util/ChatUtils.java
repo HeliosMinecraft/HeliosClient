@@ -1,5 +1,6 @@
 package dev.heliosclient.util;
 
+import dev.heliosclient.util.color.ColorUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 

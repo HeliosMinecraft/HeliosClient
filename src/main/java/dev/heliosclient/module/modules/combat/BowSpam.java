@@ -14,7 +14,7 @@ public class BowSpam extends Module_ {
     private final SettingGroup sgGeneral = new SettingGroup("General");
 
     private final DoubleSetting baseCharge = sgGeneral.add(new DoubleSetting.Builder()
-            .name("Charge ")
+            .name("Charge")
             .description("Min charge of the bow before releasing (in ticks)")
             .range(3, 20)
             .onSettingChange(this)

@@ -54,9 +54,7 @@ public class BlockUtils {
     }
 
     public static boolean canBreak(BlockPos blockPos, BlockState state) {
-        if (mc.player.isCreative()) return true;
-
-        if (state.getHardness(mc.world, blockPos) < 0) return false;
+        if (!mc.player.isCreative() && state.getHardness(mc.world, blockPos) < 0) return false;
         return state.getOutlineShape(mc.world, blockPos) != VoxelShapes.empty();
     }
 
@@ -67,7 +65,7 @@ public class BlockUtils {
     }
 
     public static boolean canBreakInstantly(BlockState state, float speed) {
-        return mc.player.isCreative() || calcBlockBreakingDelta2(state, speed) >= 1;
+        return mc.player.isCreative() || calcBlockBreakingDelta3(state, speed) >= 1;
     }
 
     public static boolean canPlace(BlockPos pos, BlockState state) {
@@ -80,13 +78,12 @@ public class BlockUtils {
     }
 
     public static boolean breakBlock(BlockPos pos, boolean swing) {
-        if (!canBreak(pos, mc.world.getBlockState(pos))) return false;
-        BlockPos bp = pos instanceof BlockPos.Mutable ? new BlockPos(pos) : pos;
-
+      // if (!canBreak(pos, mc.world.getBlockState(pos))) return false;
+       BlockPos bp = pos instanceof BlockPos.Mutable ? new BlockPos(pos) : pos;
 
         if (mc.interactionManager.isBreakingBlock())
-            mc.interactionManager.updateBlockBreakingProgress(pos, getClosestFace(bp));
-        else mc.interactionManager.attackBlock(pos, getClosestFace(bp));
+            mc.interactionManager.updateBlockBreakingProgress(pos, getBlockDirection(bp));
+        else mc.interactionManager.attackBlock(pos, getBlockDirection(bp));
 
         if (swing) mc.player.swingHand(Hand.MAIN_HAND);
         else mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -98,24 +95,58 @@ public class BlockUtils {
         return new BlockPos((int) pos.x, (int) pos.y, (int) pos.z);
     }
 
-    /**
-     * @see AbstractBlock#calcBlockBreakingDelta(BlockState, PlayerEntity, BlockView, BlockPos)
-     */
-    public static double calcBlockBreakingDelta(BlockState state, ItemStack stack) {
-        return calcBlockBreakingDelta2(state, getMiningSpeedForBlockState(state, stack));
+    public static float calcBlockBreakingDelta3(BlockState state, float breakSpeed) {
+        float f = state.getHardness(null,null);
+        if (f == -1.0F) {
+            return 0.0F;
+        } else {
+            int i = mc.player.canHarvest(state) ? 30 : 100;
+            return breakSpeed / f / (float) i;
+        }
+    }
+
+    public static double calcBlockBreakingDelta2(BlockState state) {
+        return calcBlockBreakingDelta(state, mc.player.getInventory().selectedSlot);
     }
 
     /**
      * @see AbstractBlock#calcBlockBreakingDelta(BlockState, PlayerEntity, BlockView, BlockPos)
      */
-    public static double calcBlockBreakingDelta2(BlockState state, double speed) {
+    public static double calcBlockBreakingDelta(BlockState state, int slot) {
         float f = state.getHardness(null, null);
         if (f == -1.0F) {
             return 0.0F;
         } else {
-            int i = HeliosClient.MC.player.canHarvest(state) ? 30 : 100;
-            return speed / f / (double) i;
+            ItemStack stack =  mc.player.getInventory().getStack(slot);
+            int i = (!state.isToolRequired() || stack.isSuitableFor(state)) ? 30 : 100;
+            return getMiningSpeedForBlockState(state, stack) / f / (double) i;
         }
+    }
+
+    // Determine the best direction to interact with the block
+    public static Direction getBlockDirection(BlockPos position) {
+        Vec3d playerEyesPos = mc.player.getEyePos();
+        int blockPosY = position.getY();
+
+        BlockPos belowBlockPos = position.down();
+        BlockPos aboveBlockPos = position.up();
+
+        // Check if block is above player's eye level
+        if (blockPosY > playerEyesPos.y) {
+            // Check if block below the target position is replaceable
+            if (mc.world.getBlockState(belowBlockPos).isReplaceable()) {
+                return Direction.DOWN;
+            } else {
+                return mc.player.getHorizontalFacing().getOpposite();
+            }
+        }
+
+        // Check if block above the target position is not replaceable
+        if (!mc.world.getBlockState(aboveBlockPos).isReplaceable()) {
+            return mc.player.getHorizontalFacing().getOpposite();
+        }
+
+        return Direction.UP;
     }
 
     /**
@@ -157,13 +188,6 @@ public class BlockUtils {
         return speed;
     }
 
-    /**
-     * Returns the best possible block direction to interact with.
-     */
-    public static Direction getClosestFace(BlockPos blockPos) {
-        Vec3d vec = mc.player.getEyePos().subtract(Vec3d.ofCenter(blockPos));
-        return Direction.getFacing(vec.x, vec.y, vec.z);
-    }
 
     public static void useItem(BlockPos pos) {
         useItem(pos, Hand.MAIN_HAND);

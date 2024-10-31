@@ -12,12 +12,12 @@ import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.EntityTypeListSetting;
 import dev.heliosclient.system.TickRate;
-import dev.heliosclient.util.misc.SortMethod;
-import dev.heliosclient.util.timer.TickTimer;
 import dev.heliosclient.util.entity.TargetUtils;
+import dev.heliosclient.util.misc.SortMethod;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.TargetRenderer;
 import dev.heliosclient.util.render.color.QuadColor;
+import dev.heliosclient.util.timer.TickTimer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -157,7 +157,7 @@ public class TriggerBot extends Module_ {
 
         addQuickSettings(sgGeneral.getSettings());
 
-        targetFinder.setSortMethod(SortMethod.LowestDistance);
+        targetFinder.sortMethod(SortMethod.LowestDistance);
     }
 
     @Override

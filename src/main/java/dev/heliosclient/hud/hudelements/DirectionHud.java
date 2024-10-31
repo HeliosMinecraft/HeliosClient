@@ -4,7 +4,7 @@ import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.render.Renderer2d;
 import net.minecraft.client.font.TextRenderer;

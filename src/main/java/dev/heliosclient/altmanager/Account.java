@@ -5,7 +5,7 @@ import dev.heliosclient.altmanager.accounts.CrackedAccount;
 public abstract class Account {
     private String username;
     private String password;
-    //Kindof used while saving.
+    //Kindof to be used while saving. Idk
     private boolean wasPreviouslyLoggedIn;
 
     public Account(String username, String password, boolean wasPreviouslyLoggedIn) {
@@ -36,7 +36,7 @@ public abstract class Account {
     }
 
     public boolean isCracked(){
-        return this instanceof CrackedAccount || password == null;
+        return this instanceof CrackedAccount || (password == null && !username.isEmpty());
     }
 
     public abstract boolean login();

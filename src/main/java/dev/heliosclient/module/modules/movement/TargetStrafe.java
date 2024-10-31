@@ -10,8 +10,8 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.modules.world.Timer;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.util.misc.SortMethod;
 import dev.heliosclient.util.entity.TargetUtils;
+import dev.heliosclient.util.misc.SortMethod;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.entity.Entity;
@@ -26,10 +26,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 
-//IDK why I added this
 public class TargetStrafe extends Module_ {
-
-    static boolean strafeDirectionChanged = false;
     SettingGroup sgGeneral = new SettingGroup("General");
     SettingGroup sgEntities = new SettingGroup("Entities");
     DropDownSetting sort = sgGeneral.add(new DropDownSetting.Builder()
@@ -51,9 +48,10 @@ public class TargetStrafe extends Module_ {
     );
     DoubleSetting speed = sgGeneral.add(new DoubleSetting.Builder()
             .name("Speed")
-            .description("Speed of the movement")
+            .description("Speed of strafing movement")
             .onSettingChange(this)
             .defaultValue(1)
+            .value(1)
             .min(0.0)
             .max(3)
             .roundingPlace(2)
@@ -136,6 +134,7 @@ public class TargetStrafe extends Module_ {
     BooleanSetting tamed = sgEntities.add(new BooleanSetting("Tamed", "Aim at tamed", this, false, () -> true, true));
     BooleanSetting others = sgEntities.add(new BooleanSetting("Other", "Aim at others", this, false, () -> true, true));
 
+    boolean strafeDirectionChanged = false;
 
     public TargetStrafe() {
         super("TargetStrafe", "Strafe around a target", Categories.MOVEMENT);
@@ -161,6 +160,7 @@ public class TargetStrafe extends Module_ {
 
         return PlayerUtils.canSeeEntity(entity) || entity.isInvisible();
     }
+
     private boolean isAttackable(Entity entity) {
         if (!onlyAttackAttackable.value) {
             return true;
@@ -168,6 +168,7 @@ public class TargetStrafe extends Module_ {
 
         return entity.isAttackable();
     }
+
     private boolean isFriend(Entity entity) {
         if (!ignoreFriend.value || !(entity instanceof PlayerEntity)) {
             return false;
@@ -193,25 +194,24 @@ public class TargetStrafe extends Module_ {
 
         if (legit.value) return;
 
-        TargetUtils.getInstance().setSortMethod((SortMethod) sort.getOption());
+        TargetUtils.getInstance().sortMethod((SortMethod) sort.getOption());
         TargetUtils.getInstance().setRange(range.value);
         Entity entity = TargetUtils.getInstance().getNewTargetIfNull(e -> !isBlackListed(e) && isEntityVisible(e) && isAttackable(e) && mc.player.distanceTo(e) <= range.value && (onlyAttackAttackable.value && e.isAttackable()) && !isFriend(e), true);
 
-        if (!(entity instanceof LivingEntity livingEntity) || (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam(livingEntity))) {
+        if (!TargetUtils.getInstance().isLivingEntity() || (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam((LivingEntity) entity))) {
             return;
         }
 
         if (entity.distanceTo(mc.player) <= range.value) {
-            if (mc.player == null || !livingEntity.isAlive()) return;
+            if (mc.player == null || !entity.isAlive()) return;
 
             if (timer.value != 1.0) {
                 ModuleManager.get(Timer.class).setOverride(timer.value);
             }
 
 
-            if (!legit.value) {
-                strafeAround(entity);
-            }
+            strafeAround(entity);
+
             // jump while strafing
             if (jump.value && mc.player.isOnGround()) {
                 mc.player.jump();
@@ -219,6 +219,7 @@ public class TargetStrafe extends Module_ {
         }
     }
 
+    //Legit mode simulates target-strafe by modifying the input
     @SubscribeEvent
     public void onKeyBoardInput(KeyboardInputEvent event) {
         if(mc.options.leftKey.isPressed()){
@@ -227,14 +228,13 @@ public class TargetStrafe extends Module_ {
             strafeDirectionChanged = false;
         }
 
-        if (!legit.value) return;
-        if (mc.player == null) return;
+        if (!legit.value || mc.player == null) return;
 
-        TargetUtils.getInstance().setSortMethod((SortMethod) sort.getOption());
+        TargetUtils.getInstance().sortMethod((SortMethod) sort.getOption());
         TargetUtils.getInstance().setRange(range.value);
         Entity entity = TargetUtils.getInstance().getNewTargetIfNull(e -> !isBlackListed(e) && isEntityVisible(e) && isAttackable(e) && mc.player.distanceTo(e) <= range.value && (onlyAttackAttackable.value && e.isAttackable()), true);
 
-        if (!(entity instanceof LivingEntity livingEntity) || (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam(livingEntity))) {
+        if (!TargetUtils.getInstance().isLivingEntity() || (ignoreTeammate.value && ModuleManager.get(Teams.class).isInMyTeam((LivingEntity) entity))) {
             return;
         }
 
@@ -242,14 +242,10 @@ public class TargetStrafe extends Module_ {
                 ModuleManager.get(Timer.class).setOverride(timer.value);
             }
 
-            //Look at target only if AimAssist is not enabled
-            //Major issue with this would be desync of target entities between AimAssist and target strafe.
-            //Could be fixed by having a TargetUtils class to handle targets which should keep them both in sync
-            //and every other module.
-            RotationUtils.lookAt(entity.getBoundingBox().getCenter());
+            RotationUtils.instaLookAt(entity.getBoundingBox().getCenter());
 
             //Move forward if player is not nearby to the entity enough
-            if (mc.player.distanceTo(entity) > range.value - 0.5) {
+            if (mc.player.distanceTo(entity) > range.value - 1) {
                 event.pressingForward = true;
             } else {
                 event.pressingBack = true;
@@ -267,10 +263,14 @@ public class TargetStrafe extends Module_ {
                 strafeDirectionChanged = !strafeDirectionChanged;
             }
 
-            // jump while strafing
-            if (jump.value && !mc.player.isOnGround()) {
-                mc.player.jump();
+            if(jump.value){
+                event.jumping = true;
             }
+
+            // jump while strafing
+            //if (jump.value && !mc.player.isOnGround()) {
+              //  mc.player.jump();
+            //}
             event.cancel();
     }
 
@@ -306,10 +306,11 @@ public class TargetStrafe extends Module_ {
         }
 
         // Rotate player to face the target
-        RotationUtils.lookAt(target, RotationUtils.LookAtPos.CENTER);
+        RotationUtils.instaLookAt(target, RotationUtils.LookAtPos.CENTER);
     }
 
 
+    //unused
     public void doMotionStrafe(Vec3d playerPos, Entity entity, Vec3d targetPos) {
         double dx = targetPos.x - playerPos.x;
         double dz = targetPos.z - playerPos.z;

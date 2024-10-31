@@ -19,7 +19,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.heliosclient.util.ColorUtils.blend;
+import static dev.heliosclient.util.color.ColorUtils.blend;
 
 public class PlayerUtils {
     public static MinecraftClient mc = MinecraftClient.getInstance();
@@ -35,6 +35,7 @@ public class PlayerUtils {
         return mc.player.getWorld().raycast(new RaycastContext(playerEyePos, entityBox.getCenter(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
     }
 
+    //Probably doesn't work but, it should work as a placeholder
     public static boolean isPlayerNearEdge(double threshold) {
         BlockPos playerPos = mc.player.getBlockPos();
         Box playerBox = mc.player.getBoundingBox();
@@ -109,13 +110,13 @@ public class PlayerUtils {
     public static boolean hasWeaponInHand(PlayerEntity player) {
         if (player.getMainHandStack() == null) return false;
         Item item = player.getMainHandStack().getItem();
-        return item instanceof SwordItem || item instanceof AxeItem || item instanceof TridentItem  /* || item instanceof MaceItem*/;
+        return item instanceof SwordItem || item instanceof AxeItem || item instanceof TridentItem || item instanceof PickaxeItem /* || item instanceof MaceItem*/;
     }
 
     public static boolean hasRangedWeaponInHand(PlayerEntity player) {
         if (player.getMainHandStack() == null) return false;
         Item item = player.getMainHandStack().getItem();
-        return item instanceof BowItem || item instanceof CrossbowItem || item instanceof SnowballItem || item instanceof EggItem;
+        return item instanceof BowItem || item instanceof CrossbowItem || item instanceof SnowballItem || item instanceof EggItem || item instanceof TridentItem;
     }
 
     public static boolean isSprinting(PlayerEntity player) {

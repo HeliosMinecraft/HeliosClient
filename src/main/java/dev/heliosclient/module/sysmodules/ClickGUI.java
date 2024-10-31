@@ -11,9 +11,9 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
 import dev.heliosclient.ui.clickgui.ModuleButton;
 import dev.heliosclient.ui.clickgui.Tooltip;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.FontUtils;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
@@ -85,18 +85,6 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> ScrollType.value == 1)
             .build()
     );
-    public DoubleSetting scrollingSmoothness = sgMisc.add(new DoubleSetting.Builder()
-            .name("Scrolling Smoothness")
-            .description("The smoothness applied while scrolling")
-            .onSettingChange(this)
-            .value(0.1)
-            .defaultValue(0.1)
-            .max(1)
-            .min(0.01)
-            .roundingPlace(2)
-            .shouldRender(() -> ScrollType.value == 1)
-            .build()
-    );
     public DoubleSetting moduleButtonHeight = sgMisc.add(new DoubleSetting.Builder()
             .name("ModuleButton Height")
             .description("ModuleButton Height for the ClickGUI")
@@ -107,6 +95,18 @@ public class ClickGUI extends Module_ {
             .defaultValue(16)
             .value(16d)
             .roundingPlace(0)
+            .build()
+    );
+    public DoubleSetting scrollingSmoothness = sgMisc.add(new DoubleSetting.Builder()
+            .name("Scrolling Smoothness")
+            .description("The smoothness applied while scrolling")
+            .onSettingChange(this)
+            .value(0.1)
+            .defaultValue(0.1)
+            .max(1)
+            .min(0.01)
+            .roundingPlace(2)
+            .shouldRender(() -> ScrollType.value == 1)
             .build()
     );
     public DoubleSetting ScrollSpeed = sgMisc.add(new DoubleSetting.Builder()
@@ -311,14 +311,6 @@ public class ClickGUI extends Module_ {
             .description("Reload, save or load configs")
             .build()
     );
-    public BooleanSetting disableEventSystem = sgExpert.add(new BooleanSetting.Builder()
-            .name("Disable Event System")
-            .description("Disables the client's event system. Warning: This will cause ALL modules and features of the client to stop working and may get out of sync. This option will also only be turned off again via the config")
-            .onSettingChange(this)
-            .value(false)
-            .defaultValue(false)
-            .build()
-    );
     ButtonSetting loadFonts = sgGeneral.add(new ButtonSetting.Builder()
             .name("Font")
             .build()
@@ -337,6 +329,14 @@ public class ClickGUI extends Module_ {
             .value(true)
             .build()
     );
+    public BooleanSetting disableGlobalShadows = sgExpert.add(new BooleanSetting.Builder()
+            .name("Disables all blurred shadow")
+            .description("Any blurred shadow rendering of HeliosClient will be disabled and all settings relying on it will be useless")
+            .onSettingChange(this)
+            .value(false)
+            .defaultValue(false)
+            .build()
+    );
 
     public ClickGUI() {
         super("ClickGUI", "ClickGui related stuff.", Categories.RENDER);
@@ -346,7 +346,7 @@ public class ClickGUI extends Module_ {
         addSettingGroup(sgSound);
         addSettingGroup(sgTooltip);
         addSettingGroup(sgConfig);
-        //addSettingGroup(sgExpert);
+        addSettingGroup(sgExpert);
 
         active.value = true;
 

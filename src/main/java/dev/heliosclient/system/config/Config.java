@@ -7,6 +7,7 @@ import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.hud.HudElementList;
 import dev.heliosclient.managers.*;
 import dev.heliosclient.module.Categories;
+import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.Setting;
 import dev.heliosclient.module.settings.SettingGroup;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static dev.heliosclient.HeliosClient.LOGGER;
 
@@ -52,7 +52,6 @@ public class Config {
 
     public void loadEverything() {
         loadConfigManagers();
-
         load();
     }
 
@@ -132,16 +131,14 @@ public class Config {
         //       |                    //
         // module settings            // - 2 loops (setting groups and the setting list)
 
-        // Very space efficient ik.
-
-        // I should get a darwin award for this
+        // Programmers get spooked by this on Halloween
 
         LOGGER.info("Loading Modules... ");
 
         CategoryManager.getCategories().forEach((s, category) -> {
             if (category == Categories.SEARCH) return;
 
-            if (panesMap.map() != null && panesMap.has(category.name)) {
+            if (panesMap.mapExists() && panesMap.has(category.name)) {
                 MapReader trashMap = panesMap.getMap(category.name);
 
                 for (Module_ m : ModuleManager.getModulesByCategory(category)) {
@@ -169,15 +166,14 @@ public class Config {
 
                 if (setting.name != null) {
                     try {
-                        if (settingsMap != null)
-                            setting.loadFromFile(settingsMap);
-                    }catch (Throwable e){
+                        if (settingsMap != null) setting.loadFromFile(settingsMap);
+                    } catch (Throwable e){
                         e.printStackTrace();
                         continue;
                     }
 
-                    if (setting.iSettingChange != null && setting != HeliosClient.CLICKGUI.FontRenderer) {
-                        setting.iSettingChange.onSettingChange(setting);
+                    if (setting != HeliosClient.CLICKGUI.FontRenderer) {
+                        setting.postSettingChange();
                     }
                 }
             }
@@ -210,7 +206,7 @@ public class Config {
     }
 
     /**
-     * Gets the hud configuration for the client.
+     * This will write all the Hud elements data we have to the "hud" sub-config
      */
     public void writeHudConfig() {
         try {
@@ -256,28 +252,34 @@ public class Config {
         }
     }
 
-
     // Generates the default configuration for the modules.
     public void writeDefaultModuleConfig() {
-        final AtomicInteger[] xOffset = {new AtomicInteger(4)};
-        final int[] yOffset = {4};
         Map<String, Object> categoryPaneMap = new HashMap<>();
-        CategoryManager.getCategories().forEach((s, category) -> {
+        int xOffset = 4;
+        int yOffset = 4;
+
+        for (Map.Entry<String, Category> entry : CategoryManager.getCategories().entrySet()) {
+            Category category = entry.getValue();
             Map<String, Object> paneConfigMap = new HashMap<>();
-            if (xOffset[0].get() > 400) {
-                xOffset[0].set(4);
-                yOffset[0] = 128;
+
+            if (xOffset > 400) {
+                xOffset = 4;
+                yOffset = 128;
             }
-            paneConfigMap.put("x", xOffset[0].get());
-            paneConfigMap.put("y", yOffset[0]);
+
+            paneConfigMap.put("x", xOffset);
+            paneConfigMap.put("y", yOffset);
             paneConfigMap.put("collapsed", category != Categories.SEARCH);
+
             for (Module_ module : ModuleManager.getModulesByCategory(category)) {
                 paneConfigMap.put(module.name.replace(" ", ""), module.saveToFile(new ArrayList<>()));
             }
+
             categoryPaneMap.put(category.name, paneConfigMap);
-            moduleConfigManager.put("panes", categoryPaneMap);
-            xOffset[0].addAndGet(100);
-        });
+            xOffset += 100;
+        }
+
+        moduleConfigManager.put("panes", categoryPaneMap);
     }
 
     public void loadHudElements() {

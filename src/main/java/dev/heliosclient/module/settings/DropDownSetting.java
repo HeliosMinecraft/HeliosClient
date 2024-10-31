@@ -19,7 +19,7 @@ import java.util.function.BooleanSupplier;
 import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class DropDownSetting extends Setting<Integer> {
-    public List options;
+    public List<?> options;
     public int value;
     public boolean selecting = false;
     List<String> tooltipText;
@@ -39,7 +39,6 @@ public class DropDownSetting extends Setting<Integer> {
             maxOptionWidth = Math.max(maxOptionWidth, Math.round(Renderer2D.getFxStringWidth(option.toString())));
         }
         this.tooltipText = optionsTooltips;
-
     }
 
     public <T> DropDownSetting(String name, String description, ISettingChange iSettingChange, T[] options, int value, BooleanSupplier shouldRender, int defaultValue, List<String> optionsTooltips) {
@@ -229,6 +228,12 @@ public class DropDownSetting extends Setting<Integer> {
     @Override
     public void setValue(Integer value) {
        this.value = value;
+    }
+
+    public void setOption(Object value) {
+        if(options.contains(value)){
+            setValue(options.indexOf(value));
+        }
     }
 
     @Override

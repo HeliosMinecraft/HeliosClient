@@ -1,7 +1,7 @@
 package dev.heliosclient.system;
 
 import dev.heliosclient.ui.clickgui.ConsoleScreen;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;

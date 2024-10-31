@@ -47,7 +47,7 @@ public class TheAlteningAccount extends Account {
     }
 
     //Original Authors are LiquidBounce mc-authLib in kotlin
-    //Similar Wiki for the authserver:  https://wiki.vg/Legacy_Mojang_Authentication
+    //Similar Wiki for the auth-server:  https://wiki.vg/Legacy_Mojang_Authentication
     public static class YggdrasilUserAuthentication {
         private static final String clientIdentifier = UUID.randomUUID().toString();
 
@@ -89,6 +89,7 @@ public class TheAlteningAccount extends Account {
                 this.requestUser = true;
             }
         }
+
         public static Session doAuthenticate(String username, String password) throws Exception {
             if (username == null || username.isBlank()) {
                 throw new IllegalArgumentException("Username cannot be blank");
@@ -163,9 +164,7 @@ public class TheAlteningAccount extends Account {
         private record AuthenticationResponse(String accessToken, String clientToken,
                                               YggdrasilUserAuthentication.AuthenticationResponse.Profile[] availableProfiles,
                                               YggdrasilUserAuthentication.AuthenticationResponse.Profile selectedProfile) {
-
-            private record Profile(String id, String name) {
-            }
+            private record Profile(String id, String name) { }
         }
     }
 

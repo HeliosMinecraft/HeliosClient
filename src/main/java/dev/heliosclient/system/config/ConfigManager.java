@@ -29,7 +29,7 @@ public class ConfigManager {
     private final ConcurrentHashMap<String, SubConfig> configs;
     private SubConfig currentConfig;
     private final List<String> configNames;
-    private String defaultFileName;
+    private final String defaultFileName;
 
     public ConfigManager(String configDir, String defaultFileName) {
         this(Path.of(configDir), defaultFileName);
@@ -197,6 +197,7 @@ public class ConfigManager {
         public String getName() {
             return name;
         }
+
         public boolean create() {
             try {
                 return configFile.toFile().createNewFile();
@@ -213,6 +214,7 @@ public class ConfigManager {
         public Path getConfigPath() {
             return configFile;
         }
+
         public File getConfigFile() {
             return configFile.toFile();
         }
@@ -232,12 +234,15 @@ public class ConfigManager {
                 Type type = new TypeToken<HashMap<String, Object>>(){}.getType();
                 Map<String, Object> loadedData = GSON.fromJson(reader, type);
                 data.clear();
+                //I know 10 ways in which this would have caused a problem
                 if(loadedData == null) return;
+
                 data.putAll(loadedData);
             } catch (IOException e) {
                 HeliosClient.LOGGER.error("Failed to load config: {}", name, e);
             }
         }
+
         public <T> T get(String key, Class<T> type) {
             Object value = data.get(key);
             if (type.isInstance(value)) {

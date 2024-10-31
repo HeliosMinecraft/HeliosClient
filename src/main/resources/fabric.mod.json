@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "dev.heliosclient.HeliosClient"
+    ],
+    "preLaunch": [
+      "dev.heliosclient.PreLaunchMain"
     ]
   },
   "accessWidener": "heliosclient.accesswidener",

@@ -1,7 +1,7 @@
 package dev.heliosclient.scripting;
 
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -44,4 +44,8 @@ public record MapReader(Map<String, Object> map) {
         }
         return new MapReader(nestedMap);
     }
+
+    public boolean mapExists(){
+        return map != null;
+    }
 }

@@ -12,8 +12,8 @@ import dev.heliosclient.module.settings.*;
 import dev.heliosclient.system.UniqueID;
 import dev.heliosclient.ui.clickgui.gui.HudBox;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.interfaces.ISaveAndLoad;
 import dev.heliosclient.util.interfaces.ISettingChange;
 import dev.heliosclient.util.misc.MapReader;
@@ -77,36 +77,81 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     // This is a lot of complete customisation.
     // Todo: Add radius setting for rounded background
     public BooleanSetting renderBg = sgUI.add(new BooleanSetting.Builder()
-            .name("Render background")
+            .name("Render Background")
             .description("Render the background for the element")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
-            .build());
-    public BooleanSetting rounded = sgUI.add(new BooleanSetting.Builder()
-            .name("Rounded background")
-            .description("Rounds the background of the element for better visuals")
+            .build()
+    );
+    public BooleanSetting renderOutline = sgUI.add(new BooleanSetting.Builder()
+            .name("Render Outline")
+            .description("Render a outline around the element")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
-            .shouldRender(() -> renderBg.value)
-            .build());
+            .build()
+    );
+    public DoubleSetting outlineThickness = sgUI.add(new DoubleSetting.Builder()
+            .name("Outline Thickness")
+            .description("Thickness of the outline around the element")
+            .value(1.2d)
+            .min(0)
+            .max(15)
+            .defaultValue(1.2d)
+            .roundingPlace(1)
+            .shouldRender(() -> renderOutline.value)
+            .onSettingChange(this)
+            .build()
+    );
+    public RGBASetting outlineColor = sgUI.add(new RGBASetting.Builder()
+            .name("Outline Color")
+            .description("Color for the outline")
+            .value(Color.WHITE)
+            .defaultValue(Color.WHITE)
+            .shouldRender(() -> renderOutline.value)
+            .onSettingChange(this)
+            .build()
+    );
+    public CycleSetting style = sgUI.add(new CycleSetting.Builder()
+            .name("Style")
+            .description("Style for the background and outline")
+            .defaultValue(List.of(Renderer2D.RectRenderStyle.values()))
+            .defaultListOption(Renderer2D.RectRenderStyle.PLAIN)
+            .onSettingChange(this)
+            .shouldRender(() -> renderBg.value || renderOutline.value)
+            .build()
+    );
+    public DoubleSetting roundedRadius = sgUI.add(new DoubleSetting.Builder()
+            .name("Radius of rounded style")
+            .description("Radius of rounded style")
+            .value(3)
+            .min(1)
+            .max(35)
+            .defaultValue(3)
+            .roundingPlace(1)
+            .shouldRender(() -> style.isOption(Renderer2D.RectRenderStyle.ROUNDED) && (renderBg.value || renderOutline.value))
+            .onSettingChange(this)
+            .build()
+    );
     public BooleanSetting clientColorCycle = sgUI.add(new BooleanSetting.Builder()
-            .name("Client Color Cycle")
+            .name("Client Color Cycle Style")
             .description("Use the client default color cycle for the background of the element")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
-            .shouldRender(() -> renderBg.value)
-            .build());
-    public RGBASetting backgroundColor = sgUI.add(new RGBASetting.Builder()
-            .name("Background Color")
-            .description("Render the background for the element")
+            .shouldRender(() -> renderBg.value || renderOutline.value)
+            .build()
+    );
+    public RGBASetting styleColor = sgUI.add(new RGBASetting.Builder()
+            .name("Style Color")
+            .description("Color to render the style for the element")
             .value(new Color(4, 3, 3, 157))
             .defaultValue(new Color(4, 3, 3, 157))
-            .shouldRender(() -> renderBg.value && !clientColorCycle.value)
+            .shouldRender(() -> (renderBg.value || renderOutline.value) && !clientColorCycle.value)
             .onSettingChange(this)
-            .build());
+            .build()
+    );
     public DoubleSetting padding = sgUI.add(new DoubleSetting.Builder()
             .name("Padding")
             .description("Amount of Padding around the borders")
@@ -114,17 +159,19 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .min(0)
             .max(15)
             .defaultValue(0D)
-            .shouldRender(() -> renderBg.value)
+            .shouldRender(() -> renderBg.value || renderOutline.value)
             .onSettingChange(this)
-            .build());
+            .build()
+    );
     public BooleanSetting shadow = sgUI.add(new BooleanSetting.Builder()
             .name("Shadow")
             .description("Shadow for the background of the element")
             .value(false)
             .defaultValue(false)
             .onSettingChange(this)
-            .shouldRender(() -> renderBg.value)
-            .build());
+            .shouldRender(() -> renderBg.value|| renderOutline.value )
+            .build()
+    );
     public DoubleSetting shadowRadius = sgUI.add(new DoubleSetting.Builder()
             .name("Shadow Radius")
             .description("Radius of the shadow")
@@ -132,24 +179,27 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
             .max(50)
             .defaultValue(5D)
             .value(5D)
-            .shouldRender(() -> shadow.value && renderBg.value)
+            .shouldRender(() -> shadow.value && (renderBg.value|| renderOutline.value))
             .onSettingChange(this)
-            .build());
+            .build()
+    );
     public BooleanSetting syncShadowColorAsBackground = sgUI.add(new BooleanSetting.Builder()
-            .name("Sync Background color to shadow")
-            .description("Syncs shadow color with background color")
+            .name("Sync Style color to shadow")
+            .description("Syncs shadow color with style color")
             .defaultValue(true)
             .onSettingChange(this)
-            .shouldRender(() -> shadow.value && renderBg.value)
-            .build());
+            .shouldRender(() -> shadow.value && (renderBg.value|| renderOutline.value))
+            .build()
+    );
     public RGBASetting shadowColor = sgUI.add(new RGBASetting.Builder()
             .name("Shadow Color")
             .description("Render the shadow for the element")
             .value(new Color(4, 3, 3, 157))
             .defaultValue(new Color(4, 3, 3, 157))
-            .shouldRender(() -> shadow.value && !syncShadowColorAsBackground.value && renderBg.value)
+            .shouldRender(() -> shadow.value && !syncShadowColorAsBackground.value && (renderBg.value|| renderOutline.value))
             .onSettingChange(this)
-            .build());
+            .build()
+    );
 
 
     public HudElement(HudElementData<?> hudElementInfo) {
@@ -291,7 +341,7 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         setHudBox();
 
-        if (renderBg.value) {
+        if (renderBg.value || renderOutline.value) {
             drawContext.getMatrices().push();
             drawContext.getMatrices().translate(0D, 0D, 0D);
             Color bgStart, bgEnd;
@@ -299,30 +349,46 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
                 bgStart = ColorManager.INSTANCE.getPrimaryGradientStart();
                 bgEnd = ColorManager.INSTANCE.getPrimaryGradientEnd();
             } else {
-                bgStart = backgroundColor.getColor();
+                bgStart = styleColor.getColor();
                 bgEnd = bgStart;
             }
             Color blended = ColorUtils.blend(bgStart, bgEnd, 1 / 2f);
             Color finalShadowColor = syncShadowColorAsBackground.value ? blended : shadowColor.value;
 
-            drawBackground(drawContext, bgStart, bgEnd, finalShadowColor);
+            if(renderBg.value) drawBackground(drawContext, bgStart, bgEnd, finalShadowColor);
+            if(renderOutline.value) drawOutline(drawContext, clientColorCycle.value ? bgStart : outlineColor.getColor(),  clientColorCycle.value ? bgEnd : outlineColor.getColor(), finalShadowColor);
 
             drawContext.getMatrices().pop();
         }
     }
 
-    private void drawBackground(DrawContext drawContext, Color bgStart, Color bgEnd, Color finalShadowColor) {
-        if (rounded.value) {
+    protected void drawBackground(DrawContext drawContext, Color bgStart, Color bgEnd, Color finalShadowColor) {
+        if (style.isOption(Renderer2D.RectRenderStyle.ROUNDED)) {
             if (shadow.value) {
-                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, 2, (int) shadowRadius.value, finalShadowColor);
+                Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart, bgEnd, bgEnd, bgStart, roundedRadius.getFloat(), (int) shadowRadius.value, finalShadowColor);
             } else {
-                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), 2);
+                Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(), bgStart, bgEnd, bgEnd, bgStart, hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), roundedRadius.getFloat());
             }
         } else {
             if (shadow.value) {
                 Renderer2D.drawGradientWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), (int) shadowRadius.value, bgStart.getRGB(), bgEnd.getRGB(), finalShadowColor, Renderer2D.Direction.LEFT_RIGHT);
             } else {
                 Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), bgStart.getRGB(), bgEnd.getRGB(), Renderer2D.Direction.LEFT_RIGHT);
+            }
+        }
+    }
+    protected void drawOutline(DrawContext drawContext, Color bgStart, Color bgEnd, Color finalShadowColor) {
+        if (style.isOption(Renderer2D.RectRenderStyle.ROUNDED)) {
+            if (shadow.value && !renderBg.value) {
+                Renderer2D.drawOutlineGradientRoundedBoxWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(), roundedRadius.getFloat(), outlineThickness.getInt(), bgStart, bgEnd, bgEnd, bgStart, (int) shadowRadius.value, finalShadowColor);
+            } else {
+                Renderer2D.drawOutlineGradientRoundedBox(drawContext.getMatrices().peek().getPositionMatrix(), hudBox.getX(), hudBox.getY(),hudBox.getWidth() - 1.9f, hudBox.getHeight(), roundedRadius.getFloat(), outlineThickness.getInt(),  bgStart, bgEnd, bgEnd, bgStart);
+            }
+        } else {
+            if (shadow.value && !renderBg.value) {
+                Renderer2D.drawOutlineGradientBoxWithShadow(drawContext.getMatrices(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(),outlineThickness.getFloat() ,bgStart, bgEnd, bgEnd, bgStart, shadowRadius.getInt(), finalShadowColor);
+            } else {
+                Renderer2D.drawOutlineGradientBox(drawContext.getMatrices().peek().getPositionMatrix(), hudBox.getX(), hudBox.getY(), hudBox.getWidth() - 1.9f, hudBox.getHeight(),outlineThickness.getFloat() ,bgStart, bgEnd, bgEnd, bgStart);
             }
         }
     }
@@ -494,4 +560,6 @@ public class HudElement implements ISettingChange, ISaveAndLoad, Listener {
     public static int getSnapSize() {
         return snapSize;
     }
+
+
 }

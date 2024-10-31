@@ -13,7 +13,7 @@ import java.util.*;
 public class HoleUtils {
     // List of blocks considered blast-proof (cannot be destroyed by explosions)
     static List<Block> blastProofBlocks = List.of(Blocks.BEDROCK, Blocks.OBSIDIAN, Blocks.ENDER_CHEST,Blocks.CRYING_OBSIDIAN);
-
+    static Set<BlockPos> checkedPositions = Collections.synchronizedSet(new HashSet<>());
     // Arrays to define the relative positions of blast-resistant blocks and air blocks in a quad hole
     // North and south are on the Z axis
 
@@ -53,9 +53,7 @@ public class HoleUtils {
     public static Set<HoleInfo> getHoles(int range, int vRange, boolean quadChecker) {
         Set<HoleInfo> holes = Collections.synchronizedSet(new HashSet<>());
         BlockIterator iterator = new BlockIterator(HeliosClient.MC.player, range, vRange);
-        Set<BlockPos> checkedPositions = Collections.synchronizedSet(new HashSet<>());
-
-        while (iterator.hasNext()) {
+        for(int iterations = 0; iterations < 1_000_000 && iterator.hasNext(); iterations++ ){
             BlockPos pos = iterator.next();
             if (checkedPositions.contains(pos)) continue;
 
@@ -64,6 +62,7 @@ public class HoleUtils {
                 holes.add(hole);
             }
         }
+        checkedPositions.clear();
         return holes;
     }
 
@@ -223,7 +222,7 @@ public class HoleUtils {
             } else if (block == Blocks.BEDROCK) {
                 bedrock++;
             } else if (block == Blocks.AIR && world.isAir(newPos.offset(Direction.UP))) {
-                if (quadChecker && (obsidian + bedrock == 2) && !quadChecked) {
+               if (quadChecker && (obsidian + bedrock == 2) && !quadChecked) {
                     if (isQuad(pos, world, checkedPositions)) {
                         //Return a box containing all the four poses.
                         BlockPos start = pos.offset(airOffset[0][0]).offset(airOffset[0][1]);

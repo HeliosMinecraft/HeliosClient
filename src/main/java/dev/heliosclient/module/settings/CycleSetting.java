@@ -75,10 +75,6 @@ public class CycleSetting extends Setting<Integer> {
         }
     }
 
-    public void setValue(int value) {
-        this.value = value;
-    }
-
     @Override
     public Integer get() {
         return value;
@@ -139,6 +135,12 @@ public class CycleSetting extends Setting<Integer> {
     @Override
     public void setValue(Integer value) {
         this.value = value;
+    }
+
+    public void setOption(Object value) {
+       if(options.contains(value)){
+           setValue(options.indexOf(value));
+       }
     }
 
     @Override

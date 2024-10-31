@@ -9,7 +9,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
 import dev.heliosclient.util.timer.TickTimer;
@@ -115,5 +115,9 @@ public class FakeLag extends Module_ {
             storedPackets.forEach(mc.player.networkHandler::sendPacket);
             storedPackets.clear();
         }
+    }
+
+    public Vec3d getFakeLagPos(){
+        return lagPos;
     }
 }

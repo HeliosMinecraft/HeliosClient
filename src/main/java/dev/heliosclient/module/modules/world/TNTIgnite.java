@@ -8,9 +8,9 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.blocks.BlockIterator;
 import dev.heliosclient.util.blocks.BlockUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Items;
@@ -113,7 +113,7 @@ public class TNTIgnite extends Module_ {
                     boolean handHasFlintSteel =  InventoryUtils.doesAnyHandStackHas(stack -> stack.getItem() == Items.FLINT_AND_STEEL);
 
                     if (hasSwitched && handHasFlintSteel) {
-                        mc.interactionManager.interactBlock(mc.player,offHand ? Hand.OFF_HAND : Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(), BlockUtils.getClosestFace(pos), pos, false));
+                        mc.interactionManager.interactBlock(mc.player,offHand ? Hand.OFF_HAND : Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(), BlockUtils.getBlockDirection(pos), pos, false));
                         //If a TNT has been ignited then it's not a block anymore,
                         // so we can break out safely without worrying of looping into the same TNT again.
 

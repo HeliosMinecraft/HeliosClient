@@ -17,6 +17,12 @@ public abstract class TickEvent extends Event {
     //Called for every Client tick
     @LuaEvent("ClientTick")
     public static class CLIENT extends TickEvent {
+        public static class PRE extends CLIENT{
+
+        }
+        public static class POST extends CLIENT{
+
+        }
     }
 
     @LuaEvent("WorldTick")

@@ -35,7 +35,6 @@ public class HudEditorScreen extends Screen implements Listener {
     public static HudEditorScreen INSTANCE = new HudEditorScreen();
     private final List<HudElement> selectedElements = new ArrayList<>();
     private final MapReader copiedSettings = new MapReader(new HashMap<>());
-    private final int defaultSnapSize = 120;
     private final Color LIGHT_YELLOW = new Color(223, 248, 89, 121);
     float thickness = 0.5f; // Thickness of the alignment lines
     float threshold = 1; // Threshold between two HudBoxes for the alignment lines to show.
@@ -114,7 +113,7 @@ public class HudEditorScreen extends Screen implements Listener {
         float textWidth = Renderer2D.getFxStringWidth(sizeChangeText);
         float textHeight = Renderer2D.getFxStringHeight(sizeChangeText);
         float x = this.width / 2f - textWidth / 2f;
-        float y = this.height - textHeight * 2f;
+        float y = this.height - textHeight * 5f;
         AnimationUtils.drawFadingAndPoppingBoxBetter(Renderer2D.drawContext, fadeAnimation, x - 2, y - 2, textWidth + 4, textHeight + 4, LIGHT_YELLOW.getRGB(), true, 3f);
         AnimationUtils.drawFadingAndPoppingText(Renderer2D.drawContext, fadeAnimation, sizeChangeText, x, y, -1, true);
 

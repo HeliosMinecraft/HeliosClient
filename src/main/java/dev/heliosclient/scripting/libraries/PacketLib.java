@@ -25,7 +25,10 @@ public class PacketLib extends TwoArgFunction {
         LuaValue library = tableOf();
         library.set("sendChatMessagePacket", new sendChatMessagePacket());
 
-        env.set("PacketLib", library);
+        env.set("packetLib", library);
+        if (!env.get("package").isnil())
+            env.get("package").get("loaded").set("packetLib", library);
+
         return library;
     }
 

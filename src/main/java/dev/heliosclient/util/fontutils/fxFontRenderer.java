@@ -1,6 +1,6 @@
 package dev.heliosclient.util.fontutils;
 
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.util.math.MatrixStack;

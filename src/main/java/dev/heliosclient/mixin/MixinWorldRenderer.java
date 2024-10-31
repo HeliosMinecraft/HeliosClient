@@ -5,7 +5,7 @@ import dev.heliosclient.module.modules.render.BlockSelection;
 import dev.heliosclient.module.modules.render.ESP;
 import dev.heliosclient.module.modules.render.Freecam;
 import dev.heliosclient.module.modules.render.NoRender;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;

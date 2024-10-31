@@ -59,7 +59,7 @@ public class Fullbright extends Module_ {
     }
 
     @Override
-    public void onSettingChange(Setting setting) {
+    public void onSettingChange(Setting<?> setting) {
         super.onSettingChange(setting);
         if (active.value) {
             if (mode.value == 0 && mc.player != null) {

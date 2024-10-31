@@ -1,4 +1,4 @@
-package dev.heliosclient.util;
+package dev.heliosclient.util.color;
 
 import dev.heliosclient.HeliosClient;
 import net.minecraft.util.math.random.Random;
@@ -67,6 +67,7 @@ public class ColorUtils {
     public static int argbToRgb(int argb) {
        return argbToRgb(argb,255);
     }
+
     public static int argbToRgb(int argb,int injectAlpha) {
         // Extract the individual components
         int red = ColorUtils.getRed(argb);
@@ -199,8 +200,6 @@ public class ColorUtils {
         else
             return new Color(Objects.requireNonNullElse(color, -1));
     }
-
-
 
     /**
      * Changes alpha on integer color.

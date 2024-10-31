@@ -258,7 +258,7 @@ public abstract class Setting<T> implements Listener, ISaveAndLoad {
     public void charTyped(char chr, int modifiers) {
     }
 
-    protected void postSettingChange(){
+    public void postSettingChange(){
         if(this.iSettingChange != null){
             this.iSettingChange.onSettingChange(this);
         }

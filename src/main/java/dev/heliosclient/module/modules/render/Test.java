@@ -119,6 +119,18 @@ public class Test extends Module_ {
 
         if (GradientRounded.value)
             Renderer2D.drawRoundedGradientRectangleWithShadow(drawContext.getMatrices(), 22, 20, 40, 40, Color.BLUE, Color.WHITE, Color.BLACK, Color.GRAY, 2, 20, Color.WHITE);
+
+        Color[] array = new Color[]{
+                Color.RED,
+                Color.ORANGE,
+                Color.YELLOW,
+                Color.GREEN,
+                Color.BLUE,
+                Color.CYAN,
+                Color.PINK
+        };
+
+        Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(),array, 22, 20, 40, 40,  2, true,true,true,true);
     }
 
     @SubscribeEvent

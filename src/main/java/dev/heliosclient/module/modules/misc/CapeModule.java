@@ -8,8 +8,8 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.buttonsetting.ButtonSetting;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.inputbox.InputBox;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class CapeModule extends Module_ {
     public DropDownSetting getCapeFrom = sgCape.add(new DropDownSetting.Builder()
             .name("Get Cape from")
             .description("Gets your favourite CURRENT_PLAYER_CAPE from the following places. Need valid UUID or player name")
-            .value(List.of(CapeManager.CapeType.values()))
+            .value(List.of(CapeManager.CapeOrigin.values()))
             .defaultListIndex(0)
             .addOptionToolTip("None")
             .addOptionToolTip("Fetch cape from optifine api")
@@ -43,7 +43,7 @@ public class CapeModule extends Module_ {
             .value("")
             .characterLimit(16)
             .inputMode(InputBox.InputMode.DIGITS_AND_CHARACTERS_AND_UNDERSCORE)
-            .shouldRender(() -> (CapeManager.CapeType.values()[getCapeFrom.value] != CapeManager.CapeType.NONE) && (CapeManager.CapeType.values()[getCapeFrom.value] == CapeManager.CapeType.OPTIFINE))
+            .shouldRender(() -> (CapeManager.CapeOrigin.values()[getCapeFrom.value] != CapeManager.CapeOrigin.LOCAL) && (CapeManager.CapeOrigin.values()[getCapeFrom.value] == CapeManager.CapeOrigin.OPTIFINE))
             .onSettingChange(this)
             .build()
     );
@@ -53,7 +53,7 @@ public class CapeModule extends Module_ {
             .value("")
             .characterLimit(37)
             .inputMode(InputBox.InputMode.ALL)
-            .shouldRender(() -> (CapeManager.CapeType.values()[getCapeFrom.value] != CapeManager.CapeType.NONE) && (CapeManager.CapeType.values()[getCapeFrom.value] != CapeManager.CapeType.OPTIFINE))
+            .shouldRender(() -> (CapeManager.CapeOrigin.values()[getCapeFrom.value] != CapeManager.CapeOrigin.LOCAL) && (CapeManager.CapeOrigin.values()[getCapeFrom.value] != CapeManager.CapeOrigin.OPTIFINE))
             .onSettingChange(this)
             .build()
     );
@@ -102,11 +102,11 @@ public class CapeModule extends Module_ {
 
         loadCapes.addButton("Get Cape", 0, 0, () -> {
             try {
-                CapeManager.CapeType capeType = CapeManager.CapeType.values()[getCapeFrom.value];
-                if (shouldUsePlayerName() && capeType == CapeManager.CapeType.OPTIFINE) {
-                    CapeManager.getCapes(capeType, playerName.value, null);
+                CapeManager.CapeOrigin CapeOrigin = CapeManager.CapeOrigin.values()[getCapeFrom.value];
+                if (shouldUsePlayerName() && CapeOrigin == CapeManager.CapeOrigin.OPTIFINE) {
+                    CapeManager.getCapes(CapeOrigin, playerName.value, null);
                 } else if (shouldUseUUID()) {
-                    CapeManager.getCapes(capeType, null, UUID.value);
+                    CapeManager.getCapes(CapeOrigin, null, UUID.value);
                 }
                 capes.iSettingChange.onSettingChange(capes);
 
@@ -149,7 +149,7 @@ public class CapeModule extends Module_ {
     public void onEnable() {
         super.onEnable();
         if(mc.player != null && capes.getOption() != null) {
-            CapeManager.capeTextureManager.assignCapeToPlayer(mc.player.getUuid(), capes.getOption().toString().toLowerCase());
+            CapeManager.getTextureManager().assignCapeToPlayer(mc.player.getUuid(), capes.getOption().toString().toLowerCase());
         }
         setCapes();
     }
@@ -159,7 +159,7 @@ public class CapeModule extends Module_ {
         super.onSettingChange(setting);
 
         if(setting == capes && mc.player != null && capes.getOption() != null){
-            CapeManager.capeTextureManager.assignCapeToPlayer(mc.player.getUuid(),capes.getOption().toString().toLowerCase());
+            CapeManager.getTextureManager().assignCapeToPlayer(mc.player.getUuid(),capes.getOption().toString().toLowerCase());
         }
         setCapes();
     }
@@ -174,7 +174,7 @@ public class CapeModule extends Module_ {
 
         setCapes();
         if(mc.player != null && capes.getOption() != null) {
-            CapeManager.capeTextureManager.assignCapeToPlayer(mc.player.getUuid(), capes.getOption().toString().toLowerCase());
+            CapeManager.getTextureManager().assignCapeToPlayer(mc.player.getUuid(), capes.getOption().toString().toLowerCase());
         }
     }
 }

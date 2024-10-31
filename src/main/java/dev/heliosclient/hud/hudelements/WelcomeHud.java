@@ -6,7 +6,7 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.StringSetting;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.inputbox.InputBox;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;

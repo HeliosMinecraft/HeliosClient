@@ -68,8 +68,7 @@ public class ArmorHud extends HudElement {
         this.width = 20;
         this.height =  20 * 4 + 4;
         this.renderBg.setValue(true);
-        this.rounded.setValue(true);
-
+        this.style.setOption(Renderer2D.RectRenderStyle.ROUNDED);
     }
 
     @Override

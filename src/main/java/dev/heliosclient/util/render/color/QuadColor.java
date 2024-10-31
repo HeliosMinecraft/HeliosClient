@@ -1,10 +1,8 @@
 package dev.heliosclient.util.render.color;
 
-import dev.heliosclient.util.ColorUtils;
-import me.x150.renderer.util.Colors;
+import dev.heliosclient.util.color.ColorUtils;
 import net.minecraft.util.math.Box;
 
-import java.util.Arrays;
 import java.util.function.Function;
 
 public class QuadColor extends RenderColor {

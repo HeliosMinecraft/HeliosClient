@@ -8,8 +8,8 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.BlockListSetting;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.blocks.BlockUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.GradientBlockRenderer;
@@ -150,6 +150,7 @@ public class Scaffold extends Module_ {
             .description("Silently switches to the item")
             .onSettingChange(this)
             .defaultValue(false)
+            .shouldRender(()-> autoSwitch.value)
             .build()
     );
     /* Render */
@@ -208,7 +209,7 @@ public class Scaffold extends Module_ {
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        if (towerMode.getOption() != TowerMode.None && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed()) {
+        if (towerMode.getOption() != TowerMode.None && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed() && !mc.world.getBlockState(mc.player.getBlockPos().down(2)).isReplaceable()) {
             //Only tower if there is air above.
             if (!mc.world.getBlockCollisions(mc.player,mc.player.getBoundingBox().stretch(0,0.4f,0)).iterator().hasNext()) {
                 if (whileMoving.value || !PlayerUtils.isMoving(mc.player)) {

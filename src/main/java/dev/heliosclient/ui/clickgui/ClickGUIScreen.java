@@ -11,10 +11,10 @@ import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.sysmodules.ClickGUI;
 import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
@@ -104,7 +104,7 @@ public class ClickGUIScreen extends Screen {
             } else {
                 this.scale += speed * Easing.ease(EasingType.QUADRATIC_IN, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1f));
             }
-            this.scale = MathHelper.clamp(this.scale, 0.0f, 1.4f);
+            this.scale = MathHelper.clamp(this.scale, 0.0f, 1.0f);
         } else {
             this.scale = 1.0f;
             if (shouldClose) {

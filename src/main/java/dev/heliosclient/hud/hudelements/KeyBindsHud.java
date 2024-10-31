@@ -6,14 +6,14 @@ import dev.heliosclient.managers.ColorManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.KeyBind;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.KeyboardUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class KeyBindsHud extends HudElement {
-    public static HudElementData<KeyBindsHud> DATA = new HudElementData<>("Keybinds", "Shows the modules with keybinds", KeyBindsHud::new);
+    public static HudElementData<KeyBindsHud> DATA = new HudElementData<>("KeyBinds", "Shows the modules with set keyBinds", KeyBindsHud::new);
 
     public KeyBindsHud() {
         super(DATA);

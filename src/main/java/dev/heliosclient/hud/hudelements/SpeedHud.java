@@ -3,8 +3,8 @@ package dev.heliosclient.hud.hudelements;
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
 import dev.heliosclient.managers.ColorManager;
-import dev.heliosclient.util.ColorUtils;
 import dev.heliosclient.util.MathUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -18,7 +18,7 @@ public class SpeedHud extends HudElement {
         this.height = Math.round(Renderer2D.getStringHeight());
     }
 
-    public static HudElementData<SpeedHud> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second", SpeedHud::new);
+    public static HudElementData<SpeedHud> DATA = new HudElementData<>("Player Speed", "Shows player speed in blocks per second aka meter per second", SpeedHud::new);
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {

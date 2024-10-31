@@ -69,7 +69,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
             if (speedMine.modifier.value < 1 || (BlockUtils.canBreakInstantly(block, breakSpeedMod) == BlockUtils.canBreakInstantly(block, ogBreakSpeed))) {
                 return breakSpeedMod;
             } else {
-                return (float) (0.9f / BlockUtils.calcBlockBreakingDelta2(HeliosClient.MC.world.getBlockState(pos), 1f));
+                return (float) (0.9f / BlockUtils.calcBlockBreakingDelta2(HeliosClient.MC.world.getBlockState(pos)));
             }
         }
 

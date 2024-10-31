@@ -12,16 +12,22 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.ChatUtils;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.timer.TickTimer;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.network.packet.s2c.play.EntityStatusS2CPacket;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 
 public class AutoTotem extends Module_ {
     private final SettingGroup sgGeneral = new SettingGroup("General");
@@ -66,6 +72,34 @@ public class AutoTotem extends Module_ {
             .onSettingChange(this)
             .build()
     );
+    BooleanSetting immediateNearCrystal = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Immediate Near Crystal")
+            .description("Will autototem instantly as soon as we find a crystal near you that can damage you")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
+    BooleanSetting stopMotion = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Stop Motion")
+            .description("This will immediately stop you before switching to a totem")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
+    BooleanSetting stopSprint = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Stop Sprint")
+            .description("This will send a packet to the server to stop sprinting")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
+    BooleanSetting swapInstead = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Swap Instead")
+            .description("This will try to swap the totem instead of picking and moving it")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
     KeyBind totemSwitchKey = sgGeneral.add(new KeyBind.Builder()
             .name("Totem Switch Key")
             .description("When you press this key, you will automatically switch to a totem")
@@ -105,7 +139,6 @@ public class AutoTotem extends Module_ {
         }
     }
 
-    //High
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
     public void onTick(TickEvent.WORLD event) {
         if(!HeliosClient.shouldUpdate()) return;
@@ -132,26 +165,64 @@ public class AutoTotem extends Module_ {
         }
     }
 
+    @SubscribeEvent(priority = SubscribeEvent.Priority.HIGH)
+    public void onPacketReceive(PacketEvent.RECEIVE event) {
+        if(event.packet instanceof EntitySpawnS2CPacket p){
+            if(p.getEntityType() == EntityType.END_CRYSTAL){
+                Vec3d crystalPos = new Vec3d(p.getX(),p.getY(),p.getZ());
+                boolean willCrystalDamage = mc.player.getPos().squaredDistanceTo(crystalPos) < DamageUtils.CRYSTAL_POWER * DamageUtils.CRYSTAL_POWER;
+                if(willCrystalDamage){
+                    if(immediateNearCrystal.value){
+                        doAutoTotem();
+                        return;
+                    }
+
+                    if(DamageUtils.calculateCrystalDamage(crystalPos,mc.player) >= healthThreshold.get()){
+                        timer.setTicks(delay.getInt());
+                    }
+                }
+            }
+        }
+    }
+
     public boolean doAutoTotem(){
+        if(mc.player.currentScreenHandler instanceof GenericContainerScreenHandler)return false;
+
         boolean offhandHasItem = !mc.player.getOffHandStack().isEmpty();
         int itemSlot = InventoryUtils.findItemInInventory(Items.TOTEM_OF_UNDYING);
         if(itemSlot == -1 || itemSlot == InventoryUtils.OFFHAND || mc.player.getOffHandStack().getItem() == Items.TOTEM_OF_UNDYING){
             return false;
         }
+        if(stopMotion.value){
+            mc.player.setVelocity(0,mc.player.getVelocity().y,0);
+        }
+
+        if(stopSprint.value){
+            mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.STOP_SPRINTING));
+        }
 
         //if is hotbar then swap item with offhand super-fast.
         if(itemSlot >= 0 && itemSlot < 9){
-            InventoryUtils.swapToSlot(itemSlot,true);
+            int prevSlot = mc.player.getInventory().selectedSlot;
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(itemSlot));
+            mc.player.getInventory().selectedSlot = itemSlot;
             mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-            InventoryUtils.swapBackHotbar();
+            mc.player.networkHandler.sendPacket(new UpdateSelectedSlotC2SPacket(prevSlot));
+            mc.player.getInventory().selectedSlot = prevSlot;
             return true;
-        }else if(mc.player.playerScreenHandler == mc.player.currentScreenHandler){
+        } else if(mc.player.playerScreenHandler == mc.player.currentScreenHandler){
+            if(swapInstead.value) {
+                mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, itemSlot, 40, SlotActionType.SWAP, mc.player);
+                return true;
+            }
+
             if(offhandHasItem){
                 mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,InventoryUtils.OFFHAND,0,SlotActionType.PICKUP,mc.player);
             }
 
             InventoryUtils.moveItem(itemSlot,InventoryUtils.OFFHAND, SlotActionType.PICKUP, SlotActionType.PICKUP);
         }
+
         return true;
     }
 

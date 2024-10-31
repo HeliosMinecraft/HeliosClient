@@ -5,6 +5,7 @@ import dev.heliosclient.module.settings.buttonsetting.Button;
 import dev.heliosclient.ui.clickgui.navbar.NavBar;
 import dev.heliosclient.util.inputbox.InputBox;
 import dev.heliosclient.util.inputbox.MultiLineInputBox;
+import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,12 +25,7 @@ public class ConsoleScreen extends Screen {
         consoleBox.autoScroll = true;
 
         enterBox = new InputBox(29, 13, "", 256, InputBox.InputMode.ALL);
-        enterButton = new Button("Enter", () -> {
-            if (!enterBox.getValue().isEmpty()) {
-                HeliosClient.LOGGER.info(enterBox.getValue());
-                enterBox.setText("");
-            }
-        }, 20, 20, 45, 13);
+        enterButton = new Button("Enter", this::setText, 20, 20, 45, 13);
     }
 
     @Override
@@ -80,13 +76,21 @@ public class ConsoleScreen extends Screen {
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    public void setText(){
+        if (!enterBox.getValue().isEmpty()) {
+            HeliosClient.LOGGER.info(enterBox.getValue());
+            if(enterBox.getValue().equalsIgnoreCase(".clearCache")){
+                Renderer2D.INSTANCE.deleteShadowCache();
+                HeliosClient.LOGGER.info("Shadow Cache Cleared");
+            }
+            enterBox.setText("");
+        }
+    }
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) {
-            if (!enterBox.getValue().isEmpty()) {
-                HeliosClient.LOGGER.info(enterBox.getValue());
-                enterBox.setText("");
-            }
+            setText();
         }
         if (keyCode == GLFW.GLFW_KEY_TAB ) {
             enterBox.setFocused(true);

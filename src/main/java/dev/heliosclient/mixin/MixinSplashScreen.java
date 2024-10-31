@@ -1,9 +1,8 @@
 package dev.heliosclient.mixin;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.render.textures.ClearTexture;
 import dev.heliosclient.util.render.textures.ClientTexture;
@@ -11,7 +10,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.resource.ResourceReload;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -29,16 +27,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.awt.*;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static dev.heliosclient.util.render.textures.ClientTexture.CLIENT_LOGO_TEXTURE;
+import static dev.heliosclient.util.render.textures.ClientTexture.CLIENT_ICON_TEXTURE;
 
 @Mixin(value = SplashOverlay.class, priority = 3001)
 public abstract class MixinSplashScreen {
 
-    @Unique
-    private static final Identifier CLEAR_TEXTURE = new Identifier(HeliosClient.MODID, "splashscreen/clear.png");
     @Shadow
     @Final
     static Identifier LOGO;
@@ -60,6 +57,8 @@ public abstract class MixinSplashScreen {
     @Final
     private ResourceReload reload;
 
+    @Shadow @Final private Consumer<Optional<Throwable>> exceptionHandler;
+
     @Unique
     private static int withAlpha(int color, int alpha) {
         return color & 16777215 | alpha << 24;
@@ -67,39 +66,39 @@ public abstract class MixinSplashScreen {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(MinecraftClient client, ResourceReload monitor, Consumer<Optional<Throwable>> exceptionHandler, boolean reloading, CallbackInfo ci) {
-        client.getTextureManager().registerTexture(LOGO, new ClearTexture(CLEAR_TEXTURE));
-        client.getTextureManager().registerTexture(CLIENT_LOGO_TEXTURE, new ClientTexture());
+        client.getTextureManager().registerTexture(LOGO, new ClearTexture());
+        client.getTextureManager().registerTexture(CLIENT_ICON_TEXTURE, new ClientTexture(true));
     }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I", shift = At.Shift.BEFORE, ordinal = 2))
-    private void renderSplashBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        int i = context.getScaledWindowWidth();
-        int j = context.getScaledWindowHeight();
-        float s = getS();
-        RenderSystem.enableBlend();
-        RenderSystem.blendEquation(32774);
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, s);
-        context.fill(RenderLayer.getGuiOverlay(), 0, 0, i, j, ColorHelper.Argb.getArgb(255, 0, 0, 0));
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableBlend();
-    }
-
 
     @Unique
-    private float getS() {
-        float f = this.reloadCompleteTime > -1L ? (float) (Util.getMeasuringTimeMs() - this.reloadCompleteTime) / 1000.0F : -1.0F;
-        float g = this.reloadStartTime > -1L ? (float) (Util.getMeasuringTimeMs() - this.reloadStartTime) / 500.0F : -1.0F;
-        float s;
-        if (f >= 1.0F) s = 1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F);
-        else if (reloading) s = MathHelper.clamp(g, 0.0F, 1.0F);
-        else s = 1.0F;
-        return s;
+    private void renderSplashBackground(DrawContext context) {
+        int i = context.getScaledWindowWidth();
+        int j = context.getScaledWindowHeight();
+        int alpha = MathHelper.clamp((int) (getAlpha() * 255),0,255);
+
+
+        int startColor = ColorHelper.Argb.getArgb(alpha,183, 25, 112);
+        int endColor = ColorHelper.Argb.getArgb(alpha,1, 65, 109);
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+        Renderer2D.drawGradient(context.getMatrices().peek().getPositionMatrix(), 0,0,i,j,startColor,endColor, Renderer2D.Direction.LEFT_RIGHT);
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
     }
 
-    @Inject(at = @At("RETURN"), method = "render", cancellable = true)
-    public void render2(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    @Unique
+    private float getAlpha() {
+        long l = Util.getMeasuringTimeMs();
+        float f = this.reloadCompleteTime > -1L ? (float) (l - this.reloadCompleteTime) / 1000.0F : -1.0F;
+        float g = this.reloadStartTime > -1L ? (float)(l - this.reloadStartTime) / 500.0F : -1.0F;
+        float alpha = 1.0F;
+        if(f >= 1.0F) alpha = MathHelper.ceil((1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F)) * 255.0F);
+        else if(this.reloading) alpha = MathHelper.ceil(MathHelper.clamp(g, 0.15, 1.0) * 255.0F);
+        return alpha;
+    }
+
+    @Inject(at = @At("HEAD"), method = "render", cancellable = true)
+    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         int i = context.getScaledWindowWidth();
         int j = context.getScaledWindowHeight();
         long l = Util.getMeasuringTimeMs();
@@ -109,65 +108,52 @@ public abstract class MixinSplashScreen {
 
         float f = this.reloadCompleteTime > -1L ? (float) (l - this.reloadCompleteTime) / 1000.0F : -1.0F;
         float g = this.reloadStartTime > -1L ? (float) (l - this.reloadStartTime) / 500.0F : -1.0F;
-        int k;
+        float alpha;
+
         if (f >= 1.0F) {
             if (this.client.currentScreen != null) {
                 this.client.currentScreen.render(context, 0, 0, delta);
             }
-
-            k = MathHelper.ceil((1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F)) * 255.0F);
-            context.fill(RenderLayer.getGuiOverlay(), 0, 0, i, j, withAlpha(ColorHelper.Argb.getArgb(255, 0, 0, 0), k));
+            alpha = 1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F);
         } else if (this.reloading) {
             if (this.client.currentScreen != null && g < 1.0F) {
                 this.client.currentScreen.render(context, mouseX, mouseY, delta);
             }
-
-            k = MathHelper.ceil(MathHelper.clamp(g, 0.15, 1.0) * 255.0);
-            context.fill(RenderLayer.getGuiOverlay(), 0, 0, i, j, withAlpha(ColorHelper.Argb.getArgb(255, 0, 0, 0), k));
+            alpha = MathHelper.clamp(g, 0.0F, 1.0F);
         } else {
-            k = ColorHelper.Argb.getArgb(255, 0, 0, 0);
-            float m = (float) (k >> 16 & 255) / 255.0F;
-            float n = (float) (k >> 8 & 255) / 255.0F;
-            float o = (float) (k & 255) / 255.0F;
-            GlStateManager._clearColor(m, n, o, 1.0F);
-            GlStateManager._clear(16384, MinecraftClient.IS_SYSTEM_MAC);
+            alpha = 1.0F;
         }
 
-        double d = Math.min((double) this.client.getWindow().getScaledWidth() * 0.75D, this.client.getWindow().getScaledHeight()) * 0.25D;
-        float verticalPosition = 0.0F;
+        renderSplashBackground(context);
 
-        float s = 1.0f;
+        alpha = MathHelper.clamp(alpha, 0.0F, 1.0F);
 
-        if (f >= 1.0F) s = 1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F);
-        else if (this.reloading)
-            s = MathHelper.clamp((this.reloadStartTime > -1L ? (float) (Util.getMeasuringTimeMs() - this.reloadStartTime) / 500.0F : -1.0F), 0.0F, 1.0F);
-
-        int w = (int) (d * 4);
-        if (this.reloading) {
-            float elapsedTime = (float) (Util.getMeasuringTimeMs() - this.reloadStartTime) / 1000.0F;
-
-            verticalPosition = (float) MathHelper.lerp(elapsedTime / 4.0F, d, 0);
-        }
-
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
         RenderSystem.enableBlend();
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, s);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
 
-        context.drawTexture(CLIENT_LOGO_TEXTURE, (int) (this.client.getWindow().getScaledWidth() * 0.5D) - (w / 2) - 12, (int) (d - verticalPosition), w + 5, w / 2, 0, 0, 1024, 512, 1024, 512);
+        int size = 100;
+        float halfScreenWidth = i/2.0f;
+        float halfScreenHeight = j/2.0f;
+
+        context.drawTexture(CLIENT_ICON_TEXTURE, (int) halfScreenWidth - (size / 2), (int) halfScreenHeight - (size / 2), size, size, 0, 0, size, size, size, size);
 
         if (HeliosClient.MC.textRenderer != null) {
-            context.drawText(HeliosClient.MC.textRenderer, subtitleText, (int) (this.client.getWindow().getScaledWidth() * 0.5D) - HeliosClient.MC.textRenderer.getWidth(subtitleText) / 2, w / 2 + HeliosClient.MC.textRenderer.fontHeight + 17, 0xFFFFFF, true);
+            context.drawText(HeliosClient.MC.textRenderer, subtitleText, (int) halfScreenWidth - (HeliosClient.MC.textRenderer.getWidth(subtitleText) / 2) + 5, (int) halfScreenHeight + size/2 + HeliosClient.MC.textRenderer.fontHeight - 4, 0xFFFFFF, true);
         }
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableBlend();
 
         float t = this.reload.getProgress();
         this.progress = MathHelper.clamp(this.progress * 0.95F + t * 0.050000012F, 0.0F, 1.0F);
-        if (f < 1.0F) {
-            this.renderProgressBar(context, 1.0F - MathHelper.clamp(f, 0.0F, 1.0F));
-        }
+        //opacity = 1.0F - MathHelper.clamp(f, 0.0F, 1.0F),
+        this.renderProgressBar(context, size);
+
+        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableBlend();
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
 
         if (f >= 2.0F) {
             this.client.setOverlay(null);
@@ -176,9 +162,9 @@ public abstract class MixinSplashScreen {
         if (this.reloadCompleteTime == -1L && this.reload.isComplete() && (!this.reloading || g >= 2.0F)) {
             try {
                 this.reload.throwException();
-                //  this.exceptionHandler.accept(Optional.empty());
+                this.exceptionHandler.accept(Optional.empty());
             } catch (Throwable var23) {
-                // this.exceptionHandler.accept(Optional.of(var23));
+                this.exceptionHandler.accept(Optional.of(var23));
             }
 
             this.reloadCompleteTime = Util.getMeasuringTimeMs();
@@ -186,31 +172,30 @@ public abstract class MixinSplashScreen {
                 this.client.currentScreen.init(this.client, context.getScaledWindowWidth(), context.getScaledWindowHeight());
             }
         }
-
-
         ci.cancel();
     }
 
     @Unique
-    private void renderProgressBar(DrawContext drawContext, float opacity) {
+    private void renderProgressBar(DrawContext drawContext, int logo_size) {
         int width = drawContext.getScaledWindowWidth();
         int height = drawContext.getScaledWindowHeight();
 
-        int progressBarHeight = 2;
+        Renderer2D.setDrawContext(drawContext);
 
-        int minX = 0;
-        int minY = height - progressBarHeight;
+        float roundX = (float) (width/2.0f - (logo_size / 2.0) - (width * 0.2f));
+        float roundY = (float) (height/2.0f - (logo_size / 2.0) + logo_size + 18);
+        float backgroundWidth = (width/2.0f - roundX) * 2;
 
-        int filledWidth = MathHelper.ceil((float) width * this.progress);
+        float sliderWidth = MathHelper.ceil(backgroundWidth * this.progress);
 
-        int j = Math.round(opacity * 255.0F);
-
-        if (filledWidth <= 0 || height <= 0 || minY <= 0) {
+        if(backgroundWidth <= 0 || sliderWidth <= 0){
             return;
         }
 
-        Renderer2D.setDrawContext(drawContext);
-        Renderer2D.drawRectangleWithShadow(drawContext.getMatrices(), minX, minY, filledWidth, height, withAlpha(ColorUtils.getRainbowColor().getRGB(), j), 3);
+       Renderer2D.drawRoundedRectangle(drawContext.getMatrices().peek().getPositionMatrix(),roundX, roundY,  backgroundWidth,20,5, Color.ORANGE.getRGB());
+       int sliderColor = client.options.getMonochromeLogo().getValue() ? Color.BLACK.getRGB() : Color.WHITE.getRGB();
+       Renderer2D.drawRoundedRectangleWithShadow(drawContext.getMatrices(), roundX + 3, roundY + 2, sliderWidth - 6, 15.4f,5,25, sliderColor);
+
 
         if (HeliosClient.MC.textRenderer == null)
             return;
@@ -219,11 +204,10 @@ public abstract class MixinSplashScreen {
 
         String progressText = progressPercentage + "%";
 
-        int textX = width - HeliosClient.MC.textRenderer.getWidth(progressText) - 5;
-        int textY = minY - HeliosClient.MC.textRenderer.fontHeight;
+        int textX = (int) (width/2.0f - HeliosClient.MC.textRenderer.getWidth(progressText)/2.0f);
+        int textY = (int) (roundY + 20 + HeliosClient.MC.textRenderer.fontHeight);
 
 
         drawContext.drawText(HeliosClient.MC.textRenderer, progressText, textX, textY, 0xFFFFFF, true);
     }
-
 }

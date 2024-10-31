@@ -78,7 +78,7 @@ public class ChestAura extends Module_ {
 
     public void interact(BlockEntity blockEntity) {
         BlockPos pos = blockEntity.getPos();
-        BlockHitResult blockInteractResult = new BlockHitResult(pos.toCenterPos(), BlockUtils.getClosestFace(pos), pos, false);
+        BlockHitResult blockInteractResult = new BlockHitResult(pos.toCenterPos(), BlockUtils.getBlockDirection(pos), pos, false);
 
         ActionResult result = mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockInteractResult);
 

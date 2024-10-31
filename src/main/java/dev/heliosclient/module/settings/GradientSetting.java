@@ -96,16 +96,18 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
 
                     float y = (float)  gE.y - (isMouseOver? 1 : 0);
 
-                    Renderer2D.drawRoundedGradientRectangle(context.getMatrices().peek().getPositionMatrix(),
-                            gE.gradient.getStartGradient(),
-                            gE.gradient.getEndGradient(),
-                            gE.gradient.getEndGradient(),
-                            gE.gradient.getStartGradient(),
+                    Renderer2D.drawRoundedGradientRectangleWithShadow(context.getMatrices(),
                             (float) gE.x + 3,
                             y,
                             (float) gE.width - 3,
                             18,
-                            3
+                            gE.gradient.getStartGradient(),
+                            gE.gradient.getEndGradient(),
+                            gE.gradient.getEndGradient(),
+                            gE.gradient.getStartGradient(),
+                            3,
+                            20,
+                            gE.gradient.getStartGradient()
                     );
 
                     if(this.value == gE.gradient){

@@ -2,7 +2,10 @@ package dev.heliosclient.hud.hudelements;
 
 import dev.heliosclient.hud.HudElement;
 import dev.heliosclient.hud.HudElementData;
+import dev.heliosclient.managers.ModuleManager;
+import dev.heliosclient.module.modules.world.PaletteExploit;
 import dev.heliosclient.module.settings.*;
+import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
@@ -15,18 +18,18 @@ import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Set;
 
 public class Radar extends HudElement {
     private static int RADAR_SIZE = 100; // Size of the radar in pixels
     private static int MAX_DISTANCE = 25; // Maximum entity distance
-    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
-
     public SettingGroup sgRadarSettings = new SettingGroup("General");
-    public SettingGroup sgRadarColors = new SettingGroup("Colors");
+    public SettingGroup sgRadarColors = new SettingGroup("Colors");    public static HudElementData<Radar> DATA = new HudElementData<>("Radar", "Shows entities radar", Radar::new);
     public DoubleSetting distance = sgRadarSettings.add(new DoubleSetting.Builder()
             .name("Distance To Scale")
             .description("Max Entity distance to be included in the radar")
@@ -36,6 +39,31 @@ public class Radar extends HudElement {
             .defaultValue(25.0D)
             .value(25.0D)
             .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting showGridLines = sgRadarSettings.add(new BooleanSetting.Builder()
+            .name("Show Grid Lines")
+            .description("Renders grid lines in the center of the radar")
+            .defaultValue(false)
+            .value(false)
+            .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting showChunkTrails = sgRadarSettings.add(new BooleanSetting.Builder()
+            .name("Show Chunk Trails")
+            .description("Renders old/new chunks from the Palette exploit module (because it is the most accurate currently) in the radar")
+            .defaultValue(false)
+            .value(false)
+            .onSettingChange(this)
+            .build()
+    );
+    public BooleanSetting showAllChunkTrails = sgRadarSettings.add(new BooleanSetting.Builder()
+            .name("Show All Chunk Trails")
+            .description("This will render all the stored chunks in a small way such that all trails are fit inside the radar. Useful for finding previous trail paths. This will also make the position of entities and chunks not match.")
+            .defaultValue(false)
+            .value(false)
+            .onSettingChange(this)
+            .shouldRender(() -> showChunkTrails.value)
             .build()
     );
     public DropDownSetting drawingMode = sgRadarSettings.add(new DropDownSetting.Builder()
@@ -184,11 +212,11 @@ public class Radar extends HudElement {
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
-        this.width = (int) size.value;
-        this.height = (int) size.value;
-        RADAR_SIZE = this.width;
+        this.width = size.getInt();
+        this.height = size.getInt();
 
         super.renderElement(drawContext, textRenderer);
+
         if (mc.player == null || mc.world == null) {
             return;
         }
@@ -198,6 +226,11 @@ public class Radar extends HudElement {
 
         Vec3d playerPos = mc.player.getPos();
 
+        Renderer2D.enableScissor(x - this.padding.getInt() - 2, y - this.padding.getInt() - 2, RADAR_SIZE + this.padding.getInt() + 2, RADAR_SIZE + this.padding.getInt() + 2);
+        if (showChunkTrails.value) {
+            renderChunks(drawContext, centerX, centerY);
+        }
+
         for (Entity entity : mc.world.getEntities()) {
             if (isBlackListed(entity)) {
                 continue;
@@ -206,7 +239,7 @@ public class Radar extends HudElement {
             // Ignore the Y-level difference
             double dx = playerPos.x - entityPos.x;
             double dz = playerPos.z - entityPos.z;
-            double distance = Math.sqrt(dx*dx + dz*dz);
+            double distance = Math.sqrt(dx * dx + dz * dz);
 
             if (distance <= MAX_DISTANCE) {
                 // Calculate the entity's position on the radar
@@ -221,38 +254,66 @@ public class Radar extends HudElement {
                     radius = 1.5f;
                 }
                 if (entity == mc.player) {
-                    FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF18B", x2 - 1.5f, y2 - 1.2f, yourColor.value.getRGB());
-                }else {
-                    switch ((DrawingMode) drawingMode.getOption()) {
-                        case DOT -> Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), x2, y2, radius, color);
-                        case FIRST_LETTER -> {
-                            float scaledX = x2/drawingScale.getFloat();
-                            float scaledY = y2/drawingScale.getFloat();
-                            drawContext.getMatrices().push();
-                            drawContext.getMatrices().scale(drawingScale.getFloat(),drawingScale.getFloat(),1f);
+                    FontRenderers.Small_iconRenderer.drawString(drawContext.getMatrices(), "\uF18B", x2 - FontRenderers.Small_iconRenderer.getStringWidth("\uF18B") / 2f, y2 - FontRenderers.Small_iconRenderer.getStringHeight("\uF18B") / 2f, yourColor.value.getRGB());
+                } else {
+                    drawEntityOnRadar(drawContext, entity, x2, y2, radius, color);
+                }
+            }
+        }
+        if (showGridLines.value) {
+            renderGridLines(drawContext);
+        }
+        Renderer2D.disableScissor();
+    }
 
-                            String text = entity.getType().getUntranslatedName().substring(0,1);
+    public void drawEntityOnRadar(DrawContext drawContext, Entity entity, float x, float y, float radius, int color) {
+        switch ((DrawingMode) drawingMode.getOption()) {
+            case DOT ->
+                    Renderer2D.drawFilledCircle(drawContext.getMatrices().peek().getPositionMatrix(), x, y, radius, color);
+            case FIRST_LETTER -> {
+                float scaledX = x / drawingScale.getFloat();
+                float scaledY = y / drawingScale.getFloat();
+                drawContext.getMatrices().push();
+                drawContext.getMatrices().scale(drawingScale.getFloat(), drawingScale.getFloat(), 1f);
 
-                            drawContext.drawText(mc.textRenderer,text, (int) scaledX, (int) scaledY,color,false);
-                            drawContext.getMatrices().pop();
-                        }
-                        case FACE -> {
-                            EntityRenderer<? super Entity> e = mc.getEntityRenderDispatcher().getRenderer(entity);
-                            if(e != null) {
-                                Identifier texture = e.getTexture(entity);
+                String text = entity.getType().getUntranslatedName().substring(0, 1);
 
-                                if (texture != null) {
-                                    drawContext.getMatrices().push();
-                                    drawContext.getMatrices().scale(drawingScale.getFloat(), drawingScale.getFloat(), 1f);
-                                    drawContext.drawTexture(texture, (int) (x2 / drawingScale.getFloat() - 8), (int) (y2 / drawingScale.getFloat() - 8), 8, 8, 8, 8, 64, 64);
-                                    drawContext.getMatrices().pop();
-                                }
-                            }
-                        }
+                drawContext.drawText(mc.textRenderer, text, (int) scaledX, (int) scaledY, color, false);
+                drawContext.getMatrices().pop();
+            }
+            case FACE -> {
+                EntityRenderer<? super Entity> e = mc.getEntityRenderDispatcher().getRenderer(entity);
+                if (e != null) {
+                    Identifier texture = e.getTexture(entity);
+
+                    if (texture != null) {
+                        drawContext.getMatrices().push();
+                        drawContext.getMatrices().scale(drawingScale.getFloat(), drawingScale.getFloat(), 1f);
+                        drawContext.drawTexture(texture, (int) (x / drawingScale.getFloat() - 8), (int) (y / drawingScale.getFloat() - 8), 8, 8, 8, 8, 64, 64);
+                        drawContext.getMatrices().pop();
                     }
                 }
             }
         }
+    }
+
+    private void renderGridLines(DrawContext drawContext) {
+        int color = ColorUtils.changeAlphaGetInt(0xFFFFFF, 200); // White color with some transparency
+
+        // Draw horizontal and vertical grid lines at the center
+        float paddingOff = this.padding.getFloat()/2.0f;
+        Renderer2D.drawHorizontalLine(drawContext.getMatrices().peek().getPositionMatrix(), x - paddingOff,RADAR_SIZE + (paddingOff*4.0f),y + (float) RADAR_SIZE /2,0.7f,color);
+        Renderer2D.drawVerticalLine(drawContext.getMatrices().peek().getPositionMatrix(),x + (float) RADAR_SIZE /2,y - paddingOff,RADAR_SIZE + (paddingOff*4.0f),0.7f,color);
+       // Renderer2D.drawLine(drawContext.getMatrices(), hudBox.getX(), y + (float) RADAR_SIZE / 2, hudBox.getX() + hudBox.getWidth(), y + (float) RADAR_SIZE / 2, 1.2f, color);
+        //Renderer2D.drawLine(drawContext.getMatrices(), x + (float) RADAR_SIZE / 2, hudBox.getY(), hudBox.getX() + (float) RADAR_SIZE / 2, hudBox.getY() + hudBox.getHeight(), 1.2f, color);
+    }
+
+    @Override
+    protected void drawOutline(DrawContext drawContext, Color bgStart, Color bgEnd, Color finalShadowColor) {
+        drawContext.getMatrices().push();
+        drawContext.getMatrices().translate(0, 0, 5);
+        super.drawOutline(drawContext, bgStart, bgEnd, finalShadowColor);
+        drawContext.getMatrices().pop();
     }
 
     @Override
@@ -260,6 +321,9 @@ public class Radar extends HudElement {
         super.onSettingChange(setting);
         if (setting == distance) {
             MAX_DISTANCE = (int) distance.value;
+        }
+        if (setting == size) {
+            RADAR_SIZE = this.size.getInt();
         }
     }
 
@@ -270,6 +334,109 @@ public class Radar extends HudElement {
                 (!(entity instanceof PlayerEntity) || !includePlayers.value) &&
                 (!(entity instanceof ItemEntity) || !includeItems.value) &&
                 !includeOthers.value;
+    }
+
+    private void renderChunks(DrawContext drawContext, int centerX, int centerY) {
+        Vec3d playerPos = mc.player.getPos();
+        PaletteExploit paletteExploit = ModuleManager.get(PaletteExploit.class);
+        if (paletteExploit == null) return;
+
+        if (showAllChunkTrails.value) {
+            renderAllChunks(drawContext, paletteExploit.newChunks, PaletteExploit.ChunkType.NEW, centerX, centerY, playerPos);
+            renderAllChunks(drawContext, paletteExploit.oldChunks, PaletteExploit.ChunkType.OLD, centerX, centerY, playerPos);
+            renderAllChunks(drawContext, paletteExploit.beingUpdatedOldChunks, PaletteExploit.ChunkType.BEING_UPDATED, centerX, centerY, playerPos);
+            renderAllChunks(drawContext, paletteExploit.oldGenerationOldChunks, PaletteExploit.ChunkType.OLD_GEN, centerX, centerY, playerPos);
+        } else {
+            for (ChunkPos cp : paletteExploit.newChunks) {
+                renderChunk(drawContext, cp, PaletteExploit.ChunkType.NEW, centerX, centerY, playerPos);
+            }
+            for (ChunkPos cp : paletteExploit.oldChunks) {
+                renderChunk(drawContext, cp, PaletteExploit.ChunkType.OLD, centerX, centerY, playerPos);
+            }
+            for (ChunkPos cp : paletteExploit.beingUpdatedOldChunks) {
+                renderChunk(drawContext, cp, PaletteExploit.ChunkType.BEING_UPDATED, centerX, centerY, playerPos);
+            }
+            for (ChunkPos cp : paletteExploit.oldGenerationOldChunks) {
+                renderChunk(drawContext, cp, PaletteExploit.ChunkType.OLD_GEN, centerX, centerY, playerPos);
+            }
+        }
+    }
+
+    private void renderChunk(DrawContext drawContext, ChunkPos cp, PaletteExploit.ChunkType type, int centerX, int centerY, Vec3d playerPos) {
+        double dx = playerPos.x - cp.getStartX();
+        double dz = playerPos.z - cp.getStartZ();
+        double distance = Math.sqrt(dx * dx + dz * dz);
+        if (distance <= MAX_DISTANCE) {
+            double angle = Math.atan2(cp.getStartZ() - playerPos.z, cp.getStartX() - playerPos.x) - Math.toRadians(mc.player.getYaw()) - Math.PI;
+            float x2 = (float) (centerX + Math.cos(angle) * (distance / this.distance.value) * ((float) size.value / 2));
+            float y2 = (float) (centerY + Math.sin(angle) * (distance / this.distance.value) * ((float) size.value / 2));
+            int color = ColorUtils.changeAlphaGetInt(ModuleManager.get(PaletteExploit.class).getChunkTypeColor(type), 150);
+
+            // Scale the radar size to fit the distance setting
+            float radarScale = size.getFloat() / this.distance.getFloat();
+
+            // Each chunk gets a proportionate size based on the radar scale
+            float chunkSize = radarScale * 8;
+
+            // Calculate half the chunk size for easier manipulation
+            float halfChunkSize = chunkSize / 2;
+
+            // Calculate the sine and cosine of the player's yaw (rotation)
+            float sinYaw = (float) Math.sin(-Math.toRadians(mc.player.getYaw()));
+            float cosYaw = (float) Math.cos(-Math.toRadians(mc.player.getYaw()));
+
+            // Calculate the top-left corner position of the rectangle
+            float xTopLeft = x2 + (-halfChunkSize * cosYaw - halfChunkSize * sinYaw);
+            float yTopLeft = y2 + (-halfChunkSize * sinYaw + halfChunkSize * cosYaw);
+
+            // Calculate the top-right corner position of the rectangle
+            float xTopRight = x2 + (halfChunkSize * cosYaw - halfChunkSize * sinYaw);
+            float yTopRight = y2 + (halfChunkSize * sinYaw + halfChunkSize * cosYaw);
+
+            // Calculate the bottom-left corner position of the rectangle
+            float xBottomLeft = x2 + (-halfChunkSize * cosYaw + halfChunkSize * sinYaw);
+            float yBottomLeft = y2 + (-halfChunkSize * sinYaw - halfChunkSize * cosYaw);
+
+            // Calculate the bottom-right corner position of the rectangle
+            float xBottomRight = x2 + (halfChunkSize * cosYaw + halfChunkSize * sinYaw);
+            float yBottomRight = y2 + (halfChunkSize * sinYaw - halfChunkSize * cosYaw);
+
+            // Draw the rotated rectangle with the calculated corner positions
+            Renderer2D.drawQuad(drawContext.getMatrices().peek().getPositionMatrix(),
+                    xTopLeft, yTopLeft, xTopRight, yTopRight, xBottomRight, yBottomRight, xBottomLeft, yBottomLeft, color);
+
+        }
+    }
+
+    private void renderAllChunks(DrawContext drawContext, Set<ChunkPos> chunks, PaletteExploit.ChunkType type, int centerX, int centerY, Vec3d playerPos) {
+        for (ChunkPos cp : chunks) {
+            double dx = playerPos.x - cp.getStartX();
+            double dz = playerPos.z - cp.getStartZ();
+            double distance = Math.sqrt(dx * dx + dz * dz);
+            double angle = Math.atan2(cp.getStartZ() - playerPos.z, cp.getStartX() - playerPos.x) - Math.toRadians(mc.player.getYaw()) - Math.PI;
+            float x2 = (float) (centerX + Math.cos(angle) * (distance / (this.distance.value * 16)) * ((float) size.value / 2));
+            float y2 = (float) (centerY + Math.sin(angle) * (distance / (this.distance.value * 16)) * ((float) size.value / 2));
+            int color = ColorUtils.changeAlphaGetInt(ModuleManager.get(PaletteExploit.class).getChunkTypeColor(type), 150);
+
+            float radarScale = size.getFloat() / this.distance.getFloat();
+            float chunkSize = radarScale * 8;
+
+            float halfChunkSize = chunkSize / 2;
+            float sinYaw = (float) Math.sin(-Math.toRadians(mc.player.getYaw()));
+            float cosYaw = (float) Math.cos(-Math.toRadians(mc.player.getYaw()));
+
+            float xTopLeft = x2 + (-halfChunkSize * cosYaw - halfChunkSize * sinYaw);
+            float yTopLeft = y2 + (-halfChunkSize * sinYaw + halfChunkSize * cosYaw);
+            float xTopRight = x2 + (halfChunkSize * cosYaw - halfChunkSize * sinYaw);
+            float yTopRight = y2 + (halfChunkSize * sinYaw + halfChunkSize * cosYaw);
+            float xBottomLeft = x2 + (-halfChunkSize * cosYaw + halfChunkSize * sinYaw);
+            float yBottomLeft = y2 + (-halfChunkSize * sinYaw - halfChunkSize * cosYaw);
+            float xBottomRight = x2 + (halfChunkSize * cosYaw + halfChunkSize * sinYaw);
+            float yBottomRight = y2 + (halfChunkSize * sinYaw - halfChunkSize * cosYaw);
+
+            Renderer2D.drawQuad(drawContext.getMatrices().peek().getPositionMatrix(),
+                    xTopLeft, yTopLeft, xTopRight, yTopRight, xBottomRight, yBottomRight, xBottomLeft, yBottomLeft, color);
+        }
     }
 
     private int getColor(Entity entity) {
@@ -291,9 +458,13 @@ public class Radar extends HudElement {
         }
         return color;
     }
+
+
     public enum DrawingMode {
         DOT,
         FIRST_LETTER,
         FACE
     }
+
+
 }

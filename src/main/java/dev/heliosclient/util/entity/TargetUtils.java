@@ -3,6 +3,7 @@ package dev.heliosclient.util.entity;
 import dev.heliosclient.util.misc.SortMethod;
 import dev.heliosclient.util.player.PlayerUtils;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +21,6 @@ public class TargetUtils {
     private double range;
     private Predicate<Entity> filter = (entity) -> true;
 
-
     public TargetUtils() {
     }
 
@@ -35,12 +35,14 @@ public class TargetUtils {
         return PlayerUtils.canSeeEntity(entity);
     }
 
-    public void setRange(double range) {
+    public TargetUtils setRange(double range) {
         this.range = range;
+        return this;
     }
 
-    public void setFilter(Predicate<Entity> filter) {
+    public TargetUtils setFilter(Predicate<Entity> filter) {
         this.filter = filter;
+        return this;
     }
 
     public Entity getTarget(PlayerEntity player) {
@@ -48,7 +50,7 @@ public class TargetUtils {
                 player.getWorld(),
                 player,
                 range,
-                filter,
+                filter.and(entity -> !(entity instanceof FreeCamEntity)),
                 sortMethod);
     }
 
@@ -78,12 +80,7 @@ public class TargetUtils {
     }
 
     public Entity findTarget(Consumer<Entity> run) {
-        currentTarget = EntityUtils.getNearestEntity(
-                mc.world,
-                mc.player,
-                range,
-                filter,
-                sortMethod);
+        getTarget(mc.player);
 
         if (currentTarget != null) {
             run.accept(currentTarget);
@@ -92,14 +89,21 @@ public class TargetUtils {
         return currentTarget;
     }
 
-    public Entity findTarget(Consumer<Entity> run, Predicate<Entity> filter) {
+    public boolean found(){
+        return currentTarget != null && this.filter.test(currentTarget);
+    }
 
+    public boolean isLivingEntity(){
+        return currentTarget instanceof LivingEntity;
+    }
+
+    public Entity findTarget(Consumer<Entity> run, Predicate<Entity> filter) {
         setFilter(filter);
 
         return findTarget(run);
     }
-
-    public void setSortMethod(SortMethod sortMethod) {
+    public TargetUtils sortMethod(SortMethod sortMethod) {
         this.sortMethod = sortMethod;
+        return this;
     }
 }

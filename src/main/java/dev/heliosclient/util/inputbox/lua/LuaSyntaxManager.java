@@ -1,6 +1,6 @@
 package dev.heliosclient.util.inputbox.lua;
 
-import dev.heliosclient.util.ColorUtils;
+import dev.heliosclient.util.color.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

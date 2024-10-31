@@ -64,6 +64,7 @@ public abstract class GameRendererMixin {
         GradientBlockRenderer.renderGradientBlocks();
     }
 
+
     @Inject(method = "getBasicProjectionMatrix", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;mul(Lorg/joml/Matrix4fc;)Lorg/joml/Matrix4f;"), cancellable = true)
     private void getBasicProjectionMatrix$ChangeAspectRatio(double fov, CallbackInfoReturnable<Matrix4f> cir) {
         AspectRatio ratio = ModuleManager.get(AspectRatio.class);
@@ -161,4 +162,10 @@ public abstract class GameRendererMixin {
         }
     }
 
+    @Inject(method = "renderNausea", at = @At(value = "HEAD"), cancellable = true)
+    private void renderNausea$Helios(DrawContext context, float distortionStrength, CallbackInfo ci) {
+        if (NoRender.get().isActive() && NoRender.get().noNausea.value) {
+            ci.cancel();
+        }
+    }
 }

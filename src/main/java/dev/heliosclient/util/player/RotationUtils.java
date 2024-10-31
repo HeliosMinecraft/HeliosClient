@@ -25,14 +25,6 @@ public class RotationUtils {
     // Queue to store rotations
     private static final Queue<Rotation> rotationQueue = new LinkedList<>();
 
-    public static void lookAt(Entity entity, LookAtPos lookAtPos) {
-        lookAt(lookAtPos.positionGetter.getPosition(entity));
-    }
-
-    public static void lookAt(Entity entity) {
-        lookAt(LookAtPos.CENTER.positionGetter.getPosition(entity));
-    }
-
     public static void lookAtEntityMC(Entity entity, LookAtPos lookAtPos) {
         Vec3d vec3d = lookAtPos.positionGetter.getPosition(mc.player);
         double d = entity.getPos().x - vec3d.x;
@@ -48,9 +40,33 @@ public class RotationUtils {
         mc.player.bodyYaw = mc.player.headYaw;
         mc.player.prevBodyYaw = mc.player.bodyYaw;
     }
+    /* == Instantly looks at a given pos == */
+    public static void instaLookAt(Vec3d pos) {
+        instaLookAt(pos.getX(), pos.getY(), pos.getZ());
+    }
+    public static void instaLookAt(Entity entity, LookAtPos lookAtPos) {
+        instaLookAt(lookAtPos.positionGetter.getPosition(entity));
+    }
+    public static void instaLookAt(Entity entity) {
+        instaLookAt(LookAtPos.CENTER.positionGetter.getPosition(entity));
+    }
+
+    public static void instaLookAt(double targetX, double targetY, double targetZ) {
+        float yaw = (float) getYaw(targetX, targetZ);
+        float pitch = (float) getPitch(targetX,targetY, targetZ);
+        setPlayerRotations(yaw,pitch);
+    }
+
+    /* == Schedules look at a given pos == */
 
     public static void lookAt(Vec3d pos) {
         lookAt(pos.getX(), pos.getY(), pos.getZ());
+    }
+    public static void lookAt(Entity entity, LookAtPos lookAtPos) {
+        lookAt(lookAtPos.positionGetter.getPosition(entity));
+    }
+    public static void lookAt(Entity entity) {
+        lookAt(LookAtPos.CENTER.positionGetter.getPosition(entity));
     }
 
     public static void lookAt(double targetX, double targetY, double targetZ) {
