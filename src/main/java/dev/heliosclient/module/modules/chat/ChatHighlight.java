@@ -81,10 +81,6 @@ public class ChatHighlight extends Module_ {
 
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
-
-        //Test
-     //   this.highlightList.add("ElBe_Gaming");
-     //   this.highlightList.add("tanishisherewith");
     }
 
     public void checkForHighlights() {
@@ -112,7 +108,7 @@ public class ChatHighlight extends Module_ {
 
 
     //Priority low for chat tweaks to append first.
-    @SubscribeEvent
+    @SubscribeEvent(priority =  SubscribeEvent.Priority.LOW)
     public void onChatMessageEvent(ChatMessageEvent event) {
         event.setCanceled(true);
 
@@ -165,8 +161,7 @@ public class ChatHighlight extends Module_ {
                         // The message has been edited; we should change the text.
                         messageEdited = true;
                     }
-                } catch (PatternSyntaxException ignored) {
-                }
+                } catch (PatternSyntaxException ignored) {}
             }
         }
 
@@ -174,7 +169,6 @@ public class ChatHighlight extends Module_ {
             event.setMessage(Text.of(builder.toString()));
         }
     }
-
 
     private String applyCaseCheck(String input) {
         if (checkCase.getOption() != CaseCheck.NONE) {

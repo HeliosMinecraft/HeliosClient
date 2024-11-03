@@ -78,8 +78,6 @@ public class ColorManager implements Listener {
                 .setEndGradient(this::getPrimaryGradientEnd)
                 .register();
 
-
-
         registerStaticGradient("Sunrise", new Color(255, 94, 77), new Color(255, 165, 0));
         registerStaticGradient("Ocean", new Color(0, 105, 148), new Color(0, 168, 255));
         registerStaticGradient("Forest", new Color(34, 139, 34), new Color(107, 142, 35));
@@ -163,13 +161,12 @@ public class ColorManager implements Listener {
             return clickGuiPaneText;
         }
     }
-
+    
     @SuppressWarnings("all")
     @SubscribeEvent
     public void onTick(TickEvent.CLIENT e) {
         if (HeliosClient.CLICKGUI == null) return;
         ColorManager.SYNC_ACCENT = HeliosClient.CLICKGUI.syncAccentColor.value;
-
 
         Tooltip.tooltip.mode = HeliosClient.CLICKGUI.TooltipMode.value;
         Tooltip.tooltip.fixedPos = HeliosClient.CLICKGUI.TooltipPos.value;
@@ -178,13 +175,10 @@ public class ColorManager implements Listener {
         //Hud color is synced in HUDModule.java
         if (SYNC_ACCENT) {
             updateClickGuiSecondary(HeliosClient.CLICKGUI.AccentColor.getColor(), HeliosClient.CLICKGUI.AccentColor.isRainbow());
-
             updatePrimaryGradients(HeliosClient.CLICKGUI.AccentColor.getColor(), HeliosClient.CLICKGUI.AccentColor.getColor());
             return;
         }
-
-
-        
+        //hey blackbox, fix this bloated code please
 
         GUI gui = (ModuleManager.get(GUI.class));
 
@@ -195,7 +189,6 @@ public class ColorManager implements Listener {
         }else if (gui.ColorMode.value == 1) {
             updatePrimaryGradients(gui.gradientType.get().getStartGradient(), gui.gradientType.get().getEndGradient());
         }
-
 
         updateClickGuiSecondary(HeliosClient.CLICKGUI.AccentColor.getColor(), HeliosClient.CLICKGUI.AccentColor.isRainbow());
 

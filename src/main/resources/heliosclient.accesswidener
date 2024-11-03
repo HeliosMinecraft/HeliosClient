@@ -31,3 +31,5 @@ accessible method net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SP
 
 accessible method net/minecraft/client/render/Camera setPos (DDD)V
 accessible method net/minecraft/client/render/Camera setRotation (FF)V
+
+accessible method net/minecraft/client/network/ClientPlayerEntity getPermissionLevel ()I

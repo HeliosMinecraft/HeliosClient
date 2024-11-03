@@ -54,6 +54,7 @@ public class ModuleManager {
                 new AutoNametag(),
                 new BetterPortals(),
                 new LiquidInteract(),
+                new ServerScraper(),
                 new Painter(),
                 new SignTweaks(),
                 new Collisions(),

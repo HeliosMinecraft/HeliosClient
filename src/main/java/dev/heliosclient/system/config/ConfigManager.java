@@ -113,6 +113,7 @@ public class ConfigManager {
     public boolean save() {
         return currentConfig != null && currentConfig.save();
     }
+
     public void loadCurrent() {
         if (currentConfig != null) {
             currentConfig.load();

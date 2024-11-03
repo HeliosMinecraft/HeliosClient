@@ -3,6 +3,7 @@ package dev.heliosclient.command.commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.command.Command;
+import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.util.ChatUtils;
 import net.minecraft.command.CommandSource;
 
@@ -14,6 +15,7 @@ public class Reset extends Command {
     @Override
     public void build(LiteralArgumentBuilder<CommandSource> builder) {
         builder.executes(context -> {
+            ModuleManager.init();
             HeliosClient.CONFIG.writeDefaultModuleConfig();
 
             ChatUtils.sendHeliosMsg("Reset config.");
