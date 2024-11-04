@@ -20,7 +20,7 @@ public class AutoSneak extends Module_ {
     );
     public BooleanSetting packet = sgGeneral.add(new BooleanSetting.Builder()
             .name("Packet")
-            .description("Packet mode for sneaking instead of regular vanilla")
+            .description("Packet mode for sneaking instead of the more vanilla way")
             .onSettingChange(this)
             .value(false)
             .build()
