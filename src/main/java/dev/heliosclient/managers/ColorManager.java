@@ -178,7 +178,7 @@ public class ColorManager implements Listener {
             updatePrimaryGradients(HeliosClient.CLICKGUI.AccentColor.getColor(), HeliosClient.CLICKGUI.AccentColor.getColor());
             return;
         }
-        //hey blackbox, fix this bloated code please
+        //Eh could be better, (as it should be)... TODO
 
         GUI gui = (ModuleManager.get(GUI.class));
 

@@ -344,20 +344,12 @@ public class Radar extends HudElement {
         if (showAllChunkTrails.value) {
             renderAllChunks(drawContext, paletteExploit.newChunks, PaletteExploit.ChunkType.NEW, centerX, centerY, playerPos);
             renderAllChunks(drawContext, paletteExploit.oldChunks, PaletteExploit.ChunkType.OLD, centerX, centerY, playerPos);
-            renderAllChunks(drawContext, paletteExploit.beingUpdatedOldChunks, PaletteExploit.ChunkType.BEING_UPDATED, centerX, centerY, playerPos);
-            renderAllChunks(drawContext, paletteExploit.oldGenerationOldChunks, PaletteExploit.ChunkType.OLD_GEN, centerX, centerY, playerPos);
         } else {
             for (ChunkPos cp : paletteExploit.newChunks) {
                 renderChunk(drawContext, cp, PaletteExploit.ChunkType.NEW, centerX, centerY, playerPos);
             }
             for (ChunkPos cp : paletteExploit.oldChunks) {
                 renderChunk(drawContext, cp, PaletteExploit.ChunkType.OLD, centerX, centerY, playerPos);
-            }
-            for (ChunkPos cp : paletteExploit.beingUpdatedOldChunks) {
-                renderChunk(drawContext, cp, PaletteExploit.ChunkType.BEING_UPDATED, centerX, centerY, playerPos);
-            }
-            for (ChunkPos cp : paletteExploit.oldGenerationOldChunks) {
-                renderChunk(drawContext, cp, PaletteExploit.ChunkType.OLD_GEN, centerX, centerY, playerPos);
             }
         }
     }

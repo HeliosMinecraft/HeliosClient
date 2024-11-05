@@ -11,7 +11,7 @@ import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.entity.DisplayPreviewEntity;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
-import dev.heliosclient.util.render.textures.Texture;
+import dev.heliosclient.util.textures.Texture;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

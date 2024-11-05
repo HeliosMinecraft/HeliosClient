@@ -1,19 +1,17 @@
-package dev.heliosclient.util.render.textures;
+package dev.heliosclient.util.textures;
 
-import dev.heliosclient.HeliosClient;
 import net.minecraft.client.resource.metadata.TextureResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.ResourceTexture;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class ClientTexture extends ResourceTexture {
-    public static final Identifier CLIENT_LOGO_TEXTURE = new Identifier(HeliosClient.MODID, "splashscreen/client_splash.png");
-    public static final Identifier CLIENT_ICON_TEXTURE = new Identifier(HeliosClient.MODID, "icon.png");
+    public static final Texture CLIENT_LOGO_TEXTURE = new Texture("splashscreen/client_splash.png");
+    public static final Texture CLIENT_ICON_TEXTURE = new Texture("icon.png");
 
     public ClientTexture(boolean icon) {
         super(icon ? CLIENT_ICON_TEXTURE : CLIENT_LOGO_TEXTURE);

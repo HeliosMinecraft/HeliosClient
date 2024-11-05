@@ -108,7 +108,7 @@ public class CapeModule extends Module_ {
                 } else if (shouldUseUUID()) {
                     CapeManager.getCapes(CapeOrigin, null, UUID.value);
                 }
-                capes.iSettingChange.onSettingChange(capes);
+                capes.postSettingChange();
 
                 if (mc.player == null) {
                     AnimationUtils.addInfoToast("Fetched cape successfully", false, 1000);

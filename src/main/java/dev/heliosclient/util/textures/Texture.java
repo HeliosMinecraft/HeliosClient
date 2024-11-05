@@ -1,11 +1,12 @@
-package dev.heliosclient.util.render.textures;
+package dev.heliosclient.util.textures;
 
+import dev.heliosclient.HeliosClient;
 import net.minecraft.util.Identifier;
 
 // https://github.com/Pan4ur/ThunderHack-Recode/blob/main/src/main/java/thunder/hack
 public class Texture extends Identifier {
     public Texture(String path) {
-        super("heliosclient", validatePath(path));
+        super(HeliosClient.MODID, validatePath(path));
     }
 
     public Texture(Identifier i) {

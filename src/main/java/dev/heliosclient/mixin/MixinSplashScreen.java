@@ -4,8 +4,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
-import dev.heliosclient.util.render.textures.ClearTexture;
-import dev.heliosclient.util.render.textures.ClientTexture;
+import dev.heliosclient.util.textures.ClearTexture;
+import dev.heliosclient.util.textures.ClientTexture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
@@ -31,7 +31,7 @@ import java.awt.*;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static dev.heliosclient.util.render.textures.ClientTexture.CLIENT_ICON_TEXTURE;
+import static dev.heliosclient.util.textures.ClientTexture.CLIENT_ICON_TEXTURE;
 
 @Mixin(value = SplashOverlay.class, priority = 3001)
 public abstract class MixinSplashScreen {

@@ -33,3 +33,8 @@ accessible method net/minecraft/client/render/Camera setPos (DDD)V
 accessible method net/minecraft/client/render/Camera setRotation (FF)V
 
 accessible method net/minecraft/client/network/ClientPlayerEntity getPermissionLevel ()I
+
+accessible class net/minecraft/world/chunk/PalettedContainer$Data
+accessible method net/minecraft/world/chunk/PalettedContainer$Data palette ()Lnet/minecraft/world/chunk/Palette;
+accessible method net/minecraft/world/chunk/PalettedContainer$Data storage ()Lnet/minecraft/util/collection/PaletteStorage;
+accessible field net/minecraft/world/chunk/PalettedContainer data Lnet/minecraft/world/chunk/PalettedContainer$Data;

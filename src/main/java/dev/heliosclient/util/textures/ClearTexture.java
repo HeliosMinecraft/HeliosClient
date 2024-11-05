@@ -1,4 +1,4 @@
-package dev.heliosclient.util.render.textures;
+package dev.heliosclient.util.textures;
 
 import dev.heliosclient.HeliosClient;
 import net.minecraft.client.resource.metadata.TextureResourceMetadata;
@@ -13,16 +13,13 @@ import java.io.InputStream;
 public class ClearTexture extends ResourceTexture {
     private static final Identifier CLEAR_TEXTURE = new Identifier(HeliosClient.MODID, "splashscreen/clear.png");
 
-    public ClearTexture(Identifier location) {
-        super(location);
-    }
     public ClearTexture() {
         super(CLEAR_TEXTURE);
     }
 
     protected TextureData loadTextureData(ResourceManager resourceManager) {
         try {
-            InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("assets/heliosclient/splashscreen/clear.png");
+            InputStream input =  resourceManager.open(location);
             TextureData texture = null;
 
             if (input != null) {

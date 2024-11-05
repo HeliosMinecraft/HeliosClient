@@ -8,7 +8,7 @@ import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.render.Renderer2D;
-import dev.heliosclient.util.render.textures.Texture;
+import dev.heliosclient.util.textures.Texture;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 

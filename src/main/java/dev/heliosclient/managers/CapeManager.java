@@ -12,6 +12,7 @@ import dev.heliosclient.util.cape.CapeTextureManager;
 import dev.heliosclient.util.cape.ProfileUtils;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.fontutils.FontLoader;
+import dev.heliosclient.util.textures.Texture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.Identifier;
@@ -37,11 +38,11 @@ public class CapeManager {
     private static final Identifier SKIN = new Identifier("textures/entity/elytra.png");
 
     //Where we store and get our capes.
-    private static final File CAPE_DIRECTORY = new File(HeliosClient.MC.runDirectory, "heliosclient/capes");
+    private static final File CAPE_DIRECTORY = new File(HeliosClient.SAVE_FOLDER, "/capes");
     private static final String DEFAULT_CAPE = "helioscape.png";
     
     //The default cape texture of heliosclient.
-    public static final Identifier DEFAULT_CAPE_TEXTURE = new Identifier("heliosclient", "capes/" + DEFAULT_CAPE);
+    public static final Texture DEFAULT_CAPE_TEXTURE = new Texture("capes/helioscape.png");
 
     public static CapeManager INSTANCE = new CapeManager();
 
@@ -64,22 +65,7 @@ public class CapeManager {
                 }
             }
 
-            File defaultCapeFile = new File(CAPE_DIRECTORY, DEFAULT_CAPE);
-
-            // Do not copy if the default cape file already exists
-            if (!defaultCapeFile.exists()) {
-                try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/heliosclient/capes/helioscape.png")) {
-                    if (inputStream == null) {
-                        HeliosClient.LOGGER.error("Failed to load open inputStream to default cape resource");
-                    } else {
-                        HeliosClient.LOGGER.info("Copying default cape file in directory");
-                        Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        HeliosClient.LOGGER.info("Copying completed");
-                    }
-                } catch (IOException e) {
-                    HeliosClient.LOGGER.error("An error has occured while reading default resource asset cape", e);
-                }
-            }
+            loadDefaultCapeTexture();
 
             // Get the cape files from `heliosclient/capes` directory in an array
             File[] capeFiles = CAPE_DIRECTORY.listFiles((dir, name) -> name.toLowerCase().endsWith(".png") || name.toLowerCase().endsWith(".gif"));
@@ -117,24 +103,24 @@ public class CapeManager {
         }
     }
 
-    /*
-    private static Int2ObjectOpenHashMap<NativeImage> parseAnimatedCape(NativeImage img) {
-        Int2ObjectOpenHashMap<NativeImage> animatedCape = new Int2ObjectOpenHashMap<>();
-        int totalFrames = img.getHeight() / (img.getWidth() / 2);
-        for (int currentFrame = 0; currentFrame < totalFrames; currentFrame++) {
-            NativeImage frame = new NativeImage(img.getWidth(), img.getWidth() / 2, true);
-            for (int x = 0; x < frame.getWidth(); x++) {
-                for (int y = 0; y < frame.getHeight(); y++) {
-                    frame.setColor(x, y, img.getColor(x, y + (currentFrame * (img.getWidth() / 2))));
+    public static void loadDefaultCapeTexture(){
+        File defaultCapeFile = new File(CAPE_DIRECTORY, DEFAULT_CAPE);
+
+        // Do not copy if the default cape file already exists
+        if (!defaultCapeFile.exists()) {
+            try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("assets/heliosclient/capes/helioscape.png")) {
+                if (inputStream == null) {
+                    HeliosClient.LOGGER.error("Failed to load open inputStream to default cape resource");
+                } else {
+                    HeliosClient.LOGGER.info("Copying default cape file in directory");
+                    Files.copy(inputStream, defaultCapeFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    HeliosClient.LOGGER.info("Copying completed");
                 }
+            } catch (Throwable e) {
+                HeliosClient.LOGGER.error("An error has occurred while trying to read default cape file", e);
             }
-            animatedCape.put(currentFrame, frame);
         }
-        return animatedCape;
     }
-
-     */
-
 
     /**
      * <a href="https://github.com/dragonostic/of-capes/blob/main/src/main/java/net/drago/ofcapes/util/PlayerHandler.java">Credit</a>
@@ -165,15 +151,14 @@ public class CapeManager {
     public static void getCapes(CapeOrigin type, String profileName, String UUID) throws Exception {
         Future<?> future = HeliosExecutor.submit((Callable<Void>) () -> {
             switch (type) {
-                case OPTIFINE:
+                case OPTIFINE -> {
                     if (profileName == null || profileName.isEmpty()) {
                         throw new IllegalArgumentException("Profile name is required for OPTIFINE capes.");
                     }
                     // Get the optifine cape
                     INSTANCE.getOptifineCape(profileName);
-                    break;
-                case CRAFATAR:
-                case MINECRAFTCAPES:
+                }
+                case CRAFATAR, MINECRAFTCAPES -> {
                     if (UUID == null || UUID.isEmpty()) {
                         throw new IllegalArgumentException("Complete and a valid UUID is required.");
                     }
@@ -187,11 +172,11 @@ public class CapeManager {
                         // Get the minecraft cape
                         INSTANCE.getMinecraftCapesCape(UUID);
                     }
-                    break;
-                case LOCAL:
+                }
+                case LOCAL -> {
                     return null;
-                default:
-                    throw new IllegalArgumentException("Invalid cape type: " + type);
+                }
+                default -> throw new IllegalArgumentException("Invalid cape type: " + type);
             }
             CAPE_NAMES = loadCapes();
             return null;

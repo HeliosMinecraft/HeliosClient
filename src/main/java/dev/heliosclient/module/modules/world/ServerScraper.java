@@ -12,6 +12,7 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
+import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -21,18 +22,19 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class ServerScraper extends Module_ {
-    SettingGroup sgGeneral = new SettingGroup("AutoFill");
-    MutableText separator = Text.of("=======================================================").copy().formatted(Formatting.DARK_GREEN);
+    SettingGroup sgGeneral = new SettingGroup("General");
 
     BooleanSetting obfuscatePlayerInfo = sgGeneral.add(new BooleanSetting.Builder()
             .name("Obfuscate player info")
-            .description("It will obfuscate player info like its spawn pos, yaw, pitch, and facing direction. WARNING: This wont stop the text from being visible in your log files!!!")
+            .description("It will obfuscate your data like spawn pos, yaw, pitch, and facing direction. WARNING: This wont stop the text from being visible in your log files!!!")
             .onSettingChange(this)
             .defaultValue(false)
             .build()
     );
-    boolean resourcePackURLSent = false;
-    String lastURL = "";
+
+    final MutableText separator = Text.literal("\n=======================================================\n").formatted(Formatting.DARK_GREEN);
+    private boolean resourcePackURLSent = false;
+    private String lastURL = "";
 
     public ServerScraper() {
         super("ServerScraper", "Gathers information about the server and world on join.", Categories.WORLD);
@@ -48,40 +50,38 @@ public class ServerScraper extends Module_ {
 
             if(resourcePackURLSent) return;
 
-            Text text = Text.literal("ResourcePack URL:")
+            Text text = Text.literal("ResourcePack URL: ")
                     .formatted(Formatting.BOLD, Formatting.BLUE)
-                    .append(Text.literal(" " + rsPack.url())
-                            .formatted(Formatting.ITALIC, Formatting.GOLD)
-                    );
+                    .append(Text.literal(rsPack.url()).formatted(Formatting.ITALIC, Formatting.GOLD));
 
             ChatUtils.sendHeliosMsg(text);
             resourcePackURLSent = true;
             lastURL = rsPack.url();
         }
     }
-    public void sendGameJoinInfoMessage(GameJoinS2CPacket joinPacket){
-        ChatUtils.sendHeliosMsg(separator);
 
-        String lastDeathPos = String.valueOf(joinPacket.commonPlayerSpawnInfo().lastDeathLocation().orElse(GlobalPos.create(World.OVERWORLD,new BlockPos(0,0,0))));
+    public void sendGameJoinInfoMessage(GameJoinS2CPacket joinPacket){
+        String lastDeathPos = joinPacket.commonPlayerSpawnInfo().lastDeathLocation().orElse(GlobalPos.create(World.OVERWORLD, new BlockPos(0, 0, 0))).toString();
         String playerEntityID = String.valueOf(joinPacket.playerEntityId());
         String seed = String.valueOf(joinPacket.commonPlayerSpawnInfo().seed());
+        String viewDistance = String.valueOf(joinPacket.viewDistance());
+
         boolean reducedDebugInfo = joinPacket.reducedDebugInfo();
         boolean isHardCore = joinPacket.hardcore();
         String maxPlayers = String.valueOf(joinPacket.maxPlayers());
-
-        Text joinPacketInfo = Text.literal("Join Info:")
-                .formatted(Formatting.BOLD, Formatting.GREEN)
-                .append(Text.literal("\nLast Death Pos: ").formatted(Formatting.WHITE).append(Text.literal(lastDeathPos).formatted(Formatting.YELLOW)))
-                .append(Text.literal("\nIs HardCore: ").formatted(Formatting.WHITE).append(Text.literal(isHardCore ? "Yes" : "No").formatted(isHardCore ? Formatting.GREEN : Formatting.RED)))
-                .append(Text.literal("\nHas Reduced Debug Info: ").formatted(Formatting.WHITE).append(Text.literal(reducedDebugInfo ? "Yes" : "No").formatted(reducedDebugInfo ? Formatting.GREEN : Formatting.RED)))
-                .append(Text.literal("\nMax Players: ").formatted(Formatting.WHITE).append(Text.literal(maxPlayers).formatted(Formatting.GREEN)))
-                .append(Text.literal("\nSeed: ").formatted(Formatting.WHITE).append(Text.literal(seed).formatted(Formatting.GREEN)))
-                .append(Text.literal("\nPlayer Entity ID: ").formatted(Formatting.WHITE).append(Text.literal(playerEntityID).formatted(Formatting.YELLOW)));
+        Text joinPacketInfo = separator.copy().append(Text.literal("Join Info:").formatted(Formatting.BOLD, Formatting.GREEN))
+                .append(generateClickableText("Last Death Pos: ",lastDeathPos,Formatting.WHITE, Formatting.GREEN).formatted(obfuscatePlayerInfo.value ? Formatting.OBFUSCATED : Formatting.RESET))
+                .append(generateText("Max Players: ",Formatting.WHITE, maxPlayers,Formatting.GREEN))
+                .append(generateClickableText("Seed: ", seed, Formatting.WHITE, Formatting.GREEN))
+                .append(generateText("View Distance: ",viewDistance))
+                .append(generateText("Player Entity ID: ",playerEntityID))
+                .append(generateYesNoText("Is HardCore: ",isHardCore))
+                .append(generateYesNoText("Has Reduced Debug Info: ", reducedDebugInfo));
 
         ChatUtils.sendHeliosMsg(joinPacketInfo);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = SubscribeEvent.Priority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         // Get the current world
         ClientWorld world =  mc.world;
@@ -89,12 +89,13 @@ public class ServerScraper extends Module_ {
         if (world != null) {
             sendGameJoinInfoMessage(event.getPacket());
 
-            ChatUtils.sendHeliosMsg(separator);
-
             // Gather world information
             long worldAge = world.getTime();
             long dayTime = world.getTimeOfDay();
             boolean isDay = dayTime >= 0 && dayTime < 12000; // Daytime is between 0 and 12000 ticks
+            double dayCount = Math.floor(mc.world.getTime() / 24000);
+            int nextMapId = world.getNextMapId();
+            float tickRate = world.getTickManager().getTickRate();
 
             // Gather player and entity information
             int playerCount = world.getPlayers().size();
@@ -105,41 +106,40 @@ public class ServerScraper extends Module_ {
 
             // Gather biome information
             String biomeName = world.getBiome(mc.player.getBlockPos()).getKey().orElseThrow().getValue().toString();
-            Formatting obfuscated = obfuscatePlayerInfo.value ? Formatting.OBFUSCATED : Formatting.RESET ;
+            Formatting obfuscated = obfuscatePlayerInfo.value ? Formatting.OBFUSCATED : Formatting.RESET;
 
             Text yawAndPitch = Text.literal("\nPlayer Yaw And Pitch: ")
                     .formatted(Formatting.WHITE)
-                    .append(Text.literal("Yaw: ").formatted(Formatting.YELLOW))
-                    .append(Text.literal(String.valueOf(mc.player.getYaw())).formatted(Formatting.GREEN))
-                    .append(Text.literal(" Pitch: ").formatted(Formatting.YELLOW))
-                    .append(Text.literal(String.valueOf(mc.player.getPitch())).formatted(Formatting.GREEN))
-                    .formatted(obfuscated);
-
+                    .append(generateText("Yaw: ",Formatting.YELLOW, mc.player.getYaw() + "",Formatting.GREEN)
+                            .formatted(obfuscated)
+                    )
+                    .append(generateText("Pitch: ",Formatting.YELLOW, mc.player.getPitch() + "",Formatting.GREEN)
+                            .formatted(obfuscated)
+                    );
 
             // Constructing the information message
             Text worldInfoMessage = Text.literal("World Info:")
                     .formatted(Formatting.BOLD, Formatting.GREEN)
-                    .append(Text.literal("\nWorld Age: ").formatted(Formatting.WHITE).append(Text.literal(worldAge + " ticks").formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nDay Time: ").formatted(Formatting.WHITE).append(Text.literal(dayTime + " ticks").formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nDay Count: ").formatted(Formatting.WHITE).append(Text.literal(String.valueOf(Math.floor(mc.world.getTime() / 24000))).formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nIs Day: ").formatted(Formatting.WHITE).append(Text.literal(isDay ? "Yes" : "No").formatted(isDay ? Formatting.GREEN : Formatting.RED)))
-                    .append(Text.literal("\nPlayer Count: ").formatted(Formatting.WHITE).append(Text.literal(playerCount + "").formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nWorld Border Size: ").formatted(Formatting.WHITE).append(Text.literal(worldBorderSize + " blocks").formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nWorld Border Center: ").formatted(Formatting.WHITE).append(Text.literal(worldBorderCenter.toString()).formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nDifficulty: ").formatted(Formatting.WHITE).append(Text.literal(mc.world.getDifficulty().name()).formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nPermissionLevel: ").formatted(Formatting.WHITE).append(Text.literal(String.valueOf(mc.player.getPermissionLevel())).formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nCurrent Biome: ").formatted(Formatting.WHITE).append(Text.literal(biomeName).formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nWorld Spawn Pos: ").formatted(Formatting.WHITE).append(Text.literal(mc.world.getSpawnPos().toString()).formatted(Formatting.YELLOW)))
-                    .append(Text.literal("\nPlayer Spawn Pos: ").formatted(Formatting.WHITE).append(Text.literal(mc.player.getBlockPos().toString()).formatted(Formatting.YELLOW,obfuscated)))
-                    .append(Text.literal("\nPlayer Facing Direction: ").formatted(Formatting.WHITE).append(Text.literal(mc.player.getHorizontalFacing().name()).formatted(Formatting.YELLOW, obfuscated)))
-                    .append(yawAndPitch);
+                    .append(generateText("World Age: ",worldAge + " ticks"))
+                    .append(generateText("Day Time: ",dayTime + " ticks"))
+                    .append(generateText("Day Count: ",dayCount + ""))
+                    .append(generateYesNoText("Is Day: ",isDay))
+                    .append(generateText("Player Count: ",playerCount + ""))
+                    .append(generateText("World Tick Rate: ",tickRate + ""))
+                    .append(generateText("World Border Size: ",worldBorderSize + " blocks"))
+                    .append(generateText("World Border Center: ",worldBorderCenter.toString()))
+                    .append(generateText("Next Map ID: ", nextMapId + ""))
+                    .append(generateText("Difficulty: ",mc.world.getDifficulty().name()))
+                    .append(generateText("PermissionLevel: ",mc.player.getPermissionLevel() + ""))
+                    .append(generateText("Current Biome: ",biomeName))
+                    .append(generateText("World Spawn Pos: ",mc.world.getSpawnPos().toString()))
+                    .append(generateText("Player Spawn Pos: ",mc.player.getBlockPos().toString()).formatted(obfuscated))
+                    .append(generateText("Player Facing Direction: ",mc.player.getHorizontalFacing().name()).formatted(obfuscated))
+                    .append(yawAndPitch)
+                    .append(Text.of("\n------------------------------------------------------"));
 
             // Display the message in chat
             ChatUtils.sendHeliosMsg(worldInfoMessage);
-            ChatUtils.sendHeliosMsg(Text.of("------------------------------------------------------"));
-            //mc.inGameHud.getChatHud().addMessage(worldInfoMessage);
-           // mc.inGameHud.getChatHud().addMessage(Text.of("------------------------------------------------------"));
-
 
             ServerInfo info = mc.getCurrentServerEntry();
             if(info != null) {
@@ -155,21 +155,36 @@ public class ServerScraper extends Module_ {
                 // Constructing the server information message
                 MutableText serverInfoMessage = Text.literal("Server Info:")
                         .formatted(Formatting.BOLD, Formatting.BLUE)
-                        .append(Text.literal("\nName: ").formatted(Formatting.WHITE).append(Text.literal(serverName).formatted(Formatting.YELLOW)))
-                        .append(Text.literal("\nServer Address: ").formatted(Formatting.WHITE).append(Text.literal(serverAddress).formatted(Formatting.YELLOW)))
-                        .append(Text.literal("\nVersion: ").formatted(Formatting.WHITE).append(Text.literal(serverVersion).formatted(Formatting.YELLOW)))
-                        .append(Text.literal("\nProtocol Version: ").formatted(Formatting.WHITE).append(Text.literal(serverProtocolVersion).formatted(Formatting.YELLOW)))
-                        .append(Text.literal("\nMOTD: ").formatted(Formatting.WHITE).append(Text.literal(motd).formatted(Formatting.YELLOW)))
-                        .append(Text.literal("\nOnline: ").formatted(Formatting.WHITE).append(Text.literal(online).formatted(Formatting.YELLOW)))
-                        .append(Text.literal("\nTexture Pack Required: ").formatted(Formatting.WHITE).append(Text.literal(texturePackRequired ? "Yes" : "No").formatted(texturePackRequired ? Formatting.GREEN : Formatting.RED)))
-                        .append(Text.literal("\nTexture Pack Policy: ").formatted(Formatting.WHITE).append(Text.literal(info.getResourcePackPolicy().name()).formatted(Formatting.YELLOW)))
-                        .append(Text.literal("\nIs Chat Secure: ").formatted(Formatting.WHITE).append(Text.literal(hasSecureChat ? "Yes" : "No").formatted(hasSecureChat ? Formatting.GREEN : Formatting.RED)))
-                        .append(Text.literal("\nServer Type: ").formatted(Formatting.WHITE).append(Text.literal(info.getServerType().name()).formatted(Formatting.YELLOW)));
+                        .append(generateText("Name: ",serverName))
+                        .append(generateText("Server Address: ",serverAddress))
+                        .append(generateText("Version: ",serverVersion))
+                        .append(generateText("Protocol Version: ",serverProtocolVersion))
+                        .append(generateText("MOTD: ",motd))
+                        .append(generateText("Online: ",online))
+                        .append(generateYesNoText("Texture Pack Required: ",texturePackRequired))
+                        .append(generateText("Texture Pack Policy: ",info.getResourcePackPolicy().name()))
+                        .append(generateYesNoText("Is Chat Secure: ", hasSecureChat))
+                        .append(generateText("Server Type: ",info.getServerType().name()));
 
                 ChatUtils.sendHeliosMsg(serverInfoMessage);
             }
 
             ChatUtils.sendHeliosMsg(separator);
         }
+    }
+
+    public MutableText generateText(String prefix, Formatting prefixFormat, String value, Formatting valueFormat){
+         return Text.literal("\n" + prefix).formatted(prefixFormat).append(Text.literal(value).formatted(valueFormat));
+    }
+    public MutableText generateText(String prefix, String value){
+        return generateText(prefix,Formatting.WHITE,value,Formatting.YELLOW);
+    }
+    public MutableText generateYesNoText(String prefix, boolean bool){
+        return generateText(prefix,Formatting.WHITE, bool ? "Yes" : "No", bool ? Formatting.GREEN : Formatting.RED);
+    }
+    private MutableText generateClickableText(String prefix, String value, Formatting labelColor, Formatting valueColor) {
+        return Text.literal("\n" + prefix).formatted(labelColor)
+                .append(Text.literal(value).formatted(valueColor)
+                        .styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, value))));
     }
 }

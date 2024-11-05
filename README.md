@@ -72,7 +72,7 @@ Thanks to all the people who helped to make this project what it is now, especia
 ## Thanks to
 
 - [MoonlightMeadows](https://github.com/kawaiizenbo/MoonlightMeadows) made by [Kawaiizenbo](https://github.com/kawaiizenbo) for serving as base project.
-- [Trouser-Streak](https://github.com/etianl/Trouser-Streak) for finding the Palette Exploit.
+- <a href="https://github.com/RacoonDog">Crosby</a>, <a href="https://github.com/etianl">etianl</a> and <a href="https://github.com/rfresh2">rfresh</a> for the whole Palette Exploit
 - Many other clients for serving as a base for inspiration. (Like Meteor-Client, BleachHack, TH Recode, Old 3arth4ck, LiquidBounce)
 - [0x3C50](https://github.com/0x3C50/Renderer) for the Renderer library (especially the FontRenderer).
 - [Bleach Hack](https://github.com/BleachDev/BleachHack/tree/1.20.4) for the 3D rendering.
