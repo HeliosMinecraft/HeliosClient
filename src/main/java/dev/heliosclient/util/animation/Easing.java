@@ -22,6 +22,7 @@ public class Easing {
             case SINE_OUT -> easeOutSine(t);
             case SINE_IN_OUT -> easeInOutSine(t);
             case LINEAR_SIGMOID -> linearSigmoid(t);
+            case BACK_OUT -> backOut(t);
             default -> throw new IllegalArgumentException("Invalid easing type: " + type);
         };
     }
@@ -134,6 +135,12 @@ public class Easing {
         } else {
             return bounceOut(t * 2 - 1) * 0.5f + 0.5f;
         }
+    }
+    public static float backOut(float progress) {
+        float c1 = 1.70158f;
+        float c3 = c1 + 1;
+
+        return 1 + c3 * (float)Math.pow(progress - 1, 3) + c1 * (float)Math.pow(progress - 1, 2);
     }
 
     public static float easeInSine(float t) {

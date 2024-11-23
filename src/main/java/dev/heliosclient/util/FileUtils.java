@@ -10,17 +10,12 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -84,11 +79,10 @@ public class FileUtils {
         if (status != GifDecoder.STATUS_OK) {
             throw new IOException("Failed to read GIF file: " + gifFile.getName());
         }
-
-        for (int i = 0; i < decoder.getFrameCount(); i++) {
+       for (int i = 0; i < decoder.getFrameCount(); i++) {
             NativeImage nativeImage = convertToNativeImage(decoder.getFrame(i));
             frames.add(nativeImage);
-        }
+       }
 
         HeliosClient.LOGGER.info("(CapeManager) Successfully read {} frames from GIF file: {}", frames.size(), gifFile.getName());
         return frames;

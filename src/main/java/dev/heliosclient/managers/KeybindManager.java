@@ -13,8 +13,9 @@ import dev.heliosclient.module.settings.KeyBind;
 import dev.heliosclient.scripting.LuaFile;
 import dev.heliosclient.scripting.LuaScriptManager;
 import dev.heliosclient.ui.clickgui.ClickGUIScreen;
-import dev.heliosclient.ui.clickgui.settings.AbstractSettingScreen;
 import dev.heliosclient.ui.clickgui.hudeditor.HudEditorScreen;
+import dev.heliosclient.ui.clickgui.settings.AbstractSettingScreen;
+import dev.heliosclient.util.timer.TimerUtils;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.ingame.AbstractCommandBlockScreen;
@@ -31,15 +32,14 @@ public class KeybindManager implements Listener {
     private static final int[] CPS = new int[2];
     public static KeybindManager INSTANCE = new KeybindManager();
     static boolean isWPressed = false, isAPressed = false, isSPressed = false, isDPressed = false, isSpacePressed = false;
-    // For KeyStrokes.
+
     //Todo: Make KeyStrokes element
-    private static long lastLeftClick = 0;
-    private static long lastRightClick = 0;
+    TimerUtils leftClickTimer = new TimerUtils(true);
+    TimerUtils rightClickTimer = new TimerUtils(true);
 
     private KeybindManager() {
         EventManager.register(this);
     }
-
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
     public void keyPressedEvent(KeyPressedEvent event) {
@@ -149,15 +149,8 @@ public class KeybindManager implements Listener {
         // So that only clicks and key presses within the game screen is recorded to prevent any problems.
         if (HeliosClient.MC.currentScreen != null) return;
 
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastLeftClick > 1000) {
-            CPS[0] = 0;
-            lastLeftClick = currentTime;
-        }
-        if (currentTime - lastRightClick > 1000) {
-            CPS[1] = 0;
-            lastRightClick = currentTime;
-        }
+        leftClickTimer.every(1000,()-> CPS[0] = 0);
+        rightClickTimer.every(1000,()-> CPS[1] = 0);
     }
 
     public boolean shouldOpen() {

@@ -6,6 +6,7 @@ import dev.heliosclient.mixin.AccessorPlayerPositionLookS2CPacket;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 
 public class NoRotate extends Module_ {
     public NoRotate() {
@@ -18,6 +19,8 @@ public class NoRotate extends Module_ {
             AccessorPlayerPositionLookS2CPacket p = (AccessorPlayerPositionLookS2CPacket)ppl;
             p.setPitch(mc.player.getPitch());
             p.setYaw(mc.player.getYaw());
+            ppl.getFlags().remove(PositionFlag.X_ROT);
+            ppl.getFlags().remove(PositionFlag.Y_ROT);
         }
     }
 }

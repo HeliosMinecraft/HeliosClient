@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(KeyboardInput.class)
 public abstract class MixinKeyboardInput extends Input {
     @Shadow
-    protected static float getMovementMultiplier(boolean positive, boolean negative) {
+    private static float getMovementMultiplier(boolean positive, boolean negative) {
         return 0;
     }
 
@@ -31,6 +31,12 @@ public abstract class MixinKeyboardInput extends Input {
             this.movementForward = getMovementMultiplier(this.pressingForward, this.pressingBack);
             this.movementSideways = getMovementMultiplier(this.pressingLeft, this.pressingRight);
 
+            if (event.shouldApplyMovementForward()) {
+                this.movementForward = event.movementForward;
+            }
+            if (event.shouldApplyMovementSideways()) {
+                this.movementSideways = event.movementSideways;
+            }
 
             this.jumping = event.jumping;
             this.sneaking = event.sneaking;

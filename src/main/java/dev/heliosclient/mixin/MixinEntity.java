@@ -84,7 +84,7 @@ public abstract class MixinEntity {
     @ModifyReturnValue(method = "isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z", at = @At("RETURN"))
     private boolean isInvisibleToCanceller(boolean original) {
         if (!HeliosClient.shouldUpdate()) return original;
-        if (NoRender.get().isActive() && NoRender.get().noInvisible.value) return false;
+        if (NoRender.get().isActive() && NoRender.get().trueSight.value) return false;
         return original;
     }
 

@@ -13,30 +13,34 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 
 public class StringListSetting extends Setting<String[]> {
-    private final List<InputBox> defaultInputBoxes;
     private final List<InputBox> inputBoxes = new ArrayList<>();
 
     private final int characterLimit;
     private final InputBox.InputMode inputMode;
     public boolean isWriting = false;
-    String description;
+    //Whether the input boxes should be added/Removed by the user or not
+    private boolean allowEditing = false;
+    private int defaultBoxesSize = 0;
 
-    public StringListSetting(String name, String description, String[] defaultValues, int defaultBoxes, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender) {
+    public StringListSetting(String name, String description, String[] defaultValues, int defaultBoxesSize, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender, boolean allowEditing) {
         super(shouldRender, defaultValues);
         this.name = name;
         this.value = defaultValues;
         this.description = description;
-        this.height = 26 + defaultBoxes * 15;
+        this.height = 26 + defaultBoxesSize * 15;
         this.heightCompact = 0;
         this.characterLimit = characterLimit;
         this.inputMode = inputMode;
-        for (int i = 0; i < defaultBoxes; i++) {
+        this.defaultBoxesSize = defaultBoxesSize;
+        for (int i = 0; i < defaultBoxesSize; i++) {
             inputBoxes.add(new InputBox(160, 12, defaultValues[i], characterLimit, inputMode));
         }
-
-        defaultInputBoxes = new ArrayList<>(inputBoxes);
+        // Initialize input boxes
+        this.allowEditing = allowEditing;
     }
-
+    public StringListSetting(String name, String description, String[] defaultValues, int defaultBoxes, int characterLimit, InputBox.InputMode inputMode, BooleanSupplier shouldRender) {
+       this(name,description,defaultValues,defaultBoxes,characterLimit,inputMode,shouldRender,true);
+    }
 
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
@@ -48,21 +52,25 @@ public class StringListSetting extends Setting<String[]> {
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 5, defaultColor);
 
         // Draw a '+' button next to the text
-        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, y + 5, 11, 11, Color.black.getRGB());
-        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, y + 5, 11, 11, 0.4f, (hoveredOverAdd(mouseX, mouseY)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
-        drawContext.drawHorizontalLine(x + 167, x + 173, y + 10, Color.GREEN.getRGB());
-        drawContext.drawVerticalLine(x + 170, y + 6, y + 14, Color.GREEN.getRGB());
+        if(allowEditing) {
+            drawAddButton(drawContext, x, y, mouseX, mouseY);
+        }
         int boxOffset = y + 20;
-        value = new String[inputBoxes.size()];
+        if(value.length != inputBoxes.size()) {
+            value = new String[inputBoxes.size()];
+        }
         int counter = 0;
         boolean isFocused = false;
         for (InputBox box : inputBoxes) {
             box.render(drawContext, x, boxOffset, mouseX, mouseY, textRenderer);
 
-            // Draw a '-' button next to the text
-            Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, boxOffset, 11, 11, Color.black.getRGB());
-            drawContext.drawHorizontalLine(x + 168, x + 172, boxOffset + 5, Color.RED.getRGB());
-            Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, boxOffset, 11, 11, 0.4f, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+            if(allowEditing) {
+                // Draw a '-' button next to the text
+                Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, boxOffset, 11, 11, Color.black.getRGB());
+                drawContext.drawHorizontalLine(x + 168, x + 172, boxOffset + 5, Color.RED.getRGB());
+                Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, boxOffset, 11, 11, 0.4f, (hoveredOverRemove(mouseX, mouseY, boxOffset)) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+            }
+
             boxOffset += 16;
             value[counter] = box.getValue();
             counter++;
@@ -74,25 +82,35 @@ public class StringListSetting extends Setting<String[]> {
         this.isWriting = isFocused;
     }
 
+    private void drawAddButton(DrawContext drawContext, int x, int y, int mouseX, int mouseY) {
+        Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, y + 5, 11, 11, Color.black.getRGB());
+        Renderer2D.drawOutlineBox(drawContext.getMatrices().peek().getPositionMatrix(), x + 165, y + 5, 11, 11, 0.4f, hoveredOverAdd(mouseX, mouseY) ? Color.WHITE.getRGB() : Color.GRAY.getRGB());
+        drawContext.drawHorizontalLine(x + 167, x + 173, y + 10, Color.GREEN.getRGB());
+        drawContext.drawVerticalLine(x + 170, y + 6, y + 14, Color.GREEN.getRGB());
+    }
+
     @Override
     public void mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
         if (hoveredSetting((int) mouseX, (int) mouseY) && hoveredOverReset(mouseX, mouseY)) {
             inputBoxes.clear();
-            inputBoxes.addAll(defaultInputBoxes);
+            for (int i = 0; i < defaultBoxesSize; i++) {
+                inputBoxes.add(new InputBox(160, 12,(i >= defaultValue.length) ? "" : defaultValue[i], characterLimit, inputMode));
+            }
         }
 
-        int boxOffset = y + 20;
-        // Use a regular for loop with an index variable
-        if (hoveredOverAdd(mouseX, mouseY)) {
-            inputBoxes.add(new InputBox(160, 13, "", characterLimit, inputMode)); // Add a new empty box to the list
-        }
-        for (int i = 0; i < inputBoxes.size(); i++) {
-            if (hoveredOverRemove(mouseX, mouseY, boxOffset)) {
-                inputBoxes.remove(i); // Remove the box at the current index
-                i--; // Decrement the index to account for the removal
+        if(allowEditing) {
+            int boxOffset = y + 20;
+            if (hoveredOverAdd(mouseX, mouseY)) {
+                inputBoxes.add(new InputBox(160, 13, "", characterLimit, inputMode)); // Add a new empty box to the list
             }
-            boxOffset += 16;
+            for (int i = 0; i < inputBoxes.size(); i++) {
+                if (hoveredOverRemove(mouseX, mouseY, boxOffset)) {
+                    inputBoxes.remove(i); // Remove the box at the current index
+                    i--; // Decrement the index to account for the removal
+                }
+                boxOffset += 16;
+            }
         }
     }
 
@@ -148,9 +166,19 @@ public class StringListSetting extends Setting<String[]> {
         return description;
     }
 
+    public void setAllowEditing(boolean allowEditing) {
+        this.allowEditing = allowEditing;
+    }
+
+    public boolean shouldAllowEditing() {
+        return allowEditing;
+    }
+
     public static class Builder extends SettingBuilder<Builder, String[], StringListSetting> {
         int defaultBoxes, characterLimit;
         InputBox.InputMode inputMode;
+        boolean allowEditing = true;
+
 
         public Builder() {
             super(new String[]{});
@@ -171,13 +199,18 @@ public class StringListSetting extends Setting<String[]> {
             return this;
         }
 
+        public Builder allowEditing(boolean allowEditing) {
+            this.allowEditing = allowEditing;
+            return this;
+        }
+
         @Override
         public StringListSetting build() {
             if (defaultValue == null) {
                 defaultValue = value;
             }
 
-            return new StringListSetting(name, description, defaultValue, defaultBoxes, characterLimit, inputMode, shouldRender);
+            return new StringListSetting(name, description, defaultValue, defaultBoxes, characterLimit, inputMode, shouldRender,allowEditing);
         }
     }
 }

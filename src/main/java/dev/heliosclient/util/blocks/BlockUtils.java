@@ -78,7 +78,7 @@ public class BlockUtils {
     }
 
     public static boolean breakBlock(BlockPos pos, boolean swing) {
-      // if (!canBreak(pos, mc.world.getBlockState(pos))) return false;
+       if (!canBreak(pos, mc.world.getBlockState(pos))) return false;
        BlockPos bp = pos instanceof BlockPos.Mutable ? new BlockPos(pos) : pos;
 
         if (mc.interactionManager.isBreakingBlock())

@@ -68,7 +68,9 @@ public class BlockListSetting extends ListSetting<Block> {
                     } else if (selectedEntries.size() < maxSelectable) {
                         selectedEntries.add(block);
                     }
-                    postSettingChange();
+                    if(this.iSettingChange != null){
+                        this.iSettingChange.onSettingChange(this);
+                    }
                 }
                 if (offsetX > window.getWindowWidth() - 20) {
                     offsetY += 16;

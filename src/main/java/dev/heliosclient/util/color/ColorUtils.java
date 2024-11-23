@@ -279,6 +279,7 @@ public class ColorUtils {
     }
 
     public static String colorToHex(Color color) {
+        //Integer.toHexString(color.getRGB());
         return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 

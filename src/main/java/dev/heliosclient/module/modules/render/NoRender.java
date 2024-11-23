@@ -32,7 +32,7 @@ public class NoRender extends Module_ {
     public BooleanSetting noDarkness = sgWorld.add(new BooleanSetting("NoDarkness", "Disables darkness", this, false));
     public BooleanSetting noBeaconBeam = sgWorld.add(new BooleanSetting("NoBeacon Beam", "Disables beacon beams rendering", this, false));
     public BooleanSetting noFog = sgWorld.add(new BooleanSetting("NoFog", "Disables fog rendering", this, false));
-    public BooleanSetting noInvisible = sgWorld.add(new BooleanSetting("NoInvisible", "Makes invisible stuff become visible", this, false));
+    public BooleanSetting trueSight = sgWorld.add(new BooleanSetting("TrueSight", "Makes invisible stuff become visible", this, false));
 
     public NoRender() {
         super("NoRender", "Prevents rendering overlays and other stuff", Categories.RENDER);

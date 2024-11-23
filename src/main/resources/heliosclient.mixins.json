@@ -37,6 +37,7 @@
     "AbstractClientPlayerEntityMixin",
     "AccessorBufferBuilder",
     "AccessorClientPlayerInteractionManager",
+    "AccessorClientWorld",
     "AccessorFrustum",
     "AccessorKeybind",
     "AccessorMinecraftClient",

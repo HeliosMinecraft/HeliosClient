@@ -1,5 +1,6 @@
 package dev.heliosclient.mixin;
 
+import com.mojang.brigadier.ParseResults;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.Event;
 import dev.heliosclient.event.events.client.InventoryEvent;
@@ -13,6 +14,7 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.chat.ChatTweaks;
 import dev.heliosclient.system.UniqueID;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.*;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,6 +32,8 @@ public abstract class MixinClientPlayNetworkHandler {
 
     @Shadow
     public abstract void sendChatMessage(String content);
+
+    @Shadow protected abstract ParseResults<CommandSource> parse(String command);
 
     @Inject(method = "onGameJoin", at = @At("RETURN"), cancellable = true)
     private void onGameJoin(GameJoinS2CPacket packet, CallbackInfo info) {
@@ -93,7 +97,7 @@ public abstract class MixinClientPlayNetworkHandler {
 
     @Inject(method = "onDeathMessage", at = @At("HEAD"), cancellable = true)
     private void onDeathMessage(DeathMessageS2CPacket packet, CallbackInfo ci) {
-        if (HeliosClient.MC.player != null) {
+        if (HeliosClient.MC.player != null && packet.getEntityId() == HeliosClient.MC.player.getId()) {
             Event event = new PlayerDeathEvent(HeliosClient.MC.player);
             if (EventManager.postEvent(event).isCanceled()) {
                 ci.cancel();

@@ -192,6 +192,12 @@ public class TargetStrafe extends Module_ {
             ModuleManager.get(Timer.class).setOverride(Timer.RESET);
         }
 
+        if(mc.options.leftKey.isPressed()){
+            strafeDirectionChanged = true;
+        }else if(mc.options.rightKey.isPressed()){
+            strafeDirectionChanged = false;
+        }
+
         if (legit.value) return;
 
         TargetUtils.getInstance().sortMethod((SortMethod) sort.getOption());
@@ -222,12 +228,6 @@ public class TargetStrafe extends Module_ {
     //Legit mode simulates target-strafe by modifying the input
     @SubscribeEvent
     public void onKeyBoardInput(KeyboardInputEvent event) {
-        if(mc.options.leftKey.isPressed()){
-            strafeDirectionChanged = true;
-        }else if(mc.options.rightKey.isPressed()){
-            strafeDirectionChanged = false;
-        }
-
         if (!legit.value || mc.player == null) return;
 
         TargetUtils.getInstance().sortMethod((SortMethod) sort.getOption());
@@ -258,19 +258,13 @@ public class TargetStrafe extends Module_ {
                 event.pressingRight = true;
             }
 
-            Vec3d vec = mc.player.getPos().add(mc.player.getVelocity());
-            if (PlayerUtils.willFallMoreThanFiveBlocks(vec) || mc.player.horizontalCollision) {
+            if (PlayerUtils.isSpaceBelowEmpty(3) || mc.player.horizontalCollision) {
                 strafeDirectionChanged = !strafeDirectionChanged;
             }
 
             if(jump.value){
                 event.jumping = true;
             }
-
-            // jump while strafing
-            //if (jump.value && !mc.player.isOnGround()) {
-              //  mc.player.jump();
-            //}
             event.cancel();
     }
 
@@ -299,7 +293,7 @@ public class TargetStrafe extends Module_ {
         Vec3d strafePos = playerPos.add(strafeDirection.multiply(speed.value * 0.15f));
 
         // Check for horizontal collision
-        if (PlayerUtils.hasHorizontalCollision(strafePos) || PlayerUtils.willFallMoreThanFiveBlocks(strafePos)) {
+        if (PlayerUtils.hasHorizontalCollision(strafePos) ||PlayerUtils.isSpaceBelowEmpty(3)) {
             strafeDirectionChanged = !strafeDirectionChanged; // Reverse strafe direction
         } else {
             mc.player.updatePosition(strafePos.x, mc.player.getY(), strafePos.z);

@@ -62,7 +62,7 @@ public class PolygonMeshPatternRenderer {
     }
 
     private void drawLine(MatrixStack matrixStack, Point p1, Point p2) {
-        Renderer2D.drawLine(matrixStack, p1.x, p1.y, p2.x, p2.y, 1f, -1);
+        Renderer2D.drawLine(matrixStack.peek().getPositionMatrix(), p1.x, p1.y, p2.x, p2.y, 1f, -1);
     }
 
     private class Point {

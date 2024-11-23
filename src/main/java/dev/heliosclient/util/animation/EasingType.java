@@ -19,5 +19,6 @@ public enum EasingType {
     SINE_IN,
     SINE_OUT,
     SINE_IN_OUT,
+    BACK_OUT,
     LINEAR_SIGMOID
 }

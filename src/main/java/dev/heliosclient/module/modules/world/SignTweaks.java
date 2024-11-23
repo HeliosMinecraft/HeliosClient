@@ -38,12 +38,13 @@ public class SignTweaks extends Module_ {
     );
 
     StringListSetting lines = sgAutoFill.add(new StringListSetting.Builder()
-            .name("Text for each line (only 4)")
+            .name("Text for each line")
             .description("The text for each line represented by each text box. Only first four will be counted")
             .defaultBoxes(4)
             .defaultValue(new String[]{"HeliosClient on Top!", "", "", "", ""})
             .characterLimit(15)
             .inputMode(InputBox.InputMode.ALL)
+            .allowEditing(false)
             .shouldRender(()->autoFill.value)
             .build()
     );

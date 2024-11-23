@@ -11,7 +11,7 @@ public class TridentTweaker extends Module_ {
 
     public BooleanSetting alwaysRiptide = sgGeneral.add(new BooleanSetting.Builder()
             .name("Always Riptide")
-            .description("Allows the trident to act as with riptide even if it doesnt have it")
+            .description("Allows the trident to act as with riptide even if it doesn't have it")
             .onSettingChange(this)
             .value(false)
             .defaultValue(false)
@@ -41,6 +41,5 @@ public class TridentTweaker extends Module_ {
         super("TridentTweaker", "Tweaks various settings of the trident", Categories.MOVEMENT);
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
-
     }
 }

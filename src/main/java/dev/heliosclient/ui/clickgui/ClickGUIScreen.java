@@ -67,7 +67,6 @@ public class ClickGUIScreen extends Screen {
             });
         }
         searchBar = new SearchBar();
-        EventManager.register(searchBar);
     }
 
     @Override
@@ -97,14 +96,15 @@ public class ClickGUIScreen extends Screen {
             if (close) {
                 this.scale -= speed * Easing.ease(EasingType.BOUNCE_OUT, MathHelper.clamp((currentTime - timeOnOpen) / 2000f, 0, 1));
                 if (this.scale <= 0.0) {
+                    this.scale = 0.0f;
                     super.close();
                     searchBar.setText("");
                     shouldClose = false;
                 }
             } else {
-                this.scale += speed * Easing.ease(EasingType.QUADRATIC_IN, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1f));
+                this.scale += speed * Easing.ease(EasingType.QUADRATIC_IN_OUT, MathHelper.clamp((currentTime - timeOnOpen) / 1000f, 0, 1f));
             }
-            this.scale = MathHelper.clamp(this.scale, 0.0f, 1.0f);
+            this.scale = MathHelper.clamp(this.scale,0.0f,1.0f);
         } else {
             this.scale = 1.0f;
             if (shouldClose) {

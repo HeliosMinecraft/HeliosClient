@@ -117,9 +117,7 @@ public class FreeCamEntity extends ClientPlayerEntity {
     }
 
     @Override
-    public void attack(Entity target) {
-
-    }
+    public void attack(Entity target) {}
 
     private void updateLastTickPosition() {
         this.lastRenderX = this.getX();

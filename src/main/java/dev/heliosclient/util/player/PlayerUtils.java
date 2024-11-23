@@ -3,7 +3,6 @@ package dev.heliosclient.util.player;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.mixin.AccessorMinecraftClient;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.input.Input;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -12,6 +11,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
@@ -24,47 +24,16 @@ import static dev.heliosclient.util.color.ColorUtils.blend;
 public class PlayerUtils {
     public static MinecraftClient mc = MinecraftClient.getInstance();
 
-    public static boolean isPressingMovementButton() {
-        Input input = mc.player.input;
-        return input.pressingForward || input.pressingBack || input.pressingLeft || input.pressingRight;
-    }
-
     public static boolean canSeeEntity(Entity entity) {
         Vec3d playerEyePos = mc.player.getEyePos();
         Box entityBox = entity.getBoundingBox();
         return mc.player.getWorld().raycast(new RaycastContext(playerEyePos, entityBox.getCenter(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, mc.player)).getType() == HitResult.Type.MISS;
     }
 
-    //Probably doesn't work but, it should work as a placeholder
-    public static boolean isPlayerNearEdge(double threshold) {
-        BlockPos playerPos = mc.player.getBlockPos();
-        Box playerBox = mc.player.getBoundingBox();
-
-        // Check the edges of the block the player is standing on
-        BlockPos[] edgePositions = {
-                playerPos.north(), playerPos.south(), playerPos.east(), playerPos.west(),
-                playerPos.north().up(), playerPos.south().up(), playerPos.east().up(), playerPos.west().up()
-        };
-
-        for (BlockPos edgePos : edgePositions) {
-            if (isEdgeEmpty(edgePos, playerBox, threshold)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isPlayerNearEdge(double edgeThreshold) {
+        Vec2f safeWalkMotion = MovementUtils.performSafeMovement(mc.player.input.movementForward,mc.player.input.movementSideways,edgeThreshold);
+        return safeWalkMotion.x == 0.0 || safeWalkMotion.y == 0.0;
     }
-
-    private static boolean isEdgeEmpty(BlockPos edgePos, Box playerBox, double threshold) {
-        Box edgeBox = new Box(edgePos);
-        return mc.world.isAir(edgePos) && !playerBox.intersects(edgeBox) && isWithinThreshold(playerBox, edgeBox, threshold);
-    }
-
-    private static boolean isWithinThreshold(Box playerBox, Box edgeBox, double threshold) {
-        return playerBox.minX - edgeBox.maxX <= threshold || edgeBox.minX - playerBox.maxX <= threshold ||
-                playerBox.minY - edgeBox.maxY <= threshold || edgeBox.minY - playerBox.maxY <= threshold ||
-                playerBox.minZ - edgeBox.maxZ <= threshold || edgeBox.minZ - playerBox.maxZ <= threshold;
-    }
-
 
     public static boolean canSeeEntityMC(PlayerEntity player, Entity entity) {
         return player.canSee(entity);
@@ -75,23 +44,31 @@ public class PlayerUtils {
         return player.getWorld().getBlockState(pos.down()).isFullCube(player.getWorld(), pos) && player.getWorld().getBlockState(pos.north()).isFullCube(player.getWorld(), pos) && player.getWorld().getBlockState(pos.south()).isFullCube(player.getWorld(), pos) && player.getWorld().getBlockState(pos.east()).isFullCube(player.getWorld(), pos) && player.getWorld().getBlockState(pos.west()).isFullCube(player.getWorld(), pos);
     }
 
-    public static boolean isMoving(PlayerEntity player) {
-        return (player.getVelocity().lengthSquared() > 0 || player.getVelocity().horizontalLengthSquared() > 0) && (player.getX() != player.prevX && player.getY() != player.prevY && player.getZ() != player.prevZ);
-    }
-
     public static boolean hasHorizontalCollision(Vec3d pos) {
         return mc.world.getBlockCollisions(mc.player, mc.player.getBoundingBox().offset(pos.subtract(mc.player.getPos()))).iterator().hasNext();
     }
 
     public static boolean willFallMoreThanFiveBlocks(Vec3d pos) {
+       return willFallXBlocks(pos, 5);
+    }
+    public static boolean willFallXBlocks(Vec3d pos, int blocks) {
         BlockPos blockPos = BlockPos.Mutable.ofFloored(pos);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < blocks; i++) {
             blockPos = blockPos.down();
             if (!mc.world.isAir(blockPos)) {
                 return false;
             }
         }
         return true;
+    }
+    public static boolean isSpaceBelowEmpty(double height) {
+        Box bb = mc.player.getBoundingBox();
+        for (double i = 0; i < height + 0.51; i += 0.01) {
+            if (!mc.world.isSpaceEmpty(mc.player, bb.offset(0, -i, 0))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isPlayerLookingAtEntity(PlayerEntity player, Entity target, double maxDistance) {
@@ -117,6 +94,12 @@ public class PlayerUtils {
         if (player.getMainHandStack() == null) return false;
         Item item = player.getMainHandStack().getItem();
         return item instanceof BowItem || item instanceof CrossbowItem || item instanceof SnowballItem || item instanceof EggItem || item instanceof TridentItem;
+    }
+    public static boolean isHolding(final Item item) {
+        ItemStack handStack = mc.player.getMainHandStack();
+        if (!handStack.isEmpty() && handStack.getItem() == item) return true;
+        handStack = mc.player.getOffHandStack();
+        return !handStack.isEmpty() && handStack.getItem() == item;
     }
 
     public static boolean isSprinting(PlayerEntity player) {

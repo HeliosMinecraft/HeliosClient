@@ -1,16 +1,14 @@
 package dev.heliosclient.managers;
 
+import dev.heliosclient.HeliosClient;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.ChatUtils;
-import net.minecraft.client.MinecraftClient;
 
 import java.util.HashSet;
 import java.util.Objects;
 
 public class FriendManager {
     private static final HashSet<String> friendsName = new HashSet<>();
-    protected static MinecraftClient mc = MinecraftClient.getInstance();
-    // Declare a list of friends
     private static HashSet<Friend> friends = new HashSet<>();
 
     public FriendManager() {
@@ -28,7 +26,7 @@ public class FriendManager {
     }
 
     public static void addFriend(Friend friend) {
-        if (Objects.equals(friend.playerName(), mc.getSession().getUsername())) {
+        if (Objects.equals(friend.playerName(), HeliosClient.MC.getSession().getUsername())) {
             ChatUtils.sendHeliosMsg("You can't befriend yourself.");
         } else {
             friends.add(friend);

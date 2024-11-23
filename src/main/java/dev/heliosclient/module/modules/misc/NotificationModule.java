@@ -41,6 +41,35 @@ public class NotificationModule extends Module_ {
             .defaultListIndex(0)
             .build()
     );
+    public CycleSetting notificationPosition = sgConfig.add(new CycleSetting.Builder()
+            .name("Position")
+            .description("Where the notifications should appear on the screen")
+            .onSettingChange(this)
+            .defaultValue(List.of(Notification.PositionMode.values()))
+            .defaultListOption(Notification.PositionMode.BOTTOM_RIGHT)
+            .build()
+    );
+    public DoubleSetting notificationVSpacing = sgConfig.add(new DoubleSetting.Builder()
+            .name("Vertical Spacing")
+            .description("The vertical spacing between notification")
+            .onSettingChange(this)
+            .defaultValue(5)
+            .value(5)
+            .min(0D)
+            .max(20)
+            .roundingPlace(0)
+            .build()
+    );
+    public DoubleSetting notificationHSpacing = sgConfig.add(new DoubleSetting.Builder()
+            .name("Horizontal Spacing")
+            .description("The horizontal spacing of the notification from the position on screen")
+            .onSettingChange(this)
+            .defaultValue(5)
+            .value(5)
+            .range(0,500)
+            .roundingPlace(0)
+            .build()
+    );
     public BooleanSetting fancyMode = sgConfig.add(new BooleanSetting.Builder()
             .name("Fancy Mode")
             .description("Makes notifications more compact and fancy")
@@ -106,6 +135,9 @@ public class NotificationModule extends Module_ {
 
         Notification.ANIMATE = Notification.AnimationStyle.values()[animationStyle.value];
         Notification.IS_FANCY = fancyMode.value;
+        NotificationManager.setPositionMode((Notification.PositionMode) notificationPosition.getOption());
         NotificationManager.setMaxDisplayed((int) maxNotifications.value);
+        NotificationManager.setVerticalSpacing(notificationVSpacing.getInt());
+        NotificationManager.setHorizontalSpacing(notificationHSpacing.getInt());
     }
 }

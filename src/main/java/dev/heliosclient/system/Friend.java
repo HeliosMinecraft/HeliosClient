@@ -1,7 +1,7 @@
 package dev.heliosclient.system;
 
 public record Friend(String playerName) {
-    // Override the equals method to compare friends by their player names
+    // Override to compare friends by their player names
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Friend other) {

@@ -16,11 +16,7 @@ public class HudElementButton {
 
     public HudElementButton(HudElement hudElement) {
         this.hudElement = hudElement;
-        HudManager.INSTANCE.hudElements.forEach(hudElement1 -> {
-            if (hudElement1.getClass().equals(hudElement.getClass())) {
-                count++;
-            }
-        });
+        this.updateCount();
     }
 
     public void render(DrawContext drawContext, boolean collapsed, int x, int y, float delta) {
@@ -57,14 +53,23 @@ public class HudElementButton {
         try {
             T instance = clazz.getDeclaredConstructor().newInstance();
             HudManager.INSTANCE.addHudElement(instance);
-            HudElement lastHudElement =  HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1);
 
-            lastHudElement.posX = (HeliosClient.MC.getWindow().getScaledWidth()/2) % HudElement.NUMBER_OF_LINES;
-            lastHudElement.posY = (HeliosClient.MC.getWindow().getScaledHeight()/2) % HudElement.NUMBER_OF_LINES;
-            lastHudElement.distanceX = (HeliosClient.MC.getWindow().getScaledWidth() - lastHudElement.width)/2;
-            lastHudElement.distanceY =  (HeliosClient.MC.getWindow().getScaledHeight() - lastHudElement.height)/2;
-            lastHudElement.x = (HeliosClient.MC.getWindow().getScaledWidth() - lastHudElement.width)/2;
-            lastHudElement.y = (HeliosClient.MC.getWindow().getScaledHeight() - lastHudElement.height)/2;
+            HudElement lastHudElement = HudManager.INSTANCE.hudElements.get(HudManager.INSTANCE.hudElements.size() - 1);
+
+            // Calculate the center position
+            int centerX = HeliosClient.MC.getWindow().getScaledWidth() / 2;
+            int centerY = HeliosClient.MC.getWindow().getScaledHeight() / 2;
+
+            // Set the position to center the HudElement
+            lastHudElement.x = centerX - (lastHudElement.width / 2);
+            lastHudElement.y = centerY - (lastHudElement.height / 2);
+
+            lastHudElement.distanceX = (HeliosClient.MC.getWindow().getScaledWidth() - lastHudElement.width) / 2;
+            lastHudElement.distanceY = (HeliosClient.MC.getWindow().getScaledHeight() - lastHudElement.height) / 2;
+
+            // Set posX and posY based on the centered position
+            lastHudElement.posX = lastHudElement.x / (HeliosClient.MC.getWindow().getScaledWidth() / HudElement.NUMBER_OF_LINES);
+            lastHudElement.posY = lastHudElement.y / (HeliosClient.MC.getWindow().getScaledHeight() / HudElement.NUMBER_OF_LINES);
 
         } catch (Exception e) {
             HeliosClient.LOGGER.error("Error adding hud element instance to list", e);

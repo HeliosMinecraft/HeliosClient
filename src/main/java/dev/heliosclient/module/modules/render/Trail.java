@@ -9,10 +9,10 @@ import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.timer.TickTimer;
-import dev.heliosclient.util.player.PlayerUtils;
+import dev.heliosclient.util.player.MovementUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.LineColor;
+import dev.heliosclient.util.timer.TickTimer;
 import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
@@ -133,7 +133,7 @@ public class Trail extends Module_ {
             });
         }
 
-        if (!whenStationary.value && !PlayerUtils.isMoving(mc.player))
+        if (!whenStationary.value && !MovementUtils.isMoving(mc.player))
             return;
 
         ticksToAdd.incrementAndEvery(ticksPerLine.getInt(),()->{

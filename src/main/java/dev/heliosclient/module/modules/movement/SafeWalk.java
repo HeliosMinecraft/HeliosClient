@@ -1,14 +1,15 @@
 package dev.heliosclient.module.modules.movement;
 
 import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.input.KeyboardInputEvent;
 import dev.heliosclient.event.events.player.ClipAtLedgeEvent;
+import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.player.PlayerUtils;
+import dev.heliosclient.util.player.MovementUtils;
+import net.minecraft.util.math.Vec2f;
 
 public class SafeWalk extends Module_ {
     private final SettingGroup sgGeneral = new SettingGroup("General");
@@ -22,14 +23,14 @@ public class SafeWalk extends Module_ {
     );
     BooleanSetting onEdge = sgGeneral.add(new BooleanSetting.Builder()
             .name("On Edge")
-            .description("Will only place when you are on edge near a block")
+            .description("Will automatically prevent you from walking over the edge, like sneaking, but without sneaking")
             .onSettingChange(this)
             .defaultValue(false)
             .build()
     );
     DoubleSetting edgeThreshold = sgGeneral.add(new DoubleSetting.Builder()
             .name("Edge Distance")
-            .description("Distance from the edge to scaffold")
+            .description("Distance from the edge to safe-walk")
             .onSettingChange(this)
             .defaultValue(0.12d)
             .range(0, 0.2)
@@ -44,9 +45,10 @@ public class SafeWalk extends Module_ {
     }
 
     @SubscribeEvent
-    public void onKeyInput(KeyboardInputEvent event) {
-        if(onEdge.value && PlayerUtils.isPlayerNearEdge(edgeThreshold.value) && mc.player.isOnGround()) {
-            event.sneaking = true;
+    public void onPlayerMove(PlayerMotionEvent event) {
+        if(onEdge.value && MovementUtils.isPressingMovementButton() && mc.player.isOnGround()) {
+            Vec2f vec = MovementUtils.performSafeMovement(event.getMovement().x, event.getMovement().z,edgeThreshold.value);
+            event.modifyMovement().heliosClient$setXZ(vec.x,vec.y);
         }
     }
 

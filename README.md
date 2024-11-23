@@ -12,17 +12,17 @@
 
 <p>Keep in mind that these images might be outdated as Helios is currently updating frequently!</p>
 <details>
-    <summary>Click to show the new GUI</summary>
-    <p>New clickGui as of commit #235 (a13bf24)</p>
-    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/Updated_ClickGUI.png?raw=true" alt="New Click GUI">
+    <summary>Click to show the latest client GUI</summary>
+    <p>WIP</p>
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/Latest_ClickGUI.png?raw=true" alt="Latest Click GUI">
 </details>  
 <details>
- <summary>Click to show the previous GUI</summary>
-  <p>Previous click-gui as of commit #199 (0758e8c)</p>
+    <summary>Click to show old GUI </summary>
+    <p>New clickGui as of commit #235 (a13bf24)</p>
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/Updated_ClickGUI.png?raw=true" alt="New Click GUI">
+    <p>Previous click-gui as of commit #199 (0758e8c)</p>
     <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/heliosclientgui.png?raw=true" alt="Prev Click GUI">
-</details>
-<details>
- <summary>Click to show the old GUI</summary>
+    <p>Very old GUI (In starting stages)</p>
     <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/ClickGUI.png?raw=true" alt="Old Click GUI">
 </details>
 
@@ -47,12 +47,12 @@
 To submit a bug open an issue in this repository. Before doing so please assure yourself that the issues isn't already listed under [Known issues](#known-issues).
 
 ## Known issues
-- Buggy modules like Tick-Shift.
+- ~~Buggy modules like Tick-Shift.~~
 - Incomplete modules like Phase, Fucker, InventoryTweaks.
 - ~~HudElements don't resize to their proper locations sometimes.~~
 - Scripting System (WIP).
 - Lack of combat and some important utility modules.
-- No Baritone Integration
+- ~~No Baritone Integration~~
 - ~~No AltManager~~  No AltManager GUI
 - Lack of commands
 - Lack of shaders (Neither of the current contributors know much good about GLSL)

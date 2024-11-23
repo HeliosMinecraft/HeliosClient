@@ -26,6 +26,7 @@ import org.joml.Matrix4f;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CategoryPane implements Listener {
     public static int width = 85;
@@ -61,7 +62,7 @@ public class CategoryPane implements Listener {
         this.y = initialY;
         this.collapsed = collapsed;
         this.parentScreen = parentScreen;
-        moduleButtons = new CopyOnWriteArrayList<ModuleButton>();
+        this.moduleButtons = new CopyOnWriteArrayList<>();
         this.maxWidth = 0;
         this.height = 4;
         for (Module_ m : ModuleManager.getModulesByCategory(category)) {
@@ -90,21 +91,31 @@ public class CategoryPane implements Listener {
     }
 
     public void addModule(List<Module_> moduleS) {
+        // Update only if the module list has changed
+        AtomicBoolean hasChanges = new AtomicBoolean(false);
+
+        // Check for new modules
         for (Module_ module : moduleS) {
-            boolean exists = false;
-            for (ModuleButton button : moduleButtons) {
-                if (button.module == module) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
+            if (moduleButtons.stream().noneMatch(button -> button.module == module)) {
                 ModuleButton moduleButton = new ModuleButton(module, parentScreen);
                 moduleButtons.add(moduleButton);
+                hasChanges.set(true);
             }
         }
 
-        calcHeightAndWidth();
+        // Check for removed modules
+        moduleButtons.removeIf(button -> {
+            boolean shouldRemove = moduleS.stream().noneMatch(module -> module == button.module);
+            if (shouldRemove) {
+                hasChanges.set(true);
+            }
+            return shouldRemove;
+        });
+
+
+        if (hasChanges.get()) {
+            calcHeightAndWidth();
+        }
     }
 
     public void calcHeightAndWidth() {
@@ -296,7 +307,7 @@ public class CategoryPane implements Listener {
             }
         }
     }
-
+    //Has rendering been always this boiler or is it just me? Either way I think I will make use of lambdas next time.
     private void drawOutlineGradientBox(Matrix4f matrix4f, float x, float y, float width) {
         if (HeliosClient.CLICKGUI.getTheme() == ClickGUI.Theme.Rounded) {
             Renderer2D.drawOutlineGradientRoundedBox(matrix4f, x - 1, y + categoryNameHeight, width + 2f, hudBox.getHeight() + 6,  HeliosClient.CLICKGUI.guiRoundness.getInt() + 1, 1f, ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientStart(), ColorManager.INSTANCE.getPrimaryGradientEnd(), ColorManager.INSTANCE.getPrimaryGradientEnd());

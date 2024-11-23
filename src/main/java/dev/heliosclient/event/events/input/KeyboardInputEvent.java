@@ -11,6 +11,7 @@ public class KeyboardInputEvent extends Event {
     public boolean pressingRight;
     public boolean jumping;
     public boolean sneaking;
+    public float movementForward = 0.0f, movementSideways = 0.0f;
 
     public KeyboardInputEvent(boolean pressingForward, boolean pressingBack, boolean pressingLeft, boolean pressingRight, boolean jumping, boolean sneaking) {
         this.pressingForward = pressingForward;
@@ -37,4 +38,10 @@ public class KeyboardInputEvent extends Event {
         this.set(false,false,false,false,false,false);
     }
 
+    public boolean shouldApplyMovementForward(){
+        return this.movementForward != 0.0f;
+    }
+    public boolean shouldApplyMovementSideways(){
+        return this.movementSideways != 0.0f;
+    }
 }

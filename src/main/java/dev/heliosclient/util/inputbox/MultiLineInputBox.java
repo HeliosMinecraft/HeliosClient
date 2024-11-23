@@ -31,6 +31,7 @@ public class MultiLineInputBox implements Listener {
     protected final InputBox.InputMode inputMode;
     public int x, y, width, height;
     public boolean displayLineNos = true;
+
     public boolean doSyntaxHighLighting = true;
     public boolean doAutoComplete = false;
     public boolean autoScroll = false;
@@ -782,5 +783,41 @@ public class MultiLineInputBox implements Listener {
 
     public boolean isEmpty() {
         return lines.isEmpty() || lines.size() < 2;
+    }
+
+    public boolean shouldAutoScroll() {
+        return autoScroll;
+    }
+
+    public MultiLineInputBox setAutoScroll(boolean autoScroll) {
+        this.autoScroll = autoScroll;
+        return this;
+    }
+
+    public boolean shouldDoSyntaxHighLighting() {
+        return doSyntaxHighLighting;
+    }
+
+    public MultiLineInputBox setSyntaxHighLighting(boolean doSyntaxHighLighting) {
+        this.doSyntaxHighLighting = doSyntaxHighLighting;
+        return this;
+    }
+
+    public boolean shouldDisplayLineNo() {
+        return displayLineNos;
+    }
+
+    public MultiLineInputBox setDisplayLineNo(boolean displayLineNos) {
+        this.displayLineNos = displayLineNos;
+        return this;
+    }
+
+    public boolean shouldDoAutoComplete() {
+        return doAutoComplete;
+    }
+
+    public MultiLineInputBox setAutoComplete(boolean doAutoComplete) {
+        this.doAutoComplete = doAutoComplete;
+        return this;
     }
 }

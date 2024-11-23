@@ -32,6 +32,8 @@ import static dev.heliosclient.managers.FontManager.fonts;
 /**
  * Settings for the client and ClickGUI.
  */
+
+//TODO: This is a coloring mess. The colors of the client are changed in 3 different places, the click gui settings, the GUI module and the HUD module.
 public class ClickGUI extends Module_ {
     public static boolean pause = false;
     public static boolean keybinds = false;
@@ -41,7 +43,6 @@ public class ClickGUI extends Module_ {
     public SettingGroup sgGeneral = new SettingGroup("General");
     public SettingGroup sgSound = new SettingGroup("Sound");
     public SettingGroup sgExpert = new SettingGroup("Expert");
-
 
     public CycleSetting theme = sgMisc.add(new CycleSetting.Builder()
             .name("GUI Theme")
@@ -63,8 +64,8 @@ public class ClickGUI extends Module_ {
             .shouldRender(() -> theme.isOption(Theme.Rounded))
             .build()
     );
-    //Sorry guys, some of these aren't camel cased.
 
+    //Sorry guys, some of these aren't camel cased.
     public CycleSetting ScrollType = sgMisc.add(new CycleSetting.Builder()
             .name("Scrolling System")
             .description("Scrolling for the ClickGui")

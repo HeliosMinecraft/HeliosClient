@@ -6,7 +6,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import dev.heliosclient.util.interfaces.ISimpleOption;
+import dev.heliosclient.system.mixininterface.ISimpleOption;
 
 public class CustomFov extends Module_ {
     private final SettingGroup sgGeneral = new SettingGroup("General");

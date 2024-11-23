@@ -1,10 +1,6 @@
 package dev.heliosclient.util.cape;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.BufferedInputStream;
@@ -350,8 +346,7 @@ public class GifDecoder {
         }
         try {
             is.close();
-        } catch (IOException e) {
-        }
+        } catch (IOException ignored) {}
         return status;
     }
 
@@ -366,7 +361,7 @@ public class GifDecoder {
         status = STATUS_OK;
         try {
             name = name.trim().toLowerCase();
-            if ((name.indexOf("file:") >= 0) || (name.indexOf(":/") > 0)) {
+            if ((name.contains("file:")) || (name.indexOf(":/") > 0)) {
                 URL url = new URL(name);
                 in = new BufferedInputStream(url.openStream());
             } else {
@@ -546,8 +541,7 @@ public class GifDecoder {
                         break;
                     n += count;
                 }
-            } catch (IOException e) {
-            }
+            } catch (IOException ignored) {}
 
             if (n < blockSize) {
                 status = STATUS_FORMAT_ERROR;
@@ -570,8 +564,7 @@ public class GifDecoder {
         int n = 0;
         try {
             n = in.read(c);
-        } catch (IOException e) {
-        }
+        } catch (IOException ignored) {}
         if (n < nbytes) {
             status = STATUS_FORMAT_ERROR;
         } else {
@@ -611,11 +604,11 @@ public class GifDecoder {
 
                         case 0xff: // application extension
                             readBlock();
-                            String app = "";
+                            StringBuilder app = new StringBuilder();
                             for (int i = 0; i < 11; i++) {
-                                app += (char) block[i];
+                                app.append((char) block[i]);
                             }
-                            if (app.equals("NETSCAPE2.0")) {
+                            if (app.toString().equals("NETSCAPE2.0")) {
                                 readNetscapeExt();
                             } else
                                 skip(); // don't care
@@ -659,11 +652,11 @@ public class GifDecoder {
      * Reads GIF file header information.
      */
     protected void readHeader() {
-        String id = "";
+        StringBuilder id = new StringBuilder();
         for (int i = 0; i < 6; i++) {
-            id += (char) read();
+            id.append((char) read());
         }
-        if (!id.startsWith("GIF")) {
+        if (!id.toString().startsWith("GIF")) {
             status = STATUS_FORMAT_ERROR;
             return;
         }
@@ -785,9 +778,6 @@ public class GifDecoder {
         lastRect = new Rectangle(ix, iy, iw, ih);
         lastImage = image;
         lastBgColor = bgColor;
-//		int dispose = 0;
-//		boolean transparency = false;
-//		int delay = 0;
         lct = null;
     }
 

@@ -45,6 +45,4 @@ public class SearchBar extends InputBox {
 
         drawSelectionBox(drawContext, textY, textHeight);
     }
-
-
 }

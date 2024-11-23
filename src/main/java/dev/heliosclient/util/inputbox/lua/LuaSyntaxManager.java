@@ -7,10 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LuaSyntaxManager {
-    private final List<String> keywords;
-    public LuaSyntaxManager() {
-        this.keywords = Arrays.asList("and", "break", "do", "else", "elseif", "end", "for", "function", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "until", "while");
-    }
+    private static final List<String> keywords  = Arrays.asList("and", "break", "do", "else", "elseif", "end", "for", "function", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "until", "while");
 
     public static String applySyntaxHighlighting(String code) {
         LuaLexer lexer = new LuaLexer(code);

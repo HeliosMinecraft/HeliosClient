@@ -65,7 +65,7 @@ public class CapeManager {
                 }
             }
 
-            loadDefaultCapeTexture();
+            copyDefaultCapeTexture();
 
             // Get the cape files from `heliosclient/capes` directory in an array
             File[] capeFiles = CAPE_DIRECTORY.listFiles((dir, name) -> name.toLowerCase().endsWith(".png") || name.toLowerCase().endsWith(".gif"));
@@ -82,7 +82,7 @@ public class CapeManager {
                     String fileName = file.getName();
                     capeNames.add(fileName);
 
-                    capeTextureManager.registerCapeTextures(inputStream, file, fileName);
+                    capeTextureManager.registerCapeTextures(inputStream, file, fileName.toLowerCase().trim());
                     HeliosClient.LOGGER.info("Loaded cape: {}", file.getAbsolutePath());
                 } catch (IOException e) {
                     HeliosClient.LOGGER.error("An error has occurred while reading cape file: {}{}", ColorUtils.darkGreen, file.getName(), e);
@@ -103,7 +103,7 @@ public class CapeManager {
         }
     }
 
-    public static void loadDefaultCapeTexture(){
+    public static void copyDefaultCapeTexture(){
         File defaultCapeFile = new File(CAPE_DIRECTORY, DEFAULT_CAPE);
 
         // Do not copy if the default cape file already exists
@@ -123,7 +123,7 @@ public class CapeManager {
     }
 
     /**
-     * <a href="https://github.com/dragonostic/of-capes/blob/main/src/main/java/net/drago/ofcapes/util/PlayerHandler.java">Credit</a>
+     * <a href="https://github.com/dragonostic/of-capes/blob/main/src/main/java/net/drago/ofcapes/util/PlayerHandler.java">Logic Credit</a>
      *
      * @param image Native image to be parsed
      * @return parsed image
@@ -184,48 +184,6 @@ public class CapeManager {
         future.get();
     }
 
-    private static void saveCapeFromBase64(String UUID, String url) throws Exception {
-        HttpURLConnection connection = INSTANCE.getConnection(url);
-        connection.connect();
-
-        if (connection.getResponseCode() / 100 == 2) {
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
-            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-
-            if (result == null) {
-                throw new JsonParseException("Json result returned is null");
-            }
-            JsonElement jsonElement = result.getAsJsonObject("textures").get("cape");
-            boolean animated = result.getAsJsonObject("animatedCape").getAsBoolean();
-
-            if (animated) {
-                HeliosClient.LOGGER.error("Animated capes are not supported");
-                AnimationUtils.addErrorToast("Animated capes are not supported", false, 1500);
-                connection.disconnect();
-                return;
-            }
-
-            if (jsonElement.isJsonNull()) {
-                HeliosClient.LOGGER.error("UUID does not contain any capes: {} If you are sure that this UUID should contain a cape then try other service (i.e Craftar or Minecraft capes", UUID);
-                AnimationUtils.addErrorToast("UUID does not contain any capes, Check Logs for details", true, 1500);
-                connection.disconnect();
-                throw new NullPointerException("UUID does not contain any capes");
-            }
-
-            String capeTexture = jsonElement.getAsString();
-            byte[] imageBytes = Base64.getDecoder().decode(capeTexture);
-            BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
-
-            String profileName = ProfileUtils.getProfileName(UUID);
-            File outputfile = new File(CAPE_DIRECTORY, profileName + ".png");
-            ImageIO.write(image, "png", outputfile);
-            connection.disconnect();
-        } else {
-            HeliosClient.LOGGER.error("Connection Message: {}, Response Code: {}", connection.getResponseMessage(), connection.getResponseCode());
-            throw new HttpResponseException(connection.getResponseCode(), connection.getResponseMessage());
-        }
-    }
-
     private void getOptifineCape(String profileName) throws Exception {
         String url = "http://s.optifine.net/capes/" + profileName + ".png";
         saveCapeFromUrl(profileName, null, url);
@@ -262,10 +220,58 @@ public class CapeManager {
             ImageIO.write(image, "png", outputfile);
             connection.disconnect();
         } else {
+            String responseMessage = connection.getResponseMessage();
+            HeliosClient.LOGGER.error("Connection Message: {}, Response Code: {}", responseMessage, connection.getResponseCode());
+            if(connection.getResponseCode() == 404) {
+                responseMessage += " [Helios] Given player UUID may not contain a cape";
+            }
+
+            throw new HttpResponseException(connection.getResponseCode(), responseMessage);
+        }
+    }
+
+    private static void saveCapeFromBase64(String UUID, String url) throws Exception {
+        HttpURLConnection connection = INSTANCE.getConnection(url);
+        connection.connect();
+
+        if (connection.getResponseCode() / 100 == 2) {
+            InputStreamReader reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
+            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+
+            if (result == null) {
+                throw new JsonParseException("Json result returned is null");
+            }
+            JsonElement jsonElement = result.getAsJsonObject("textures").get("cape");
+            boolean animated = result.getAsJsonPrimitive("animatedCape").getAsBoolean();
+
+            if (animated) {
+                HeliosClient.LOGGER.error("Animated capes are not supported");
+                AnimationUtils.addErrorToast("Animated capes are not supported", false, 1500);
+                connection.disconnect();
+                return;
+            }
+
+            if (jsonElement.isJsonNull()) {
+                HeliosClient.LOGGER.error("UUID does not contain any capes: {} If you are sure that this UUID should contain a cape then try other service (i.e Craftar or Minecraft capes", UUID);
+                AnimationUtils.addErrorToast("UUID does not contain any capes, Check Logs for details", true, 1500);
+                connection.disconnect();
+                throw new NullPointerException("UUID does not contain any capes");
+            }
+
+            String capeTexture = jsonElement.getAsString();
+            byte[] imageBytes = Base64.getDecoder().decode(capeTexture);
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
+
+            String profileName = ProfileUtils.getProfileName(UUID);
+            File outputfile = new File(CAPE_DIRECTORY, profileName + ".png");
+            ImageIO.write(image, "png", outputfile);
+            connection.disconnect();
+        } else {
             HeliosClient.LOGGER.error("Connection Message: {}, Response Code: {}", connection.getResponseMessage(), connection.getResponseCode());
             throw new HttpResponseException(connection.getResponseCode(), connection.getResponseMessage());
         }
     }
+
     public static Identifier getCurrentCapeTexture() {
         if(HeliosClient.MC.player == null){
             return capeTextureManager.getCurrentTexture(HeliosClient.MC.getGameProfile().getId(),false);
@@ -280,13 +286,14 @@ public class CapeManager {
         return capeTextureManager.getCurrentTexture(HeliosClient.MC.player.getUuid(),true);
     }
 
+    public static CapeTextureManager getTextureManager(){
+        return capeTextureManager;
+    }
+
     public enum CapeOrigin {
         LOCAL,
         OPTIFINE,
         CRAFATAR,
         MINECRAFTCAPES
-    }
-    public static CapeTextureManager getTextureManager(){
-        return capeTextureManager;
     }
 }

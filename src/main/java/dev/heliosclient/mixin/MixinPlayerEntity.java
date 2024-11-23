@@ -48,7 +48,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
     @Inject(method = "onDeath", at = @At("HEAD"), cancellable = true)
     private void onDeath(DamageSource damageSource, CallbackInfo ci) {
-        PlayerDeathEvent event = new PlayerDeathEvent(HeliosClient.MC.player);
+        PlayerDeathEvent event = new PlayerDeathEvent(PlayerEntity.class.cast(this));
         EventManager.postEvent(event);
         if (event.isCanceled()) {
             ci.cancel();

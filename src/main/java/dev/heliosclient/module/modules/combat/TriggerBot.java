@@ -12,18 +12,19 @@ import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.settings.*;
 import dev.heliosclient.module.settings.lists.EntityTypeListSetting;
 import dev.heliosclient.system.TickRate;
-import dev.heliosclient.util.entity.TargetUtils;
-import dev.heliosclient.util.misc.SortMethod;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.TargetRenderer;
 import dev.heliosclient.util.render.color.QuadColor;
 import dev.heliosclient.util.timer.TickTimer;
+import dev.heliosclient.util.world.RaytraceUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class TriggerBot extends Module_ {
 
@@ -56,6 +57,13 @@ public class TriggerBot extends Module_ {
             .shouldRender(() -> !smartDelay.value)
             .build()
     );
+    BooleanSetting clickMouse = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Mouse Click")
+            .description("Simulates mouse clicking to avoid flagging anti-cheats, but may result in less accuracy and wont work with range above reach distance")
+            .onSettingChange(this)
+            .defaultValue(false)
+            .build()
+    );
     BooleanSetting onlyWithWeapon = sgGeneral.add(new BooleanSetting.Builder()
             .name("Only with weapon")
             .description("Attacks only when you are holding a weapon")
@@ -63,7 +71,6 @@ public class TriggerBot extends Module_ {
             .defaultValue(false)
             .build()
     );
-
     BooleanSetting ignoreTeammate = sgGeneral.add(new BooleanSetting.Builder()
             .name("Ignore teammate")
             .description("Uses teams module to avoid hitting at team members")
@@ -145,10 +152,29 @@ public class TriggerBot extends Module_ {
             .defaultListOption(QuadColor.CardinalDirection.EAST)
             .build()
     );
-    TargetUtils targetFinder = new TargetUtils();
 
     private TickTimer timer = new TickTimer();
     private Entity targetEntity;
+
+    private final Predicate<Entity> entityPredicate = (entity) -> {
+        //Apply to all entities (like end crystal, TNT, armor-stands etc.)
+        boolean A = entities.getSelectedEntries().contains(entity.getType()) &&
+                entity.distanceTo(mc.player) <= range.value &&
+                entity.isAlive() &&
+                entity.isAttackable();
+
+        boolean B = true;
+
+        //Apply to only living entities
+        if (entity instanceof LivingEntity e) {
+            B = !isTeamMate(e) &&
+                    !isFriend(e) &&
+                    !isInvisible(e) &&
+                    !AntiBot.isBot(e);
+        }
+
+        return A && B;
+    };
 
     public TriggerBot() {
         super("TriggerBot", "Attacks entities when you look at them", Categories.COMBAT);
@@ -156,8 +182,6 @@ public class TriggerBot extends Module_ {
         addSettingGroup(sgRender);
 
         addQuickSettings(sgGeneral.getSettings());
-
-        targetFinder.sortMethod(SortMethod.LowestDistance);
     }
 
     @Override
@@ -208,11 +232,18 @@ public class TriggerBot extends Module_ {
         }
 
         if(shouldAttack()) {
-            targetEntity = targetFinder.getNewTargetIfNull(true);
+            EntityHitResult hitResult = RaytraceUtils.raycastFromPlayer(range.getFloat());
+            if(hitResult == null) return;
 
-            if (targetEntity != null) {
-                mc.interactionManager.attackEntity(mc.player, targetEntity);
-                mc.player.swingHand(Hand.MAIN_HAND);
+            targetEntity = hitResult.getEntity();
+
+            if (targetEntity != null && entityPredicate.test(targetEntity)) {
+                if(clickMouse.value){
+                    PlayerUtils.doLeftClick();
+                } else {
+                    mc.interactionManager.attackEntity(mc.player, targetEntity);
+                    mc.player.swingHand(Hand.MAIN_HAND);
+                }
             }
         }
     }
@@ -228,35 +259,6 @@ public class TriggerBot extends Module_ {
         TargetRenderer.INSTANCE.dir = (QuadColor.CardinalDirection) direction.getOption();
 
         TargetRenderer.INSTANCE.render();
-    }
-
-    @Override
-    public void onSettingChange(Setting<?> setting) {
-        super.onSettingChange(setting);
-
-
-        //TODO: Use ray-casting instead of this unholy finding.
-        targetFinder.setRange(range.value);
-        targetFinder.setFilter(entity -> {
-
-            //Apply to all entities (like end crystal, TNT, armor-stands etc.)
-            boolean A = entities.getSelectedEntries().contains(entity.getType()) &&
-                    PlayerUtils.isPlayerLookingAtEntity(mc.player, entity, range.value) &&
-                    entity.isAlive() &&
-                    entity.isAttackable();
-
-            boolean B = true;
-
-            //Apply to only living entities
-            if (entity instanceof LivingEntity e) {
-                B = !isTeamMate(e) &&
-                        !isFriend(e) &&
-                        !isInvisible(e) &&
-                        !AntiBot.isBot(e);
-            }
-
-            return A && B;
-        });
     }
 
 }

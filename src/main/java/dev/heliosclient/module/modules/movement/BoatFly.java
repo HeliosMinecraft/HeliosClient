@@ -90,7 +90,6 @@ public class BoatFly extends Module_ {
         super("BoatFly", "Lets you fly your boat", Categories.MOVEMENT);
         addSettingGroup(sgGeneral);
         addQuickSettings(sgGeneral.getSettings());
-
     }
 
     @Override
@@ -178,7 +177,6 @@ public class BoatFly extends Module_ {
         ) && cancelServerPackets.value) {
             event.setCanceled(true);
         }
-
     }
 
     public enum Mode {

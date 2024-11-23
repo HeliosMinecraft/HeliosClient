@@ -13,6 +13,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameJoinS2CPacket;
 import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -33,12 +34,19 @@ public class ServerScraper extends Module_ {
     );
 
     final MutableText separator = Text.literal("\n=======================================================\n").formatted(Formatting.DARK_GREEN);
-    private boolean resourcePackURLSent = false;
-    private String lastURL = "";
+    private boolean resourcePackURLSent;
+    private String lastURL;
 
     public ServerScraper() {
         super("ServerScraper", "Gathers information about the server and world on join.", Categories.WORLD);
         addSettingGroup(sgGeneral);
+    }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        resourcePackURLSent = false;
+        lastURL = "";
     }
 
     @SubscribeEvent
@@ -50,11 +58,20 @@ public class ServerScraper extends Module_ {
 
             if(resourcePackURLSent) return;
 
+            MutableText urlText = Text.literal(rsPack.url());
+            urlText.setStyle(urlText.getStyle()
+                    .withColor(Formatting.GOLD)
+                    .withUnderline(true)
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, rsPack.url()))
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("[Click To Open]")))
+            );
+
             Text text = Text.literal("ResourcePack URL: ")
                     .formatted(Formatting.BOLD, Formatting.BLUE)
-                    .append(Text.literal(rsPack.url()).formatted(Formatting.ITALIC, Formatting.GOLD));
+                    .append(urlText);
 
             ChatUtils.sendHeliosMsg(text);
+
             resourcePackURLSent = true;
             lastURL = rsPack.url();
         }
@@ -70,7 +87,7 @@ public class ServerScraper extends Module_ {
         boolean isHardCore = joinPacket.hardcore();
         String maxPlayers = String.valueOf(joinPacket.maxPlayers());
         Text joinPacketInfo = separator.copy().append(Text.literal("Join Info:").formatted(Formatting.BOLD, Formatting.GREEN))
-                .append(generateClickableText("Last Death Pos: ",lastDeathPos,Formatting.WHITE, Formatting.GREEN).formatted(obfuscatePlayerInfo.value ? Formatting.OBFUSCATED : Formatting.RESET))
+                .append(generateClickableText("Last Death Pos: ",lastDeathPos, Formatting.RESET, Formatting.GREEN).formatted(obfuscatePlayerInfo.value ? Formatting.OBFUSCATED : Formatting.RESET))
                 .append(generateText("Max Players: ",Formatting.WHITE, maxPlayers,Formatting.GREEN))
                 .append(generateClickableText("Seed: ", seed, Formatting.WHITE, Formatting.GREEN))
                 .append(generateText("View Distance: ",viewDistance))
@@ -110,10 +127,10 @@ public class ServerScraper extends Module_ {
 
             Text yawAndPitch = Text.literal("\nPlayer Yaw And Pitch: ")
                     .formatted(Formatting.WHITE)
-                    .append(generateText("Yaw: ",Formatting.YELLOW, mc.player.getYaw() + "",Formatting.GREEN)
+                    .append(generateText("Yaw: ", Formatting.YELLOW, mc.player.getYaw() + "",Formatting.GREEN)
                             .formatted(obfuscated)
                     )
-                    .append(generateText("Pitch: ",Formatting.YELLOW, mc.player.getPitch() + "",Formatting.GREEN)
+                    .append(generateText("Pitch: ", Formatting.YELLOW, mc.player.getPitch() + "",Formatting.GREEN)
                             .formatted(obfuscated)
                     );
 
@@ -130,7 +147,7 @@ public class ServerScraper extends Module_ {
                     .append(generateText("World Border Center: ",worldBorderCenter.toString()))
                     .append(generateText("Next Map ID: ", nextMapId + ""))
                     .append(generateText("Difficulty: ",mc.world.getDifficulty().name()))
-                    .append(generateText("PermissionLevel: ",mc.player.getPermissionLevel() + ""))
+                    .append(generateText("Client PermissionLevel: ",mc.player.getPermissionLevel() + ""))
                     .append(generateText("Current Biome: ",biomeName))
                     .append(generateText("World Spawn Pos: ",mc.world.getSpawnPos().toString()))
                     .append(generateText("Player Spawn Pos: ",mc.player.getBlockPos().toString()).formatted(obfuscated))
@@ -159,7 +176,7 @@ public class ServerScraper extends Module_ {
                         .append(generateText("Server Address: ",serverAddress))
                         .append(generateText("Version: ",serverVersion))
                         .append(generateText("Protocol Version: ",serverProtocolVersion))
-                        .append(generateText("MOTD: ",motd))
+                        .append(generateText("MOTD: ",Formatting.WHITE, motd,Formatting.RESET))
                         .append(generateText("Online: ",online))
                         .append(generateYesNoText("Texture Pack Required: ",texturePackRequired))
                         .append(generateText("Texture Pack Policy: ",info.getResourcePackPolicy().name()))
@@ -183,8 +200,14 @@ public class ServerScraper extends Module_ {
         return generateText(prefix,Formatting.WHITE, bool ? "Yes" : "No", bool ? Formatting.GREEN : Formatting.RED);
     }
     private MutableText generateClickableText(String prefix, String value, Formatting labelColor, Formatting valueColor) {
+        MutableText valueText = Text.literal(value);
+        valueText.setStyle(valueText.getStyle()
+                .withColor(valueColor)
+                .withUnderline(true)
+                .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, value))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("[Click To Copy]")))
+        );
         return Text.literal("\n" + prefix).formatted(labelColor)
-                .append(Text.literal(value).formatted(valueColor)
-                        .styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, value))));
+                .append(valueText);
     }
 }

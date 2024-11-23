@@ -4,6 +4,7 @@ import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.world.Timer;
 import net.minecraft.client.render.RenderTickCounter;
 import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,8 +16,12 @@ public abstract class MixinRenderTickCounter {
     @Shadow
     public float lastFrameDuration;
 
+    @Shadow private long prevTimeMillis;
+
+    @Shadow @Final private float tickTime;
+
     @Inject(method = "beginRenderTick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/RenderTickCounter;prevTimeMillis:J", opcode = Opcodes.PUTFIELD))
-    private void onBeginRenderTick(long a, CallbackInfoReturnable<Integer> info) {
-        lastFrameDuration *= (float) ModuleManager.get(Timer.class).getTimerMultiplier();
+    private void onBeginRenderTick(long timeMillis, CallbackInfoReturnable<Integer> info) {
+        this.lastFrameDuration = (float) ((float)(timeMillis - this.prevTimeMillis) / tickTime * ModuleManager.get(Timer.class).getTimerMultiplier());
     }
 }

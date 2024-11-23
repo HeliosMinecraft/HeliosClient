@@ -12,7 +12,6 @@ import dev.heliosclient.module.settings.StringListSetting;
 import dev.heliosclient.system.Friend;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.inputbox.InputBox;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -24,7 +23,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class ChatHighlight extends Module_ {
-    protected static MinecraftClient mc = MinecraftClient.getInstance();
     private final SettingGroup sgGeneral = new SettingGroup("General");
     public HashSet<String> highlightList = new HashSet<>();
 

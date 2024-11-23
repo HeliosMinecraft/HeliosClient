@@ -94,14 +94,12 @@ public class TNTIgnite extends Module_ {
                 int flintAndSteelSlot = InventoryUtils.findItemInHotbar(Items.FLINT_AND_STEEL);
                 if(flintAndSteelSlot == InventoryUtils.OFFHAND){
                     offHand = true;
-                }else {
-                    if (flintAndSteelSlot != -1 && mc.player.getInventory().selectedSlot != flintAndSteelSlot) {
-                        hasSwitched = InventoryUtils.swapToSlot(flintAndSteelSlot, swapBack.value);
-                    } else if (flintAndSteelSlot == -1) {
-                        ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "Flint and Steel not found in hotbar, disabling...");
-                        toggle();
-                        return;
-                    }
+                }else if (flintAndSteelSlot != -1 && mc.player.getInventory().selectedSlot != flintAndSteelSlot) {
+                    hasSwitched = InventoryUtils.swapToSlot(flintAndSteelSlot, swapBack.value);
+                } else if (flintAndSteelSlot == -1) {
+                    ChatUtils.sendHeliosMsg(ColorUtils.darkRed + "Flint and Steel not found in hotbar, disabling...");
+                    toggle();
+                    return;
                 }
             }
             BlockIterator iterator = new BlockIterator(mc.player, (int) range.value, (int) (range.value - 1));
@@ -114,8 +112,8 @@ public class TNTIgnite extends Module_ {
 
                     if (hasSwitched && handHasFlintSteel) {
                         mc.interactionManager.interactBlock(mc.player,offHand ? Hand.OFF_HAND : Hand.MAIN_HAND, new BlockHitResult(pos.toCenterPos(), BlockUtils.getBlockDirection(pos), pos, false));
-                        //If a TNT has been ignited then it's not a block anymore,
-                        // so we can break out safely without worrying of looping into the same TNT again.
+                        // If a TNT has been ignited then it's not a block anymore,
+                        // so we can break out safely without worrying of looping into the igniting the same TNT again.
 
                         if (tickDelay.value >  0) {
                             tickTimer = 0;

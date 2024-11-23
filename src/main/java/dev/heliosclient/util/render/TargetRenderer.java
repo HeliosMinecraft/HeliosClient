@@ -15,7 +15,6 @@ public class TargetRenderer {
     public GradientManager.Gradient color = ColorManager.getPrimaryGradient();
     public QuadColor.CardinalDirection dir = QuadColor.CardinalDirection.DIAGONAL_LEFT;
     public float radius = 1f;
-
     private LivingEntity targetEntity = null;
 
     public void set(LivingEntity targetEntity){
@@ -31,15 +30,14 @@ public class TargetRenderer {
             case Circle -> Renderer3D.drawFlatFilledCircle(radius,Renderer3D.getInterpolatedPosition(targetEntity),320,color);
             case Outline -> Renderer3D.drawBoxOutline(targetEntity.getBoundingBox(),color,3f);
             case WireFrame,
-                 Player_Skeleton -> WireframeEntityRenderer.render(targetEntity,1.0f,color, LineColor.gradient(this.color.getStartGradient().getRGB(),this.color.getEndGradient().getRGB()),1.5f,true,true,renderMode == RenderMode.Player_Skeleton);
+                 PlayerSkeleton -> WireframeEntityRenderer.render(targetEntity,1.0f,color, LineColor.gradient(this.color.getStartGradient().getRGB(),this.color.getEndGradient().getRGB()),1.5f,true,true,renderMode == RenderMode.PlayerSkeleton);
         }
     }
-
 
     public enum RenderMode {
         Outline,
         WireFrame,
-        Player_Skeleton,
+        PlayerSkeleton,
         Circle
     }
 }

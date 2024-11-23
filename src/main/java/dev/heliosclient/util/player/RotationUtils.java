@@ -40,6 +40,20 @@ public class RotationUtils {
         mc.player.bodyYaw = mc.player.headYaw;
         mc.player.prevBodyYaw = mc.player.bodyYaw;
     }
+
+    /**
+     * From minecraft's Entity class
+     */
+    public static Vec3d getRotationVector(float pitch, float yaw){
+        float f = pitch * 0.017453292F;
+        float g = -yaw * 0.017453292F;
+        float h = MathHelper.cos(g);
+        float i = MathHelper.sin(g);
+        float j = MathHelper.cos(f);
+        float k = MathHelper.sin(f);
+        return new Vec3d(i * j, -k, h * j);
+    }
+
     /* == Instantly looks at a given pos == */
     public static void instaLookAt(Vec3d pos) {
         instaLookAt(pos.getX(), pos.getY(), pos.getZ());

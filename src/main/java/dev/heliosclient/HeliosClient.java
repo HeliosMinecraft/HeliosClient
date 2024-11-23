@@ -54,7 +54,6 @@ public class HeliosClient implements ModInitializer, Listener {
     public static ConsoleScreen CONSOLE = new ConsoleScreen();
     public static File SAVE_FOLDER = new File(MC.runDirectory.getPath() + "/heliosclient");
 
-
     //Methods for saving and loading
     public static void loadConfig() {
         load(config -> {

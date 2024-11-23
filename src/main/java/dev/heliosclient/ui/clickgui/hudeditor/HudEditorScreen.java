@@ -31,18 +31,20 @@ import java.util.HashMap;
 import java.util.List;
 
 public class HudEditorScreen extends Screen implements Listener {
-    private static final long SCROLL_TIMEOUT = 2000; // 2 seconds
     public static HudEditorScreen INSTANCE = new HudEditorScreen();
     private final List<HudElement> selectedElements = new ArrayList<>();
     private final MapReader copiedSettings = new MapReader(new HashMap<>());
     private final Color LIGHT_YELLOW = new Color(223, 248, 89, 121);
+
     float thickness = 0.5f; // Thickness of the alignment lines
     float threshold = 1; // Threshold between two HudBoxes for the alignment lines to show.
     Animation fadeAnimation = new Animation(EasingType.LINEAR_IN);
+
     // Variables to track the drag state and initial position
     private boolean isDragging = false;
     private HudBox dragBox = null;
     private boolean isScrolling;
+    private static final long SCROLL_TIMEOUT = 2000; // 2 seconds
     private final TimerUtils scrollTimer = new TimerUtils();
 
     private HudEditorScreen() {
@@ -156,7 +158,6 @@ public class HudEditorScreen extends Screen implements Listener {
             Renderer2D.drawHorizontalLine(drawContext.getMatrices().peek().getPositionMatrix(), 0, this.width, y, thickness, Color.WHITE.getRGB());
         }
     }
-
 
     @Override
     public boolean shouldPause() {

@@ -2,12 +2,9 @@ package dev.heliosclient.util;
 
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class MathUtils {
@@ -40,17 +37,20 @@ public class MathUtils {
         }
         return out;
     }
+
     public static int o2iSafe(Object obj) {
         int result;
         try {
             if (obj instanceof Double db) {
-                result = ((Double) obj).intValue();
-            } else if (obj instanceof Float) {
-                result = ((Float) obj).intValue();
-            } else if (obj instanceof Integer) {
-                result = (Integer) obj;
+                result = db.intValue();
+            } else if (obj instanceof Float fl) {
+                result = fl.intValue();
+            } else if (obj instanceof Long lg) {
+                result = lg.intValue();
+            } else if (obj instanceof Integer integer) {
+                result = integer;
             } else {
-                throw new IllegalArgumentException("Object is not an instance of Double, Float or Integer");
+                throw new IllegalArgumentException("Object is not an instance of Double, Float, Long or Integer");
             }
         } catch (ClassCastException e) {
             // This should never happen if we've checked the instance correctly
@@ -80,18 +80,5 @@ public class MathUtils {
 
         // Return the array
         return array;
-    }
-
-    public static List<String> filterAndSortList(List<String> list, String input) {
-        List<String> filteredList = new ArrayList<>();
-        for (String entry : list) {
-            if (entry.equals(input)) {
-                filteredList.add(entry);
-            }
-        }
-
-        filteredList.sort(Comparator.comparingInt((String entry) -> StringUtils.getLevenshteinDistance(entry, input)));
-
-        return filteredList;
     }
 }

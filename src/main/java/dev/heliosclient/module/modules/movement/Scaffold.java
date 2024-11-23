@@ -11,6 +11,7 @@ import dev.heliosclient.module.settings.lists.BlockListSetting;
 import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.player.InventoryUtils;
+import dev.heliosclient.util.player.MovementUtils;
 import dev.heliosclient.util.player.PlayerUtils;
 import dev.heliosclient.util.render.GradientBlockRenderer;
 import dev.heliosclient.util.render.color.QuadColor;
@@ -212,7 +213,7 @@ public class Scaffold extends Module_ {
         if (towerMode.getOption() != TowerMode.None && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed() && !mc.world.getBlockState(mc.player.getBlockPos().down(2)).isReplaceable()) {
             //Only tower if there is air above.
             if (!mc.world.getBlockCollisions(mc.player,mc.player.getBoundingBox().stretch(0,0.4f,0)).iterator().hasNext()) {
-                if (whileMoving.value || !PlayerUtils.isMoving(mc.player)) {
+                if (whileMoving.value || !MovementUtils.isMoving(mc.player)) {
                     mc.player.setVelocity(mc.player.getVelocity().x, towerSpeed.value, mc.player.getVelocity().z);
                 }
             }

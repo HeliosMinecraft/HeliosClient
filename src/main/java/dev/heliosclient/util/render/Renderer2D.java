@@ -412,50 +412,6 @@ public class Renderer2D implements Listener {
         drawGradient(matrices.peek().getPositionMatrix(), x, y, width, height, startColor, endColor, direction);
     }
 
-    /**
-     * Draws an outline rounded rectangle by drawing 4 side rectangles, and 4 arcs
-     *
-     * @param matrix4f  Matrix4f object to draw the rounded rectangle
-     * @param x         X pos
-     * @param y         Y pos
-     * @param width     Width of rounded rectangle
-     * @param height    Height of rounded rectangle
-     * @param radius    Radius of the quadrants / the rounded rectangle
-     * @param color     Color of the rounded rectangle
-     * @param thickness thickness of the outline
-     */
-    public static void drawOutlineRoundedBox(Matrix4f matrix4f, float x, float y, float width, float height, float radius, float thickness, int color) {
-        // Draw the rectangles for the outline
-        drawRectangle(matrix4f, x + radius, y, width - radius * 2, thickness, color); // Top rectangle
-        drawRectangle(matrix4f, x + radius, y + height - thickness, width - radius * 2, thickness, color); // Bottom rectangle
-        drawRectangle(matrix4f, x, y + radius, thickness, height - radius * 2, color); // Left rectangle
-        drawRectangle(matrix4f, x + width - thickness, y + radius, thickness, height - radius * 2, color); // Right rectangle
-
-        // Draw the arcs at the corners for the outline
-        drawArc(matrix4f, x + radius, y + radius, radius, thickness, color, 180, 270); // Top-left arc
-        drawArc(matrix4f, x + width - radius, y + radius, radius, thickness, color, 90, 180); // Top-right arc
-        drawArc(matrix4f, x + width - radius, y + height - radius, radius, thickness, color, 0, 90); // Bottom-right arc
-        drawArc(matrix4f, x + radius, y + height - radius, radius, thickness, color, 270, 360); // Bottom-left arc
-    }
-    /**
-     * Draws an outline rounded rectangle with a shadow
-     *
-     * @param matrices  MatrixStack object to draw the rounded rectangle and shadow
-     * @param x         X pos
-     * @param y         Y pos
-     * @param width     Width of rounded rectangle
-     * @param height    Height of rounded rectangle
-     * @param radius    Radius of the quadrants / the rounded rectangle
-     * @param color     Color of the rounded rectangle
-     * @param thickness thickness of the outline
-     */
-    public static void drawOutlineRoundedBoxWithShadow(MatrixStack matrices, float x, float y, float width, float height, float radius, float thickness, int color, int shadowRadius, Color shadowColor) {
-        //First draw shadow
-        drawOutlineBlurredShadow(matrices,x,y,width,height,shadowRadius,shadowColor,true,radius);
-
-        drawOutlineRoundedBox(matrices.peek().getPositionMatrix(),x,y,width,height,radius,thickness,color);
-    }
-
     public static void drawRainbowGradientRectangle(Matrix4f matrix4f, float x, float y, float width, float height) {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
 
@@ -1380,6 +1336,53 @@ public class Renderer2D implements Listener {
 
         RenderSystem.defaultBlendFunc();
     }
+    /**
+     * Draws an outline rounded rectangle using lines and arcs.
+     *
+     * @param matrix4f  Matrix4f object to draw the rounded rectangle
+     * @param x         X pos
+     * @param y         Y pos
+     * @param width     Width of rounded rectangle
+     * @param height    Height of rounded rectangle
+     * @param radius    Radius of the quadrants / the rounded rectangle
+     * @param color     Color of the rounded rectangle
+     * @param thickness Thickness of the outline
+     */
+    public static void drawOutlineRoundedBox(Matrix4f matrix4f, float x, float y, float width, float height, float radius, float thickness, int color) {
+        // Ensure the radius is not larger than half the width or height
+        radius = Math.min(radius, Math.min(width, height) / 2);
+
+        // Draw the straight edges using lines
+        drawLine(matrix4f, x + radius, y, x + width - radius, y, thickness, color); // Top edge
+        drawLine(matrix4f, x + width, y + radius, x + width, y + height - radius, thickness, color); // Right edge
+        drawLine(matrix4f, x + width - radius, y + height, x + radius, y + height, thickness, color); // Bottom edge
+        drawLine(matrix4f, x, y + height - radius, x, y + radius, thickness, color); // Left edge
+
+        // Draw the arcs at the corners for the outline
+        drawArc(matrix4f, x + radius, y + radius, radius, thickness, color, 180, 270); // Top-left arc
+        drawArc(matrix4f, x + width - radius, y + radius, radius, thickness, color, 90, 180); // Top-right arc
+        drawArc(matrix4f, x + width - radius, y + height - radius, radius, thickness, color, 0, 90); // Bottom-right arc
+        drawArc(matrix4f, x + radius, y + height - radius, radius, thickness, color, 270, 360); // Bottom-left arc
+    }
+
+    /**
+     * Draws an outline rounded rectangle with a shadow
+     *
+     * @param matrices  MatrixStack object to draw the rounded rectangle and shadow
+     * @param x         X pos
+     * @param y         Y pos
+     * @param width     Width of rounded rectangle
+     * @param height    Height of rounded rectangle
+     * @param radius    Radius of the quadrants / the rounded rectangle
+     * @param color     Color of the rounded rectangle
+     * @param thickness thickness of the outline
+     */
+    public static void drawOutlineRoundedBoxWithShadow(MatrixStack matrices, float x, float y, float width, float height, float radius, float thickness, int color, int shadowRadius, Color shadowColor) {
+        //First draw shadow
+        drawOutlineBlurredShadow(matrices,x,y,width,height,shadowRadius,shadowColor,true,radius);
+
+        drawOutlineRoundedBox(matrices.peek().getPositionMatrix(),x,y,width,height,radius,thickness,color);
+    }
 
     private static List<Color> generateGradientColors(Color[] colors, int steps) {
         List<Color> gradientColors = new ArrayList<>();
@@ -1518,9 +1521,7 @@ public class Renderer2D implements Listener {
 
     /* ==== Drawing Lines ==== */
 
-    public static void drawLine(MatrixStack matrixStack, float x1, float y1, float x2, float y2,float lineWidth, int color) {
-        Matrix4f matrix = matrixStack.peek().getPositionMatrix();
-
+    public static void drawLine(Matrix4f matrix, float x1, float y1, float x2, float y2,float lineWidth, int color) {
         float red = (color >> 16 & 255) / 255.0F;
         float green = (color >> 8 & 255) / 255.0F;
         float blue = (color & 255) / 255.0F;

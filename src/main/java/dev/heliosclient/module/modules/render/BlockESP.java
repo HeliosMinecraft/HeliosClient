@@ -16,12 +16,12 @@ import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.lists.BlockListSetting;
 import dev.heliosclient.system.HeliosExecutor;
 import dev.heliosclient.util.blocks.BlockUtils;
-import dev.heliosclient.util.blocks.ChunkChecker;
-import dev.heliosclient.util.blocks.ChunkUtils;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
+import dev.heliosclient.util.world.ChunkChecker;
+import dev.heliosclient.util.world.ChunkUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -41,8 +41,10 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.Stack;
+import java.util.function.Consumer;
 
 public class BlockESP extends Module_ {
     Set<BlockPos> positions = Sets.newConcurrentHashSet();
@@ -205,8 +207,17 @@ public class BlockESP extends Module_ {
     }
 
     public void updateBlocks() {
-        this.searchBlocks(mc.world, (world, pos) -> {
-            if (blocks.getSelectedEntries().contains(world.getBlockState(pos).getBlock()) && positions.size() < 10000) {
+        List<Block> selectedBlocks = blocks.getSelectedEntries();
+
+        // Using a local variable for world to avoid repeated calls
+        World world = mc.world;
+
+        this.searchBlocks(world, pos -> {
+            BlockState state = world.getBlockState(pos);
+            Block block = state.getBlock();
+
+            // Check if the block is selected and not already processed
+            if (selectedBlocks.contains(block) && positions.size() < 10000) {
                 positions.add(pos);
             }
         });
@@ -218,13 +229,24 @@ public class BlockESP extends Module_ {
 
         return b1 != Blocks.AIR;
     }
+    // Using bitwise operations for direction exclusions
     public boolean isExcludedDirection(Direction d) {
-        return excludeUp.value && d == Direction.UP ||
-                excludeDown.value && d == Direction.DOWN ||
-                excludeNorth.value && d == Direction.NORTH ||
-                excludeSouth.value && d == Direction.SOUTH ||
-                excludeEast.value && d == Direction.EAST ||
-                excludeWest.value && d == Direction.WEST;
+        int exclusions = (excludeUp.value ? 1 : 0) |
+                (excludeDown.value ? 1 : 0) << 1 |
+                (excludeNorth.value ? 1 : 0) << 2 |
+                (excludeSouth.value ? 1 : 0) << 3 |
+                (excludeEast.value ? 1 : 0) << 4 |
+                (excludeWest.value ? 1 : 0) << 5;
+
+        return switch (d) {
+            case UP -> (exclusions & 1) != 0;
+            case DOWN -> (exclusions & 2) != 0;
+            case NORTH -> (exclusions & 4) != 0;
+            case SOUTH -> (exclusions & 8) != 0;
+            case EAST -> (exclusions & 16) != 0;
+            case WEST -> (exclusions & 32) != 0;
+            default -> false;
+        };
     }
     public void removeExcludedDirection(Direction[] directions) {
         if(excludeNorth.value){
@@ -247,26 +269,26 @@ public class BlockESP extends Module_ {
         }
     }
     private void floodFill(World world, BlockPos pos, Block block, Set<BlockPos> visited, Set<BlockPos> processed) {
-        // If the current position has already been visited or the visited set has exceeded a maximum size (500), return to prevent infinite recursion
-        if (visited.contains(pos) || visited.size() > 500) {
-            return;
-        }
+        Stack<BlockPos> stack = new Stack<>();
+        stack.push(pos);
 
-        // Mark the current position as visited
-        visited.add(pos);
+        while (!stack.isEmpty() && visited.size() <= 500) {
+            BlockPos currentPos = stack.pop();
 
-        // Check all adjacent blocks (up, down, north, south, east, west)
-        for (Direction direction : Direction.values()) {
-            BlockPos adjacentPos = pos.offset(direction);
-            BlockState adjacentState = world.getBlockState(adjacentPos);
+            // If already visited, skip
+            if (visited.contains(currentPos)) continue;
+            visited.add(currentPos);
 
-            // If the adjacent block is the same as the target block, recursively call floodFill to explore further
-            if (adjacentState.getBlock() == block) {
-                floodFill(world, adjacentPos, block, visited, processed);
-            }
-            // If the adjacent block is not air (or meets the onlyAirCheck condition), add it to the processed set
-            else if(onlyAirCheck(adjacentState.getBlock()) && !isExcludedDirection(direction)){
-                processed.add(adjacentPos);
+            for (Direction direction : Direction.values()) {
+                BlockPos adjacentPos = currentPos.offset(direction);
+                BlockState adjacentState = world.getBlockState(adjacentPos);
+                Block adjacentBlock = adjacentState.getBlock();
+
+                if (adjacentBlock == block) {
+                    stack.push(adjacentPos);
+                } else if (onlyAirCheck(adjacentBlock) && !isExcludedDirection(direction)) {
+                    processed.add(adjacentPos);
+                }
             }
         }
     }
@@ -380,8 +402,8 @@ public class BlockESP extends Module_ {
     @SubscribeEvent
     public void onChunkDataEvent(ChunkDataEvent event) {
         // Start a task to search the chunk
-        HeliosExecutor.submit(new ChunkChecker(mc.world, event.getChunk(), (world, pos) -> {
-            if (blocks.getSelectedEntries().contains(world.getBlockState(pos).getBlock()) && positions.size() < 10000) {
+        HeliosExecutor.submit(new ChunkChecker(mc.world, event.getChunk(), pos -> {
+            if (blocks.getSelectedEntries().contains(mc.world.getBlockState(pos).getBlock()) && positions.size() < 10000) {
                 positions.add(pos);
             }
         }));
@@ -415,7 +437,7 @@ public class BlockESP extends Module_ {
 
 
 
-    private void searchBlocks(World world, BiConsumer<World, BlockPos> consumer) {
+    private void searchBlocks(World world, Consumer<BlockPos> consumer) {
         //Loop every chunk
         for (Chunk chunk : ChunkUtils.getLoadedChunks()) {
             //Start a task to search the chunk

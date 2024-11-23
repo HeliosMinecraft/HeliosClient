@@ -1,13 +1,13 @@
-package dev.heliosclient.util.blocks;
+package dev.heliosclient.util.world;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public record ChunkChecker(World world, Chunk chunk, BiConsumer<World, BlockPos> biConsumer) implements Runnable {
+public record ChunkChecker(World world, Chunk chunk, Consumer<BlockPos> blockPosConsumer) implements Runnable {
 
     @Override
     public void run() {
@@ -18,7 +18,7 @@ public record ChunkChecker(World world, Chunk chunk, BiConsumer<World, BlockPos>
                 maxY = heightmap.get(x - chunk.getPos().getStartX(), z - chunk.getPos().getStartZ());
                 for (int y = world.getBottomY(); y < maxY; y++) {
                     BlockPos pos = new BlockPos(x, y, z);
-                    biConsumer.accept(world, pos);
+                    blockPosConsumer.accept(pos);
                 }
             }
         }

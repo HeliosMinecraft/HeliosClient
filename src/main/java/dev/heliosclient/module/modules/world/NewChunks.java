@@ -10,9 +10,9 @@ import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.HeliosExecutor;
-import dev.heliosclient.util.blocks.ChunkChecker;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.render.color.QuadColor;
+import dev.heliosclient.util.world.ChunkChecker;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
@@ -170,10 +170,9 @@ public class NewChunks extends Module_ {
         }
     }
 
-
     private void searchChunk(Chunk chunk) {
         if (!newChunks.contains(chunk) && mc.world.getChunkManager().getChunk(chunk.getPos().x, chunk.getPos().z) == null) {
-            HeliosExecutor.submit(new ChunkChecker(mc.world, chunk, (world, pos) -> {
+            HeliosExecutor.submit(new ChunkChecker(mc.world, chunk, pos -> {
                 FluidState fluid = chunk.getFluidState(pos);
 
                 if (!fluid.isEmpty() && !fluid.isStill()) {

@@ -24,8 +24,7 @@ public class EntityUtils {
     public static Entity getNearestEntity(World world, PlayerEntity player, double radius, Predicate<Entity> filter, Comparator<Entity> sort) {
         return world.getOtherEntities(player, new Box(player.getBlockPos()).expand(radius), filter)
                 .stream()
-                .sorted(sort)
-                .findFirst()
+                .min(sort)
                 .orElse(null);
     }
 
@@ -43,9 +42,9 @@ public class EntityUtils {
                 .orElse(null);
     }
 
-    public static List<Entity> getAllOfType(float radius, EntityType... entities) {
-        return HeliosClient.MC.world.getOtherEntities(HeliosClient.MC.player, new Box(HeliosClient.MC.player.getBlockPos()).expand(radius), entity -> {
-            for (EntityType e : entities) {
+    public static List<Entity> getAllOfType(float radius, EntityType<?>... entities) {
+        return HeliosClient.MC.world.getOtherEntities(HeliosClient.MC.player, HeliosClient.MC.player.getBoundingBox().expand(radius), entity -> {
+            for (EntityType<?> e : entities) {
                 if (e == entity.getType()) {
                     return true;
                 }

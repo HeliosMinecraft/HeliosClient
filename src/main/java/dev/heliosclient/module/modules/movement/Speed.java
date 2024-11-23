@@ -1,6 +1,7 @@
 package dev.heliosclient.module.modules.movement;
 
 import dev.heliosclient.event.SubscribeEvent;
+import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
@@ -9,7 +10,7 @@ import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.system.mixininterface.IVec3d;
-import dev.heliosclient.util.player.PlayerUtils;
+import dev.heliosclient.util.player.MovementUtils;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -32,7 +33,7 @@ public class Speed extends Module_ {
             .description("Strict movement and sprinting for strafing")
             .onSettingChange(this)
             .value(false)
-            .shouldRender(()-> speedMode.isOption(Modes.StrictStrafe))
+            .shouldRender(() -> speedMode.isOption(Modes.StrictStrafe))
             .build()
     );
     BooleanSetting whileSneaking = sgGeneral.add(new BooleanSetting.Builder()
@@ -42,7 +43,14 @@ public class Speed extends Module_ {
             .value(false)
             .build()
     );
-
+    BooleanSetting jump = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Should Jump")
+            .description("This will jump in modes where jumping happens")
+            .onSettingChange(this)
+            .value(true)
+            .defaultValue(true)
+            .build()
+    );
     DoubleSetting speed = sgGeneral.add(new DoubleSetting.Builder()
             .name("Speed")
             .description("Multiplier of speed.")
@@ -50,10 +58,12 @@ public class Speed extends Module_ {
             .value(1.2)
             .defaultValue(1.2)
             .min(0.1)
-            .max(100)
+            .max(20)
             .roundingPlace(1)
             .build()
     );
+
+    private boolean jumpNextTick = false;
 
     public Speed() {
         super("Speed", "Allows you to move faster.", Categories.MOVEMENT);
@@ -61,6 +71,19 @@ public class Speed extends Module_ {
         addSettingGroup(sgGeneral);
 
         addQuickSettings(sgGeneral.getSettings());
+    }
+
+    @SubscribeEvent(priority = SubscribeEvent.Priority.LOW)
+    public void onTick(TickEvent.PLAYER e) {
+        if (jumpNextTick && jump.value && !mc.options.jumpKey.isPressed()) {
+            double vel = Math.abs(mc.player.getVelocity().getX()) + Math.abs(mc.player.getVelocity().getZ());
+
+            if (vel >= 0.12 && mc.player.isOnGround()) {
+                mc.player.updateVelocity(vel >= 0.3 ? 0.0f : 0.15f, new Vec3d(mc.player.sidewaysSpeed, 0, mc.player.forwardSpeed));
+                mc.player.jump();
+            }
+            jumpNextTick = false;
+        }
     }
 
     @SubscribeEvent
@@ -71,41 +94,59 @@ public class Speed extends Module_ {
 
         // Strafe Mode
         if (speedMode.getOption() == Modes.Strafe) {
-                if (!mc.player.isSprinting()) {
-                    mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
-                }
+            if (!mc.player.isSprinting()) {
+                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+            }
 
-                mc.player.setVelocity(new Vec3d(0, mc.player.getVelocity().y, 0));
-                mc.player.updateVelocity((float) speed.value/4f, new Vec3d(mc.player.sidewaysSpeed, 0, mc.player.forwardSpeed));
-
-                double vel = Math.abs(mc.player.getVelocity().getX()) + Math.abs(mc.player.getVelocity().getZ());
-
-                if (vel >= 0.12 && mc.player.isOnGround()) {
-                    mc.player.updateVelocity(vel >= 0.3 ? 0.0f : 0.15f, new Vec3d(mc.player.sidewaysSpeed, 0, mc.player.forwardSpeed));
-                    mc.player.jump();
-                }
+            mc.player.setVelocity(new Vec3d(0, mc.player.getVelocity().y, 0));
+            mc.player.updateVelocity((float) speed.value / 4f, new Vec3d(mc.player.sidewaysSpeed, 0, mc.player.forwardSpeed));
+            jumpNextTick = true;
         } else if (speedMode.getOption() == Modes.StrictStrafe) {
-                if (!PlayerUtils.isPressingMovementButton() || (strict.value && PlayerUtils.isMoving(mc.player))) {
-                    ((IVec3d) e.getMovement()).heliosClient$setXZ(0,0);
-                    return;
-                }
+            if (!MovementUtils.isPressingMovementButton() || (strict.value && MovementUtils.isMoving(mc.player))) {
+                ((IVec3d) e.getMovement()).heliosClient$setXZ(0, 0);
+                return;
+            }
 
-                if (!mc.player.isSprinting() && !strict.value) {
-                   mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
-                }
+            if (!mc.player.isSprinting() && !strict.value) {
+                mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
+            }
 
-            double prevX = e.getMovement().x * speed.value;
-            double prevZ = e.getMovement().z * speed.value * 1.001;
-            double useSpeed = mc.player.getVelocity().horizontalLength() * (speed.value / 10.0);
-
+            double desiredSpeed = speed.value * 0.1;
             double angle = Math.toRadians(mc.player.getYaw(mc.getTickDelta()));
             double forward = mc.player.input.movementForward;
             double strafe = mc.player.input.movementSideways;
 
-            double x = (-Math.sin(angle) * forward + Math.cos(angle) * strafe) * useSpeed + prevX;
-            double z = (Math.cos(angle) * forward + Math.sin(angle) * strafe) * useSpeed + prevZ;
+            double x = (-Math.sin(angle) * forward + Math.cos(angle) * strafe);
+            double z = (Math.cos(angle) * forward + Math.sin(angle) * strafe);
 
-            e.modifyMovement().heliosClient$setXZ(x, z);
+            // If only left or right is pressed, add a small boost to the movement if not more strict
+            if (forward == 0.0 && strafe != 0.0 && !strict.value) {
+                x += strafe * 0.1;
+                z += strafe * 0.1;
+            }
+
+            // Normalize the movement vector to maintain speed consistency
+            double length = Math.sqrt(x * x + z * z);
+            if (length > 1) {
+                x /= length;
+                z /= length;
+            }
+
+            x *= desiredSpeed;
+            z *= desiredSpeed;
+
+            // Smoothly adjust the player's velocity
+            double currentX = mc.player.getVelocity().x;
+            double currentZ = mc.player.getVelocity().z;
+
+            // Interpolate towards the target speed
+            double newX = currentX + (x - currentX) * 0.1; // Smooth factor
+            double newZ = currentZ + (z - currentZ) * 0.1;
+
+            // Modify the player's movement
+            e.modifyMovement().heliosClient$setXZ(newX, newZ);
+
+            jumpNextTick = true;
         }
         // OnGround Mode
         else if (speedMode.getOption() == Modes.OnGround) {
@@ -147,7 +188,7 @@ public class Speed extends Module_ {
             if (mc.options.jumpKey.isPressed()) {
                 double currentJumpHeight = mc.player.getVelocity().y;
                 double newJumpHeight = Math.min(currentJumpHeight + 0.0351293, 0.5);
-                mc.player.setVelocity(mc.player.getVelocity().x , newJumpHeight, mc.player.getVelocity().z);
+                mc.player.setVelocity(mc.player.getVelocity().x, newJumpHeight, mc.player.getVelocity().z);
             }
         }
         // SprintBoost Mode aka onGround but a bit different

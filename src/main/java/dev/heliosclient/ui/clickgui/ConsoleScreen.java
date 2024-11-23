@@ -19,10 +19,11 @@ public class ConsoleScreen extends Screen {
 
     public ConsoleScreen() {
         super(Text.of("Console"));
-        consoleBox = new MultiLineInputBox(50, 50, "Test", Long.MAX_VALUE, InputBox.InputMode.ALL);
-        consoleBox.doSyntaxHighLighting = false;
-        consoleBox.displayLineNos = true;
-        consoleBox.autoScroll = true;
+        consoleBox = new MultiLineInputBox(50, 50, "", Long.MAX_VALUE, InputBox.InputMode.ALL)
+                .setSyntaxHighLighting(true)
+                .setAutoComplete(true)
+                .setAutoScroll(true)
+                .setDisplayLineNo(true);
 
         enterBox = new InputBox(29, 13, "", 256, InputBox.InputMode.ALL);
         enterButton = new Button("Enter", this::setText, 20, 20, 45, 13);
@@ -54,7 +55,6 @@ public class ConsoleScreen extends Screen {
         enterButton.setX(HeliosClient.MC.getWindow().getScaledWidth() - 58);
         enterButton.setY(HeliosClient.MC.getWindow().getScaledHeight() - 33);
     }
-
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {

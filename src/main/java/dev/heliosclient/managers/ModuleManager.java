@@ -6,6 +6,7 @@ import dev.heliosclient.module.Category;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.chat.ChatHighlight;
 import dev.heliosclient.module.modules.chat.ChatTweaks;
+import dev.heliosclient.module.modules.chat.Notifier;
 import dev.heliosclient.module.modules.chat.Spammer;
 import dev.heliosclient.module.modules.combat.*;
 import dev.heliosclient.module.modules.misc.*;
@@ -56,6 +57,7 @@ public class ModuleManager {
                 new LiquidInteract(),
                 new ServerScraper(),
                 new Painter(),
+                new Notifier(),
                 new SignTweaks(),
                 new Collisions(),
                 new AbortBreaking(),
@@ -215,30 +217,40 @@ public class ModuleManager {
 
     public static ArrayList<Module_> getModuleByNameSearch(String moduleName, int amount) {
         ArrayList<Module_> moduleS = new ArrayList<>();
+        if (moduleName.isEmpty()) return moduleS;
+        moduleName = moduleName.trim();
 
         for (Module_ module : modules) {
-            if (moduleS.size() > amount) {
+            if (moduleS.size() >= amount) {
                 break;
             }
 
-            if (!moduleName.isEmpty() && module.name.trim().equalsIgnoreCase(moduleName.trim())) {
+            if (module.name.trim().equalsIgnoreCase(moduleName)) {
                 moduleS.add(module);
-                return moduleS;
+                return moduleS; // Exact match found, return immediately
             }
-            if (!moduleName.isEmpty() && module.name.contains(moduleName)) {
+            if (module.name.trim().toLowerCase().contains(moduleName.toLowerCase())) {
                 moduleS.add(module);
             }
         }
 
+        String finalModuleName = moduleName;
         moduleS.sort((m1, m2) -> {
-            int m1Score = StringUtils.getLevenshteinDistance(m1.name.trim().toLowerCase(), moduleName.trim().toLowerCase());
-            int m2Score = StringUtils.getLevenshteinDistance(m2.name.trim().toLowerCase(), moduleName.trim().toLowerCase());
-            return Integer.compare(m2Score, m1Score);
+            int m1Score = StringUtils.getLevenshteinDistance(m1.name.trim().toLowerCase(), finalModuleName.toLowerCase());
+            int m2Score = StringUtils.getLevenshteinDistance(m2.name.trim().toLowerCase(), finalModuleName.toLowerCase());
+
+            // First, sort by the score
+            int scoreComparison = Integer.compare(m1Score, m2Score);
+            if (scoreComparison != 0) {
+                return scoreComparison;
+            }
+
+            // If scores are equal, sort alphabetically
+            return m1.name.compareToIgnoreCase(m2.name);
         });
 
         return moduleS;
     }
-
 
     public static ArrayList<Module_> getModulesByCategory(Category category) {
         ArrayList<Module_> returnedModules = new ArrayList<>();

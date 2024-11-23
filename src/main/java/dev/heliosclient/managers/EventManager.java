@@ -73,15 +73,12 @@ public class EventManager {
             List<EventListener> eventListeners = listeners.get(event.getClass());
 
             if (eventListeners == null || eventListeners.isEmpty()) return event;
-
+            eventListeners.remove(null);
             for (EventListener listener : eventListeners) {
-                if(listener == null){
-                    eventListeners.remove(listener);
-                    continue;
-                }
                 listener.accept(event);
             }
 
+            //Run script events on a separate thread to avoid block our main thread.
             if (event.getClass().isAnnotationPresent(LuaEvent.class) && LuaEventManager.INSTANCE.hasListeners()) {
                executor.execute(() -> LuaEventManager.INSTANCE.post(event.getClass().getAnnotation(LuaEvent.class).value(), CoerceJavaToLua.coerce(event)));
             }
