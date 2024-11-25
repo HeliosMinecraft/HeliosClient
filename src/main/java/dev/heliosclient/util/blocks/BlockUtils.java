@@ -69,7 +69,7 @@ public class BlockUtils {
     }
 
     public static boolean canPlace(BlockPos pos, BlockState state) {
-        if (pos == null || mc.world == null || !World.isValid(pos) || !mc.world.getBlockState(pos).isReplaceable() || !mc.world.isInBuildLimit(pos))
+        if (pos == null || mc.world == null || !World.isValid(pos) || !state.isReplaceable() || !mc.world.isInBuildLimit(pos))
             return false;
         return mc.world.getWorldBorder().contains(pos) && mc.world.canPlace(state, pos, ShapeContext.absent());
     }
@@ -215,18 +215,14 @@ public class BlockUtils {
     }
 
     public static boolean place(BlockPos pos, boolean airPlace, boolean rotate) {
-        return place(pos, rotate, false, airPlace, Hand.MAIN_HAND);
+        return place(pos, rotate, airPlace, Hand.MAIN_HAND);
     }
 
-    public static boolean place(BlockPos pos, boolean airPlace, boolean rotate, boolean clientSideRotation) {
-        return place(pos, rotate, clientSideRotation, airPlace, Hand.MAIN_HAND);
-    }
-
-    public static boolean place(BlockPos pos, boolean airPlace, boolean rotate, boolean clientSideRotation, int itemSlotHotbar, boolean silentSwitch) {
+    public static boolean place(BlockPos pos, boolean airPlace, boolean rotate, int itemSlotHotbar, boolean silentSwitch) {
 
         InventoryUtils.swapToSlot(itemSlotHotbar, silentSwitch);
 
-        boolean returnVal = place(pos, rotate, clientSideRotation, airPlace, itemSlotHotbar == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
+        boolean returnVal = place(pos, rotate, airPlace, itemSlotHotbar == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
         if (silentSwitch)
             InventoryUtils.swapBackHotbar();
@@ -256,7 +252,7 @@ public class BlockUtils {
                 || block instanceof TrapdoorBlock;
     }
 
-    public static boolean place(BlockPos pos, boolean rotate, boolean clientSideRotation, boolean airPlace, Hand hand) {
+    public static boolean  place(BlockPos pos, boolean rotate, boolean airPlace, Hand hand) {
         if (!canPlace(pos, mc.world.getBlockState(pos)) || mc.player.getStackInHand(hand) == null  || mc.player.getStackInHand(hand).isEmpty())
             return false;
 
@@ -270,7 +266,6 @@ public class BlockUtils {
             neighbour = pos;
         } else {
             neighbour = airPlace ? pos : pos.offset(d);
-
             hitPos = hitPos.add(d.getOffsetX() * 0.5, d.getOffsetY() * 0.5, d.getOffsetZ() * 0.5);
         }
 
@@ -283,8 +278,8 @@ public class BlockUtils {
             float yaw =   (float) RotationUtils.getYaw(hitPos);
             float pitch = (float) RotationUtils.getPitch(hitPos);
 
-            RotationUtils.setServerRotations(yaw,pitch);
             mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, mc.player.isOnGround()));
+            RotationUtils.setServerRotations(yaw,pitch);
         }
 
         result = interactBlock(blockHitResult,neighborBlock,hand);
@@ -298,7 +293,6 @@ public class BlockUtils {
         }
 
         ActionResult result = mc.interactionManager.interactBlock(mc.player, hand, blockHitResult);
-
 
         if (result.shouldSwingHand()) {
             mc.player.swingHand(hand);

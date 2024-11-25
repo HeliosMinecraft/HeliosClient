@@ -80,6 +80,9 @@ public class InfoNotification extends Notification {
     }
 
     private void renderFancyStyle(MatrixStack matrices, fxFontRenderer fontRenderer) {
+        //Fancy, but neither customisable nor practical.
+        //TODO : ^^^
+
         // Gradient background
         Renderer2D.drawRoundedGradientRectangle(
                 matrices.peek().getPositionMatrix(),

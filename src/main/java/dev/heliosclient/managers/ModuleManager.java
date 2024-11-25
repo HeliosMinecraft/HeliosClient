@@ -218,7 +218,7 @@ public class ModuleManager {
     public static ArrayList<Module_> getModuleByNameSearch(String moduleName, int amount) {
         ArrayList<Module_> moduleS = new ArrayList<>();
         if (moduleName.isEmpty()) return moduleS;
-        moduleName = moduleName.trim();
+        moduleName = moduleName.trim().toLowerCase();
 
         for (Module_ module : modules) {
             if (moduleS.size() >= amount) {
@@ -229,15 +229,15 @@ public class ModuleManager {
                 moduleS.add(module);
                 return moduleS; // Exact match found, return immediately
             }
-            if (module.name.trim().toLowerCase().contains(moduleName.toLowerCase())) {
+            if (module.name.trim().toLowerCase().contains(moduleName)) {
                 moduleS.add(module);
             }
         }
 
         String finalModuleName = moduleName;
         moduleS.sort((m1, m2) -> {
-            int m1Score = StringUtils.getLevenshteinDistance(m1.name.trim().toLowerCase(), finalModuleName.toLowerCase());
-            int m2Score = StringUtils.getLevenshteinDistance(m2.name.trim().toLowerCase(), finalModuleName.toLowerCase());
+            int m1Score = StringUtils.getLevenshteinDistance(m1.name.trim().toLowerCase(), finalModuleName);
+            int m2Score = StringUtils.getLevenshteinDistance(m2.name.trim().toLowerCase(), finalModuleName);
 
             // First, sort by the score
             int scoreComparison = Integer.compare(m1Score, m2Score);

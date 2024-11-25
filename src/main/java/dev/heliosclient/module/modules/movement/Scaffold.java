@@ -341,10 +341,10 @@ public class Scaffold extends Module_ {
 
         if (autoSwitch.value) {
             ScaffoldCount.setScaffoldStack(mc.player.getInventory().getStack(itemSlot));
-            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value, true, itemSlot, silentSwitch.value);
+            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value, itemSlot, silentSwitch.value);
         } else {
             ScaffoldCount.setScaffoldStack(mc.player.getInventory().getMainHandStack());
-            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value,  true);
+            placeResult = BlockUtils.place(pos, airPlace.value, rotate.value);
         }
 
         if (placeResult) {

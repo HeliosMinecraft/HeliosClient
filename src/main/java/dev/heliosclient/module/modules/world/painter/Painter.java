@@ -358,7 +358,7 @@ public class Painter extends Module_ {
                         boolean swapped = InventoryUtils.swapToSlot(slot, false);
 
                         if (swapped) {
-                            BlockUtils.place(changedPos, playerRotate.value,false, airPlace.value, slot == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                            BlockUtils.place(changedPos, playerRotate.value,airPlace.value, slot == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
                         }
                     }
                 }

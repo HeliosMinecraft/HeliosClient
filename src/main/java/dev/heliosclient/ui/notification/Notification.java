@@ -1,6 +1,7 @@
 package dev.heliosclient.ui.notification;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
@@ -11,9 +12,13 @@ import net.minecraft.util.math.MathHelper;
 public abstract class Notification {
     public static AnimationStyle ANIMATE = AnimationStyle.SLIDE;
     protected PositionMode positionMode = PositionMode.BOTTOM_RIGHT;
+
     protected int screenWidth;
     protected int screenHeight;
 
+    /**
+     * This specifies if the notification is supposed to look "fancy" / "compact"
+     */
     public static boolean IS_FANCY = false;
 
     protected int width = 1;
@@ -83,6 +88,10 @@ public abstract class Notification {
         }
     }
 
+    /**
+     * Override this method IF you want to remove animations.
+     * But then you will need to update x and y position to target position.
+     */
     public void update() {
         timeElapsed = System.currentTimeMillis() - creationTime;
 
@@ -138,8 +147,8 @@ public abstract class Notification {
                 scale = 0;
             }
         }
-        x = targetX;
-        y = targetY;
+        this.x = targetX;
+        this.y = targetY;
     }
 
     // Helper methods for slide animation
@@ -223,14 +232,22 @@ public abstract class Notification {
         y += deltaY;
     }
 
+    /**
+     * Linearly smoothened way to move to a Y position.
+     * This is different from the {@link #moveY(int)} as this takes a targetY instead of deltaY
+     */
     public void smoothMoveY(int targetY) {
         int currentY = getY();
 
-        // Calculate new Y with smoothness (easing)
-        int newY = Math.round((targetY - currentY) * 0.25f);
+        // Calculate new Y with linear smoothness (easing)
+        int newDeltaY = Math.round((targetY - currentY) * 0.25f);
 
-        moveY(newY);
+        moveY(newDeltaY);
     }
+
+    /**
+     * This should be used update the notification's dimensions
+     */
     protected void updateDimensions(int newWidth, int newHeight) {
         // Only recalculate if dimensions actually change
         if (this.width != newWidth || this.height != newHeight) {
@@ -249,12 +266,19 @@ public abstract class Notification {
             y = targetY + deltaY;
         }
     }
+
     public boolean isExpired() {
         return expired;
     }
 
+    /**
+     * Render the notification in this method
+     */
     public abstract void render(MatrixStack matrices, int y, fxFontRenderer fontRenderer);
 
+    /**
+     * Override this method to play a sound when the notification is displayed. Called in {@link NotificationManager#updateNotifications()}
+     */
     public void playSound(SoundEvent soundEvent, float volume, float pitch) {}
 
     public long getCreationTime() {

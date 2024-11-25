@@ -11,6 +11,7 @@ import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
+//TODO: Make this pretty
 public class HeliosClientInfoScreen extends Screen {
     public static HeliosClientInfoScreen INSTANCE = new HeliosClientInfoScreen();
     private final ThreePartsLayoutWidget layout = new ThreePartsLayoutWidget(this);
@@ -40,5 +41,4 @@ public class HeliosClientInfoScreen extends Screen {
         this.renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
     }
-
 }

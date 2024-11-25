@@ -57,7 +57,7 @@ public class NotificationManager implements Listener {
         // Add notifications from the queue until the maximum number is reached
         while (displayedNotifications.size() < MAX_DISPLAYED && !notificationQueue.isEmpty()) {
             Notification notification = notificationQueue.poll();
-            if (notification == null) return;
+            if (notification == null) continue;
 
             notification.setCreationTime(System.currentTimeMillis());
             notification.playSound(notification.soundEvent, notification.volume, notification.pitch);
@@ -76,6 +76,7 @@ public class NotificationManager implements Listener {
                 POSITION_MODE == Notification.PositionMode.BOTTOM_LEFT)
                 ? screenHeight - VERTICAL_SPACING
                 : VERTICAL_SPACING;
+
         int targetX = calculateInitialTargetX(screenWidth);
 
         for (Notification notification : displayedNotifications) {
@@ -103,7 +104,6 @@ public class NotificationManager implements Listener {
                 default -> targetY;
             };
 
-            // Update X position based on position mode and horizontal spacing
             int newX = calculateNotificationX(screenWidth, notification.getWidth(), targetX);
 
             notification.smoothMoveY(targetOffset);
@@ -126,7 +126,6 @@ public class NotificationManager implements Listener {
         };
     }
 
-    // Add method to set horizontal spacing
     public static void setHorizontalSpacing(int spacing) {
         HORIZONTAL_SPACING = Math.max(0, spacing);
     }

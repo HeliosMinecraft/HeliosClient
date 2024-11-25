@@ -2,11 +2,11 @@ package dev.heliosclient.module.modules.movement;
 
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
+import dev.heliosclient.event.events.player.PlayerMotionEvent;
 import dev.heliosclient.mixin.AccessorMinecraftClient;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.*;
-import dev.heliosclient.system.mixininterface.IVec3d;
 import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.player.DamageUtils;
@@ -14,10 +14,12 @@ import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -53,7 +55,7 @@ public class NoFall extends Module_ {
             .name("Mode")
             .description("Mode which should save player from fall height ")
             .onSettingChange(this)
-            .defaultValue(List.of("Classic", "AlwaysOnGround", "Clutch", "Disconnect (annoying)"))
+            .defaultValue(List.of("PositionAndOnGround", "OnGroundOnly", "Clutch", "Disconnect (annoying)"))
             .defaultListIndex(0)
             .build()
     );
@@ -118,14 +120,18 @@ public class NoFall extends Module_ {
     @Override
     public void onSettingChange(Setting<?> setting) {
         super.onSettingChange(setting);
-        if (cancelBounce.value && mode.value == 2) {
+        if ((setting == cancelBounce || setting == mode) && cancelBounce.value && mode.value == 2) {
             ChatUtils.sendHeliosMsg("(NoFall Clutch) SlimeBlocks will cause fall damage with cancelBounce on!");
         }
     }
 
     @SubscribeEvent
     public void onTick(TickEvent.PLAYER event) {
-        assert mc.player != null;
+        if (mode.value == 2) {
+            if (shouldResetClutch()) {
+                cm.resetClutch();
+            }
+        }
         if (mc.player.fallDistance >= fallHeight.value && !mc.player.isCreative()) {
             if (mode.value == 0) {
                 // Second condition is to check if the y velocity of player is fast enough to cause damage.
@@ -143,20 +149,12 @@ public class NoFall extends Module_ {
                         )
                 );
             } else if (mode.value == 1) {
-                // Prevents the half-heart damage from classic mode
+                // Prevents the half-heart damage from PositionAndOnGround mode
                 mc.player.networkHandler.sendPacket(
                         new PlayerMoveC2SPacket.OnGroundOnly(
                                 true
                         )
                 );
-
-                //Clutch mode!
-            } else if (mode.value == 2) {
-
-                if (shouldResetClutch()) {
-                    cm.resetClutch();
-                }
-                clutch();
             } else if (mode.value == 3) {
                 int distance = 0;
                 int y = (int) mc.player.getY();
@@ -177,45 +175,56 @@ public class NoFall extends Module_ {
             }
         }
     }
+    @SubscribeEvent
+    public void onMotion(PlayerMotionEvent event) {
+        if (mc.player.fallDistance >= fallHeight.value && !mc.player.isCreative()) {
+            clutch(event);
+        }
+    }
 
-    private void clutch() {
+    private void clutch(PlayerMotionEvent event) {
         float health = mc.player.getHealth();
         boolean shouldClutch = !onlyApplyNearDeath.value || DamageUtils.calcFallDamage(mc.player) >= health - 2;
 
         if (shouldClutch) {
-            BlockHitResult result = mc.world.raycast(new RaycastContext(mc.player.getPos(), mc.player.getPos().subtract(0, 4, 0), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
+            double prevX = mc.player.getVelocity().x;
+            double prevZ = mc.player.getVelocity().z;
+
+            if (stop.value) {
+                event.modifyMovement().heliosClient$setXZ(0, 0);
+            }
+
+            BlockHitResult result = mc.world.raycast(new RaycastContext(mc.player.getPos(), mc.player.getPos().subtract(0, mc.interactionManager.getReachDistance() - 1, 0), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
 
             if (result != null && result.getType() == HitResult.Type.BLOCK) {
                 BlockPos bpDown = result.getBlockPos();
 
-                if (!isPlayerAlreadySafe(bpDown)) {
+                if (!isPlayerAlreadySafe(result.getBlockPos())) {
                     for (ClutchItem item : ClutchItem.values()) {
-                        cm.clutch(item, bpDown);
+                        cm.clutch(item, bpDown,event);
                         if (cm.hasClutchedProperly()) {
                             break;
                         }
                     }
                 }
-
             }
+            if (stop.value)
+                event.modifyMovement().heliosClient$setXZ(prevX, prevZ);
         }
     }
 
     private boolean shouldResetClutch() {
-        return mc.player.isOnGround() || mc.player.getBlockStateAtPos().getFluidState() != Fluids.EMPTY.getDefaultState();
+        return  mc.player.isOnGround() ||
+                mc.player.getBlockStateAtPos().getFluidState() != Fluids.EMPTY.getDefaultState() ||
+                mc.player.fallDistance < fallHeight.value;
     }
 
-    public boolean isPlayerAlreadySafe(BlockPos bpDown) {
-        Block block = mc.world.getBlockState(bpDown).getBlock();
-
+    public boolean isPlayerAlreadySafe(BlockPos blockPos) {
         if (forcePlace.value) {
             return false;
         }
 
-        //If the block is air, then it's not safe.
-        if (BlockUtils.airBreed(block)) {
-            return false;
-        }
+        Block block = mc.world.getBlockState(blockPos).getBlock();
 
         //If block is clutch item then it's probably safe. (probably because we are not accounting fallDistance for now,
         // meaning haybales and slimeblocks may still kill you).
@@ -266,12 +275,13 @@ public class NoFall extends Module_ {
         private boolean hasClutchedProperly = false;
 
 
-        public void clutch(ClutchItem item, BlockPos pos) {
+        public void clutch(ClutchItem item, BlockPos pos, PlayerMotionEvent event) {
             if (item == ClutchItem.WATER_BUCKET && mc.world.getDimensionKey() == DimensionTypes.THE_NETHER) {
                 return;
             }
 
             int slot = InventoryUtils.findItemInHotbar(item.getItem());
+
             if (slot == -1) {
                 hasClutchedProperly = false;
                 return;
@@ -282,29 +292,31 @@ public class NoFall extends Module_ {
             ItemStack stack = mc.player.getInventory().getStack(slot);
             int count = InventoryUtils.getItemStackCountSafe(stack);
 
-
-            InventoryUtils.swapToSlot(slot, true);
-
             //We want to rotate only when the player has set the rotate setting for blocks
             rotate(rotate.value, pos.toCenterPos(), item.getResultItem());
 
-            double prevX = mc.player.getVelocity().x;
-            double prevZ = mc.player.getVelocity().z;
-
-            if (stop.value)
-                ((IVec3d) mc.player.getVelocity()).heliosClient$setXZ(0, 0);
+            InventoryUtils.swapToSlot(slot, true);
 
             if (item.getResultItem() == null) {
-                double prevY = mc.player.getVelocity().y;
+                double prevY = event.getMovement().y;
 
-                ((IVec3d) mc.player.getVelocity()).heliosClient$setY(0);
+                event.modifyMovement().heliosClient$setY(0);
 
-                BlockUtils.place(pos, rotate.value,false, airPlace.value, slot == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                BlockUtils.place(pos.up(), rotate.value,airPlace.value, slot == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
-                ((IVec3d) mc.player.getVelocity()).heliosClient$setY(prevY);
-
+                event.modifyMovement().heliosClient$setY(prevY);
             } else {
+                Block block = mc.world.getBlockState(pos).getBlock();
+                if (BlockUtils.isClickable(block) || block instanceof LeavesBlock) {
+                    mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+                    mc.player.setSneaking(true);
+                }
                 ((AccessorMinecraftClient) mc).rightClick();
+
+                if (BlockUtils.isClickable(block) || block instanceof LeavesBlock) {
+                    mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+                    mc.player.setSneaking(false);
+                }
             }
 
             if (item.getResultItem() != null) {
@@ -315,14 +327,15 @@ public class NoFall extends Module_ {
                     hasClutchedProperly = newStack.getCount() != count;
             }
 
-            if (stop.value)
-                ((IVec3d) mc.player.getVelocity()).heliosClient$setXZ(prevX, prevZ);
+            if(hasClutchedProperly){
+                InventoryUtils.swapBackHotbar();
+            }
         }
 
         public void rotate(boolean rotate, Vec3d vec, Item resultItem) {
             if (resultItem == null && !rotate) return;
 
-            RotationUtils.lookAt(vec);
+            RotationUtils.instaLookAt(vec);
         }
 
         public boolean hasClutchedProperly() {
