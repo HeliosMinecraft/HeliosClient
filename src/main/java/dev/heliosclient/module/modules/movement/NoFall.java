@@ -178,7 +178,9 @@ public class NoFall extends Module_ {
     @SubscribeEvent
     public void onMotion(PlayerMotionEvent event) {
         if (mc.player.fallDistance >= fallHeight.value && !mc.player.isCreative()) {
-            clutch(event);
+            if (mode.value == 2) {
+                clutch(event);
+            }
         }
     }
 
@@ -274,7 +276,6 @@ public class NoFall extends Module_ {
     public class ClutchManager {
         private boolean hasClutchedProperly = false;
 
-
         public void clutch(ClutchItem item, BlockPos pos, PlayerMotionEvent event) {
             if (item == ClutchItem.WATER_BUCKET && mc.world.getDimensionKey() == DimensionTypes.THE_NETHER) {
                 return;
@@ -327,7 +328,7 @@ public class NoFall extends Module_ {
                     hasClutchedProperly = newStack.getCount() != count;
             }
 
-            if(hasClutchedProperly){
+            if(hasClutchedProperly()){
                 InventoryUtils.swapBackHotbar();
             }
         }
