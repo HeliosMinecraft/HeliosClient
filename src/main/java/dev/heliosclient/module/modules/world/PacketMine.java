@@ -225,8 +225,8 @@ public class PacketMine extends Module_ {
             VoxelShape shape = state.getOutlineShape(mc.world, pos);
             if (shape == null || shape.isEmpty()) return;
 
-            int start = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getStartGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
-            int end = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getEndGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+            int start = gradientBool.value ? ColorUtils.changeAlpha(gradient.getStartColor().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+            int end = gradientBool.value ? ColorUtils.changeAlpha(gradient.getEndColor().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
 
             ModuleManager.get(BreakIndicator.class).renderIndicator(shape.getBoundingBox().expand(0.001f).offset(pos), (float) info.progress, (BreakIndicator.IndicateType) type.getOption(),start,end);
         });

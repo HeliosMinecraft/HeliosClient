@@ -13,6 +13,7 @@ import dev.heliosclient.util.player.DamageUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.fluid.Fluids;
@@ -196,14 +197,12 @@ public class NoFall extends Module_ {
                 event.modifyMovement().heliosClient$setXZ(0, 0);
             }
 
-            BlockHitResult result = mc.world.raycast(new RaycastContext(mc.player.getPos(), mc.player.getPos().subtract(0, mc.interactionManager.getReachDistance() - 1, 0), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
+            BlockHitResult result = mc.world.raycast(new RaycastContext(mc.player.getPos(), mc.player.getPos().subtract(0, mc.interactionManager.getReachDistance(), 0), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
 
             if (result != null && result.getType() == HitResult.Type.BLOCK) {
-                BlockPos bpDown = result.getBlockPos();
-
                 if (!isPlayerAlreadySafe(result.getBlockPos())) {
                     for (ClutchItem item : ClutchItem.values()) {
-                        cm.clutch(item, bpDown,event);
+                        cm.clutch(item, result.getBlockPos(), event);
                         if (cm.hasClutchedProperly()) {
                             break;
                         }
@@ -216,22 +215,26 @@ public class NoFall extends Module_ {
     }
 
     private boolean shouldResetClutch() {
-        return  mc.player.isOnGround() ||
-                mc.player.getBlockStateAtPos().getFluidState() != Fluids.EMPTY.getDefaultState() ||
-                mc.player.fallDistance < fallHeight.value;
+        return mc.player.isOnGround() ||
+               mc.player.getBlockStateAtPos().getFluidState() != Fluids.EMPTY.getDefaultState() ||
+               mc.player.fallDistance < fallHeight.value;
     }
 
-    public boolean isPlayerAlreadySafe(BlockPos blockPos) {
+    public boolean isPlayerAlreadySafe(BlockPos collidingBlockPos) {
+        //We don't need to force place in water
+        BlockState state = mc.world.getBlockState(collidingBlockPos);
+        if(state.getFluidState().isOf(Fluids.WATER) || state.getFluidState().isOf(Fluids.FLOWING_WATER)) return true;
+
         if (forcePlace.value) {
             return false;
         }
 
-        Block block = mc.world.getBlockState(blockPos).getBlock();
+        Block block = state.getBlock();
 
-        //If block is clutch item then it's probably safe. (probably because we are not accounting fallDistance for now,
+        // If block is clutch item then it's probably safe. (probably because we are not accounting fallDistance for now,
         // meaning haybales and slimeblocks may still kill you).
         for (ClutchItem item : ClutchItem.values()) {
-            if (item.getBlock() == block || block.getDefaultState().isLiquid()) {
+            if (item.getBlock() == block) {
                 return true;
             }
         }
@@ -242,9 +245,9 @@ public class NoFall extends Module_ {
 
     public enum ClutchItem {
         WATER_BUCKET(Items.WATER_BUCKET, Items.BUCKET, Blocks.WATER),
-        POWDER_SNOW_BUCKET(Items.POWDER_SNOW_BUCKET, Items.BUCKET, Blocks.POWDER_SNOW),
         HAY_BLOCK(Items.HAY_BLOCK, null, Blocks.HAY_BLOCK),
         SLIME_BLOCK(Items.SLIME_BLOCK, null, Blocks.SLIME_BLOCK),
+        POWDER_SNOW_BUCKET(Items.POWDER_SNOW_BUCKET, Items.BUCKET, Blocks.POWDER_SNOW),
         COB_WEB(Items.COBWEB, null, Blocks.COBWEB);
 
 

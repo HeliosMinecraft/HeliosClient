@@ -39,20 +39,21 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
 
         checkGradientAvailability();
     }
-    private void checkGradientAvailability(){
-        if(defaultValue == null){
+
+    private void checkGradientAvailability() {
+        if (defaultValue == null) {
             Optional<String> optional = gradientList.stream().findFirst();
-            optional.ifPresent(s ->{
+            optional.ifPresent(s -> {
                 this.value = GradientManager.getGradient(s);
                 this.defaultValue = value;
             });
         }
     }
 
-    public void createTable(double width){
+    public void createTable(double width) {
         gradientTable = new Table();
 
-        for(String gradientName: gradientList){
+        for (String gradientName : gradientList) {
             gradientTable.addEntry(new GradientEntry(GradientManager.getGradient(gradientName)), width);
         }
     }
@@ -73,10 +74,10 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
 
         //Draw preview
         Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
-                this.value.getStartGradient(),
-                this.value.getEndGradient(),
-                this.value.getEndGradient(),
-                this.value.getStartGradient(),
+                this.value.getStartColor(),
+                this.value.getEndColor(),
+                this.value.getEndColor(),
+                this.value.getStartColor(),
                 x + width - 50,
                 y + 2,
                 40,
@@ -84,53 +85,54 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
                 3
         );
     }
-    public boolean isLinear2D(){
+
+    public boolean isLinear2D() {
         return Objects.requireNonNull(GradientManager.getKeyForGradient(this.value)).equalsIgnoreCase("Linear2D");
     }
 
-    public void renderAllGradients(DrawContext context, int mouseX, int mouseY){
+    public void renderAllGradients(DrawContext context, int mouseX, int mouseY) {
         for (List<TableEntry> row : gradientTable.table) {
             for (TableEntry entry : row) {
                 if (entry instanceof GradientEntry gE) {
-                    boolean isMouseOver = ListSetting.isMouseOver(mouseX,mouseY,(float) gE.x + 3,(float) gE.y,(float) gE.width - 3, 18);
+                    boolean isMouseOver = ListSetting.isMouseOver(mouseX, mouseY, (float) gE.x + 3, (float) gE.y, (float) gE.width - 3, 18);
 
-                    float y = (float)  gE.y - (isMouseOver? 1 : 0);
+                    float y = (float) gE.y - (isMouseOver ? 1 : 0);
 
                     Renderer2D.drawRoundedGradientRectangleWithShadow(context.getMatrices(),
                             (float) gE.x + 3,
                             y,
                             (float) gE.width - 3,
                             18,
-                            gE.gradient.getStartGradient(),
-                            gE.gradient.getEndGradient(),
-                            gE.gradient.getEndGradient(),
-                            gE.gradient.getStartGradient(),
+                            gE.gradient.getStartColor(),
+                            gE.gradient.getEndColor(),
+                            gE.gradient.getEndColor(),
+                            gE.gradient.getStartColor(),
                             3,
                             20,
-                            gE.gradient.getStartGradient()
+                            gE.gradient.getStartColor()
                     );
 
-                    if(this.value == gE.gradient){
+                    if (this.value == gE.gradient) {
                         Renderer2D.drawOutlineRoundedBox(context.getMatrices().peek().getPositionMatrix(),
-                                (float)gE.x + 2,
+                                (float) gE.x + 2,
                                 y,
                                 (float) gE.width - 2,
                                 19,
                                 3f,
                                 1.2f,
                                 Color.WHITE.getRGB()
-                                );
+                        );
                     }
 
                     String nameOfG = GradientManager.getKeyForGradient(gE.gradient);
 
-                    if(nameOfG == null){
+                    if (nameOfG == null) {
                         nameOfG = "Unknown";
-                    }else{
+                    } else {
                         nameOfG = nameOfG.trim();
                     }
 
-                    Renderer2D.drawCustomString(FontRenderers.Mid_fxfontRenderer,context.getMatrices(),nameOfG,(float) (gE.x + gE.width/2.0f - Renderer2D.getCustomStringWidth(nameOfG,FontRenderers.Mid_fxfontRenderer)/2.0f + 1),y + 9 - Renderer2D.getCustomStringHeight(nameOfG,FontRenderers.Mid_fxfontRenderer)/2.0f,-1);
+                    Renderer2D.drawCustomString(FontRenderers.Mid_fxfontRenderer, context.getMatrices(), nameOfG, (float) (gE.x + gE.width / 2.0f - Renderer2D.getCustomStringWidth(nameOfG, FontRenderers.Mid_fxfontRenderer) / 2.0f + 1), y + 9 - Renderer2D.getCustomStringHeight(nameOfG, FontRenderers.Mid_fxfontRenderer) / 2.0f, -1);
                 }
             }
         }
@@ -152,10 +154,10 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
 
         //Draw preview
         Renderer2D.drawRoundedGradientRectangle(drawContext.getMatrices().peek().getPositionMatrix(),
-                this.value.getStartGradient(),
-                this.value.getEndGradient(),
-                this.value.getEndGradient(),
-                this.value.getStartGradient(),
+                this.value.getStartColor(),
+                this.value.getEndColor(),
+                this.value.getEndColor(),
+                this.value.getStartColor(),
                 x + moduleWidth - 15,
                 y + 2,
                 12,
@@ -190,6 +192,12 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
         }
         return this.value;
     }
+    public Color getStartColor(){
+        return get().getStartColor();
+    }
+    public Color getEndColor(){
+        return get().getEndColor();
+    }
 
     @Override
     public Object saveToFile(List<Object> objectList) {
@@ -207,6 +215,7 @@ public class GradientSetting extends ParentScreenSetting<GradientManager.Gradien
 
         this.value = GradientManager.getGradient(mapVal.toString());
     }
+
     @Override
     public void setValue(GradientManager.Gradient value) {
         this.value = value;

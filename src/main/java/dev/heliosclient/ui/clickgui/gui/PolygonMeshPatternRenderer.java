@@ -43,7 +43,7 @@ public class PolygonMeshPatternRenderer {
     }
 
     public void render(MatrixStack matrixStack, int mouseX, int mouseY) {
-        Renderer2D.drawToGradientMask(matrixStack.peek().getPositionMatrix(), maskGradient.getStartGradient(), maskGradient.getEndGradient(), maskGradient.getEndGradient(), maskGradient.getStartGradient(), 0, 0, MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight(), () -> {
+        Renderer2D.drawToGradientMask(matrixStack.peek().getPositionMatrix(), maskGradient.getStartColor(), maskGradient.getEndColor(), maskGradient.getEndColor(), maskGradient.getStartColor(), 0, 0, MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight(), () -> {
             for (Point point : points) {
                 point.move(mouseX, mouseY);
                 point.display(matrixStack);

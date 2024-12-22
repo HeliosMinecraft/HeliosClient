@@ -97,8 +97,8 @@ public class BreakIndicator extends Module_ {
             BlockState state = mc.world.getBlockState(currentBreakingPos);
             VoxelShape shape = state.getOutlineShape(mc.world, currentBreakingPos);
             if (shape == null || shape.isEmpty()) return;
-            int start = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getStartGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
-            int end = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getEndGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+            int start = gradientBool.value ? ColorUtils.changeAlpha(gradient.getStartColor().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+            int end = gradientBool.value ? ColorUtils.changeAlpha(gradient.getEndColor().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
 
             renderIndicator(shape.getBoundingBox().expand(0.001f).offset(currentBreakingPos), selfBreakingProgress/10.0f, (IndicateType) type.getOption(),start,end);
         }
@@ -113,8 +113,8 @@ public class BreakIndicator extends Module_ {
             VoxelShape shape = state.getOutlineShape(mc.world, pos);
 
             if (shape == null || shape.isEmpty()) return;
-            int start = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getStartGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
-            int end = gradientBool.value ? ColorUtils.changeAlpha(gradient.get().getEndGradient().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+            int start = gradientBool.value ? ColorUtils.changeAlpha(gradient.getStartColor().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
+            int end = gradientBool.value ? ColorUtils.changeAlpha(gradient.getEndColor().getRGB(),alpha.getInt()).getRGB() : highlightColor.value.getRGB();
 
             renderIndicator(shape.getBoundingBox().expand(0.001f).offset(pos), (float) (breakProgress + 1) / 10, (IndicateType) type.getOption(),start,end);
         });

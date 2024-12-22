@@ -38,24 +38,24 @@ public class GradientManager {
 
 
     public static class Gradient {
-        private final Supplier<Color> startGradient;
-        private final Supplier<Color> endGradient;
+        private final Supplier<Color> startColor;
+        private final Supplier<Color> endColor;
 
-        public static Gradient of(Supplier<Color> startGradient, Supplier<Color> endGradient){
-            return new Gradient(startGradient, endGradient);
+        public static Gradient of(Supplier<Color> startColor, Supplier<Color> endGradient){
+            return new Gradient(startColor, endGradient);
         }
 
-        public Gradient(Supplier<Color> startGradient, Supplier<Color> endGradient) {
-            this.startGradient = startGradient;
-            this.endGradient = endGradient;
+        public Gradient(Supplier<Color> startColor, Supplier<Color> endColor) {
+            this.startColor = startColor;
+            this.endColor = endColor;
         }
 
-        public Color getStartGradient() {
-            return startGradient.get();
+        public Color getStartColor() {
+            return startColor.get();
         }
 
-        public Color getEndGradient() {
-            return endGradient.get();
+        public Color getEndColor() {
+            return endColor.get();
         }
     }
 

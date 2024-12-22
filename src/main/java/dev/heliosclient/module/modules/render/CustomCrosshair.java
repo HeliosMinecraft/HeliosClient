@@ -146,8 +146,8 @@ public class CustomCrosshair extends Module_ {
     }
 
     public void renderInverseTriangleGap(DrawContext dr, int x, int y) {
-        Color startG = colorMode.value == 0 ? staticColor.getColor() : gradientType.get().getStartGradient();
-        Color endG = colorMode.value == 0 ? staticColor.getColor() : gradientType.get().getEndGradient();
+        Color startG = colorMode.value == 0 ? staticColor.getColor() : gradientType.getStartColor();
+        Color endG = colorMode.value == 0 ? staticColor.getColor() : gradientType.getEndColor();
 
         Matrix4f mc = dr.getMatrices().peek().getPositionMatrix();
         //left
@@ -177,8 +177,8 @@ public class CustomCrosshair extends Module_ {
     }
 
     public void mask(DrawContext dr, Runnable task, int x, int y, int width, int height) {
-        Color startG = colorMode.value == 0 ? staticColor.getColor() : gradientType.get().getStartGradient();
-        Color endG = colorMode.value == 0 ? staticColor.getColor() : gradientType.get().getEndGradient();
+        Color startG = colorMode.value == 0 ? staticColor.getColor() : gradientType.getStartColor();
+        Color endG = colorMode.value == 0 ? staticColor.getColor() : gradientType.getEndColor();
 
         Renderer2D.drawToGradientMask(dr.getMatrices().peek().getPositionMatrix(),
                 startG,

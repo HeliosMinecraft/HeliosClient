@@ -121,6 +121,7 @@ public class HoleESP extends Module_ {
             .build()
     );
     SettingGroup sgColor = new SettingGroup("Color");
+
     CycleSetting gradientDirection = sgColor.add(new CycleSetting.Builder()
             .name("Gradient Direction")
             .description("Direction of gradient, up/down")

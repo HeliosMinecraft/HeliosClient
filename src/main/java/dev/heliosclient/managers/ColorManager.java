@@ -187,7 +187,7 @@ public class ColorManager implements Listener {
         if (gui.ColorMode.value == 0) {
             updatePrimaryGradients(gui.staticColor.getColor(), gui.staticColor.getColor());
         }else if (gui.ColorMode.value == 1) {
-            updatePrimaryGradients(gui.gradientType.get().getStartGradient(), gui.gradientType.get().getEndGradient());
+            updatePrimaryGradients(gui.gradientType.get().getStartColor(), gui.gradientType.get().getEndColor());
         }
 
         updateClickGuiSecondary(HeliosClient.CLICKGUI.AccentColor.getColor(), HeliosClient.CLICKGUI.AccentColor.isRainbow());
