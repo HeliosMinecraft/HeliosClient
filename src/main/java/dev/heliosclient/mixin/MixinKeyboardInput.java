@@ -4,6 +4,9 @@ import dev.heliosclient.event.events.input.KeyboardInputEvent;
 import dev.heliosclient.managers.EventManager;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.input.KeyboardInput;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.util.PlayerInput;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,19 +20,18 @@ public abstract class MixinKeyboardInput extends Input {
         return 0;
     }
 
-    @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/input/KeyboardInput;sneaking:Z", shift = At.Shift.AFTER), allow = 1)
-    private void onTick(boolean slowDown, float slowDownFactor, CallbackInfo ci) {
-        KeyboardInputEvent event = new KeyboardInputEvent(pressingForward, pressingBack, pressingLeft, pressingRight, jumping, sneaking);
+    @Shadow @Final private GameOptions settings;
+
+    @Inject(method = "tick", at = @At(value = "HEAD"), cancellable = true)
+    private void onTick(CallbackInfo ci) {
+        KeyboardInputEvent event = new KeyboardInputEvent(this.settings.forwardKey.isPressed(), this.settings.backKey.isPressed(), this.settings.leftKey.isPressed(), this.settings.rightKey.isPressed(), this.settings.jumpKey.isPressed(), this.settings.sneakKey.isPressed(), this.settings.sprintKey.isPressed());
         EventManager.postEvent(event);
 
         if(event.isCanceled()){
-            this.pressingForward = event.pressingForward;
-            this.pressingBack = event.pressingBack;
-            this.pressingLeft = event.pressingLeft;
-            this.pressingRight = event.pressingRight;
+            this.playerInput = new PlayerInput(event.pressingForward,event.pressingBack,event.pressingLeft,event.pressingRight,event.jumping,event.sneaking,event.sprinting);
 
-            this.movementForward = getMovementMultiplier(this.pressingForward, this.pressingBack);
-            this.movementSideways = getMovementMultiplier(this.pressingLeft, this.pressingRight);
+            this.movementForward = getMovementMultiplier(playerInput.forward(),playerInput.backward());
+            this.movementSideways = getMovementMultiplier(playerInput.left(), playerInput.right());
 
             if (event.shouldApplyMovementForward()) {
                 this.movementForward = event.movementForward;
@@ -37,9 +39,7 @@ public abstract class MixinKeyboardInput extends Input {
             if (event.shouldApplyMovementSideways()) {
                 this.movementSideways = event.movementSideways;
             }
-
-            this.jumping = event.jumping;
-            this.sneaking = event.sneaking;
+            ci.cancel();
         }
     }
 }

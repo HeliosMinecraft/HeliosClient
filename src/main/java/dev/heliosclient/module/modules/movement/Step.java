@@ -127,11 +127,11 @@ public class Step extends Module_ {
             return;
         }
 
-        mc.player.setStepHeight((float) stepHeight.value);
+        PlayerUtils.setStepHeight((float) stepHeight.value);
 
         if (shiftSuppress.value) {
             if (mc.options.sneakKey.isPressed()) {
-                mc.player.setStepHeight(0.5f);
+                PlayerUtils.setStepHeight(0.5f);
             }
         }
 
@@ -157,10 +157,10 @@ public class Step extends Module_ {
         return mc.player.isInLava()
                 || mc.player.isRiding()
                 || mc.player.isTouchingWater()
-                || mc.player.isFallFlying()
+                || mc.player.isGliding()
                 || mc.player.isHoldingOntoLadder()
-                || mc.player.input.jumping
-                || mc.player.input.sneaking;
+                || mc.player.input.playerInput.jump()
+                || mc.player.input.playerInput.sneak();
     }
 
     @Override
@@ -170,7 +170,7 @@ public class Step extends Module_ {
             return;
         }
         wasOnGround = false;
-        mc.player.setStepHeight(previousHeight);
+        PlayerUtils.setStepHeight(previousHeight);
     }
 
     public enum ReverseStepMode{

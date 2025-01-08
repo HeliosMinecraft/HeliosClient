@@ -26,7 +26,7 @@ public class DisplayPreviewEntity {
 
     public DisplayPreviewEntity(){
         mc.getSkinProvider().fetchSkinTextures(profile).thenAccept(sT -> {
-            skinTexture = sT;
+            skinTexture = sT.orElse(DefaultSkinHelper.getSteve());
             slim = skinTexture.model() == SkinTextures.Model.SLIM;
         });
         updateLimbs();

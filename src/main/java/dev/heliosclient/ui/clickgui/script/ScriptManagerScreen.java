@@ -114,7 +114,7 @@ public class ScriptManagerScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         if (mc.world == null) {
-            super.renderBackgroundTexture(context);
+            super.renderBackgroundTexture(context,MENU_BACKGROUND_TEXTURE,0,0,0,0,width,height);
         }
 
         if(GUI.coolVisuals()) {

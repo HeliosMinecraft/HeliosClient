@@ -57,7 +57,7 @@ public class BrandSpoof extends Module_ {
     public void onPacketSend(PacketEvent.SEND event) {
         if (!(event.packet instanceof CustomPayloadC2SPacket packet)) return;
 
-        if (spoofBrand.value && packet.payload().id().equals(BrandCustomPayload.ID)) {
+        if (spoofBrand.value && packet.payload().getId().equals(BrandCustomPayload.ID)) {
             mc.getNetworkHandler().getConnection().send(new CustomPayloadC2SPacket(new BrandCustomPayload(brandToSpoof.value)));
         }
     }
@@ -101,7 +101,7 @@ public class BrandSpoof extends Module_ {
             msg.append("\t").append(download).append(" ");
             msg.append(spoof);
 
-            mc.player.sendMessage(msg);
+            mc.player.sendMessage(msg,false);
         }
     }
 

@@ -73,6 +73,7 @@ public class Zoom extends Module_ {
         if (scrollZoom.value) {
             targetZoomAmount -= (event.getVerticalAmount() * mc.options.getMouseWheelSensitivity().getValue() * 1.25f);
             targetZoomAmount = MathHelper.clamp(targetZoomAmount, 1, 110);
+            event.cancel();
         }
     }
 

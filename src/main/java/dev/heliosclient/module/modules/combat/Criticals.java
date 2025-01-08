@@ -153,7 +153,7 @@ public class Criticals extends Module_ {
         double y = mc.player.getY();
         double z = mc.player.getZ();
 
-        PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.PositionAndOnGround(x, y + height, z, false);
+        PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.PositionAndOnGround(x, y + height, z, false,mc.player.horizontalCollision);
 
         mc.player.networkHandler.sendPacket(packet);
     }

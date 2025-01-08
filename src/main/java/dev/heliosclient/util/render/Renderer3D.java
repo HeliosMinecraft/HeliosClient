@@ -8,11 +8,13 @@ import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.*;
 import org.joml.Matrix4f;
@@ -79,15 +81,14 @@ public class Renderer3D {
         MatrixStack matrices = matrixFrom(box.minX, box.minY, box.minZ);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         // Fill
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
 
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         Vertexer.vertexBoxQuads(matrices, buffer, moveToZero(box), color, excludeDirs);
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
         cleanup();
     }
@@ -108,16 +109,16 @@ public class Renderer3D {
         MatrixStack matrices = matrixFrom(box.minX, box.minY, box.minZ);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
+
 
         // Outline
         RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.setShader(ShaderProgramKeys.RENDERTYPE_LINES);
         RenderSystem.lineWidth(lineWidth);
 
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
         Vertexer.vertexBoxLines(matrices, buffer, moveToZero(box), color, excludeDirs);
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
 
         RenderSystem.enableCull();
@@ -138,19 +139,19 @@ public class Renderer3D {
         MatrixStack matrices = matrixFrom(x1, y1, z1);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
 
         // Fill
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         Vertexer.vertexQuad(matrices, buffer,
                 0f, 0f, 0f,
                 (float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1),
                 (float) (x3 - x1), (float) (y3 - y1), (float) (z3 - z1),
                 (float) (x4 - x1), (float) (y4 - y1), (float) (z4 - z1),
                 cullMode, color);
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
         cleanup();
     }
@@ -166,21 +167,20 @@ public class Renderer3D {
         MatrixStack matrices = matrixFrom(x1, y1, z1);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);;
 
         int[] colors = color.getAllColors();
 
         // Outline
         RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.setShader(ShaderProgramKeys.RENDERTYPE_LINES);
         RenderSystem.lineWidth(lineWidth);
 
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
         Vertexer.vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1), LineColor.gradient(colors[0], colors[1]));
         Vertexer.vertexLine(matrices, buffer, (float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1), (float) (x3 - x1), (float) (y3 - y1), (float) (z3 - z1), LineColor.gradient(colors[1], colors[2]));
         Vertexer.vertexLine(matrices, buffer, (float) (x3 - x1), (float) (y3 - y1), (float) (z3 - z1), (float) (x4 - x1), (float) (y4 - y1), (float) (z4 - z1), LineColor.gradient(colors[2], colors[3]));
         Vertexer.vertexLine(matrices, buffer, (float) (x4 - x1), (float) (y4 - y1), (float) (z4 - z1), 0f, 0f, 0f, LineColor.gradient(colors[3], colors[0]));
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
         RenderSystem.enableCull();
         cleanup();
@@ -198,7 +198,7 @@ public class Renderer3D {
         MatrixStack matrices = matrixFrom(x1, y1, z1);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
 
         // Line
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
@@ -206,12 +206,11 @@ public class Renderer3D {
 
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.setShader(ShaderProgramKeys.RENDERTYPE_LINES);
         RenderSystem.lineWidth(width);
 
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
         Vertexer.vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1), color);
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();
@@ -234,7 +233,7 @@ public class Renderer3D {
         // Line
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.setShader(ShaderProgramKeys.RENDERTYPE_LINES);
         RenderSystem.lineWidth(width);
 
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
@@ -244,7 +243,7 @@ public class Renderer3D {
 
         Vertexer.vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (end.x - start.x), (float) (end.y - start.y), (float) (end.z - start.z), color);
 
-        Renderer2D.draw();
+        Renderer2D.draw(buffer);
 
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
         GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_FASTEST);
@@ -278,7 +277,7 @@ public class Renderer3D {
 
         int halfWidth = mc.textRenderer.getWidth(text) / 2;
 
-        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(Tessellator.getInstance().getBuffer());
+        VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(786432));
 
         mc.textRenderer.draw(text, -halfWidth, 0f, color, shadow, matrices.peek().getPositionMatrix(), immediate, TextRenderer.TextLayerType.NORMAL, 0, 0xf000f0);
         immediate.draw();
@@ -348,15 +347,14 @@ public class Renderer3D {
 
         setup();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
 
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
-        buffer.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
         Vertexer.vertexTriangle(matrices, buffer, Vec3d.ZERO, pos1, pos3, color);
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();
@@ -382,7 +380,8 @@ public class Renderer3D {
 
         setup();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+
 
         // By disabling the depth mask before rendering the circle, we prevent the circle from writing to the depth buffer.
         // This allows the player to be rendered on top of the circle.
@@ -391,8 +390,7 @@ public class Renderer3D {
         RenderSystem.disableCull();
 
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        buffer.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         for (int i = 0; i < segments; i++) {
             float angle1 = ((float) i / segments) * 360f;
@@ -404,7 +402,7 @@ public class Renderer3D {
             Vertexer.vertexTriangle(matrices, buffer, Vec3d.ZERO, pos1, pos2, color);
         }
 
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
         RenderSystem.depthMask(true);
 
@@ -420,13 +418,11 @@ public class Renderer3D {
 
         setup();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
 
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-
-        buffer.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         for (int i = 0; i < segments; i++) {
             for (int j = 0; j < segments; j++) {
                 float u1 = ((float) i / segments) * 360f;
@@ -443,7 +439,7 @@ public class Renderer3D {
                 Vertexer.vertexTriangle(matrices, buffer, pos2, pos4, pos3, QuadColor.single(ColorUtils.changeAlpha(Color.WHITE, 100).getRGB()));
             }
         }
-        tessellator.draw();
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
         RenderSystem.enableCull();
         RenderSystem.enableDepthTest();
@@ -453,19 +449,17 @@ public class Renderer3D {
     public static void drawSphere(MatrixStack matrices, double radius, float z, Color color) {
         Matrix4f matrix = matrices.peek().getPositionMatrix();
         setup();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
 
         // By disabling the depth mask before rendering the sphere, we prevent the sphere from writing to the depth buffer.
         // This allows the player to be rendered on top of the circle.
         RenderSystem.depthMask(false);
-
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         for (int i = 0; i <= 20; i++) {
             final float x2 = (float) (Math.sin(((i * 56.548656f) / 180f)) * radius);
             final float y2 = (float) (Math.cos(((i * 56.548656f) / 180f)) * radius);
-            bufferBuilder.vertex(matrix, x2, y2, z).color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f).next();
+            bufferBuilder.vertex(matrix, x2, y2, z).color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
         }
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
@@ -493,7 +487,7 @@ public class Renderer3D {
             return Vec3d.ZERO;
         }
 
-        double tickDelta = mc.getTickDelta();
+        double tickDelta = mc.getRenderTickCounter().getTickDelta(false);
         return new Vec3d(
                 MathHelper.lerp(tickDelta, e.lastRenderX, e.getX()),
                 MathHelper.lerp(tickDelta, e.lastRenderY, e.getY()),

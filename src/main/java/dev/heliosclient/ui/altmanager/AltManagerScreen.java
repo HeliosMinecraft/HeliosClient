@@ -15,7 +15,7 @@ public class AltManagerScreen extends Screen {
 
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
-        renderBackgroundTexture(drawContext);
+        renderBackgroundTexture(drawContext,MENU_BACKGROUND_TEXTURE,0,0,0,0,width,height);
     }
 
     @Override

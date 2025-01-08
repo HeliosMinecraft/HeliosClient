@@ -1,17 +1,14 @@
 package dev.heliosclient.ui.clickgui.settings;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.managers.GradientManager;
 import dev.heliosclient.module.modules.render.GUI;
 import dev.heliosclient.module.settings.GradientSetting;
-import dev.heliosclient.module.settings.RGBASetting;
 import dev.heliosclient.module.settings.lists.ListSetting;
 import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import dev.heliosclient.ui.clickgui.gui.Window;
 import dev.heliosclient.ui.clickgui.gui.tables.TableEntry;
 import dev.heliosclient.util.interfaces.IWindowContentRenderer;
-import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -35,7 +32,7 @@ public class GradientSettingScreen extends Screen implements IWindowContentRende
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         if (this.client.world == null) {
-            super.renderBackgroundTexture(drawContext);
+            super.renderBackgroundTexture(drawContext,MENU_BACKGROUND_TEXTURE,0,0,0,0,width,height);
         }
         if(GUI.coolVisuals()){
             PolygonMeshPatternRenderer.INSTANCE.render(drawContext.getMatrices(),mouseX,mouseY);

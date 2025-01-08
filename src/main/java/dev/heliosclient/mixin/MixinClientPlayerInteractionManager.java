@@ -3,14 +3,12 @@ package dev.heliosclient.mixin;
 import dev.heliosclient.event.events.block.*;
 import dev.heliosclient.event.events.entity.EntityInteractEvent;
 import dev.heliosclient.event.events.player.PlayerAttackEntityEvent;
-import dev.heliosclient.event.events.player.ReachEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.player.NoBreakDelay;
 import dev.heliosclient.module.modules.render.Freecam;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
@@ -36,28 +34,6 @@ public abstract class MixinClientPlayerInteractionManager {
     @Shadow
     @Final
     private MinecraftClient client;
-
-    @Shadow
-    public abstract float getReachDistance();
-
-    @Shadow public abstract boolean breakBlock(BlockPos pos);
-
-    @Shadow @Final private ClientPlayNetworkHandler networkHandler;
-
-    @Inject(method = "getReachDistance()F", at = @At(value = "HEAD"), cancellable = true)
-    private void getReach(CallbackInfoReturnable<Float> cir) {
-        ReachEvent reachEvent = new ReachEvent(cir.getReturnValueF());
-        EventManager.postEvent(reachEvent);
-        if (reachEvent.isCanceled())
-            cir.setReturnValue(reachEvent.getReach());
-    }
-
-    @Inject(method = "hasExtendedReach()Z", at = @At(value = "HEAD"), cancellable = true)
-    private void onHasExtendedReach(CallbackInfoReturnable<Boolean> cir) {
-        ReachEvent reachEvent = new ReachEvent(getReachDistance());
-        EventManager.postEvent(reachEvent);
-        if (reachEvent.isCanceled()) cir.setReturnValue(true);
-    }
 
     @Inject(method = "attackEntity", at = @At(value = "TAIL"), cancellable = true)
     private void onAttackEntity(PlayerEntity player, Entity target, CallbackInfo ci) {
@@ -140,5 +116,4 @@ public abstract class MixinClientPlayerInteractionManager {
             callbackInfo.cancel();
         }
     }
-
 }

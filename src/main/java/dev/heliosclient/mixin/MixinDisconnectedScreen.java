@@ -70,6 +70,6 @@ public abstract class MixinDisconnectedScreen extends Screen {
     @Unique
     private void tryConnect() {
         ServerInfo info = autoReconnect.lastConnection;
-        ConnectScreen.connect(new TitleScreen(), HeliosClient.MC, ServerAddress.parse(info.address), info, false);
+        ConnectScreen.connect(new TitleScreen(), HeliosClient.MC, ServerAddress.parse(info.address), info, false, null);
     }
 }

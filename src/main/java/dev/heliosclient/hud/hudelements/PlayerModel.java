@@ -43,7 +43,7 @@ public class PlayerModel extends HudElement {
             Renderer2D.drawRectangle(drawContext.getMatrices().peek().getPositionMatrix(), this.x, this.y, width - 1, height - 1, Color.BLACK.getRGB());
         }
         if (player != null) {
-            Renderer2D.drawEntity(drawContext, x + width / 2, (int) (y + height - (6 * size.value)), ((int) (25 * size.value)), player, HeliosClient.MC.getTickDelta());
+            Renderer2D.drawEntity(drawContext, x + width / 2, (int) (y + height - (6 * size.value)), ((int) (25 * size.value)), player, HeliosClient.MC.getRenderTickCounter().getTickDelta(false));
         }
     }
 

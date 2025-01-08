@@ -9,7 +9,6 @@ import dev.heliosclient.util.textures.ClientTexture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.ResourceReload;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -77,8 +76,8 @@ public abstract class MixinSplashScreen {
         int alpha = MathHelper.clamp((int) (getAlpha() * 255),0,255);
 
 
-        int startColor = ColorHelper.Argb.getArgb(alpha,183, 25, 112);
-        int endColor = ColorHelper.Argb.getArgb(alpha,1, 65, 109);
+        int startColor = ColorHelper.getArgb(alpha,183, 25, 112);
+        int endColor = ColorHelper.getArgb(alpha,1, 65, 109);
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
         Renderer2D.drawGradient(context.getMatrices().peek().getPositionMatrix(), 0,0,i,j,startColor,endColor, Renderer2D.Direction.LEFT_RIGHT);
@@ -98,7 +97,9 @@ public abstract class MixinSplashScreen {
     }
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
-    public void render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    public void helios$render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        int size = 100;
+  /*
         int i = context.getScaledWindowWidth();
         int j = context.getScaledWindowHeight();
         long l = Util.getMeasuringTimeMs();
@@ -123,7 +124,7 @@ public abstract class MixinSplashScreen {
         } else {
             alpha = 1.0F;
         }
-
+        /*
         renderSplashBackground(context);
 
         alpha = MathHelper.clamp(alpha, 0.0F, 1.0F);
@@ -131,25 +132,27 @@ public abstract class MixinSplashScreen {
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
         RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0f);
+        //RenderSystem.setShaderTexture(0, CLIENT_LOGO_TEXTURE);
 
-        int size = 100;
         float halfScreenWidth = i/2.0f;
         float halfScreenHeight = j/2.0f;
 
-        context.drawTexture(CLIENT_ICON_TEXTURE, (int) halfScreenWidth - (size / 2), (int) halfScreenHeight - (size / 2), size, size, 0, 0, size, size, size, size);
+        Renderer2D.drawTexture(context.getMatrices(),(int) halfScreenWidth - (size / 2), (int) halfScreenHeight - (size / 2),size, size,0,0, size, size,size, size);
 
         if (HeliosClient.MC.textRenderer != null) {
             context.drawText(HeliosClient.MC.textRenderer, subtitleText, (int) halfScreenWidth - (HeliosClient.MC.textRenderer.getWidth(subtitleText) / 2) + 5, (int) halfScreenHeight + size/2 + HeliosClient.MC.textRenderer.fontHeight - 4, 0xFFFFFF, true);
         }
 
+
+
         float t = this.reload.getProgress();
         this.progress = MathHelper.clamp(this.progress * 0.95F + t * 0.050000012F, 0.0F, 1.0F);
         //opacity = 1.0F - MathHelper.clamp(f, 0.0F, 1.0F),
+
         this.renderProgressBar(context, size);
 
-        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableBlend();
         RenderSystem.depthMask(true);
@@ -173,6 +176,8 @@ public abstract class MixinSplashScreen {
             }
         }
         ci.cancel();
+
+   */
     }
 
     @Unique

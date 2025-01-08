@@ -146,14 +146,16 @@ public class NoFall extends Module_ {
                                 mc.player.getX(),
                                 mc.player.getY(),
                                 mc.player.getZ(),
-                                true
+                                true,
+                                mc.player.horizontalCollision
                         )
                 );
             } else if (mode.value == 1) {
                 // Prevents the half-heart damage from PositionAndOnGround mode
                 mc.player.networkHandler.sendPacket(
                         new PlayerMoveC2SPacket.OnGroundOnly(
-                                true
+                                true,
+                                mc.player.horizontalCollision
                         )
                 );
             } else if (mode.value == 3) {
@@ -169,7 +171,7 @@ public class NoFall extends Module_ {
                 if (distance <= 3) {
                     assert mc.world != null;
                     mc.player.networkHandler.sendPacket(
-                            new PlayerMoveC2SPacket.OnGroundOnly(true)
+                            new PlayerMoveC2SPacket.OnGroundOnly(true, mc.player.horizontalCollision)
                     );
                     mc.world.disconnect();
                 }
@@ -197,7 +199,7 @@ public class NoFall extends Module_ {
                 event.modifyMovement().heliosClient$setXZ(0, 0);
             }
 
-            BlockHitResult result = mc.world.raycast(new RaycastContext(mc.player.getPos(), mc.player.getPos().subtract(0, mc.interactionManager.getReachDistance(), 0), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
+            BlockHitResult result = mc.world.raycast(new RaycastContext(mc.player.getPos(), mc.player.getPos().subtract(0, mc.player.getBlockInteractionRange(), 0), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
 
             if (result != null && result.getType() == HitResult.Type.BLOCK) {
                 if (!isPlayerAlreadySafe(result.getBlockPos())) {
@@ -280,7 +282,7 @@ public class NoFall extends Module_ {
         private boolean hasClutchedProperly = false;
 
         public void clutch(ClutchItem item, BlockPos pos, PlayerMotionEvent event) {
-            if (item == ClutchItem.WATER_BUCKET && mc.world.getDimensionKey() == DimensionTypes.THE_NETHER) {
+            if (item == ClutchItem.WATER_BUCKET && mc.world.getDimensionEntry().matchesKey(DimensionTypes.THE_NETHER)) {
                 return;
             }
 

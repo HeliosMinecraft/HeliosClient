@@ -76,21 +76,21 @@ public class ArmorHud extends HudElement {
         super.onSettingChange(setting);
 
         if(setting == textSize && HeliosClient.shouldUpdate()){
-            this.cFontRenderer = new fxFontRenderer(FontManager.fonts,textSize.getFloat());
+            this.cFontRenderer = new fxFontRenderer(FontManager.fonts[0],textSize.getFloat());
         }
     }
     @SubscribeEvent
     public void onFontChange(FontChangeEvent e){
         if(mc.getWindow() == null) return;
 
-        this.cFontRenderer = new fxFontRenderer(e.getFonts(),textSize.getFloat());
+        this.cFontRenderer = new fxFontRenderer(e.getFonts()[0],textSize.getFloat());
     }
 
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         super.renderElement(drawContext, textRenderer);
         if(cFontRenderer == null){
-            this.cFontRenderer = new fxFontRenderer(FontManager.fonts,textSize.getFloat());
+            this.cFontRenderer = new fxFontRenderer(FontManager.fonts[0],textSize.getFloat());
         }
 
         ItemStack helmet, chestplate, leggings, boots;

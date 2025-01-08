@@ -1,9 +1,11 @@
 package dev.heliosclient.util.fontutils;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 
 import java.awt.*;
 
@@ -18,7 +20,7 @@ public class fxFontRenderer extends FontRenderer {
      * @param fonts  The fonts to use. The font renderer will go over each font in this array, search for the glyph, and render it if found. If no font has the specified glyph, it will draw the missing font symbol.
      * @param sizePx The size of the font in minecraft pixel units. One pixel unit = `guiScale` pixels
      */
-    public fxFontRenderer(Font[] fonts, float sizePx) {
+    public fxFontRenderer(Font fonts, float sizePx) {
         super(fonts, sizePx);
     }
 
@@ -59,10 +61,12 @@ public class fxFontRenderer extends FontRenderer {
 
         // Draw the text at the specified coordinates with the specified color
         //this.drawString(matrixStack, text, x / scaleFactor, y / scaleFactor, r, g, b, a);
+        RenderSystem.setShaderColor(r/255.0F,g/255.0F,b/255.0F,a/255.0F);
+
         try {
-            super.drawString(matrixStack, text, x, y, r, g, b, a);
-        } catch (NullPointerException ignored) {
-        }
+            super.drawText(matrixStack, Text.of(text), x,y,a/255.0F);
+        } catch (NullPointerException ignored) {}
+        RenderSystem.setShaderColor(1.0F,1.0F,1.0F,1.0F);
     }
 
     public void drawCenteredString(MatrixStack stack, String s, float x, float y, int color) {
@@ -71,10 +75,12 @@ public class fxFontRenderer extends FontRenderer {
         int b = 256 - ColorUtils.getBlue(color);
         int a = 256 - ColorUtils.getAlpha(color);
 
+        RenderSystem.setShaderColor(r/255.0F,g/255.0F,b/255.0F,a/255.0F);
         try {
-            super.drawCenteredString(stack, s, x, y, r, g, b, a);
+            super.drawCenteredText(stack, Text.of(s), x,y,a/255.0F);
         } catch (NullPointerException ignored) {
         }
+        RenderSystem.setShaderColor(1.0F,1.0F,1.0F,1.0F);
     }
 
 }

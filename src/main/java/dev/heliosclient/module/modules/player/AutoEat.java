@@ -14,7 +14,8 @@ import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.PlayerUtils;
-import net.minecraft.item.FoodComponent;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.hit.BlockHitResult;
@@ -75,7 +76,7 @@ public class AutoEat extends Module_ {
     ItemListSetting blackListedFood = sgGeneral.add(new ItemListSetting.Builder()
             .name("BlackListed Food")
             .iSettingChange(this)
-            .filter(Item::isFood)
+            .filter(item -> item.getComponents().contains(DataComponentTypes.FOOD))
             .items(Items.POISONOUS_POTATO,Items.ROTTEN_FLESH,Items.CHORUS_FRUIT,Items.PUFFERFISH, Items.SPIDER_EYE,Items.SUSPICIOUS_STEW)
             .build()
     );
@@ -160,7 +161,7 @@ public class AutoEat extends Module_ {
             if (mc.player.getInventory().getStack(slot) == null) continue;
 
             Item item = mc.player.getInventory().getStack(slot).getItem();
-            FoodComponent foodC = item.getFoodComponent();
+            FoodComponent foodC = item.getComponents().get(DataComponentTypes.FOOD);
             if (foodC == null) continue;
 
             if (gapplePriority.value && item == Items.ENCHANTED_GOLDEN_APPLE) {
@@ -169,18 +170,18 @@ public class AutoEat extends Module_ {
                 return slot;
             }
 
-            if (foodC.getHunger() > maxHunger) {
+            if (foodC.nutrition() > maxHunger) {
                 if (shouldAvoid(item)) continue;
 
                 bestSlot = slot;
-                maxHunger = foodC.getHunger();
+                maxHunger = foodC.nutrition();
             }
         }
 
         //Offhand
         Item item = mc.player.getInventory().getStack(InventoryUtils.OFFHAND).getItem();
-        FoodComponent component = item.getFoodComponent();
-        if (component != null && item.getFoodComponent().getHunger() > maxHunger && !shouldAvoid(item)) {
+        FoodComponent component = item.getComponents().get(DataComponentTypes.FOOD);
+        if (component != null && component.nutrition() > maxHunger && !shouldAvoid(item)) {
             return InventoryUtils.OFFHAND;
         }
 

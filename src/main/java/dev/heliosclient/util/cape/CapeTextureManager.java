@@ -37,10 +37,12 @@ public class CapeTextureManager {
         } else {
             NativeImage image = NativeImage.read(stream);
             HeliosClient.MC.execute(() -> {
-                Identifier capeIdentifier = HeliosClient.MC.getTextureManager().registerDynamicTexture(prefix + "_cape", new NativeImageBackedTexture(CapeManager.parseCape(image)));
-                Identifier elytraIdentifier = HeliosClient.MC.getTextureManager().registerDynamicTexture(prefix + "_elytra", new NativeImageBackedTexture(image));
-                staticTextures.put(prefix + "_cape", capeIdentifier);
-                staticTextures.put(prefix + "_elytra", elytraIdentifier);
+                Identifier capeIdentifier = Identifier.ofVanilla(prefix + "_cape");
+                Identifier elytraIdentifier = Identifier.ofVanilla(prefix + "_elytra");
+                HeliosClient.MC.getTextureManager().registerTexture(capeIdentifier, new NativeImageBackedTexture(CapeManager.parseCape(image)));
+                HeliosClient.MC.getTextureManager().registerTexture(elytraIdentifier, new NativeImageBackedTexture(image));
+                staticTextures.put(capeIdentifier.toString(), capeIdentifier);
+                staticTextures.put(elytraIdentifier.toString(), elytraIdentifier);
             });
         }
     }

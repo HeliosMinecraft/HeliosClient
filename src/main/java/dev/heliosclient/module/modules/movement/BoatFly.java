@@ -57,6 +57,13 @@ public class BoatFly extends Module_ {
             .roundingPlace(2)
             .build()
     );
+    BooleanSetting onGround = sgGeneral.add(new BooleanSetting.Builder()
+            .name("Boat onGround")
+            .description("Sets boat onGround flag as true")
+            .defaultValue(false)
+            .onSettingChange(this)
+            .build()
+    );
     BooleanSetting cancelServerPackets = sgGeneral.add(new BooleanSetting.Builder()
             .name("Cancel Server packets")
             .description("Cancels incoming boat movement packets from the server")
@@ -165,7 +172,8 @@ public class BoatFly extends Module_ {
                 nextPosZ += MathHelper.cos(yawRad) * horizontalSpeed.value;
             }
             boatEntity.setPosition(nextPosX, nextPosY, nextPosZ);
-            mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(boatEntity));
+            boatEntity.setOnGround(onGround.value);
+            mc.player.networkHandler.sendPacket(new VehicleMoveC2SPacket(boatEntity.getPos(),boatEntity.getYaw(),boatEntity.getPitch(),onGround.value));
         }
     }
 

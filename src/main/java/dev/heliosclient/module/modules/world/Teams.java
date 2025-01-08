@@ -5,9 +5,9 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeableArmorItem;
 import net.minecraft.item.ItemStack;
 
 public class Teams extends Module_ {
@@ -58,12 +58,19 @@ public class Teams extends Module_ {
             ItemStack playerArmorPiece = mc.player.getInventory().armor.get((int) armorIndex.value);
             ItemStack entityArmorPiece = player.getInventory().armor.get((int) armorIndex.value);
 
-            if (accountArmorColor.value && playerArmorPiece.getItem() instanceof DyeableArmorItem playerArmorItem && entityArmorPiece.getItem() instanceof DyeableArmorItem entityArmorItem) {
-                return playerArmorItem.getColor(playerArmorPiece) == entityArmorItem.getColor(entityArmorPiece);
+            if (accountArmorColor.value && isArmorDyeable(playerArmorPiece) && isArmorDyeable(entityArmorPiece)) {
+                return getDyeColor(playerArmorPiece) == getDyeColor(entityArmorPiece);
             }
         }
         return false;
     }
+    public boolean isArmorDyeable(ItemStack stack) {
+        return stack != null && stack.getItem().getComponents().contains(DataComponentTypes.DYED_COLOR);
+    }
+    public int getDyeColor(ItemStack stack) {
+        return stack.getItem().getComponents().get(DataComponentTypes.DYED_COLOR).rgb();
+    }
+
     public int getActualTeamColor(LivingEntity livingEntity) {
         if (livingEntity == null) {
             return -1;
@@ -76,8 +83,8 @@ public class Teams extends Module_ {
         if (livingEntity instanceof PlayerEntity player) {
             ItemStack entityArmorPiece = player.getInventory().armor.get((int) armorIndex.value);
 
-            if (accountArmorColor.value && entityArmorPiece.getItem() instanceof DyeableArmorItem entityArmorItem) {
-                return entityArmorItem.getColor(entityArmorPiece);
+            if (accountArmorColor.value && isArmorDyeable(entityArmorPiece)) {
+                return getDyeColor(entityArmorPiece);
             }
         }
         return -1;

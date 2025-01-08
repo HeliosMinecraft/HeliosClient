@@ -1,35 +1,21 @@
 package dev.heliosclient.util.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import dev.heliosclient.managers.ModuleManager;
-import dev.heliosclient.module.modules.render.CrystalESP;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.EndCrystalEntityRenderer;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.client.render.entity.model.*;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.EndCrystalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Arm;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static dev.heliosclient.util.render.Renderer3D.cleanup;
-import static dev.heliosclient.util.render.Renderer3D.matrixFrom;
+import java.util.ArrayList;
+import java.util.List;
 
 
 //Inspired from MeteorClient WireframeEntityRenderer. :D (Couldn't work out the vertices for rendering)
@@ -48,33 +34,127 @@ public class WireframeEntityRenderer {
     private static QuadColor sideColor;
     private static float lineWidth;
     private static boolean lines, sides;
-    private static boolean skeleton_player;
+    private static boolean player_skeleton;
 
-    public static void render(Entity entity, double scale, QuadColor sideColor, LineColor lineColor, float lineWidth, boolean sides, boolean lines, boolean skeleton_player) {
+    public static void render(Entity entity, double scale, QuadColor sideColor, LineColor lineColor, float lineWidth, boolean sides, boolean lines, boolean player_skeleton) {
         WireframeEntityRenderer.sideColor = sideColor;
         WireframeEntityRenderer.lineColor = lineColor;
         WireframeEntityRenderer.lineWidth = lineWidth;
         WireframeEntityRenderer.sides = sides;
         WireframeEntityRenderer.lines = lines;
-        WireframeEntityRenderer.skeleton_player = skeleton_player;
+        WireframeEntityRenderer.player_skeleton = player_skeleton;
 
+        float tickDelta = mc.getRenderTickCounter().getTickDelta(false);
+
+        pos = Renderer3D.getInterpolatedPosition(entity);
+        var entityRenderer = (EntityRenderer<Entity, EntityRenderState>) mc.getEntityRenderDispatcher().getRenderer(entity);
+        var state = entityRenderer.getAndUpdateRenderState(entity,tickDelta);
+
+        stack.push();
+        stack.scale((float) scale, (float) scale, (float) scale);
+        entityRenderer.render(state,stack,WireframeVertexConsumerProvider.INSTANCE,-1);
+        stack.pop();
+    }
+    public static class WireframeVertexConsumerProvider implements VertexConsumerProvider {
+        static WireframeVertexConsumerProvider INSTANCE = new WireframeVertexConsumerProvider();
+        @Override
+        public VertexConsumer getBuffer(RenderLayer layer) {
+            return WireframeVertexConsumer.INSTANCE;
+        }
+    }
+    public static class WireframeVertexConsumer implements VertexConsumer {
+        static WireframeVertexConsumer INSTANCE = new WireframeVertexConsumer();
+        private final List<Vector3f> vertices = new ArrayList<>();
+
+        @Override
+        public VertexConsumer vertex(float x, float y, float z) {
+            vertices.add(new Vector3f(x,y,z));
+            if(vertices.size() == 4){
+                float x1 = vertices.get(0).x;
+                float y1 = vertices.get(0).y;
+                float z1 = vertices.get(0).z;
+
+                float x2 = vertices.get(1).x;
+                float y2 = vertices.get(1).y;
+                float z2 = vertices.get(1).z;
+
+                float x3 = vertices.get(2).x;
+                float y3 = vertices.get(2).y;
+                float z3 = vertices.get(2).z;
+
+                float x4 = vertices.get(3).x;
+                float y4 = vertices.get(3).y;
+                float z4 = vertices.get(3).z;
+
+                Vertexer.vertexLine(stack,this,x1,y1,z1,x2,y2,z2,lineColor);
+                Vertexer.vertexLine(stack,this,x2,y2,z2,x3,y3,z3,lineColor);
+                Vertexer.vertexLine(stack,this,x3,y3,z3,x4,y4,z4,lineColor);
+                Vertexer.vertexLine(stack,this,x4,y4,z4,x1,y1,z1,lineColor);
+
+                vertices.clear();
+            }
+            return this;
+        }
+
+        @Override
+        public VertexConsumer color(int red, int green, int blue, int alpha) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer texture(float u, float v) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer overlay(int u, int v) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer light(int u, int v) {
+            return this;
+        }
+
+        @Override
+        public VertexConsumer normal(float x, float y, float z) {
+            return this;
+        }
+
+    }
+
+    /*
+    public static void render(Entity entity, double scale, QuadColor sideColor, LineColor lineColor, float lineWidth, boolean sides, boolean lines, boolean player_skeleton) {
+        WireframeEntityRenderer.sideColor = sideColor;
+        WireframeEntityRenderer.lineColor = lineColor;
+        WireframeEntityRenderer.lineWidth = lineWidth;
+        WireframeEntityRenderer.sides = sides;
+        WireframeEntityRenderer.lines = lines;
+        WireframeEntityRenderer.player_skeleton = player_skeleton;
+
+        float tickDelta = mc.getRenderTickCounter().getTickDelta(false);
+        
         pos = Renderer3D.getInterpolatedPosition(entity);
 
         stack.push();
         stack.scale((float) scale, (float) scale, (float) scale);
 
-        EntityRenderer<?> entityRenderer = mc.getEntityRenderDispatcher().getRenderer(entity);
+        EntityRenderer<?,?> entityRenderer = mc.getEntityRenderDispatcher().getRenderer(entity);
+        
 
         // LivingEntityRenderer
-        if (entityRenderer instanceof LivingEntityRenderer renderer) {
+        if (entityRenderer instanceof LivingEntityRenderer<?,?,?> renderer) {
             LivingEntity livingEntity = (LivingEntity) entity;
-            EntityModel model = renderer.getModel();
+            EntityModel<?> model = renderer.getModel();
+            EntityRenderState renderState = renderer.createRenderState();
+            renderer.updateRenderState(r,renderState,tickDelta);
+            renderer.getAndUpdateRenderState(entity,tickDelta);
 
             // PlayerEntityRenderer
             if (entityRenderer instanceof PlayerEntityRenderer r) {
-                PlayerEntityModel<AbstractClientPlayerEntity> playerModel = r.getModel();
+                PlayerEntityModel playerModel = r.getModel();
 
-                playerModel.sneaking = entity.isInSneakingPose();
+                renderState.sneaking = entity.isInSneakingPose();
                 BipedEntityModel.ArmPose mainHandPose = PlayerEntityRenderer.getArmPose((AbstractClientPlayerEntity) entity, Hand.MAIN_HAND);
                 BipedEntityModel.ArmPose offHandPos = PlayerEntityRenderer.getArmPose((AbstractClientPlayerEntity) entity, Hand.OFF_HAND);
 
@@ -82,7 +162,8 @@ public class WireframeEntityRenderer {
                     offHandPos = livingEntity.getOffHandStack().isEmpty() ? BipedEntityModel.ArmPose.EMPTY : BipedEntityModel.ArmPose.ITEM;
 
                 if (livingEntity.getMainArm() == Arm.RIGHT) {
-                    playerModel.rightArmPose = mainHandPose;
+
+                    mainHandPose;
                     playerModel.leftArmPose = offHandPos;
                 } else {
                     playerModel.rightArmPose = offHandPos;
@@ -90,44 +171,44 @@ public class WireframeEntityRenderer {
                 }
             }
 
-            model.handSwingProgress = livingEntity.getHandSwingProgress(mc.getTickDelta());
+            model.handSwingProgress = livingEntity.getHandSwingProgress(tickDelta);
             model.riding = livingEntity.hasVehicle();
             model.child = livingEntity.isBaby();
 
-            float bodyYaw = MathHelper.lerpAngleDegrees(mc.getTickDelta(), livingEntity.prevBodyYaw, livingEntity.bodyYaw);
-            float yaw = bodyYaw - livingEntity.getYaw(mc.getTickDelta());
+            float bodyYaw = MathHelper.lerpAngleDegrees(tickDelta, livingEntity.prevBodyYaw, livingEntity.bodyYaw);
+            float yaw = bodyYaw - livingEntity.getYaw(tickDelta);
 
 
-            float pitch = livingEntity.getPitch(mc.getTickDelta());
+            float pitch = livingEntity.getPitch(tickDelta);
 
-            float animationProgress = renderer.getAnimationProgress(livingEntity, mc.getTickDelta());
+            float animationProgress = renderer.getAnimationProgress(livingEntity, tickDelta);
             float limbDistance = 0;
             float limbAngle = 0;
 
             //limbs position and rotation
             if (!livingEntity.hasVehicle() && livingEntity.isAlive()) {
-                limbDistance = livingEntity.limbAnimator.getSpeed(mc.getTickDelta());
-                limbAngle = livingEntity.limbAnimator.getPos(mc.getTickDelta());
+                limbDistance = livingEntity.limbAnimator.getSpeed(tickDelta);
+                limbAngle = livingEntity.limbAnimator.getPos(tickDelta);
 
                 if (limbDistance > 1) limbDistance = 1;
             }
 
             //Simulate model animation and angles to apply to the entity model Parts
-            model.animateModel(livingEntity, limbAngle, limbDistance, mc.getTickDelta());
+            model.animateModel(livingEntity, limbAngle, limbDistance, tickDelta);
             model.setAngles(livingEntity, limbAngle, limbDistance, animationProgress, -yaw, pitch);
 
             //See LivingEntityRenderer#render
-            renderer.setupTransforms(livingEntity, stack, animationProgress, bodyYaw, mc.getTickDelta());
+            renderer.setupTransforms(livingEntity, stack, animationProgress, bodyYaw, tickDelta);
             stack.scale(-1, -1, 1);
-            renderer.scale(livingEntity, stack, mc.getTickDelta());
+            renderer.scale(livingEntity, stack, tickDelta);
             stack.translate(0, -1.501F, 0);
 
-            if (model instanceof AnimalModel m) {
+            if (model instanceof MobbMode m) {
                 //Player / any other biped entity wireframe rendering.
                 if (model instanceof BipedEntityModel mo) {
-                    if (entity instanceof PlayerEntity && WireframeEntityRenderer.skeleton_player) {
+                    if (entity instanceof PlayerEntity && WireframeEntityRenderer.player_skeleton) {
                         Renderer3D.renderThroughWalls();
-                        float lerpBody = MathHelper.lerpAngleDegrees(mc.getTickDelta(), livingEntity.prevBodyYaw, livingEntity.bodyYaw);
+                        float lerpBody = MathHelper.lerpAngleDegrees(tickDelta, livingEntity.prevBodyYaw, livingEntity.bodyYaw);
 
                         BufferBuilder buffer = prepare(lineWidth);
 
@@ -222,10 +303,10 @@ public class WireframeEntityRenderer {
             CrystalESP esp = ModuleManager.get(CrystalESP.class);
 
             stack.push();
-            float h = EndCrystalEntityRenderer.getYOffset(crystalEntity, mc.getTickDelta());
+            float h = EndCrystalEntityRenderer.getYOffset(tickDelta);
 
 
-            float j = ((float) crystalEntity.endCrystalAge + mc.getTickDelta()) * 3.0F;
+            float j = ((float) crystalEntity.endCrystalAge + tickDelta) * 3.0F;
             stack.push();
             if (esp.isActive())
                 stack.scale((float) (2.0F * esp.scaleOutside.value), (float) (2.0F * esp.scaleOutside.value), (float) (2.0F * esp.scaleOutside.value));
@@ -259,6 +340,11 @@ public class WireframeEntityRenderer {
             stack.pop();
         }
         stack.pop();
+    }
+    private static void renderModelParts(EntityModel<?> model, MatrixStack stack, VertexConsumerProvider buffer) {
+        for (ModelPart part : model.getParts()) {
+            renderModelPart(part, stack, buffer);
+        }
     }
 
     private static void renderModelPart(ModelPart part) {
@@ -336,7 +422,7 @@ public class WireframeEntityRenderer {
         // Line
         RenderSystem.disableDepthTest();
         RenderSystem.disableCull();
-        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.lineWidth(width);
 
         buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES);
@@ -363,4 +449,6 @@ public class WireframeEntityRenderer {
         Vertexer.vertexLine(matrices, buffer, 0f, 0f, 0f, (float) (x2 - x1), (float) (y2 - y1), (float) (z2 - z1), color);
     }
 
+
+     */
 }

@@ -26,6 +26,7 @@ import dev.heliosclient.util.player.RotationSimulator;
 import dev.heliosclient.util.render.Renderer2D;
 import dev.heliosclient.util.timer.TimerUtils;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -44,7 +45,7 @@ public class HeliosClient implements ModInitializer, Listener {
     public static final MinecraftClient MC = MinecraftClient.getInstance();
     public static final Logger LOGGER = LoggerFactory.getLogger("HeliosClient");
     public static final String clientTag = ColorUtils.yellow + "Helios" + ColorUtils.white + "Client";
-    public static final String versionTag = ColorUtils.gray + "v0.dev";
+    public static final String versionTag = ColorUtils.gray + "v0.alpha";
     public static final String MODID = "heliosclient";
     private static final TimerUtils configTimer = new TimerUtils();
 
@@ -52,7 +53,7 @@ public class HeliosClient implements ModInitializer, Listener {
     public static AddonManager ADDONMANAGER = new AddonManager();
     public static ClickGUI CLICKGUI;
     public static ConsoleScreen CONSOLE = new ConsoleScreen();
-    public static File SAVE_FOLDER = new File(MC.runDirectory.getPath() + "/heliosclient");
+    public static File SAVE_FOLDER = new File(FabricLoader.getInstance().getGameDir().toAbsolutePath() + "/heliosclient");
 
     //Methods for saving and loading
     public static void loadConfig() {

@@ -8,9 +8,10 @@ import dev.heliosclient.module.settings.CycleSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.util.render.Renderer2D;
-import dev.heliosclient.util.textures.Texture;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.util.Identifier;
 
 import java.util.List;
 
@@ -19,8 +20,8 @@ public class ClientTag extends HudElement {
 
     public SettingGroup sgSettings = new SettingGroup("General");
 
-    static Texture LOGO = new Texture("icon.png");
-    static Texture FULL_SPLASH = new Texture("splashscreen/client_splash.png");
+    static Identifier LOGO = Identifier.of(HeliosClient.MODID,"icon.png");
+    static Identifier FULL_SPLASH = Identifier.of(HeliosClient.MODID,"splashscreen/client_splash.png");
 
     private final CycleSetting mode = sgSettings.add(new CycleSetting.Builder()
             .name("Mode")
@@ -66,13 +67,13 @@ public class ClientTag extends HudElement {
                 this.width = (int) Math.round(80 * scale.value);
                 this.height = (int) Math.round(24 * scale.value);
 
-                drawContext.drawTexture(FULL_SPLASH, this.x,  (int) Math.round(this.y - (6 * scale.value)),0,0, this.width,(int) Math.round(36 * scale.value),this.width,(int) Math.round(36 * scale.value));
+                drawContext.drawTexture(RenderLayer::getEntityCutoutNoCull,FULL_SPLASH, this.x,  (int) Math.round(this.y - (6 * scale.value)),0,0, this.width,(int) Math.round(36 * scale.value),this.width,(int) Math.round(36 * scale.value));
             }
             case Logo -> {
                 //Square 303x303 reduced by 8 times. (303/8 ~= 38)
                 this.width = this.height = (int) Math.round(38 * scale.value);
 
-                drawContext.drawTexture(LOGO, this.x, this.y,0,0, this.width,this.height, this.width,this.height);
+                drawContext.drawTexture(RenderLayer::getEntityCutoutNoCull,LOGO, this.x, this.y,0,0, this.width,this.height, this.width,this.height);
             }
         }
     }

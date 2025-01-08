@@ -4,6 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.mixin.AccessorMinecraftClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.*;
@@ -69,6 +70,9 @@ public class PlayerUtils {
             }
         }
         return false;
+    }
+    public static void setStepHeight(float stepHeight){
+        mc.player.getAttributeInstance(EntityAttributes.STEP_HEIGHT).setBaseValue(stepHeight);
     }
 
     public static boolean isPlayerLookingAtEntity(PlayerEntity player, Entity target, double maxDistance) {
@@ -146,7 +150,7 @@ public class PlayerUtils {
         for (int x = (int) -distance; x <= distance; x++) {
             for (int z = (int) -distance; z <= distance; z++) {
                 for (int y = Math.max(HeliosClient.MC.world.getBottomY(), (int) -Ydistance); y <= Ydistance; y++) {
-                    if (y > HeliosClient.MC.world.getTopY()) break;
+                    if (y > HeliosClient.MC.world.getWorldChunk(mc.player.getBlockPos()).getTopYInclusive()) break;
                     blocks.add(playerPos.add(x, y, z));
                 }
             }

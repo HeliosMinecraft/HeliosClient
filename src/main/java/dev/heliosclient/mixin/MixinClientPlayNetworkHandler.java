@@ -97,7 +97,7 @@ public abstract class MixinClientPlayNetworkHandler {
 
     @Inject(method = "onDeathMessage", at = @At("HEAD"), cancellable = true)
     private void onDeathMessage(DeathMessageS2CPacket packet, CallbackInfo ci) {
-        if (HeliosClient.MC.player != null && packet.getEntityId() == HeliosClient.MC.player.getId()) {
+        if (HeliosClient.MC.player != null && packet.playerId() == HeliosClient.MC.player.getId()) {
             Event event = new PlayerDeathEvent(HeliosClient.MC.player);
             if (EventManager.postEvent(event).isCanceled()) {
                 ci.cancel();

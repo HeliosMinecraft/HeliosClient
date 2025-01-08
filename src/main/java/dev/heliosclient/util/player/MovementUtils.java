@@ -60,7 +60,7 @@ public class MovementUtils {
 
     public static boolean isPressingMovementButton() {
         Input input = mc.player.input;
-        return input.pressingForward || input.pressingBack || input.pressingLeft || input.pressingRight;
+        return input.playerInput.forward() || input.playerInput.backward() || input.playerInput.left() || input.playerInput.right();
     }
 
     public static boolean isMoving(PlayerEntity player) {

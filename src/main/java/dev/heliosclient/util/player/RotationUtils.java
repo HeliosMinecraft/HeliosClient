@@ -139,8 +139,8 @@ public class RotationUtils {
     }
 
     private static void setPlayerRotations(float yaw, float pitch){
-        prevPitch = mc.player.getPitch(mc.getTickDelta());
-        prevYaw = mc.player.getYaw(mc.getTickDelta());
+        prevPitch = mc.player.getPitch(mc.getRenderTickCounter().getTickDelta(false));
+        prevYaw = mc.player.getYaw(mc.getRenderTickCounter().getTickDelta(false));
 
         mc.player.setYaw(yaw);
         mc.player.setPitch(pitch);
@@ -184,7 +184,7 @@ public class RotationUtils {
                     if (rotation.clientSide)
                         setPlayerRotations(rotation.yaw, rotation.pitch);
 
-                    mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw, rotation.pitch, mc.player.isOnGround()));
+                    mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(rotation.yaw, rotation.pitch, mc.player.isOnGround(),mc.player.horizontalCollision));
                     rotation.run();
 
                     if (rotation.clientSide)

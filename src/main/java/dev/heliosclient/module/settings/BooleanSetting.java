@@ -38,7 +38,7 @@ public class BooleanSetting extends Setting<Boolean> {
     @Override
     public void render(DrawContext drawContext, int x, int y, int mouseX, int mouseY, TextRenderer textRenderer) {
         super.render(drawContext, x, y, mouseX, mouseY, textRenderer);
-        checkBoxAnimation.setFadeSpeed(HeliosClient.MC.getLastFrameDuration()/10f);
+        checkBoxAnimation.setFadeSpeed(HeliosClient.MC.getRenderTickCounter().getLastFrameDuration()/10f);
 
 
         Renderer2D.drawFixedString(drawContext.getMatrices(), name, x + 2, y + 8, ColorManager.INSTANCE.defaultTextColor());

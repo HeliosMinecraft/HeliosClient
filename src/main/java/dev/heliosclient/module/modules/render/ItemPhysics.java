@@ -7,15 +7,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.SettingGroup;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.random.Random;
 
 public class ItemPhysics extends Module_ {
     SettingGroup sgGeneral = new SettingGroup("General");
@@ -50,14 +42,15 @@ public class ItemPhysics extends Module_ {
     public void onItemPhysicsEvent(ItemPhysicsEvent event) {
         event.setCanceled(true);
 
+        /*
         ItemStack itemStack = event.item.getStack();
         MatrixStack matrixStack = event.matrixStack;
         int j = itemStack.isEmpty() ? 187 : Item.getRawId(itemStack.getItem()) + itemStack.getDamage();
         Random random = Random.create(j);
-        BakedModel bakedModel = event.itemRenderer.getModel(itemStack, event.item.getWorld(), null, event.item.getId());
+        BakedModel bakedModel = event.itemEntityRenderState.seed.(itemStack, event.item.getWorld(), null, event.item.getId());
         boolean hasDepth = bakedModel.hasDepth();
         int amount = getRenderedAmount(itemStack);
-        float scale = this.scale.value > 0.0 ? (float) this.scale.value : bakedModel.getTransformation().ground.scale.x();
+        float scale = this.scale.value > 0.0 ? (float) this.scale.value : bakedModel.getTransformation().ground().scale.x();
         float m = bakedModel.getTransformation().getTransformation(ModelTransformationMode.GROUND).scale.y();
         matrixStack.translate(0.0F, 0.25F * m, 0.0F);
         if (!hasDepth) {
@@ -77,9 +70,11 @@ public class ItemPhysics extends Module_ {
                 matrixStack.translate(random.nextFloat() * 0.3F - 0.15F, random.nextFloat() * 0.3F - 0.15F, random.nextFloat() * 0.3F - 0.10F);
             }
 
-            event.itemRenderer.renderItem(itemStack, ModelTransformationMode.GROUND, false, matrixStack, event.vertexConsumerProvider, event.i, OverlayTexture.DEFAULT_UV, bakedModel);
+            event.itemRenderer.renderItem(itemStack, ModelTransformationMode.GROUND, event.i, OverlayTexture.DEFAULT_UV, matrixStack, event.vertexConsumerProvider, mc.world,0);
             matrixStack.pop();
         }
+
+         */
     }
 
     private int getRenderedAmount(ItemStack stack) {

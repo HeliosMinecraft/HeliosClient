@@ -10,6 +10,7 @@ import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.modules.world.Teams;
 import dev.heliosclient.module.settings.*;
+import dev.heliosclient.system.mixininterface.IEntityRenderState;
 import dev.heliosclient.util.MathUtils;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.entity.FreeCamEntity;
@@ -282,11 +283,13 @@ public class NameTags extends Module_ {
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.LOW)
     public void itemLabelRenderEvent(ItemPhysicsEvent event) {
-        String text = event.item.getName().getString();
+        String text = event.itemEntityRenderState.displayName.getString();
+        IEntityRenderState state = (IEntityRenderState)event.itemEntityRenderState;
+        ItemEntity itemEntity = ((ItemEntity) state.helios$getEntity());
         if (displayCount.value) {
-            text = text + " x" + event.item.getStack().getCount();
+            text = text + " x" + itemEntity.getStack().getCount();
         }
-        renderItemNameTag(event.item, (float) (yOffset.value + 0.5f), text);
+        renderItemNameTag(itemEntity, (float) (yOffset.value + 0.5f), text);
     }
 
     public void renderNameTag(LivingEntity entity, float entityYOff, String name) {

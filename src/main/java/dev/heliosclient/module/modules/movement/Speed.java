@@ -75,7 +75,7 @@ public class Speed extends Module_ {
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.LOW)
     public void onTick(TickEvent.PLAYER e) {
-        if (jumpNextTick && jump.value && !mc.options.jumpKey.isPressed()) {
+        if (jumpNextTick && jump.value && !mc.options.jumpKey.isPressed() && !mc.player.isClimbing() && !mc.player.isGliding()) {
             double vel = Math.abs(mc.player.getVelocity().getX()) + Math.abs(mc.player.getVelocity().getZ());
 
             if (vel >= 0.12 && mc.player.isOnGround()) {
@@ -89,7 +89,7 @@ public class Speed extends Module_ {
     @SubscribeEvent
     @SuppressWarnings("all")
     public void onMotion(PlayerMotionEvent e) {
-        if ((mc.options.sneakKey.isPressed() && !whileSneaking.value) || mc.getCameraEntity() != mc.player)
+        if ((mc.options.sneakKey.isPressed() && !whileSneaking.value) || mc.getCameraEntity() != mc.player || mc.player.isGliding())
             return;
 
         // Strafe Mode
@@ -112,7 +112,7 @@ public class Speed extends Module_ {
             }
 
             double desiredSpeed = speed.value * 0.1;
-            double angle = Math.toRadians(mc.player.getYaw(mc.getTickDelta()));
+            double angle = Math.toRadians(mc.player.getYaw(mc.getRenderTickCounter().getTickDelta(false)));
             double forward = mc.player.input.movementForward;
             double strafe = mc.player.input.movementSideways;
 
@@ -150,7 +150,7 @@ public class Speed extends Module_ {
         }
         // OnGround Mode
         else if (speedMode.getOption() == Modes.OnGround) {
-            if (mc.options.jumpKey.isPressed() || mc.player.isFallFlying())
+            if (mc.options.jumpKey.isPressed())
                 return;
 
             double speeds = 0.85 + speed.value / 30;

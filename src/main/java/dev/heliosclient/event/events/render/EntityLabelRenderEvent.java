@@ -3,6 +3,7 @@ package dev.heliosclient.event.events.render;
 import dev.heliosclient.event.Cancelable;
 import dev.heliosclient.event.Event;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
@@ -13,16 +14,18 @@ public class EntityLabelRenderEvent extends Event {
     public static EntityLabelRenderEvent INSTANCE = new EntityLabelRenderEvent();
     public int i;
     public Entity entity;
+    public EntityRenderState entityRenderState;
     public Text entityName;
     public MatrixStack matrixStack;
     public VertexConsumerProvider vertexConsumerProvider;
 
 
-    public static EntityLabelRenderEvent get(Entity entity, Text text, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
+    public static EntityLabelRenderEvent get(Entity entity,EntityRenderState entityRenderState, Text text, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         INSTANCE.entity = entity;
         INSTANCE.entityName = text;
         INSTANCE.matrixStack = matrixStack;
         INSTANCE.vertexConsumerProvider = vertexConsumerProvider;
+        INSTANCE.entityRenderState = entityRenderState;
         INSTANCE.i = i;
         return INSTANCE;
     }

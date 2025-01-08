@@ -58,8 +58,7 @@ public class FontLoader {
             try (InputStream inputStream = FontLoader.class.getResourceAsStream("/assets/" + FONTS_FOLDER + "/" + s)) {
                 assert inputStream != null;
                 Files.copy(inputStream, defaultFontFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
 
         LinkedList<Font> fonts = new LinkedList<>();

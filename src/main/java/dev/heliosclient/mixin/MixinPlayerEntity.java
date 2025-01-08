@@ -3,10 +3,14 @@ package dev.heliosclient.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.events.player.*;
+import dev.heliosclient.event.events.player.ClipAtLedgeEvent;
+import dev.heliosclient.event.events.player.ItemDropEvent;
+import dev.heliosclient.event.events.player.PlayerDamageEvent;
+import dev.heliosclient.event.events.player.PlayerDeathEvent;
 import dev.heliosclient.managers.EventManager;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.movement.Sprint;
+import dev.heliosclient.module.modules.player.Reach;
 import dev.heliosclient.module.modules.world.SpeedMine;
 import dev.heliosclient.util.blocks.BlockUtils;
 import dev.heliosclient.util.entity.FreeCamEntity;
@@ -18,6 +22,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -56,7 +61,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
     }
 
     @ModifyReturnValue(method = "getBlockBreakingSpeed", at = @At(value = "RETURN"))
-    public float ongetBlockBreakingSpeed(float ogBreakSpeed, BlockState block) {
+    public float onGetBlockBreakingSpeed(float ogBreakSpeed, BlockState block) {
         if (!getWorld().isClient) return ogBreakSpeed;
 
         SpeedMine speedMine = ModuleManager.get(SpeedMine.class);
@@ -88,7 +93,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 
 
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
-    private void onPlayerDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    private void onPlayerDamage(ServerWorld world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (EventManager.postEvent(new PlayerDamageEvent((PlayerEntity) (Object) this, source)).isCanceled()) {
             cir.cancel();
         }
@@ -111,10 +116,13 @@ public abstract class MixinPlayerEntity extends LivingEntity {
         if (event.isCanceled()) info.setReturnValue(event.isCanceled());
     }
 
-    @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
-    protected void onJump(CallbackInfo ci) {
-        PlayerJumpEvent event = new PlayerJumpEvent((PlayerEntity) (Object) this);
-        EventManager.postEvent(event);
-        if (event.isCanceled()) ci.cancel();
+    @ModifyReturnValue(method = "getBlockInteractionRange", at = @At("RETURN"))
+    private double modifyBlockInteractionRange(double original) {
+        return Math.max(0, original+ ModuleManager.get(Reach.class).blockReach.value);
+    }
+
+    @ModifyReturnValue(method = "getEntityInteractionRange", at = @At("RETURN"))
+    private double modifyEntityInteractionRange(double original) {
+        return Math.max(0, original +ModuleManager.get(Reach.class).entityReach.value);
     }
 }

@@ -4,13 +4,13 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.player.PacketEvent;
 import dev.heliosclient.mixin.AccessorEntityVelocityUpS2CPacket;
-import dev.heliosclient.mixin.AccessorExplosionS2CPacket;
 import dev.heliosclient.module.Categories;
 import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.DoubleSetting;
 import dev.heliosclient.module.settings.DropDownSetting;
 import dev.heliosclient.module.settings.SettingGroup;
+import dev.heliosclient.system.mixininterface.IExplosionS2CPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
@@ -104,7 +104,7 @@ public class Velocity extends Module_ {
             return;
 
         if (event.packet instanceof EntityVelocityUpdateS2CPacket pac) {
-            if (pac.getId() == mc.player.getId()) {
+            if (pac.getEntityId() == mc.player.getId()) {
                 switch ((Mode) mode.getOption()) {
                     case Matrix -> {
                         if (!flag) {
@@ -132,24 +132,25 @@ public class Velocity extends Module_ {
             }
         }
 
-        if (event.packet instanceof ExplosionS2CPacket explosionPac && this.explosion.value) {
+        if (event.packet instanceof ExplosionS2CPacket && this.explosion.value) {
+            IExplosionS2CPacket packet = (IExplosionS2CPacket) event.packet; 
             switch ((Mode) mode.getOption()) {
                 case Cancel -> {
-                    ((AccessorExplosionS2CPacket) explosionPac).setVelocityX(0);
-                    ((AccessorExplosionS2CPacket) explosionPac).setVelocityY(0);
-                    ((AccessorExplosionS2CPacket) explosionPac).setVelocityZ(0);
+                    packet.helios$setVelocityX(0);
+                    packet.helios$setVelocityY(0);
+                    packet.helios$setVelocityZ(0);
                     ccTickCoolDown = -1;
                 }
                 case Custom -> {
-                    ((AccessorExplosionS2CPacket) explosionPac).setVelocityX((float) (((AccessorExplosionS2CPacket) explosionPac).getVelocityX() * horizontal.value / 100f));
-                    ((AccessorExplosionS2CPacket) explosionPac).setVelocityZ((float) (((AccessorExplosionS2CPacket) explosionPac).getVelocityZ() * horizontal.value / 100f));
-                    ((AccessorExplosionS2CPacket) explosionPac).setVelocityY((float) (((AccessorExplosionS2CPacket) explosionPac).getVelocityY() * vertical.value / 100f));
+                    packet.helios$setVelocityX((float) (packet.helios$getVelocityX() * horizontal.value / 100f));
+                    packet.helios$setVelocityZ((float) (packet.helios$getVelocityZ() * horizontal.value / 100f));
+                    packet.helios$setVelocityY((float) (packet.helios$getVelocityY() * vertical.value / 100f));
                     ccTickCoolDown = -1;
                 }
                 case Grim -> {
-                    ((AccessorExplosionS2CPacket) explosionPac).setVelocityX(0);
-                    ((AccessorExplosionS2CPacket) explosionPac).setVelocityY(0);
-                    ((AccessorExplosionS2CPacket) explosionPac).setVelocityZ(0);
+                    packet.helios$setVelocityX(0);
+                    packet.helios$setVelocityY(0);
+                    packet.helios$setVelocityZ(0);
                     flag = true;
                 }
             }
@@ -179,7 +180,7 @@ public class Velocity extends Module_ {
             case Grim -> {
                 if (flag) {
                     if (ccTickCoolDown <= 0) {
-                        mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
+                        mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround(),mc.player.horizontalCollision));
                         mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, BlockPos.ofFloored(mc.player.getPos()), Direction.DOWN));
                     }
                     flag = false;

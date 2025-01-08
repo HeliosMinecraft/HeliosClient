@@ -91,8 +91,8 @@ public class RotationSimulator implements Listener {
         public Rotation(double yaw, double pitch, Runnable task, int tickTiming, int randomness, EasingType type) {
             this.setTarget(yaw, pitch, task, tickTiming, randomness, type);
             Rotation.ticksPassed = 0;
-            this.startYaw = mc.player.getYaw(mc.getTickDelta());
-            this.startPitch = mc.player.getPitch(mc.getTickDelta());
+            this.startYaw = mc.player.getYaw(mc.getRenderTickCounter().getTickDelta(false));
+            this.startPitch = mc.player.getPitch(mc.getRenderTickCounter().getTickDelta(false));
         }
 
         public void setTarget(double yaw, double pitch, Runnable task, int tickTiming, int randomness, EasingType type) {
@@ -135,8 +135,8 @@ public class RotationSimulator implements Listener {
             }
 
             RotationUtils.rotate((float) interpolatedYaw, (float) interpolatedPitch, false, null);
-            mc.player.renderYaw = mc.player.getYaw(mc.getTickDelta());
-            mc.player.renderPitch = mc.player.getPitch(mc.getTickDelta());
+            mc.player.renderYaw = mc.player.getYaw(mc.getRenderTickCounter().getTickDelta(false));
+            mc.player.renderPitch = mc.player.getPitch(mc.getRenderTickCounter().getTickDelta(false));
         }
     }
 

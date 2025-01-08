@@ -1,30 +1,37 @@
 package dev.heliosclient.event.events.world;
 
 import dev.heliosclient.event.Event;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.world.explosion.Explosion;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.util.math.Vec3d;
+
+import java.util.Optional;
 
 public class ExplosionEvent extends Event {
-    final LivingEntity causingEntity;
-    final float power;
-    final Explosion explosion;
+    final Vec3d center;
+    final Optional<Vec3d> playerKnockBack;
+    final ParticleEffect explosionParticle;
+    final float estimatedPower;
 
-    public ExplosionEvent(LivingEntity causingEntity, float power, Explosion explosion) {
-        this.causingEntity = causingEntity;
-        this.power = power;
-        this.explosion = explosion;
+    public ExplosionEvent(Vec3d center, Optional<Vec3d> playerKnockBack, ParticleEffect explosionParticle) {
+        this.center = center;
+        this.playerKnockBack = playerKnockBack;
+        this.explosionParticle = explosionParticle;
+        this.estimatedPower = (float) Math.sqrt(playerKnockBack.map(Vec3d::length).orElse(0.0)) * 0.5f;
     }
 
-    public Explosion getExplosion() {
-        return explosion;
+    public float getEstimatedPower() {
+        return estimatedPower;
     }
 
-    public Entity getCausingEntity() {
-        return causingEntity;
+    public Optional<Vec3d> getPlayerKnockBack() {
+        return playerKnockBack;
     }
 
-    public float getPower() {
-        return power;
+    public ParticleEffect getExplosionParticle() {
+        return explosionParticle;
+    }
+
+    public Vec3d getCenter() {
+        return center;
     }
 }

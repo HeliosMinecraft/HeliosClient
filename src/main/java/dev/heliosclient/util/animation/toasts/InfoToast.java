@@ -4,8 +4,10 @@ package dev.heliosclient.util.animation.toasts;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.render.Renderer2D;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.util.Identifier;
@@ -16,11 +18,11 @@ import java.util.List;
 
 public class InfoToast implements Toast {
 
-    private static final Identifier TEXTURE = new Identifier("textures/gui/sprites/toast/advancement.png");
+    private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/sprites/toast/advancement.png");
     private final String message;
     private final boolean hasProgressBar;
     private final long endDelay;
-    private long lastTime;
+    private long lastTime,startTime;
     private float lastProgress;
     private float progress;
 
@@ -31,16 +33,32 @@ public class InfoToast implements Toast {
         this.endDelay = endDelay;
     }
 
-    public Visibility draw(DrawContext context, ToastManager manager, long startTime) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+    public void setProgress(float progress) {
+        this.progress = progress;
+    }
+
+    @Override
+    public Visibility getVisibility() {
+        return startTime >= this.endDelay ? Visibility.HIDE : Visibility.SHOW;
+    }
+
+    @Override
+    public void update(ToastManager manager, long time) {
+
+    }
+
+    @Override
+    public void draw(DrawContext context, TextRenderer textRenderer, long startTime) {
+        this.startTime = startTime;
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX);
         RenderSystem.setShaderColor(1, 1, 1, 1);
 
-        context.drawTexture(TEXTURE, 0, 0, 0, 0, getWidth(), getHeight());
+        context.drawTexture(RenderLayer::getArmorCutoutNoCull,TEXTURE, 0, 0,0,0,getWidth(), getHeight(),getWidth(), getHeight());
         List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth(), HeliosClient.MC.textRenderer);
 
         int yOffset = 2;
         for (String s : messageWarp) {
-            context.drawText(manager.getClient().textRenderer, s, this.getWidth() - HeliosClient.MC.textRenderer.getWidth(s), yOffset, Color.GREEN.getRGB(), false);
+            context.drawText(textRenderer, s, this.getWidth() - HeliosClient.MC.textRenderer.getWidth(s), yOffset, Color.GREEN.getRGB(), false);
             yOffset += HeliosClient.MC.textRenderer.fontHeight + 4;
         }
 
@@ -66,12 +84,5 @@ public class InfoToast implements Toast {
             // Draw the progress bar
             context.fill(3, 28, 3 + progressBarWidth, 29, Color.GREEN.getRGB());
         }
-
-        return startTime >= this.endDelay ? Visibility.HIDE : Visibility.SHOW;
     }
-
-    public void setProgress(float progress) {
-        this.progress = progress;
-    }
-
 }

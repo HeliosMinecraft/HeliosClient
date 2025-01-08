@@ -39,4 +39,14 @@ public class MixinVec3d implements IVec3d {
         this.x = x;
         this.z = z;
     }
+
+    @Override
+    public void heliosClient$setX(double x) {
+        this.x = x;
+    }
+
+    @Override
+    public void heliosClient$setZ(double z) {
+        this.z = z;
+    }
 }

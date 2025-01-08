@@ -44,7 +44,7 @@ public abstract class MixinClientWorld {
             info.cancel();
     }
 
-    @ModifyVariable(method = "setTimeOfDay", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    @ModifyVariable(method = "setTime", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private long modifySetTimeOfDay(long timeOfDay) {
         TimeChanger timeChanger = ModuleManager.get(TimeChanger.class);
         if (timeChanger.isActive()) {

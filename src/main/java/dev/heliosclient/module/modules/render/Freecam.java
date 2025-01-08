@@ -139,7 +139,7 @@ public class Freecam extends Module_ {
             PlayerActionC2SPacket.Action action = p.getAction();
             if(action != PlayerActionC2SPacket.Action.START_DESTROY_BLOCK && action != PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK) return;
 
-            if (blockOutOfRangePackets.value && p.getPos().toCenterPos().distanceTo(mc.player.getEyePos()) >= mc.interactionManager.getReachDistance()) {
+            if (blockOutOfRangePackets.value && p.getPos().toCenterPos().distanceTo(mc.player.getEyePos()) >= mc.player.getBlockInteractionRange()) {
                 event.setCanceled(true);
                 return;
             }
@@ -150,7 +150,7 @@ public class Freecam extends Module_ {
         } else if (event.getPacket() instanceof PlayerInteractBlockC2SPacket p) {
             Vec3d pos = p.getBlockHitResult().getPos();
 
-            if (blockOutOfRangePackets.value && pos.distanceTo(mc.player.getEyePos()) >= mc.interactionManager.getReachDistance()) {
+            if (blockOutOfRangePackets.value && pos.distanceTo(mc.player.getEyePos()) >= mc.player.getBlockInteractionRange()) {
                 event.setCanceled(true);
                 return;
             }
@@ -165,7 +165,7 @@ public class Freecam extends Module_ {
                 return;
             }
 
-            if (blockOutOfRangePackets.value && entity.getPos().distanceTo(mc.player.getEyePos()) > mc.interactionManager.getReachDistance()) {
+            if (blockOutOfRangePackets.value && entity.getPos().distanceTo(mc.player.getEyePos()) > mc.player.getBlockInteractionRange()) {
                 event.setCanceled(true);
                 return;
             }

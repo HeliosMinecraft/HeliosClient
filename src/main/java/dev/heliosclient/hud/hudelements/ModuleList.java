@@ -200,7 +200,7 @@ public class ModuleList extends HudElement implements Listener {
     @Override
     public void renderElement(DrawContext drawContext, TextRenderer textRenderer) {
         if (colorMode.getOption() == METEOR) {
-            rainbowHue1 += rainbowSpeed.value * mc.getTickDelta();
+            rainbowHue1 += rainbowSpeed.value * mc.getRenderTickCounter().getTickDelta(false);
             if (rainbowHue1 > 1) rainbowHue1 -= 1;
             else if (rainbowHue1 < -1) rainbowHue1 += 1;
 

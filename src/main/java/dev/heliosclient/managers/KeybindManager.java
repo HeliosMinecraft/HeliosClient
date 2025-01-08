@@ -19,8 +19,7 @@ import dev.heliosclient.util.timer.TimerUtils;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.ingame.AbstractCommandBlockScreen;
-import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
-import net.minecraft.client.gui.screen.ingame.AnvilScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.StructureBlockScreen;
 import net.minecraft.client.gui.screen.multiplayer.AddServerScreen;
 import net.minecraft.client.gui.screen.multiplayer.DirectConnectScreen;
@@ -155,7 +154,7 @@ public class KeybindManager implements Listener {
 
     public boolean shouldOpen() {
         return !(HeliosClient.MC.currentScreen instanceof ChatScreen) &&
-                !(HeliosClient.MC.currentScreen instanceof AbstractInventoryScreen) &&
+                !(HeliosClient.MC.currentScreen instanceof HandledScreen<?>) &&
                 !(HeliosClient.MC.currentScreen instanceof GameMenuScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof AddServerScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof DirectConnectScreen) &&
@@ -164,7 +163,6 @@ public class KeybindManager implements Listener {
                 !(HeliosClient.MC.currentScreen instanceof AbstractSettingScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof StructureBlockScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof AbstractCommandBlockScreen) &&
-                !(HeliosClient.MC.currentScreen instanceof AnvilScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof HudEditorScreen) &&
                 !(HeliosClient.MC.currentScreen instanceof ClickGUIScreen);
     }

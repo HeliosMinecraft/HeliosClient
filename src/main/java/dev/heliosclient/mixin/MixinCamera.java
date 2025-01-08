@@ -13,11 +13,9 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 @Mixin(Camera.class)
 public abstract class MixinCamera {
 
-    @Shadow
-    protected abstract void moveBy(double x, double y, double z);
+    @Shadow protected abstract void moveBy(float f, float g, float h);
 
-    @Shadow
-    protected abstract double clipToSpace(double desiredCameraDistance);
+    @Shadow protected abstract float clipToSpace(float f);
 
     @ModifyArgs(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;setRotation(FF)V"))
     private void updateSetRotation(Args args) {
@@ -29,9 +27,9 @@ public abstract class MixinCamera {
         }
     }
 
-    @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;moveBy(DDD)V"))
-    private void redirectUpdateMoveBy(Camera instance, double x, double y, double z) {
+    @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;moveBy(FFF)V"))
+    private void redirectUpdateMoveBy(Camera instance, float f, float g, float h) {
         FreeLook freeLook = ModuleManager.get(FreeLook.class);
-        this.moveBy(-this.clipToSpace(freeLook.isActive() ? freeLook.getDistanceFromPlayer() : 4.0), 0.0, 0.0);
+        this.moveBy(-this.clipToSpace(freeLook.isActive() ? freeLook.getDistanceFromPlayer() : 4.0F), 0.0F, 0.0F);
     }
 }

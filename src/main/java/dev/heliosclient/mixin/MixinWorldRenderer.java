@@ -12,6 +12,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,13 +23,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
     @Inject(method = "drawBlockOutline", at = @At("HEAD"), cancellable = true)
-    private void onDrawHighlightedBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ, BlockPos pos, BlockState state, CallbackInfo ci) {
+    private void onDrawHighlightedBlockOutline(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ, BlockPos pos, BlockState state, int color, CallbackInfo ci) {
         if (ModuleManager.get(BlockSelection.class).isActive())
             ci.cancel();
     }
 
-    @Redirect(method = "render", require = 0, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/render/Camera;getFocusedEntity()Lnet/minecraft/entity/Entity;", ordinal = 3))
+    @Redirect(method = "getEntitiesToRender", require = 0, at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/render/Camera;getFocusedEntity()Lnet/minecraft/entity/Entity;"))
     private Entity allowRenderingClientPlayerInFreeCameraMode(Camera camera) {
         if (ModuleManager.get(Freecam.class).isActive()) {
             return MinecraftClient.getInstance().player;
@@ -59,8 +60,8 @@ public abstract class MixinWorldRenderer {
     }
 
     @Inject(method = "renderWeather", at = @At("HEAD"), cancellable = true)
-    private void onRenderWeather(LightmapTextureManager manager, float f, double d, double e, double g, CallbackInfo info) {
-        if (NoRender.get().isActive() && NoRender.get().noWeather.value) info.cancel();
+    private void onRenderWeather(FrameGraphBuilder frameGraphBuilder, Vec3d pos, float tickDelta, Fog fog, CallbackInfo ci) {
+        if (NoRender.get().isActive() && NoRender.get().noWeather.value) ci.cancel();
     }
 
     @Inject(method = "hasBlindnessOrDarkness(Lnet/minecraft/client/render/Camera;)Z", at = @At("HEAD"), cancellable = true)

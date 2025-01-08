@@ -1,6 +1,5 @@
 package dev.heliosclient.mixin;
 
-import com.mojang.blaze3d.platform.TextureUtil;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.CapeManager;
 import dev.heliosclient.managers.ModuleManager;
@@ -18,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractClientPlayerEntity.class)
 public abstract class AbstractClientPlayerEntityMixin {
     @Unique
-    private static final Identifier SKIN = new Identifier("textures/entity/elytra.png");
+    private static final Identifier SKIN = Identifier.ofVanilla("textures/entity/elytra.png");
 
     @Unique
     private static @NotNull SkinTextures getModifiedSkinTexture(SkinTextures original) {

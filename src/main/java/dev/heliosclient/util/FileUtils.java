@@ -92,7 +92,7 @@ public class FileUtils {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 int argb = image.getRGB(x, y);
-                nativeImage.setColor(x, y, argb);
+                nativeImage.setColorArgb(x, y, argb);
             }
         }
         return nativeImage;

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 public class FontManager implements Listener {
     public static Font[] fonts, iconFonts;
+    public static Font font, iconFont;
     public static Font[] originalFonts;
     public static int hudFontSize = 8, clientFontSize = 8;
     public static ArrayList<String> fontNames = new ArrayList<>();
@@ -27,7 +28,9 @@ public class FontManager implements Listener {
     public void refresh() {
         fontNames.clear();
         fonts = FontLoader.loadFonts();
+        font = fonts[0];
         iconFonts = FontLoader.loadIconFonts();
+        iconFont = iconFonts[0];
         originalFonts = fonts.clone();
         for (Font font : originalFonts) {
             fontNames.add(font.getName());
@@ -44,26 +47,26 @@ public class FontManager implements Listener {
     }
 
     public void registerFonts() {
-        FontRenderers.fontRenderer = new FontRenderer(fonts, hudFontSize);
-        FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, clientFontSize);
-        FontRenderers.iconRenderer = new fxFontRenderer(iconFonts, 10f);
+        FontRenderers.fontRenderer = new FontRenderer(font, hudFontSize);
+        FontRenderers.fxfontRenderer = new fxFontRenderer(font, clientFontSize);
+        FontRenderers.iconRenderer = new fxFontRenderer(iconFont, 10f);
 
-        FontRenderers.Super_Small_fxfontRenderer = new fxFontRenderer(fonts, 4f);
-        FontRenderers.Super_Small_iconRenderer = new fxFontRenderer(iconFonts, 4f);
+        FontRenderers.Super_Small_fxfontRenderer = new fxFontRenderer(font, 4f);
+        FontRenderers.Super_Small_iconRenderer = new fxFontRenderer(iconFont, 4f);
 
-        FontRenderers.Small_fxfontRenderer = new fxFontRenderer(fonts, 6f);
-        FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFonts, 6f);
+        FontRenderers.Small_fxfontRenderer = new fxFontRenderer(font, 6f);
+        FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFont, 6f);
 
-        FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(fonts, 8f);
-        FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFonts, 8f);
+        FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(font, 8f);
+        FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFont, 8f);
 
-        FontRenderers.Large_fxfontRenderer = new fxFontRenderer(fonts, 13f);
-        FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFonts, 13f);
+        FontRenderers.Large_fxfontRenderer = new fxFontRenderer(font, 13f);
+        FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFont, 13f);
 
         if(FontLoader.COMICALFONTS != null)
-          FontRenderers.Comical_fxfontRenderer = new fxFontRenderer(FontLoader.COMICALFONTS, 12f);
+          FontRenderers.Comical_fxfontRenderer = new fxFontRenderer(FontLoader.COMICALFONTS[0], 12f);
 
-        FontRenderers.Ultra_Large_iconRenderer = new fxFontRenderer(iconFonts, 25f);
+        FontRenderers.Ultra_Large_iconRenderer = new fxFontRenderer(iconFont, 25f);
 
         //Post the font change event to the EventManager
         EventManager.postEvent(new FontChangeEvent(FontManager.fonts));

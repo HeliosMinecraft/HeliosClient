@@ -10,8 +10,8 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 
 public class SoundUtils {
-    public static final Identifier TING_SOUND = new Identifier("heliosclient:ting");
-    public static final Identifier CLICK_SOUND = new Identifier("heliosclient:click");
+    public static final Identifier TING_SOUND = Identifier.of("heliosclient:ting");
+    public static final Identifier CLICK_SOUND = Identifier.of("heliosclient:click");
     public static SoundEvent TING_SOUNDEVENT = SoundEvent.of(TING_SOUND);
     public static SoundEvent CLICK_SOUNDEVENT = SoundEvent.of(CLICK_SOUND);
 

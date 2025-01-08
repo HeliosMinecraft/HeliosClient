@@ -199,7 +199,7 @@ public class PacketMine extends Module_ {
         boolean isGettingRemoved = mc.world.getBlockState(pos).isAir() ||
                                     mc.player.getEyePos()
                                             .subtract(0.5, 0, 0.5f)
-                                            .distanceTo(pos.offset(direction).toCenterPos()) > mc.interactionManager.getReachDistance();
+                                            .distanceTo(pos.offset(direction).toCenterPos()) > mc.player.getBlockInteractionRange();
         if (isGettingRemoved) {
             mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, pos, direction));
             mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));

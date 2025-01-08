@@ -83,7 +83,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         if (this.client.world == null) {
-            super.renderBackgroundTexture(drawContext);
+            super.renderBackgroundTexture(drawContext,MENU_BACKGROUND_TEXTURE,0,0,0,0,width,height);
         }
 
         if(GUI.coolVisuals()){

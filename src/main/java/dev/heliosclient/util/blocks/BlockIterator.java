@@ -32,7 +32,7 @@ public class BlockIterator implements Iterator<BlockPos> {
 
     @Override
     public BlockPos next() {
-        while (y <= world.getTopY() && y >= world.getBottomY()) {
+        while (y <= world.getWorldChunk(mut).getTopYInclusive() && y >= world.getBottomY()) {
             mut.set(player.getBlockPos().add(x, y, z));
             if (world.isChunkLoaded(mut.getX() >> 4, mut.getZ() >> 4)) {
                 if (++x > horizontalRadius) {

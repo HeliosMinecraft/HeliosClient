@@ -1,6 +1,7 @@
 package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.util.misc.EnchantmentUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -69,9 +70,8 @@ public class InventoryUtils {
         return itemStack.getCount();
     }
 
-    // Drop the specified item from the HeliosClient.MC.player's inventory
     public static void dropItem(ItemStack itemStack) {
-        HeliosClient.MC.player.dropStack(itemStack);
+        HeliosClient.MC.player.dropItem(itemStack,false);
     }
 
     // Drop all items of the same type as the specified item from the player's inventory
@@ -188,7 +188,7 @@ public class InventoryUtils {
             if ((blockState.getBlock() == Blocks.BAMBOO || blockState.getBlock() == Blocks.BAMBOO_SAPLING) && itemStack.getItem() instanceof SwordItem) {
                 return i;
             }
-            if (itemStack.getItem() instanceof ToolItem || itemStack.getItem() instanceof ShearsItem) {
+            if (itemStack.getItem() instanceof MiningToolItem || itemStack.getItem() instanceof ShearsItem) {
 
                 //Check if the tool is effective for the block
                 if (!itemStack.isSuitableFor(blockState)) continue;
@@ -200,7 +200,7 @@ public class InventoryUtils {
 
                 //Account for efficiency enchantment
                 if (speed > 1) {
-                    int efficiency = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemStack);
+                    int efficiency = EnchantmentHelper.getLevel(EnchantmentUtil.getEnchantmentEntry(Enchantments.EFFICIENCY), itemStack);
                     if (efficiency > 0 && !itemStack.isEmpty())
                         speed += efficiency * efficiency + 1;
                 }

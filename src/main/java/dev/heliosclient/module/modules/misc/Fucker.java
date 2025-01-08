@@ -21,7 +21,7 @@ public class Fucker extends Module_ {
     public void onTick(TickEvent.CLIENT.PRE event) {
         if(!HeliosClient.shouldUpdate()) return;
 
-        BlockPos bedPos = EntityUtils.getNearestBed(mc.world, mc.player, (int) mc.interactionManager.getReachDistance());
+        BlockPos bedPos = EntityUtils.getNearestBed(mc.world, mc.player, (int) mc.player.getBlockInteractionRange());
 
         if (bedPos == null) return;
 

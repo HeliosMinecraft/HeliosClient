@@ -1,17 +1,16 @@
 package dev.heliosclient.util.player;
 
 import dev.heliosclient.HeliosClient;
-import dev.heliosclient.event.SubscribeEvent;
-import dev.heliosclient.event.events.player.PlayerJoinEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.movement.NoFall;
-import dev.heliosclient.system.mixininterface.IExplosion;
 import dev.heliosclient.util.entity.EntityUtils;
 import dev.heliosclient.util.world.ChunkUtils;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.entity.BedBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.DamageUtil;
 import net.minecraft.entity.Entity;
@@ -23,29 +22,26 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionTypes;
 import net.minecraft.world.explosion.Explosion;
 import net.minecraft.world.explosion.ExplosionBehavior;
-
-import java.util.Objects;
+import net.minecraft.world.explosion.ExplosionImpl;
 
 public class DamageUtils implements Listener {
     public static DamageUtils INSTANCE = new DamageUtils();
-    static ExplosionBehavior behavior = new ExplosionBehavior();
-    private static Explosion explosion;
-
     //Explosion power
     public static int BED_POWER = 5, CRYSTAL_POWER = 6;
 
     public static double calculateBedBlastDamage(Vec3d bedLocation, LivingEntity target) {
         if (target instanceof PlayerEntity && ((PlayerEntity) target).getAbilities().creativeMode) return 0;
         assert HeliosClient.MC.world != null;
-        explosion = new Explosion(HeliosClient.MC.world, null, bedLocation.x, bedLocation.y, bedLocation.z, 5, false, Explosion.DestructionType.DESTROY);
 
-        double rawDamage = behavior.calculateDamage(explosion, target);
+        double rawDamage = ExplosionImpl.calculateReceivedDamage(bedLocation,target);
         rawDamage = calculateReductions(rawDamage, target, HeliosClient.MC.world.getDamageSources().explosion(null));
 
         if (rawDamage < 0) rawDamage = 0;
@@ -84,10 +80,7 @@ public class DamageUtils implements Listener {
      */
     public static double calculateCrystalDamage(Vec3d source, PlayerEntity player) {
         if (player == null || player.isCreative()) return 0;
-        explosion = new Explosion(HeliosClient.MC.world, null, source.x, source.y, source.z, 6, false, Explosion.DestructionType.DESTROY);
-        ((IExplosion) explosion).heliosClient$set(source, 6, false);
-
-        double rawDamage = behavior.calculateDamage(explosion, player);
+        double rawDamage = ExplosionImpl.calculateReceivedDamage(source,player);
 
         rawDamage = calculateReductions(rawDamage, player, HeliosClient.MC.world.getDamageSources().explosion(null));
 
@@ -114,7 +107,7 @@ public class DamageUtils implements Listener {
         }
 
         // Armor reduction
-        damage = DamageUtil.getDamageLeft((float) damage, getArmor(entity), (float) entity.getAttributeValue(EntityAttributes.GENERIC_ARMOR_TOUGHNESS));
+        damage = DamageUtil.getDamageLeft(entity,(float) damage,damageSource ,getArmor(entity),(float) entity.getAttributeValue(EntityAttributes.ARMOR_TOUGHNESS));
 
         // Resistance reduction
         damage = resistanceReduction(entity, (float) damage);
@@ -126,15 +119,52 @@ public class DamageUtils implements Listener {
     }
 
     private static float getArmor(LivingEntity entity) {
-        return (float) Math.floor(entity.getAttributeValue(EntityAttributes.GENERIC_ARMOR));
+        return (float) Math.floor(entity.getAttributeValue(EntityAttributes.ARMOR));
     }
 
     /**
      * @see LivingEntity#modifyAppliedDamage(DamageSource, float)
      */
     private static float protectionReduction(LivingEntity player, float damage, DamageSource source) {
-        int protLevel = EnchantmentHelper.getProtectionAmount(player.getArmorItems(), source);
-        return DamageUtil.getInflictedDamage(damage, protLevel);
+        if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) return damage;
+
+        int damageProtection = 0;
+
+        for (ItemStack stack : player.getAllArmorItems()) {
+            Object2IntMap<RegistryKey<Enchantment>> enchantments = new Object2IntOpenHashMap<>();
+            for(RegistryEntry<Enchantment> ench: stack.getEnchantments().getEnchantments()){
+                RegistryKey<Enchantment> enchantment = ench.getKey().get();
+                enchantments.put(enchantment, stack.getEnchantments().getLevel(ench));
+            }
+
+
+            int protection = enchantments.getInt(Enchantments.PROTECTION);
+            if (protection > 0) {
+                damageProtection += protection;
+            }
+
+            int fireProtection = enchantments.getInt(Enchantments.FIRE_PROTECTION);
+            if (fireProtection > 0 && source.isIn(DamageTypeTags.IS_FIRE)) {
+                damageProtection += 2 * fireProtection;
+            }
+
+            int blastProtection = enchantments.getInt(Enchantments.BLAST_PROTECTION);
+            if (blastProtection > 0 && source.isIn(DamageTypeTags.IS_EXPLOSION)) {
+                damageProtection += 2 * blastProtection;
+            }
+
+            int projectileProtection = enchantments.getInt(Enchantments.PROJECTILE_PROTECTION);
+            if (projectileProtection > 0 && source.isIn(DamageTypeTags.IS_PROJECTILE)) {
+                damageProtection += 2 * projectileProtection;
+            }
+
+            int featherFalling = enchantments.getInt(Enchantments.FEATHER_FALLING);
+            if (featherFalling > 0 && source.isIn(DamageTypeTags.IS_FALL)) {
+                damageProtection += 3 * featherFalling;
+            }
+        }
+
+        return DamageUtil.getInflictedDamage(damage, damageProtection);
     }
 
     /**
@@ -150,27 +180,6 @@ public class DamageUtils implements Listener {
         return Math.max(damage, 0);
     }
 
-    public static float calculateSwordDamage(ItemStack sword, PlayerEntity attacker, LivingEntity target) {
-        float swordDamage = 0;
-        try {
-            swordDamage = ((SwordItem) sword.getItem()).getAttackDamage() + 1.0F;
-        } catch (ClassCastException e) {
-            return 0;
-        }
-        // Apply Sharpness enchantment
-        int sharpnessLevel = EnchantmentHelper.getLevel(Enchantments.SHARPNESS, sword);
-        swordDamage += sharpnessLevel * 1.25F; // Each level of Sharpness adds 1.25 damage
-
-        // Apply Strength effect
-        if (attacker.hasStatusEffect(StatusEffects.STRENGTH)) {
-            int strengthLevel = Objects.requireNonNull(attacker.getStatusEffect(StatusEffects.STRENGTH)).getAmplifier() + 1;
-            swordDamage += strengthLevel * 3.0F; // Each level of Strength adds 3 damage
-        }
-
-        swordDamage = (float) calculateReductions(swordDamage, target, HeliosClient.MC.world.getDamageSources().playerAttack(attacker));
-
-        return swordDamage;
-    }
 
     public static float calculateDamageByEnv(){
         float totalDamage = 0;
@@ -192,10 +201,5 @@ public class DamageUtils implements Listener {
         }
 
         return totalDamage;
-    }
-
-    @SubscribeEvent
-    public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        explosion = new Explosion(HeliosClient.MC.world, null, 0, 0, 0, 6, false, Explosion.DestructionType.DESTROY);
     }
 }

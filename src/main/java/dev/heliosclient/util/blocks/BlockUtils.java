@@ -1,10 +1,10 @@
 package dev.heliosclient.util.blocks;
 
 import dev.heliosclient.HeliosClient;
+import dev.heliosclient.util.misc.EnchantmentUtil;
 import dev.heliosclient.util.player.InventoryUtils;
 import dev.heliosclient.util.player.RotationUtils;
 import net.minecraft.block.*;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -38,7 +38,7 @@ import static dev.heliosclient.util.render.Renderer3D.mc;
 public class BlockUtils {
 
     public static boolean isOpaqueFullCube(BlockPos pos) {
-        return mc.world.getBlockState(pos).isOpaqueFullCube(MinecraftClient.getInstance().world, pos);
+        return mc.world.getBlockState(pos).isOpaqueFullCube();
     }
 
     public static Block getBlock(BlockPos pos) {
@@ -46,7 +46,7 @@ public class BlockUtils {
     }
 
     public static Block getBlockFromString(String blockString) throws InvalidIdentifierException {
-        Identifier id = new Identifier(blockString);
+        Identifier id = Identifier.of(blockString);
         if (!Registries.BLOCK.containsId(id)) {
             throw new InvalidIdentifierException("No block found for identifier: " + blockString);
         }
@@ -157,7 +157,7 @@ public class BlockUtils {
 
 
         if (speed > 1) {
-            int efficiency = EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, itemStack);
+            int efficiency = EnchantmentHelper.getLevel(EnchantmentUtil.getEnchantmentEntry(Enchantments.EFFICIENCY), itemStack);
             if (efficiency > 0 && !itemStack.isEmpty())
                 speed += efficiency * efficiency + 1;
         }
@@ -177,30 +177,34 @@ public class BlockUtils {
             speed *= miningFatigue;
         }
 
-        if (HeliosClient.MC.player.isSubmergedIn(FluidTags.WATER) && !EnchantmentHelper.hasAquaAffinity(HeliosClient.MC.player)) {
+        if (HeliosClient.MC.player.isSubmergedIn(FluidTags.WATER) && !hasAquaAffinity()) {
             speed /= 5.0F;
         }
 
-        if (!HeliosClient.MC.player.isOnGround() || HeliosClient.MC.player.isFallFlying()) {
+        if (!HeliosClient.MC.player.isOnGround() || HeliosClient.MC.player.isGliding()) {
             speed /= 5.0F;
         }
 
         return speed;
     }
+    private static boolean hasAquaAffinity(){
+        return EnchantmentHelper.getEquipmentLevel(EnchantmentUtil.getEnchantmentEntry(Enchantments.AQUA_AFFINITY),mc.player) > 0;
+    }
 
 
     public static void useItem(BlockPos pos) {
-        useItem(pos, Hand.MAIN_HAND);
+        useItem(pos, Hand.MAIN_HAND,true);
     }
 
-    public static void useItem(BlockPos pos, Hand hand) {
+    public static void useItem(BlockPos pos, Hand hand, boolean swing) {
         if (mc.world == null || mc.player == null || mc.interactionManager == null) return;
         Direction direction = mc.crosshairTarget != null ? ((BlockHitResult) mc.crosshairTarget).getSide() : Direction.DOWN;
         ActionResult result = mc.interactionManager.interactBlock(mc.player, hand, new BlockHitResult(
                 Vec3d.ofCenter(pos), direction, pos, false
         ));
-        if (result.shouldSwingHand()) {
-            mc.player.swingHand(hand);
+        if (result.isAccepted()) {
+            if (swing) mc.player.swingHand(hand);
+            else mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(hand));
         }
     }
 
@@ -219,7 +223,6 @@ public class BlockUtils {
     }
 
     public static boolean place(BlockPos pos, boolean airPlace, boolean rotate, int itemSlotHotbar, boolean silentSwitch) {
-
         InventoryUtils.swapToSlot(itemSlotHotbar, silentSwitch);
 
         boolean returnVal = place(pos, rotate, airPlace, itemSlotHotbar == InventoryUtils.OFFHAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
@@ -278,24 +281,25 @@ public class BlockUtils {
             float yaw =   (float) RotationUtils.getYaw(hitPos);
             float pitch = (float) RotationUtils.getPitch(hitPos);
 
-            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, mc.player.isOnGround()));
+            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, mc.player.isOnGround(),mc.player.horizontalCollision));
             RotationUtils.setServerRotations(yaw,pitch);
         }
 
-        result = interactBlock(blockHitResult,neighborBlock,hand);
+        result = interactBlock(blockHitResult,neighborBlock,hand,true);
 
         return result == ActionResult.SUCCESS;
     }
 
-    private static ActionResult interactBlock(BlockHitResult blockHitResult,Block block, Hand hand){
+    private static ActionResult interactBlock(BlockHitResult blockHitResult,Block block, Hand hand, boolean swing){
         if (isClickable(block)) {
             mc.player.networkHandler.sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
         }
 
         ActionResult result = mc.interactionManager.interactBlock(mc.player, hand, blockHitResult);
 
-        if (result.shouldSwingHand()) {
-            mc.player.swingHand(hand);
+        if (result.isAccepted()) {
+            if (swing) mc.player.swingHand(hand);
+            else mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(hand));
         }
 
         if (isClickable(block))

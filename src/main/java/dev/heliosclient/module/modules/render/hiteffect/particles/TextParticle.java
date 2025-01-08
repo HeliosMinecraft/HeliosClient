@@ -2,10 +2,10 @@ package dev.heliosclient.module.modules.render.hiteffect.particles;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.modules.render.hiteffect.HitEffectParticle;
-import dev.heliosclient.util.timer.TimerUtils;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.Renderer3D;
+import dev.heliosclient.util.timer.TimerUtils;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 
@@ -33,12 +33,12 @@ public class TextParticle extends HitEffectParticle {
     public void tick() {
         current_age++;
         if (current_age >= life) {
-            scale = Math.max(scale - HeliosClient.MC.getLastFrameDuration(), 0);
+            scale = Math.max(scale - HeliosClient.MC.getRenderTickCounter().getLastFrameDuration(), 0);
             if (scale == 0.0) {
                 discard();
             }
         } else {
-            scale += HeliosClient.MC.getLastFrameDuration();
+            scale += HeliosClient.MC.getRenderTickCounter().getLastFrameDuration();
             if (scale >= finalScale) {
                 scale = finalScale;
             }

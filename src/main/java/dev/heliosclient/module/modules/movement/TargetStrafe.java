@@ -337,8 +337,8 @@ public class TargetStrafe extends Module_ {
 
         // update the player's rotation to face the target
         RotationUtils.lookAt(entity.getEyePos());
-        mc.player.bodyYaw = mc.player.getYaw(mc.getTickDelta());
-        mc.player.headYaw = mc.player.getYaw(mc.getTickDelta());
+        mc.player.bodyYaw = mc.player.getYaw(mc.getRenderTickCounter().getTickDelta(false));
+        mc.player.headYaw = mc.player.getYaw(mc.getRenderTickCounter().getTickDelta(false));
 
 
         // add a small forward movement to keep the player moving towards the target

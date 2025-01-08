@@ -1,6 +1,5 @@
 package dev.heliosclient.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.movement.NoSlow;
 import dev.heliosclient.module.modules.movement.Slippy;
@@ -8,9 +7,7 @@ import dev.heliosclient.module.modules.render.Xray;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,13 +16,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Block.class)
 public abstract class MixinBlock {
-    @ModifyReturnValue(method = "shouldDrawSide", at = @At("RETURN"))
-    private static boolean modifyDrawSide(boolean original, BlockState state, BlockView world, BlockPos pos, Direction side, BlockPos blockPos) {
+    @Inject(method = "shouldDrawSide", at = @At("RETURN"), cancellable = true)
+    private static void modifyDrawSide(BlockState state, BlockState otherState, Direction side, CallbackInfoReturnable<Boolean> cir) {
         if (ModuleManager.get(Xray.class).isActive()) {
-            return ModuleManager.get(Xray.class).shouldXray(state.getBlock());
+            cir.setReturnValue(ModuleManager.get(Xray.class).shouldXray(state.getBlock()));
+            cir.cancel();
         }
-
-        return original;
     }
 
     @Inject(method = "getSlipperiness", at = @At("RETURN"), cancellable = true)

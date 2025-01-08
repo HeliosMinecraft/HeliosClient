@@ -72,7 +72,7 @@ public abstract class ClientPlayerEntityMixin {
         EventManager.postEvent(new SendMovementPacketEvent.POST());
     }
 
-    @ModifyExpressionValue(method = "sendMovementPackets", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isSneaking()Z"))
+    @ModifyExpressionValue(method = "sendSneakingPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isSneaking()Z"))
     private boolean isSneaking(boolean sneaking) {
         return (ModuleManager.get(SafeWalk.class).isActive() && ModuleManager.get(SafeWalk.class).packet.value) || sneaking;
     }
@@ -142,7 +142,7 @@ public abstract class ClientPlayerEntityMixin {
     }
 
     @ModifyArg(
-            method = "updateNausea",
+            method = "tickNausea",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/MinecraftClient;setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"

@@ -52,13 +52,13 @@ public class ModuleButton implements Listener {
 
     public void updateScale(boolean expand) {
         if (expand) {
-            scale += (float) (HeliosClient.MC.getTickDelta() * HeliosClient.CLICKGUI.animationSpeed.value);
+            scale += (float) (HeliosClient.MC.getRenderTickCounter().getTickDelta(false) * HeliosClient.CLICKGUI.animationSpeed.value);
             if (scale > 1.0f) {
                 scale = 1.0f;
 
             }
         } else {
-            scale -= (float) (HeliosClient.MC.getTickDelta() * HeliosClient.CLICKGUI.animationSpeed.value);
+            scale -= (float) (HeliosClient.MC.getRenderTickCounter().getTickDelta(false) * HeliosClient.CLICKGUI.animationSpeed.value);
             if (scale < 0.0f) {
                 scale = 0.0f;
 

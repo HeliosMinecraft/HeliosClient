@@ -134,7 +134,7 @@ public class ClickGUIScreen extends Screen {
 
         updateScale((float) HeliosClient.CLICKGUI.animationSpeed.value, shouldClose);
         if (this.client.world == null) {
-            super.renderBackgroundTexture(drawContext);
+            super.renderBackgroundTexture(drawContext,MENU_BACKGROUND_TEXTURE,0,0,0,0,width,height);
         } else if (gui.background.value) {
             Renderer2D.drawGradient(drawContext.getMatrices().peek().getPositionMatrix(), 0, 0, width, height, ColorUtils.changeAlphaGetInt(ColorManager.INSTANCE.getPrimaryGradientStart().getRGB(), 50), ColorUtils.changeAlphaGetInt(ColorManager.INSTANCE.getPrimaryGradientEnd().getRGB(), 50), Renderer2D.Direction.LEFT_RIGHT);
         }

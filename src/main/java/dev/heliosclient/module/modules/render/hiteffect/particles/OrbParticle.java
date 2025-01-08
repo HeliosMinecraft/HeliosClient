@@ -13,20 +13,20 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.explosion.Explosion;
 
 import java.awt.*;
 
 public class OrbParticle extends HitEffectParticle implements Listener {
+    MinecraftClient mc = MinecraftClient.getInstance();
+
     public static boolean COOLER_PHYSICS = false;
     private final float radius;
     private final float gravity;
-    MinecraftClient mc = MinecraftClient.getInstance();
     private Vec3d position;
     private Vec3d velocity;
     private float scale = 1.0f;
-    private static final float FRICTION = 0.98f; // adjust friction strength as needed
-    private static final float FLUID_BUOYANCY = 0.05f; // adjust fluid buoyancy strength as needed
+    private static final float FRICTION = 0.98f;
+    private static final float FLUID_BUOYANCY = 0.05f;
 
 
     public OrbParticle(Vec3d position, Vec3d velocity, float radius, float gravity, float time_in_seconds, boolean hasRandomColor) {
@@ -54,7 +54,6 @@ public class OrbParticle extends HitEffectParticle implements Listener {
 
         // Apply a repulsion force in the direction of the collision
         this.velocity = this.velocity.add(collisionDirection.multiply(entity.getVelocity().length() / 5f ));
-
          */
 
     }
@@ -113,7 +112,7 @@ public class OrbParticle extends HitEffectParticle implements Listener {
         Box playerBox = player.getBoundingBox();
         Box particleBox = new Box(position.x - radius - 0.1f, position.y - radius - 0.1f, position.z - radius - 0.1f, position.x + radius + 0.1f, position.y + radius + 0.1f, position.z + radius + 0.1f);
         if (playerBox.intersects(particleBox)) {
-            Vec3d dir = player.getRotationVec(HeliosClient.MC.getTickDelta());
+            Vec3d dir = player.getRotationVec(HeliosClient.mc.getRenderTickCounter().getTickDelta(false));
 
             velocity = velocity.add(dir.normalize().multiply(0.03).add(0, 0.025f, 0));
         }
@@ -123,7 +122,7 @@ public class OrbParticle extends HitEffectParticle implements Listener {
 
         current_age++;
         if (current_age >= life) {
-            scale = Math.max(scale - mc.getLastFrameDuration() / 7f, 0);
+            scale = Math.max(scale - mc.getRenderTickCounter().getLastFrameDuration() / 7f, 0);
             if (scale <= 0.0f) {
                 discard();
             }
@@ -151,23 +150,19 @@ public class OrbParticle extends HitEffectParticle implements Listener {
     public void discard() {
         super.discard();
 
-        // Unregister the explosion listener
         EventManager.unregister(this);
     }
 
     @SubscribeEvent
     public void onExplosion(ExplosionEvent event) {
-        Explosion explosion = event.getExplosion();
+        Vec3d explosionPos = event.getCenter();
 
-        Vec3d explosionPos = explosion.getPosition();
-
-        // Calculate the direction from the explosion to the orb
         Vec3d dir = position.subtract(explosionPos);
 
         // Apply a force in the direction away from the explosion
         // The force decreases with the square of the distance to the explosion
         double distanceSq = dir.length();
-        double force = (COOLER_PHYSICS ? 8.0 : 1.0) / (distanceSq + 0.1);  // Adjust the force as needed
+        double force = (COOLER_PHYSICS ? 8.0 : 1.0) / (distanceSq + 0.1);
         velocity = velocity.add(dir.normalize().multiply(force));
     }
 
@@ -176,9 +171,9 @@ public class OrbParticle extends HitEffectParticle implements Listener {
         this.particleColor = hasRandomColor ? particleColor : color;
 
         matrixStack.push();
-        final double posX = MathHelper.lerp(mc.getTickDelta(), position.x, position.x + velocity.x) - mc.getEntityRenderDispatcher().camera.getPos().getX();
-        final double posY = MathHelper.lerp(mc.getTickDelta(), position.y, position.y + velocity.y) + 0.1 - mc.getEntityRenderDispatcher().camera.getPos().getY();
-        final double posZ = MathHelper.lerp(mc.getTickDelta(), position.z, position.z + velocity.z) - mc.getEntityRenderDispatcher().camera.getPos().getZ();
+        final double posX = MathHelper.lerp(mc.getRenderTickCounter().getTickDelta(false), position.x, position.x + velocity.x) - mc.getEntityRenderDispatcher().camera.getPos().getX();
+        final double posY = MathHelper.lerp(mc.getRenderTickCounter().getTickDelta(false), position.y, position.y + velocity.y) + 0.1 - mc.getEntityRenderDispatcher().camera.getPos().getY();
+        final double posZ = MathHelper.lerp(mc.getRenderTickCounter().getTickDelta(false), position.z, position.z + velocity.z) - mc.getEntityRenderDispatcher().camera.getPos().getZ();
 
         matrixStack.translate(posX, posY, posZ);
 

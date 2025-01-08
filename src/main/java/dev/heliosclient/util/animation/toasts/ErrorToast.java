@@ -4,9 +4,9 @@ package dev.heliosclient.util.animation.toasts;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.render.Renderer2D;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.toast.SystemToast;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.toast.Toast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.util.Identifier;
@@ -17,11 +17,11 @@ import java.util.List;
 
 public class ErrorToast implements net.minecraft.client.toast.Toast {
 
-    private static final Identifier TEXTURE = new Identifier("toast/system");
+    private static final Identifier TEXTURE = Identifier.ofVanilla("toast/system");
     private final String message;
     private final boolean hasProgressBar;
     private final long endDelay;
-    private long lastTime;
+    private long lastTime, startTime;
     private float lastProgress;
     private float progress;
 
@@ -32,16 +32,30 @@ public class ErrorToast implements net.minecraft.client.toast.Toast {
         this.endDelay = endDelay;
     }
 
-    public Toast.Visibility draw(DrawContext context, ToastManager manager, long startTime) {
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+    public void setProgress(float progress) {
+        this.progress = progress;
+    }
+
+    @Override
+    public Visibility getVisibility() {
+        return startTime >= this.endDelay ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
+    }
+
+    @Override
+    public void update(ToastManager manager, long time) {
+    }
+
+    @Override
+    public void draw(DrawContext context, TextRenderer textRenderer, long startTime) {
+        this.startTime = startTime;
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        context.drawGuiTexture(TEXTURE, 0, 0, this.getWidth(), this.getHeight());
+        context.drawGuiTexture(RenderLayer::getEntityCutoutNoCull,TEXTURE, 0, 0, this.getWidth(), this.getHeight());
 
         List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth() - 5, HeliosClient.MC.textRenderer);
 
         int yOffset = 6;
         for (String s : messageWarp) {
-            context.drawText(manager.getClient().textRenderer, s, this.getWidth() - HeliosClient.MC.textRenderer.getWidth(s), yOffset, Color.RED.getRGB(), false);
+            context.drawText(textRenderer, s, this.getWidth() - HeliosClient.MC.textRenderer.getWidth(s), yOffset, Color.RED.getRGB(), false);
             yOffset += HeliosClient.MC.textRenderer.fontHeight + 4;
         }
 
@@ -67,12 +81,5 @@ public class ErrorToast implements net.minecraft.client.toast.Toast {
             // Draw the progress bar
             context.fill(3, 28, 3 + progressBarWidth, 29, Color.RED.getRGB());
         }
-
-        return startTime >= this.endDelay ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
     }
-
-    public void setProgress(float progress) {
-        this.progress = progress;
-    }
-
 }

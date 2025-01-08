@@ -16,6 +16,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
@@ -52,11 +53,11 @@ public abstract class MixinLivingEntity extends Entity {
     protected abstract int getHandSwingDuration();
 
     @Shadow
-    protected abstract void jump();
+    public abstract void jump();
 
-    @Shadow public abstract boolean hasStatusEffect(StatusEffect effect);
+    @Shadow public abstract boolean hasStatusEffect(RegistryEntry<StatusEffect> effect);
 
-    @Shadow @Nullable public abstract StatusEffectInstance getStatusEffect(StatusEffect effect);
+    @Shadow @Nullable public abstract StatusEffectInstance getStatusEffect(RegistryEntry<StatusEffect> effect);
 
     @Inject(method = "isClimbing", at = @At(value = "HEAD"), cancellable = true)
     public void setClimbing(CallbackInfoReturnable<Boolean> cir) {

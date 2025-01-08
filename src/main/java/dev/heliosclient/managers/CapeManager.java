@@ -12,7 +12,6 @@ import dev.heliosclient.util.cape.CapeTextureManager;
 import dev.heliosclient.util.cape.ProfileUtils;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.fontutils.FontLoader;
-import dev.heliosclient.util.textures.Texture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.Identifier;
@@ -35,14 +34,14 @@ import java.util.concurrent.Future;
 
 public class CapeManager {
     //Default Elytra Skin
-    private static final Identifier SKIN = new Identifier("textures/entity/elytra.png");
+    private static final Identifier SKIN = Identifier.ofVanilla("textures/entity/elytra.png");
 
     //Where we store and get our capes.
     private static final File CAPE_DIRECTORY = new File(HeliosClient.SAVE_FOLDER, "/capes");
     private static final String DEFAULT_CAPE = "helioscape.png";
     
     //The default cape texture of heliosclient.
-    public static final Texture DEFAULT_CAPE_TEXTURE = new Texture("capes/helioscape.png");
+    public static final Identifier DEFAULT_CAPE_TEXTURE = Identifier.of(HeliosClient.MODID,"capes/helioscape.png");
 
     public static CapeManager INSTANCE = new CapeManager();
 
@@ -142,7 +141,7 @@ public class CapeManager {
         NativeImage imgNew = new NativeImage(imageWidth, imageHeight, true);
         for (int x = 0; x < imageSrcWidth; x++) {
             for (int y = 0; y < srcHeight; y++) {
-                imgNew.setColor(x, y, image.getColor(x, y));
+                imgNew.setColorArgb(x, y, image.getColorArgb(x, y));
             }
         }
         return imgNew;

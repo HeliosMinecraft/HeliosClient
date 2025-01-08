@@ -21,8 +21,13 @@ public class GifTextureManager {
         for (int i = 0; i < frames.size(); i++) {
             NativeImageBackedTexture capeTexture = new NativeImageBackedTexture(CapeManager.parseCape(frames.get(i)));
             NativeImageBackedTexture elytraTexture = new NativeImageBackedTexture(frames.get(i));
-            Identifier capeIdentifier = HeliosClient.MC.getTextureManager().registerDynamicTexture(prefix + "_cape_" + i, capeTexture);
-            Identifier elytraIdentifier =  HeliosClient.MC.getTextureManager().registerDynamicTexture(prefix + "_elytra_" + i, elytraTexture);
+
+            Identifier capeIdentifier = Identifier.of(prefix + "_cape_" + i);
+            Identifier elytraIdentifier = Identifier.of(prefix + "_elytra_" + i);
+
+            HeliosClient.MC.getTextureManager().registerTexture(capeIdentifier, capeTexture);
+            HeliosClient.MC.getTextureManager().registerTexture(elytraIdentifier, elytraTexture);
+
             capeTextureIdentifiers.add(capeIdentifier);
             elytraTextureIdentifiers.add(elytraIdentifier);
         }

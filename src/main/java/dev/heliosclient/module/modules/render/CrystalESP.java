@@ -19,9 +19,9 @@ import java.awt.*;
 public class CrystalESP extends Module_ {
     SettingGroup sgGeneral = new SettingGroup("General");
 
-    public DoubleSetting scaleInside = sgGeneral.add(new DoubleSetting.Builder()
-            .name("Inside Scale")
-            .description("Inside scale of crystal")
+    public DoubleSetting scale = sgGeneral.add(new DoubleSetting.Builder()
+            .name("Scale")
+            .description("Scale of crystal")
             .onSettingChange(this)
             .value(1d)
             .defaultValue(1d)
@@ -30,17 +30,7 @@ public class CrystalESP extends Module_ {
             .roundingPlace(2)
             .build()
     );
-    public DoubleSetting scaleOutside = sgGeneral.add(new DoubleSetting.Builder()
-            .name("Outside Scale")
-            .description("Outside scale of crystal")
-            .onSettingChange(this)
-            .value(1d)
-            .defaultValue(1d)
-            .min(0.01f)
-            .max(6f)
-            .roundingPlace(2)
-            .build()
-    );
+
     public DoubleSetting bounce = sgGeneral.add(new DoubleSetting.Builder()
             .name("Bounce")
             .description("Bouncing of crystal")

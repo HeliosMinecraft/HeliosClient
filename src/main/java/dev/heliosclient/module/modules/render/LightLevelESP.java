@@ -59,7 +59,7 @@ public class LightLevelESP extends Module_ {
 
             int lightLevel = mc.world.getLightLevel(LightType.BLOCK, pos);
 
-            float ratio = (float) lightLevel/mc.world.getMaxLightLevel();
+            float ratio = (float) lightLevel/15;
             int red = (int) (255 * (1 - ratio));
             int green = (int) (255 * ratio);
             int color = ColorUtils.rgbaToInt(red,green,0,100);

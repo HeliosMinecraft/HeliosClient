@@ -1,31 +1,26 @@
 package dev.heliosclient.util.textures;
 
-import net.minecraft.client.resource.metadata.TextureResourceMetadata;
-import net.minecraft.client.texture.NativeImage;
+import dev.heliosclient.HeliosClient;
 import net.minecraft.client.texture.ResourceTexture;
-import net.minecraft.resource.ResourceManager;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import net.minecraft.util.Identifier;
 
 public class ClientTexture extends ResourceTexture {
-    public static final Texture CLIENT_LOGO_TEXTURE = new Texture("splashscreen/client_splash.png");
-    public static final Texture CLIENT_ICON_TEXTURE = new Texture("icon.png");
+    public static final Identifier CLIENT_LOGO_TEXTURE = Identifier.of(HeliosClient.MODID,"splashscreen/client_splash.png");
+    public static final Identifier CLIENT_ICON_TEXTURE = Identifier.of(HeliosClient.MODID,"icon.png");
 
     public ClientTexture(boolean icon) {
         super(icon ? CLIENT_ICON_TEXTURE : CLIENT_LOGO_TEXTURE);
     }
-
+    /*
     @Override
-    protected TextureData loadTextureData(ResourceManager resourceManager) {
-        try (InputStream inputStream = resourceManager.open(location)) {
+    public TextureContents loadContents(ResourceManager resourceManager) {
+        try (InputStream inputStream = resourceManager.open(getId().t)) {
             if (inputStream == null) {
-                return new ResourceTexture.TextureData(new FileNotFoundException(location.toString()));
+                return new TextureContents(new FileNotFoundException(location.toString()));
             }
-            ResourceTexture.TextureData textureData;
+            TextureContents textureData;
             try {
-                textureData = new ResourceTexture.TextureData(new TextureResourceMetadata(true, true), NativeImage.read(inputStream));
+                textureData = new TextureContents(new TextureResourceMetadata(true, true), NativeImage.read(inputStream));
             } catch (Throwable throwable) {
                 try {
                     inputStream.close();
@@ -40,7 +35,9 @@ public class ClientTexture extends ResourceTexture {
 
             return textureData;
         } catch (IOException exception) {
-            return new ResourceTexture.TextureData(exception);
+            return new TextureContents(exception);
         }
     }
+    
+     */
 }

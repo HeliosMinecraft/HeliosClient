@@ -50,7 +50,7 @@ public class ExpThrower extends Module_ {
         if (slot == -1) return;
 
         if (feetEXP.value) {
-            RotationUtils.rotate(mc.player.getYaw(mc.getTickDelta()), 90, feetEXP.value, () -> {
+            RotationUtils.rotate(mc.player.getYaw(mc.getRenderTickCounter().getTickDelta(false)), 90, feetEXP.value, () -> {
                 throwXP(slot);
             });
         } else {

@@ -17,6 +17,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -35,15 +36,13 @@ public abstract class GameRendererMixin {
 
     @Shadow
     @Final
-    MinecraftClient client;
+    private MinecraftClient client;
     @Mutable
     @Shadow
     @Final
     private Camera camera;
 
     @Shadow private float zoom;
-
-    @Shadow public abstract void render(float tickDelta, long startTime, boolean tick);
 
     @Shadow public abstract float getFarPlaneDistance();
 
@@ -56,17 +55,17 @@ public abstract class GameRendererMixin {
 
     // MeteorClient.com
     @Inject(method = "renderWorld", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = {"ldc=hand"}))
-    private void render(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    private void render(RenderTickCounter tickCounter, CallbackInfo ci) {
         camera = client.gameRenderer.getCamera();
 
-        EventManager.postEvent(Render3DEvent.get(matrices, tickDelta, camera.getPos().x, camera.getPos().y, camera.getPos().z));
+        EventManager.postEvent(Render3DEvent.get(new MatrixStack(), tickCounter.getTickDelta(false), camera.getPos().x, camera.getPos().y, camera.getPos().z));
 
         GradientBlockRenderer.renderGradientBlocks();
     }
 
 
-    @Inject(method = "getBasicProjectionMatrix", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;mul(Lorg/joml/Matrix4fc;)Lorg/joml/Matrix4f;"), cancellable = true)
-    private void getBasicProjectionMatrix$ChangeAspectRatio(double fov, CallbackInfoReturnable<Matrix4f> cir) {
+    @Inject(method = "getBasicProjectionMatrix", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;perspective(FFFF)Lorg/joml/Matrix4f;"), cancellable = true)
+    private void getBasicProjectionMatrix$ChangeAspectRatio(float fovDegrees, CallbackInfoReturnable<Matrix4f> cir) {
         AspectRatio ratio = ModuleManager.get(AspectRatio.class);
 
         if (ratio.isActive()) {
@@ -84,14 +83,14 @@ public abstract class GameRendererMixin {
          float aspectRatio = (float) ratio.aspectRatio.value;
         float cameraDepth = (float) ratio.cameraDepth.value;
 
-        matrixStack.peek().getPositionMatrix().mul((new Matrix4f()).setPerspective((float)(fov * 0.01745329238474369), aspectRatio, cameraDepth, this.getFarPlaneDistance()));
+        matrixStack.peek().getPositionMatrix().mul((new Matrix4f()).setPerspective((float)(fovDegrees * 0.01745329238474369), aspectRatio, cameraDepth, this.getFarPlaneDistance()));
 
         cir.setReturnValue(matrixStack.peek().getPositionMatrix());
     }
 
 
     @Inject(method = "renderWorld", at = @At(value = "HEAD"))
-    private void renderWorld$ChangeZoom(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    private void renderWorld$ChangeZoom(RenderTickCounter renderTickCounter, CallbackInfo ci) {
         if (ModuleManager.get(Zoom.class).isActive()) {
             if(!isZooming){
                 lastZoom = zoom;
@@ -106,7 +105,7 @@ public abstract class GameRendererMixin {
         }
     }
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;renderWithTooltip(Lnet/minecraft/client/gui/DrawContext;IIF)V",shift = At.Shift.AFTER))
-    private void renderWorld$GlowMouse(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+    private void renderWorld$GlowMouse(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
         if(ClickGUI.shouldGlowMousePointer()) {
             DrawContext drawContext = new DrawContext(this.client, this.buffers.getEntityVertexConsumers());
 
@@ -126,20 +125,20 @@ public abstract class GameRendererMixin {
         return 0.0F;
     }
 
-    @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;D)Lnet/minecraft/util/hit/EntityHitResult;"), cancellable = true)
-    private void onUpdateTargetedEntity(float tickDelta, CallbackInfo info) {
+    @Inject(method = "findCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/ProjectileUtil;raycast(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/function/Predicate;D)Lnet/minecraft/util/hit/EntityHitResult;"), cancellable = true)
+    private void onUpdateTargetedEntity(Entity camera, double blockInteractionRange, double entityInteractionRange, float tickDelta, CallbackInfoReturnable<HitResult> cir) {
         if (ModuleManager.get(NoMiningTrace.class).shouldRemoveTrace() && client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
-            client.getProfiler().pop();
-            info.cancel();
+            //client.getProfiler().pop();
+            cir.cancel();
         }
     }
 
-    @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;raycast(DFZ)Lnet/minecraft/util/hit/HitResult;", shift = At.Shift.AFTER), cancellable = true)
-    private void injectUpdateTargetedEntity(float tickDelta, CallbackInfo ci) {
+    @Inject(method = "findCrosshairTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;raycast(DFZ)Lnet/minecraft/util/hit/HitResult;", shift = At.Shift.AFTER))
+    private void injectUpdateTargetedEntity(Entity camera, double blockInteractionRange, double entityInteractionRange, float tickDelta, CallbackInfoReturnable<HitResult> cir) {
         MinecraftClient client = MinecraftClient.getInstance();
         Entity entity = client.getCameraEntity();
         if (entity != null && client.world != null) {
-            double d = client.interactionManager.getReachDistance();
+            double d = client.player.getBlockInteractionRange();
             HitResult result = entity.raycast(d, tickDelta, false);
 
             if (ModuleManager.get(LiquidInteract.class).isActive() && result.getType() == HitResult.Type.MISS) {
@@ -159,13 +158,6 @@ public abstract class GameRendererMixin {
     private void onShowFloatingItem(ItemStack floatingItem, CallbackInfo info) {
         if (floatingItem.getItem() == Items.TOTEM_OF_UNDYING && NoRender.get().isActive() && NoRender.get().noTotemAnimation.value) {
             info.cancel();
-        }
-    }
-
-    @Inject(method = "renderNausea", at = @At(value = "HEAD"), cancellable = true)
-    private void renderNausea$Helios(DrawContext context, float distortionStrength, CallbackInfo ci) {
-        if (NoRender.get().isActive() && NoRender.get().noNausea.value) {
-            ci.cancel();
         }
     }
 }

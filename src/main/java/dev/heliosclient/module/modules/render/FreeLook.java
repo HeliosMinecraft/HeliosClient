@@ -102,8 +102,8 @@ public class FreeLook extends Module_ {
         if (scrollDistance.value) {
             distance -= (int) (event.getVerticalAmount() * mc.options.getMouseWheelSensitivity().getValue() * 1.75f);
             distance = MathHelper.clamp(distance, 0, 200);
+            event.cancel();
         }
-
     }
 
     public int getDistanceFromPlayer() {

@@ -414,13 +414,14 @@ public class ClickGUI extends Module_ {
         if (HeliosClient.MC.getWindow() != null) {
             if (setting == FontRenderer || setting == loadFonts || setting == Font) {
                 fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
-                FontRenderers.fontRenderer = new FontRenderer(fonts, FontManager.hudFontSize);
-                FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, FontManager.clientFontSize);
+                FontManager.font = fonts[0];
+                FontRenderers.fontRenderer = new FontRenderer(FontManager.font, FontManager.hudFontSize);
+                FontRenderers.fxfontRenderer = new fxFontRenderer(FontManager.font, FontManager.clientFontSize);
                 EventManager.postEvent(new FontChangeEvent(fonts));
             }
             if(setting == hudFontSize || setting == clientFontSize){
-                FontRenderers.fontRenderer = new FontRenderer(fonts, FontManager.hudFontSize);
-                FontRenderers.fxfontRenderer = new fxFontRenderer(fonts, FontManager.clientFontSize);
+                FontRenderers.fontRenderer = new FontRenderer(FontManager.font, FontManager.hudFontSize);
+                FontRenderers.fxfontRenderer = new fxFontRenderer(FontManager.font, FontManager.clientFontSize);
                 EventManager.postEvent(new FontChangeEvent(fonts));
             }
 

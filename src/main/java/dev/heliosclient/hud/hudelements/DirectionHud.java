@@ -118,7 +118,7 @@ public class DirectionHud extends HudElement {
             // Calculate player orientation (yaw) in radians
             double yawRadians = Math.toRadians(90);
             if (mc.player != null) {
-                yawRadians = Math.toRadians(mc.player.getYaw(mc.getTickDelta()));
+                yawRadians = Math.toRadians(mc.player.getYaw(mc.getRenderTickCounter().getTickDelta(false)));
             }
 
             int centerX = this.x + this.width / 2;

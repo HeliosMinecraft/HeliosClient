@@ -83,7 +83,7 @@ public class AntiVoid extends Module_ {
             }
 
             if (packetSpoof.value && mc.getNetworkHandler() != null) {
-                mc.getNetworkHandler().getConnection().send(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.prevX,mc.player.prevY,mc.player.prevZ,onGround.value));
+                mc.getNetworkHandler().getConnection().send(new PlayerMoveC2SPacket.PositionAndOnGround(mc.player.prevX,mc.player.prevY,mc.player.prevZ,onGround.value,mc.player.horizontalCollision));
             }
         }
     }
@@ -100,7 +100,7 @@ public class AntiVoid extends Module_ {
     @SubscribeEvent
     public void onPacketReceive(PacketEvent.RECEIVE event){
         if(packetCancel.value && (cancelMode.isOption(CancelMode.Both) || cancelMode.isOption(CancelMode.Incoming)) && event.getPacket() instanceof PlayerPositionLookS2CPacket pp && mc.world != null){
-            if(pp.getY() < mc.world.getBottomY() || fallCheck()){
+            if(pp.change().position().y < mc.world.getBottomY() || fallCheck()){
                 event.cancel();
             }
         }

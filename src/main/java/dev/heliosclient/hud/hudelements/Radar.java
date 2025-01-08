@@ -10,7 +10,9 @@ import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.mob.HostileEntity;
@@ -282,14 +284,14 @@ public class Radar extends HudElement {
                 drawContext.getMatrices().pop();
             }
             case FACE -> {
-                EntityRenderer<? super Entity> e = mc.getEntityRenderDispatcher().getRenderer(entity);
-                if (e != null) {
-                    Identifier texture = e.getTexture(entity);
+                var e = (EntityRenderer<?, ?>) mc.getEntityRenderDispatcher().getRenderer(entity);
+                if (e instanceof LivingEntityRenderer<?, ?, ?> entityRenderer) {
+                    Identifier texture = entityRenderer.getTexture(null);
 
                     if (texture != null) {
                         drawContext.getMatrices().push();
                         drawContext.getMatrices().scale(drawingScale.getFloat(), drawingScale.getFloat(), 1f);
-                        drawContext.drawTexture(texture, (int) (x / drawingScale.getFloat() - 8), (int) (y / drawingScale.getFloat() - 8), 8, 8, 8, 8, 64, 64);
+                        drawContext.drawTexture(RenderLayer::getEntityCutoutNoCull, texture, (int) (x / drawingScale.getFloat() - 8), (int) (y / drawingScale.getFloat() - 8), 0, 0, 8, 8, 64, 64);
                         drawContext.getMatrices().pop();
                     }
                 }

@@ -5,6 +5,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.ModuleManager;
 import dev.heliosclient.module.modules.movement.TridentTweaker;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.TridentItem;
@@ -14,12 +15,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(TridentItem.class)
 public abstract class MixinTridentItem {
-    @Redirect(method = "onStoppedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;getRiptide(Lnet/minecraft/item/ItemStack;)I"))
-    private int redirectGetRiptide(ItemStack stack) {
+    @Redirect(method = "onStoppedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;getTridentSpinAttackStrength(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/LivingEntity;)F"))
+    private float redirectGetRiptide(ItemStack stack, LivingEntity user) {
         if (ModuleManager.get(TridentTweaker.class).isActive() && ModuleManager.get(TridentTweaker.class).alwaysRiptide.value) {
             return 4;
         } else {
-            return EnchantmentHelper.getRiptide(stack);
+            return EnchantmentHelper.getTridentSpinAttackStrength(stack,user);
         }
     }
 

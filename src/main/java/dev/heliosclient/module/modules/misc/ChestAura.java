@@ -67,7 +67,7 @@ public class ChestAura extends Module_ {
             return;
 
         ChunkUtils.getBlockEntityStreamInChunks().forEach(blockEntity -> {
-            if (!containersOpened.contains(blockEntity) && mc.player.getBlockPos().isWithinDistance(blockEntity.getPos(), mc.interactionManager.getReachDistance() - 0.5)) {
+            if (!containersOpened.contains(blockEntity) && mc.player.getBlockPos().isWithinDistance(blockEntity.getPos(), mc.player.getBlockInteractionRange() - 0.5)) {
                 if ((trappedChests.value && blockEntity instanceof TrappedChestBlockEntity) || blockEntity instanceof ChestBlockEntity || blockEntity instanceof ShulkerBoxBlockEntity || blockEntity instanceof BarrelBlockEntity) {
 
                     if (isStealing)

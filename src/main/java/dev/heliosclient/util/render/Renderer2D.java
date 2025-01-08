@@ -1,8 +1,8 @@
 package dev.heliosclient.util.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.VertexSorter;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.render.RenderEvent;
@@ -11,21 +11,23 @@ import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.entity.DisplayPreviewEntity;
 import dev.heliosclient.util.fontutils.FontRenderers;
 import dev.heliosclient.util.fontutils.fxFontRenderer;
-import dev.heliosclient.util.textures.Texture;
 import me.x150.renderer.font.FontRenderer;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.equipment.EquipmentModelLoader;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
 import org.lwjgl.opengl.GL40C;
 
@@ -54,7 +56,7 @@ public class Renderer2D implements Listener {
     public static Renderers renderer = Renderers.CUSTOM;
     public static final HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
     public static final HashMap<Integer, BlurredShadow> outlineShadowCache = new HashMap<>();
-    public static VertexSorter vertexSorter;
+    public static ProjectionType projectionType;
 
     static {
         for (int i = 0; i < 36; i++) {
@@ -95,36 +97,36 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+       // RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         switch (direction) {
             case LEFT_RIGHT:
-                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
+                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
                 break;
             case TOP_BOTTOM:
-                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
+                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
                 break;
             case RIGHT_LEFT:
-                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
+                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
                 break;
             case BOTTOM_TOP:
-                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha).next();
-                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
-                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha).next();
+                bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(startRed, startGreen, startBlue, startAlpha);
+                bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
+                bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(endRed, endGreen, endBlue, endAlpha);
                 break;
         }
 
-        draw();
+        draw(bufferBuilder);
 
         RenderSystem.disableBlend();
     }
@@ -195,17 +197,17 @@ public class Renderer2D implements Listener {
     public static void drawRectangle(Matrix4f matrix4f, float x, float y, float width, float height, int color) {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+      //  RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
 
-        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(color).next();
-        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(color).next();
-        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(color).next();
-        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(color).next();
+        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(color);
+        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(color);
+        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(color);
+        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(color);
 
-        draw();
+        draw(bufferBuilder);
 
         RenderSystem.disableBlend();
     }
@@ -214,16 +216,16 @@ public class Renderer2D implements Listener {
      * Draws a quad with the given positions as vertices on a 2D plane
      */
     public static void drawQuad(Matrix4f matrix, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int color) {
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+       // RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix, x1, y1, 0).color(color).next();
-        bufferBuilder.vertex(matrix, x2, y2, 0).color(color).next();
-        bufferBuilder.vertex(matrix, x3, y3, 0).color(color).next();
-        bufferBuilder.vertex(matrix, x4, y4, 0).color(color).next();
+        bufferBuilder.vertex(matrix, x1, y1, 0).color(color);
+        bufferBuilder.vertex(matrix, x2, y2, 0).color(color);
+        bufferBuilder.vertex(matrix, x3, y3, 0).color(color);
+        bufferBuilder.vertex(matrix, x4, y4, 0).color(color);
 
-        draw();
+        draw(bufferBuilder);
     }
 
 
@@ -246,7 +248,7 @@ public class Renderer2D implements Listener {
     public static void drawOutlineBox(Matrix4f matrix4f, float x, float y, float width, float height, float thickness, boolean TOP, boolean BOTTOM, boolean LEFT, boolean RIGHT, int color) {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+       // RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
@@ -260,7 +262,7 @@ public class Renderer2D implements Listener {
         if (LEFT) drawRectangleBufferInternal(matrix4f, bufferBuilder, x - thickness, y, thickness, height, red, green, blue, alpha);
         if (RIGHT) drawRectangleBufferInternal(matrix4f, bufferBuilder, x + width, y, thickness, height, red, green, blue, alpha);
 
-        draw();
+        draw(bufferBuilder);
 
         RenderSystem.disableBlend();
     }
@@ -413,26 +415,25 @@ public class Renderer2D implements Listener {
     }
 
     public static void drawRainbowGradientRectangle(Matrix4f matrix4f, float x, float y, float width, float height) {
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
+        BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-
-        setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
+      //  RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        
         for (int i = 0; i < width; i++) {
             float hue = (i / width); // Multiply by 1 to go through the whole color spectrum once (red to red)
             Color color = Color.getHSBColor(hue, 1.0f, 1.0f); // Full saturation and brightness
 
-            bufferBuilder.vertex(matrix4f, x + i, y, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
-            bufferBuilder.vertex(matrix4f, x + i + 1, y, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
-            bufferBuilder.vertex(matrix4f, x + i + 1, y + height, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
-            bufferBuilder.vertex(matrix4f, x + i, y + height, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+            bufferBuilder.vertex(matrix4f, x + i, y, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            bufferBuilder.vertex(matrix4f, x + i + 1, y, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            bufferBuilder.vertex(matrix4f, x + i + 1, y + height, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            bufferBuilder.vertex(matrix4f, x + i, y + height, 0.0f).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
         }
-
-        Tessellator.getInstance().draw();
+        
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
         RenderSystem.disableBlend();
     }
@@ -441,7 +442,7 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.colorMask(false, false, false, true);
         RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, MinecraftClient.IS_SYSTEM_MAC);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT);
         RenderSystem.colorMask(true, true, true, true);
 
         drawRectangle(matrix, x, y, width, height, Color.BLACK.getRGB());
@@ -458,13 +459,13 @@ public class Renderer2D implements Listener {
             float hue = (i / width); // Multiply by 1 to go through the whole color spectrum once (red to red)
             Color color = Color.getHSBColor(hue, 1.0f, 1.0f); // Full saturation and brightness
 
-            bufferBuilder.vertex(matrix, x + i, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
-            bufferBuilder.vertex(matrix, x + i + 1.0f, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
-            bufferBuilder.vertex(matrix, x + i + 1.0f, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
-            bufferBuilder.vertex(matrix, x + i, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).next();
+            bufferBuilder.vertex(matrix, x + i, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            bufferBuilder.vertex(matrix, x + i + 1.0f, y, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            bufferBuilder.vertex(matrix, x + i + 1.0f, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            bufferBuilder.vertex(matrix, x + i, y + height, 0.0F).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
         }
 
-        draw();
+        draw(bufferBuilder);
 
         RenderSystem.disableBlend();
 
@@ -646,19 +647,19 @@ public class Renderer2D implements Listener {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         for (int i = 0; i <= 360; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
             double y = yCenter + Math.cos(Math.toRadians(i)) * radius;
             double x2 = xCenter + Math.sin(Math.toRadians(i)) * (radius + lineWidth);
             double y2 = yCenter + Math.cos(Math.toRadians(i)) * (radius + lineWidth);
-            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, 0).color(red, green, blue, alpha);
         }
 
 
-        draw();
+        draw(bufferBuilder);
     }
 
     /**
@@ -676,22 +677,22 @@ public class Renderer2D implements Listener {
         float blue = (float) (color & 255) / 255.0F;
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
 
 
-        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(red, green, blue, alpha);
 
         for (int i = 0; i <= 360; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
             double y = yCenter + Math.cos(Math.toRadians(i)) * radius;
-            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha);
         }
 
-        draw();
+        draw(bufferBuilder);
         RenderSystem.disableBlend();
     }
 
@@ -752,7 +753,7 @@ public class Renderer2D implements Listener {
         float alpha = (float) (color >> 24 & 255) / 255.0F;
 
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
@@ -763,11 +764,11 @@ public class Renderer2D implements Listener {
             float x2 = x + MathHelper.cos((angle + 1.0F) * 0.017453292F) * radius;
             float y2 = y + MathHelper.sin((angle + 1.0F) * 0.017453292F) * radius;
 
-            bufferBuilder.vertex(matrix4f, x, y, 0).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, x, y, 0).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha);
         }
-        draw();
+        draw(bufferBuilder);
         RenderSystem.disableBlend();
     }
 
@@ -794,12 +795,12 @@ public class Renderer2D implements Listener {
         float endAlpha = (float) (endColor >> 24 & 255) / 255.0F;
 
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(startRed, startGreen, startBlue, startAlpha).next();
+        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(startRed, startGreen, startBlue, startAlpha);
 
         for (int i = quadrant * 90; i <= quadrant * 90 + 90; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
@@ -812,10 +813,10 @@ public class Renderer2D implements Listener {
             float blue = startBlue * (1 - t) + endBlue * t;
             float alpha = startAlpha * (1 - t) + endAlpha * t;
 
-            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha);
         }
 
-        draw();
+        draw(bufferBuilder);
         RenderSystem.disableBlend();
     }
 
@@ -838,7 +839,7 @@ public class Renderer2D implements Listener {
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
 
         for (int i = startAngle; i <= endAngle; i++) {
@@ -847,11 +848,11 @@ public class Renderer2D implements Listener {
             double outerX = xCenter + Math.sin(Math.toRadians(i)) * radius;
             double outerY = yCenter + Math.cos(Math.toRadians(i)) * radius;
 
-            bufferBuilder.vertex(matrix4f, (float) innerX, (float) innerY, 0).color(red, green, blue, alpha).next();
-            bufferBuilder.vertex(matrix4f, (float) outerX, (float) outerY, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) innerX, (float) innerY, 0).color(red, green, blue, alpha);
+            bufferBuilder.vertex(matrix4f, (float) outerX, (float) outerY, 0).color(red, green, blue, alpha);
         }
 
-        draw();
+        draw(bufferBuilder);
 
         RenderSystem.disableBlend();
     }
@@ -874,19 +875,19 @@ public class Renderer2D implements Listener {
 
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         RenderSystem.enableBlend();
 
-        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, xCenter, yCenter, 0).color(red, green, blue, alpha);
 
         for (int i = quadrant * 90; i <= quadrant * 90 + 90; i++) {
             double x = xCenter + Math.sin(Math.toRadians(i)) * radius;
             double y = yCenter + Math.cos(Math.toRadians(i)) * radius;
-            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha).next();
+            bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).color(red, green, blue, alpha);
         }
 
-        draw();
+        draw(bufferBuilder);
     }
 
     /**
@@ -910,21 +911,21 @@ public class Renderer2D implements Listener {
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x3, y3, 0).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x3, y3, 0).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(red, green, blue, alpha);
 
-        draw();
+        draw(bufferBuilder);
     }
     public static void drawFilledTriangle(Matrix4f matrix4f, int x1, int y1, int x2, int y2, int x3, int y3, int color) {
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(color).next();
-        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(color).next();
-        bufferBuilder.vertex(matrix4f, x3, y3, 0).color(color).next();
+        bufferBuilder.vertex(matrix4f, x1, y1, 0).color(color);
+        bufferBuilder.vertex(matrix4f, x2, y2, 0).color(color);
+        bufferBuilder.vertex(matrix4f, x3, y3, 0).color(color);
 
-        draw();
+        draw(bufferBuilder);
     }
 
     /**
@@ -990,21 +991,21 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         BufferBuilder buf = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        buf.vertex(ma, cx, cy, 0).color(rgba).next();
+        buf.vertex(ma, cx, cy, 0).color(rgba);
 
         if (BR) {
             for (i = 0; i < 9; i++) {
                 x = x0 + (r * cosa[i]);
                 y = y0 + (r * sina[i]);
-                buf.vertex(ma, x, y, 0).color(rgba).next();
+                buf.vertex(ma, x, y, 0).color(rgba);
 
             }
         } else {
-            buf.vertex(ma, cx + halfWidth, cy + halfHeight, 0).color(rgba).next();
+            buf.vertex(ma, cx + halfWidth, cy + halfHeight, 0).color(rgba);
         }
 
 
@@ -1013,10 +1014,10 @@ public class Renderer2D implements Listener {
             for (i = 9; i < 18; i++) {
                 x = x0 + (r * cosa[i]);
                 y = y0 + (r * sina[i]);
-                buf.vertex(ma, x, y, 0).color(rgba).next();
+                buf.vertex(ma, x, y, 0).color(rgba);
             }
         } else {
-            buf.vertex(ma, cx - halfWidth, cy + halfHeight, 0).color(rgba).next();
+            buf.vertex(ma, cx - halfWidth, cy + halfHeight, 0).color(rgba);
         }
 
         y0 -= dy;
@@ -1024,11 +1025,11 @@ public class Renderer2D implements Listener {
             for (i = 18; i < 27; i++) {
                 x = x0 + (r * cosa[i]);
                 y = y0 + (r * sina[i]);
-                buf.vertex(ma, x, y, 0).color(rgba).next();
+                buf.vertex(ma, x, y, 0).color(rgba);
             }
 
         } else {
-            buf.vertex(ma, cx - halfWidth, cy - halfHeight, 0).color(rgba).next();
+            buf.vertex(ma, cx - halfWidth, cy - halfHeight, 0).color(rgba);
         }
 
         x0 += dx;
@@ -1036,20 +1037,20 @@ public class Renderer2D implements Listener {
             for (i = 27; i < 36; i++) {
                 x = x0 + (r * cosa[i]);
                 y = y0 + (r * sina[i]);
-                buf.vertex(ma, x, y, 0).color(rgba).next();
+                buf.vertex(ma, x, y, 0).color(rgba);
             }
         } else {
             x = cx + halfWidth;
-            buf.vertex(ma, x, cy - halfHeight, 0).color(rgba).next();
+            buf.vertex(ma, x, cy - halfHeight, 0).color(rgba);
         }
 
         if (!BR) {
-            buf.vertex(ma, x, cy + halfHeight, 0).color(rgba).next();
+            buf.vertex(ma, x, cy + halfHeight, 0).color(rgba);
         } else {
-            buf.vertex(ma, x, cy + (0.5f * dy), 0).color(rgba).next();
+            buf.vertex(ma, x, cy + (0.5f * dy), 0).color(rgba);
         }
 
-        draw();
+        draw(buf);
 
         RenderSystem.disableBlend();
 
@@ -1093,7 +1094,7 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         // Draw the main rectangle
         drawRectangleBufferInternal(matrix4f, bufferBuilder, x + radius, y + radius, width - 2 * radius, height - 2 * radius, red, green, blue, alpha);
@@ -1118,7 +1119,7 @@ public class Renderer2D implements Listener {
             drawRectangleBufferInternal(matrix4f, bufferBuilder, x + width - radius, y + height - radius, radius, radius, red, green, blue, alpha);
         }
 
-        draw();
+        draw(bufferBuilder);
 
 
         if (TL && radius > 0) {
@@ -1140,10 +1141,10 @@ public class Renderer2D implements Listener {
     }
 
     public static void drawRectangleBufferInternal(Matrix4f matrix4f, BufferBuilder bufferBuilder, float x, float y, float width, float height, float red, float green, float blue, float alpha) {
-        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix4f, x, y + height, 0.0F).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x + width, y + height, 0.0F).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x + width, y, 0.0F).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix4f, x, y, 0.0F).color(red, green, blue, alpha);
     }
 
     /**
@@ -1313,7 +1314,7 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.colorMask(false, false, false, true);
         RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT);
         RenderSystem.colorMask(true, true, true, true);
 
         drawRoundedRectangle(matrix, x, y, TL, TR, BL, BR, width, height, radius, color1.getRGB());
@@ -1325,12 +1326,12 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB()).next();
-        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB()).next();
-        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB()).next();
-        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB()).next();
+        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB());
+        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB());
+        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB());
+        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB());
 
-        draw();
+        draw(bufferBuilder);
 
         RenderSystem.disableBlend();
 
@@ -1384,6 +1385,20 @@ public class Renderer2D implements Listener {
         drawOutlineRoundedBox(matrices.peek().getPositionMatrix(),x,y,width,height,radius,thickness,color);
     }
 
+    public static void drawTexture(MatrixStack matrices, double x, double y, double width, double height, float u, float v, double regionWidth, double regionHeight, double textureWidth, double textureHeight) {
+        double x1 = x + width;
+        double y1 = y + height;
+        double z = 0;
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX);
+        BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+        buffer.vertex(matrix, (float) x, (float) y1, (float) z).texture((u) / (float) textureWidth, (v + (float) regionHeight) / (float) textureHeight);
+        buffer.vertex(matrix, (float) x1, (float) y1, (float) z).texture((u + (float) regionWidth) / (float) textureWidth, (v + (float) regionHeight) / (float) textureHeight);
+        buffer.vertex(matrix, (float) x1, (float) y, (float) z).texture((u + (float) regionWidth) / (float) textureWidth, (v) / (float) textureHeight);
+        buffer.vertex(matrix, (float) x, (float) y, (float) z).texture((u) / (float) textureWidth, (v + 0.0F) / (float) textureHeight);
+        BufferRenderer.drawWithGlobalProgram(buffer.end());
+    }
+
     private static List<Color> generateGradientColors(Color[] colors, int steps) {
         List<Color> gradientColors = new ArrayList<>();
 
@@ -1421,7 +1436,7 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.colorMask(false, false, false, true);
         RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT);
         RenderSystem.colorMask(true, true, true, true);
         drawRoundedRectangle(matrix, x, y, TL, TR, BL, BR, width, height, radius, colors[0].getRGB());
 
@@ -1438,15 +1453,15 @@ public class Renderer2D implements Listener {
             Color colorTop = gradientColors.get(i);
             Color colorBottom = gradientColors.get(i + 1);
 
-            bufferBuilder.vertex(matrix, x, stepY + stepHeight, 0.0F).color(colorBottom.getRGB()).next();
-            bufferBuilder.vertex(matrix, x + width, stepY + stepHeight, 0.0F).color(colorBottom.getRGB()).next();
-            bufferBuilder.vertex(matrix, x + width, stepY, 0.0F).color(colorTop.getRGB()).next();
-            bufferBuilder.vertex(matrix, x, stepY, 0.0F).color(colorTop.getRGB()).next();
+            bufferBuilder.vertex(matrix, x, stepY + stepHeight, 0.0F).color(colorBottom.getRGB());
+            bufferBuilder.vertex(matrix, x + width, stepY + stepHeight, 0.0F).color(colorBottom.getRGB());
+            bufferBuilder.vertex(matrix, x + width, stepY, 0.0F).color(colorTop.getRGB());
+            bufferBuilder.vertex(matrix, x, stepY, 0.0F).color(colorTop.getRGB());
 
             stepY += stepHeight;
         }
 
-        draw();
+        draw(bufferBuilder);
         RenderSystem.disableBlend();
         RenderSystem.defaultBlendFunc();
     }
@@ -1459,7 +1474,7 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.colorMask(false, false, false, true);
         RenderSystem.clearColor(0.0F, 0.0F, 0.0F, 0.0F);
-        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT, false);
+        RenderSystem.clear(GL40C.GL_COLOR_BUFFER_BIT);
         RenderSystem.colorMask(true, true, true, true);
 
         run.run();
@@ -1471,12 +1486,12 @@ public class Renderer2D implements Listener {
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB()).next();
-        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB()).next();
-        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB()).next();
-        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB()).next();
+        bufferBuilder.vertex(matrix, x, y + height, 0.0F).color(color1.getRGB());
+        bufferBuilder.vertex(matrix, x + width, y + height, 0.0F).color(color2.getRGB());
+        bufferBuilder.vertex(matrix, x + width, y, 0.0F).color(color3.getRGB());
+        bufferBuilder.vertex(matrix, x, y, 0.0F).color(color4.getRGB());
 
-        draw();
+        draw(bufferBuilder);
 
         RenderSystem.disableBlend();
 
@@ -1484,17 +1499,11 @@ public class Renderer2D implements Listener {
     }
 
     public static BufferBuilder setupAndBegin(VertexFormat.DrawMode m, VertexFormat vf) {
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(m,vf);
-
-        return bufferBuilder;
+        return Tessellator.getInstance().begin(m,vf);
     }
+    
 
-    public static void draw() {
-        draw(Tessellator.getInstance().getBuffer());
-    }
-
-    private static void draw(BufferBuilder builder) {
+    static void draw(BufferBuilder builder) {
         BufferRenderer.drawWithGlobalProgram(builder.end());
     }
 
@@ -1530,12 +1539,12 @@ public class Renderer2D implements Listener {
         RenderSystem.lineWidth(lineWidth);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
-        bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(red, green, blue, alpha).next();
-        bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(red, green, blue, alpha).next();
+        bufferBuilder.vertex(matrix, x1, y1, 0.0F).color(red, green, blue, alpha);
+        bufferBuilder.vertex(matrix, x2, y2, 0.0F).color(red, green, blue, alpha);
 
-        draw();
+        draw(bufferBuilder);
 
         RenderSystem.lineWidth(1.0f);
     }
@@ -1576,9 +1585,7 @@ public class Renderer2D implements Listener {
         }
 
         entityRenderDispatcher.setRenderShadows(false);
-        RenderSystem.runAsFancy(() -> {
-            entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, HeliosClient.MC.getTickDelta(), context.getMatrices(), context.getVertexConsumers(), 15728880);
-        });
+        entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, HeliosClient.MC.getRenderTime(), context.getMatrices(), HeliosClient.MC.getBufferBuilders().getEntityVertexConsumers(), 15728880);
         context.draw();
         entityRenderDispatcher.setRenderShadows(true);
         context.getMatrices().pop();
@@ -1592,11 +1599,10 @@ public class Renderer2D implements Listener {
 
     /* ==== Drawing Custom Stuff ==== */
     public static void drawDisplayPreviewEntity( int x, int y, int size, DisplayPreviewEntity entity, float mouseX, float mouseY) {
-        MatrixStack matrixStack = RenderSystem.getModelViewStack();
-        matrixStack.push();
+        Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
+        matrixStack.pushMatrix();
         matrixStack.translate(x, y, 1050.0f);
         matrixStack.scale(1.0f, 1.0f, -1.0f);
-        RenderSystem.applyModelViewMatrix();
         MatrixStack matrixStack2 = new MatrixStack();
         matrixStack2.translate(0.0, 0.0, 1000.0);
         matrixStack2.scale(size, size, size);
@@ -1607,28 +1613,27 @@ public class Renderer2D implements Listener {
         EntityRenderDispatcher entityRenderDispatcher = mc.getEntityRenderDispatcher();
         entityRenderDispatcher.setRenderShadows(false);
         VertexConsumerProvider.Immediate immediate = mc.getBufferBuilders().getEntityVertexConsumers();
-        RenderSystem.runAsFancy(()->{
-            EntityRendererFactory.Context ctx = new EntityRendererFactory.Context(
+        EntityRendererFactory.Context ctx = new EntityRendererFactory.Context(
                     mc.getEntityRenderDispatcher(),
-                    mc.getItemRenderer(),
+                    mc.getItemModelManager(),
+                    mc.getMapRenderer(),
                     mc.getBlockRenderManager(),
-                    mc.getEntityRenderDispatcher().getHeldItemRenderer(),
                     mc.getResourceManager(),
-                    mc.getEntityModelLoader(),
+                    mc.getLoadedEntityModels(),
+                    new EquipmentModelLoader(),
                     mc.textRenderer
-            );
-            DisplayPreviewEntityRenderer displayPlayerEntityRenderer = new DisplayPreviewEntityRenderer(ctx,entity.slim);
-            displayPlayerEntityRenderer.render(entity,x,y, mc.getTickDelta(), matrixStack2, immediate, 0xF000F0,mouseX, mouseY);
-        });
+        );
+
+        DisplayPreviewEntityRenderer displayPlayerEntityRenderer = new DisplayPreviewEntityRenderer(ctx,entity.slim);
+        displayPlayerEntityRenderer.render(entity,x,y, mc.getRenderTime(), matrixStack2, immediate, 0xF000F0,mouseX, mouseY);
         immediate.draw();
         entityRenderDispatcher.setRenderShadows(true);
-        matrixStack.pop();
-        RenderSystem.applyModelViewMatrix();
+        matrixStack.popMatrix();
         DiffuseLighting.enableGuiDepthLighting();
     }
 
     public static void drawEntity(DrawContext context, int x, int y, int size, Entity entity, float delta) {
-        float yaw = MathHelper.wrapDegrees(entity.prevYaw + (entity.getYaw() - entity.prevYaw) * HeliosClient.MC.getTickDelta());
+        float yaw = MathHelper.wrapDegrees(entity.prevYaw + (entity.getYaw() - entity.prevYaw) * HeliosClient.MC.getRenderTickCounter().getTickDelta(false));
         float pitch = entity.getPitch();
 
         Quaternionf quaternionf = (new Quaternionf()).rotateZ(3.1415927F);
@@ -1656,7 +1661,7 @@ public class Renderer2D implements Listener {
         }
 
         entityRenderDispatcher.setRenderShadows(false);
-        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, delta, context.getMatrices(), context.getVertexConsumers(), 15728880));
+        entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, delta, context.getMatrices(), HeliosClient.MC.getBufferBuilders().getEntityVertexConsumers(), 15728880);
         context.draw();
         entityRenderDispatcher.setRenderShadows(true);
         context.getMatrices().pop();
@@ -1678,17 +1683,17 @@ public class Renderer2D implements Listener {
     /* ==== Projection ==== */
 
     public static void unscaledProjection() {
-        vertexSorter = RenderSystem.getVertexSorting();
-        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), 0, 1000, 21000), VertexSorter.BY_Z);
+        projectionType = RenderSystem.getProjectionType();
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), 0, 1000, 21000), ProjectionType.ORTHOGRAPHIC);
     }
 
     public static void scaledProjection() {
-        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getFramebufferWidth() / mc.getWindow().getScaleFactor()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), vertexSorter);
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getFramebufferWidth() / mc.getWindow().getScaleFactor()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), projectionType);
     }
 
     public static void customScaledProjection(float scale) {
-        vertexSorter = RenderSystem.getVertexSorting();
-        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth() / scale, mc.getWindow().getFramebufferHeight() / scale, 0, 1000, 21000), VertexSorter.BY_Z);
+        projectionType = RenderSystem.getProjectionType();
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth() / scale, mc.getWindow().getFramebufferHeight() / scale, 0, 1000, 21000),  ProjectionType.ORTHOGRAPHIC);
     }
 
     /* ==== Drawing Custom Text ==== */
@@ -1973,10 +1978,10 @@ public class Renderer2D implements Listener {
 
     // https://github.com/Pan4ur/ThunderHack-Recode/blob/main/src/main/java/thunder/hack/utility/render/Render2DEngine.java
     public static class BlurredShadow {
-        Texture id;
+        Identifier id;
 
         public BlurredShadow(BufferedImage bufferedImage) {
-            this.id = new Texture("identifier/blur/" + RandomStringUtils.randomAlphanumeric(16));
+            this.id = Identifier.of(HeliosClient.MODID,"identifier/blur/" + RandomStringUtils.randomAlphanumeric(16).toLowerCase());
             registerBufferedImageTexture(id, bufferedImage);
         }
 

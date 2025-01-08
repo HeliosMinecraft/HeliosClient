@@ -111,7 +111,7 @@ public class ServerScraper extends Module_ {
             long dayTime = world.getTimeOfDay();
             boolean isDay = dayTime >= 0 && dayTime < 12000; // Daytime is between 0 and 12000 ticks
             double dayCount = Math.floor(mc.world.getTime() / 24000);
-            int nextMapId = world.getNextMapId();
+            int nextMapId = world.increaseAndGetMapId().id();
             float tickRate = world.getTickManager().getTickRate();
 
             // Gather player and entity information
@@ -165,8 +165,6 @@ public class ServerScraper extends Module_ {
                 String serverProtocolVersion = String.valueOf(info.protocolVersion);
                 String motd = info.label.getString();
                 String serverAddress = info.address;
-                String online = String.valueOf(info.online);
-                boolean hasSecureChat = info.isSecureChatEnforced();
                 boolean texturePackRequired = info.getResourcePackPolicy() == ServerInfo.ResourcePackPolicy.ENABLED;
 
                 // Constructing the server information message
@@ -177,10 +175,8 @@ public class ServerScraper extends Module_ {
                         .append(generateText("Version: ",serverVersion))
                         .append(generateText("Protocol Version: ",serverProtocolVersion))
                         .append(generateText("MOTD: ",Formatting.WHITE, motd,Formatting.RESET))
-                        .append(generateText("Online: ",online))
                         .append(generateYesNoText("Texture Pack Required: ",texturePackRequired))
                         .append(generateText("Texture Pack Policy: ",info.getResourcePackPolicy().name()))
-                        .append(generateYesNoText("Is Chat Secure: ", hasSecureChat))
                         .append(generateText("Server Type: ",info.getServerType().name()));
 
                 ChatUtils.sendHeliosMsg(serverInfoMessage);

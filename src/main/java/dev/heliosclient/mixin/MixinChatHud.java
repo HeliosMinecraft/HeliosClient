@@ -11,6 +11,7 @@ import dev.heliosclient.ui.clickgui.gui.PolygonMeshPatternRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.text.Text;
@@ -40,22 +41,22 @@ public abstract class MixinChatHud {
     private int chatLineIndex;
 
     @Shadow
-    protected abstract void logChatMessage(Text message, @Nullable MessageIndicator indicator);
-
-    @Shadow
-    protected abstract void addMessage(Text message, @Nullable MessageSignatureData signature, int ticks, @Nullable MessageIndicator indicator, boolean refresh);
-
-    @Shadow
     public abstract int getWidth();
 
     @Shadow protected abstract boolean isChatFocused();
+
+    @Shadow protected abstract void logChatMessage(ChatHudLine message);
+
+    @Shadow public abstract void addMessage(Text message);
+
+    @Shadow public abstract void addMessage(Text message, @Nullable MessageSignatureData signatureData, @Nullable MessageIndicator indicator);
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHudLine$Visible;addedTime()I"))
     public void getChatLineIndex(CallbackInfo ci, @Local(ordinal = 13) int chatLineIndex) {
         this.chatLineIndex = chatLineIndex;
     }
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;isChatHidden()Z",shift = At.Shift.AFTER))
-    public void onRender$GUICoolVisuals(DrawContext context, int currentTick, int mouseX, int mouseY,CallbackInfo ci) {
+    public void onRender$GUICoolVisuals(DrawContext context, int currentTick, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
         if(this.isChatFocused() && GUI.coolVisualsChatHud()){
             PolygonMeshPatternRenderer.INSTANCE.render(context.getMatrices(),mouseX,mouseY);
         }
@@ -85,14 +86,16 @@ public abstract class MixinChatHud {
         if (ignoreAddMessage)
             return;
 
+        messageTimestamps.add(0, System.currentTimeMillis());
+
         ChatMessageEvent event = new ChatMessageEvent(message, indicator, signature);
         EventManager.postEvent(event);
         if (event.isCanceled()) {
             ci.cancel();
             if (!event.getMessage().getString().equals(message.getString())) {
                 ignoreAddMessage = true;
-                logChatMessage(event.getMessage(), indicator);
-                addMessage(event.getMessage(), signature, client.inGameHud.getTicks(), indicator, false);
+                logChatMessage(new ChatHudLine(0, event.getMessage(),signature,indicator));
+                addMessage(event.getMessage(),signature,indicator);
                 ignoreAddMessage = false;
             }
         } else {
@@ -100,13 +103,8 @@ public abstract class MixinChatHud {
         }
     }
 
-    @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V", at = @At("HEAD"), cancellable = true)
-    private void onAddMessage(Text message, MessageSignatureData signature, int ticks, MessageIndicator indicator, boolean refresh, CallbackInfo ci) {
-        messageTimestamps.add(0, System.currentTimeMillis());
-    }
-
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/OrderedText;III)I"))
-    private void onRenderBeforeDrawContext(DrawContext context, int currentTick, int mouseX, int mouseY, CallbackInfo ci) {
+    private void onRenderBeforeDrawContext(DrawContext context, int currentTick, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
         if (ModuleManager.get(ChatTweaks.class).slideInAnimation.value && ModuleManager.get(ChatTweaks.class).isActive()) {
             calculateXOffset();
             context.getMatrices().translate(chatXMovement, 0, 0);
@@ -130,7 +128,7 @@ public abstract class MixinChatHud {
         return size;
     }
 
-    @ModifyExpressionValue(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V", at = @At(value = "CONSTANT", args = "intValue=100"))
+    @ModifyExpressionValue(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "CONSTANT", args = "intValue=100"))
     private int maxLengthIncrease(int size) {
         if (keepHistory())
             return Integer.MAX_VALUE - size;

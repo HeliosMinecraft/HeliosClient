@@ -19,7 +19,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.GlAllocationUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -179,7 +178,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
             int pickX = (int) (mouseXPick * framebuffer.textureWidth / HeliosClient.MC.getWindow().getScaledWidth());
             int pickY = (int) ((HeliosClient.MC.getWindow().getScaledHeight() - mouseYPick) * framebuffer.textureHeight / HeliosClient.MC.getWindow().getScaledHeight());
 
-            ByteBuffer buffer = GlAllocationUtils.allocateByteBuffer(4);
+            ByteBuffer buffer = ByteBuffer.allocate(4);
             GL11.glReadPixels(pickX, pickY, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
             int red = buffer.get(0) & 0xFF;
             int green = buffer.get(1) & 0xFF;
@@ -271,7 +270,7 @@ public class RGBASetting extends ParentScreenSetting<Color> implements Listener 
             int pickX = (int) (mouseXPick * framebuffer.textureWidth / HeliosClient.MC.getWindow().getScaledWidth());
             int pickY = (int) ((HeliosClient.MC.getWindow().getScaledHeight() - mouseYPick) * framebuffer.textureHeight / HeliosClient.MC.getWindow().getScaledHeight());
 
-            ByteBuffer buffer = GlAllocationUtils.allocateByteBuffer(4);
+            ByteBuffer buffer = ByteBuffer.allocate(4);
             GL11.glReadPixels(pickX, pickY, 1, 1, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
             int red = buffer.get(0) & 0xFF;
             int green = buffer.get(1) & 0xFF;
