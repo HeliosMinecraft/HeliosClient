@@ -1,29 +1,8 @@
 accessWidener v1 named
 accessible method net/minecraft/client/gui/DrawContext fillGradient (IIIIIII)V
-accessible field net/minecraft/client/render/entity/model/PlayerEntityModel cloak Lnet/minecraft/client/model/ModelPart;
 accessible class net/minecraft/client/world/ClientChunkManager$ClientChunkMap
 
 accessible method net/minecraft/client/network/ClientPlayerInteractionManager syncSelectedSlot ()V
-
-accessible method net/minecraft/client/render/entity/PlayerEntityRenderer getArmPose (Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/client/render/entity/model/BipedEntityModel$ArmPose;
-
-accessible method net/minecraft/client/render/entity/LivingEntityRenderer getAnimationProgress (Lnet/minecraft/entity/LivingEntity;F)F
-accessible method net/minecraft/client/render/entity/LivingEntityRenderer setupTransforms (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;FFF)V
-accessible method net/minecraft/client/render/entity/LivingEntityRenderer scale (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/util/math/MatrixStack;F)V
-
-accessible method net/minecraft/client/render/entity/model/AnimalModel getHeadParts ()Ljava/lang/Iterable;
-accessible method net/minecraft/client/render/entity/model/AnimalModel getBodyParts ()Ljava/lang/Iterable;
-
-accessible method net/minecraft/client/render/entity/model/PlayerEntityModel getBodyParts ()Ljava/lang/Iterable;
-
-accessible field net/minecraft/client/render/entity/EndCrystalEntityRenderer SINE_45_DEGREES F
-accessible field net/minecraft/client/render/entity/EndCrystalEntityRenderer bottom Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/EndCrystalEntityRenderer frame Lnet/minecraft/client/model/ModelPart;
-accessible field net/minecraft/client/render/entity/EndCrystalEntityRenderer core Lnet/minecraft/client/model/ModelPart;
-
-accessible field net/minecraft/client/model/ModelPart$Cuboid sides [Lnet/minecraft/client/model/ModelPart$Quad;
-accessible field net/minecraft/client/model/ModelPart cuboids Ljava/util/List;
-accessible field net/minecraft/client/model/ModelPart children Ljava/util/Map;
 
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler
