@@ -4,8 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
-import dev.heliosclient.util.textures.ClearTexture;
-import dev.heliosclient.util.textures.ClientTexture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
@@ -29,8 +27,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.awt.*;
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import static dev.heliosclient.util.textures.ClientTexture.CLIENT_ICON_TEXTURE;
 
 @Mixin(value = SplashOverlay.class, priority = 3001)
 public abstract class MixinSplashScreen {
@@ -65,8 +61,8 @@ public abstract class MixinSplashScreen {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void init(MinecraftClient client, ResourceReload monitor, Consumer<Optional<Throwable>> exceptionHandler, boolean reloading, CallbackInfo ci) {
-        client.getTextureManager().registerTexture(LOGO, new ClearTexture());
-        client.getTextureManager().registerTexture(CLIENT_ICON_TEXTURE, new ClientTexture(true));
+       // client.getTextureManager().registerTexture(LOGO, new ClearTexture());
+        //client.getTextureManager().registerTexture(CLIENT_ICON_TEXTURE, new ClientTexture(true));
     }
 
     @Unique
@@ -98,6 +94,7 @@ public abstract class MixinSplashScreen {
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
     public void helios$render(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+
         int size = 100;
   /*
         int i = context.getScaledWindowWidth();

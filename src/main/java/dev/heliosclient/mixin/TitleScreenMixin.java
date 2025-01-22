@@ -53,7 +53,21 @@ public abstract class TitleScreenMixin extends Screen {
             entity = new DisplayPreviewEntity();
         }
 
-        Renderer2D.drawDisplayPreviewEntity(x,y,30,entity,mouseX,mouseY);
+        /*
+        Renderer.roundedRectangle.reset().position(50,120).size(100,50).color(Color.BLACK,Color.WHITE,Renderer2D.Direction.LEFT_RIGHT).radius(10.0f).blurredShadow(true,10,0).draw(context.getMatrices());
+        Renderer.roundedRectangle.reset().position(100,250).size(100,50).color(Color.RED,Color.ORANGE,Renderer2D.Direction.TOP_BOTTOM).radius(10.0f).badShadow(true,3,2,125).draw(context.getMatrices());
+        Renderer.rectangle.reset()
+                .position(30,20)
+                .size(50,60)
+                .color(Color.GREEN,Color.YELLOW,Renderer2D.Direction.BOTTOM_TOP)
+                .outline(true,1.5f)
+                .draw(context.getMatrices());
+
+         */
+
+        if(entity != null) {
+            Renderer2D.drawDisplayPreviewEntity(x, y, 30, entity, mouseX, mouseY);
+        }
     }
 
     @Inject(at = @At("RETURN"), method = "init")

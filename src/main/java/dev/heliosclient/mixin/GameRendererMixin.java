@@ -63,7 +63,6 @@ public abstract class GameRendererMixin {
         GradientBlockRenderer.renderGradientBlocks();
     }
 
-
     @Inject(method = "getBasicProjectionMatrix", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;perspective(FFFF)Lorg/joml/Matrix4f;"), cancellable = true)
     private void getBasicProjectionMatrix$ChangeAspectRatio(float fovDegrees, CallbackInfoReturnable<Matrix4f> cir) {
         AspectRatio ratio = ModuleManager.get(AspectRatio.class);

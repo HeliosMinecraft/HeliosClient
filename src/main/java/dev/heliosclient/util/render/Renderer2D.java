@@ -33,10 +33,8 @@ import org.lwjgl.opengl.GL40C;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.*;
 
 import static dev.heliosclient.util.render.Renderer3D.mc;
 import static me.x150.renderer.render.Renderer2d.renderTexture;
@@ -54,8 +52,8 @@ public class Renderer2D implements Listener {
     public static Renderer2D INSTANCE = new Renderer2D();
     public static DrawContext drawContext;
     public static Renderers renderer = Renderers.CUSTOM;
-    public static final HashMap<Integer, BlurredShadow> shadowCache = new HashMap<>();
-    public static final HashMap<Integer, BlurredShadow> outlineShadowCache = new HashMap<>();
+    public static final Map<Integer, BlurredShadow> shadowCache = new HashMap<>();
+    public static final Map<Integer, BlurredShadow> outlineShadowCache = new HashMap<>();
     public static ProjectionType projectionType;
 
     static {
@@ -97,7 +95,7 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-       // RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         switch (direction) {
             case LEFT_RIGHT:
@@ -197,7 +195,7 @@ public class Renderer2D implements Listener {
     public static void drawRectangle(Matrix4f matrix4f, float x, float y, float width, float height, int color) {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-      //  RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
@@ -216,7 +214,7 @@ public class Renderer2D implements Listener {
      * Draws a quad with the given positions as vertices on a 2D plane
      */
     public static void drawQuad(Matrix4f matrix, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, int color) {
-       // RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
@@ -248,7 +246,7 @@ public class Renderer2D implements Listener {
     public static void drawOutlineBox(Matrix4f matrix4f, float x, float y, float width, float height, float thickness, boolean TOP, boolean BOTTOM, boolean LEFT, boolean RIGHT, int color) {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-       // RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
 
         BufferBuilder bufferBuilder = setupAndBegin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
@@ -421,7 +419,7 @@ public class Renderer2D implements Listener {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
-      //  RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         
         for (int i = 0; i < width; i++) {
             float hue = (i / width); // Multiply by 1 to go through the whole color spectrum once (red to red)
@@ -1002,7 +1000,6 @@ public class Renderer2D implements Listener {
                 x = x0 + (r * cosa[i]);
                 y = y0 + (r * sina[i]);
                 buf.vertex(ma, x, y, 0).color(rgba);
-
             }
         } else {
             buf.vertex(ma, cx + halfWidth, cy + halfHeight, 0).color(rgba);
@@ -1960,6 +1957,41 @@ public class Renderer2D implements Listener {
     public enum Direction {
         // Left_Right means from left to right. Same for others //
         LEFT_RIGHT, TOP_BOTTOM, RIGHT_LEFT, BOTTOM_TOP;
+
+        public int[] getVertexColor(int startColor, int endColor){
+            int[] array = new int[4];
+            switch (this.ordinal()) {
+                case 0 -> {
+                    array[0] = startColor;
+                    array[3] = startColor;
+                    array[1] = endColor;
+                    array[2] = endColor;
+                }
+                case 1 -> {
+                    array[0] = startColor;
+                    array[1] = startColor;
+                    array[2] = endColor;
+                    array[3] = endColor;
+                }
+                case 2 -> {
+                    array[0] = endColor;
+                    array[3] = endColor;
+                    array[1] = startColor;
+                    array[2] = startColor;
+                }
+                case 3 -> {
+                    array[0] = endColor;
+                    array[1] = endColor;
+                    array[2] = startColor;
+                    array[3] = startColor;
+                }
+                default -> {
+                    throw new IllegalArgumentException("Direction cannot be more than 3");
+                }
+            }
+            return array;
+        }
+
 
         public Direction getOpposite(){
             return switch (this) {

@@ -1,10 +1,10 @@
 package dev.heliosclient.util.fontutils;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 import java.awt.*;
@@ -34,14 +34,14 @@ public class fxFontRenderer extends FontRenderer {
      * @see dev.heliosclient.util.render.Renderer2D#wrapText(String, int, fxFontRenderer) , int)
      */
     public String trimToWidth(String text, float width) {
-        float textWidth = this.getStringWidth(text);
+        float textWidth = this.getTextWidth(Text.of(text));
         if (textWidth <= width) {
             return text;
         } else {
             String trimmedText = text;
             while (textWidth > width && !trimmedText.isEmpty()) {
                 trimmedText = trimmedText.substring(0, trimmedText.length() - 1);
-                textWidth = this.getStringWidth(trimmedText);
+                textWidth = this.getTextWidth(Text.of(trimmedText));
             }
             return trimmedText;
         }
@@ -53,34 +53,17 @@ public class fxFontRenderer extends FontRenderer {
         Renderer2D.stopScaling(matrixStack);
     }
 
-    public void drawString(MatrixStack matrixStack, String text, float x, float y, int color) {
-        int r = 256 - ColorUtils.getRed(color);
-        int g = 256 - ColorUtils.getGreen(color);
-        int b = 256 - ColorUtils.getBlue(color);
-        int a = 256 - ColorUtils.getAlpha(color);
-
+    public void drawString(MatrixStack stack, String text, float x, float y, int color) {
         // Draw the text at the specified coordinates with the specified color
-        //this.drawString(matrixStack, text, x / scaleFactor, y / scaleFactor, r, g, b, a);
-        RenderSystem.setShaderColor(r/255.0F,g/255.0F,b/255.0F,a/255.0F);
-
         try {
-            super.drawText(matrixStack, Text.of(text), x,y,a/255.0F);
+            this.drawText(stack, Text.literal(text).styled((it) -> it.withParent(Style.EMPTY.withColor(color))), x, y, ColorUtils.getAlpha(color)/255.0F);
         } catch (NullPointerException ignored) {}
-        RenderSystem.setShaderColor(1.0F,1.0F,1.0F,1.0F);
     }
 
-    public void drawCenteredString(MatrixStack stack, String s, float x, float y, int color) {
-        int r = 256 - ColorUtils.getRed(color);
-        int g = 256 - ColorUtils.getGreen(color);
-        int b = 256 - ColorUtils.getBlue(color);
-        int a = 256 - ColorUtils.getAlpha(color);
-
-        RenderSystem.setShaderColor(r/255.0F,g/255.0F,b/255.0F,a/255.0F);
+    public void drawCenteredString(MatrixStack stack, String text, float x, float y, int color) {
         try {
-            super.drawCenteredText(stack, Text.of(s), x,y,a/255.0F);
-        } catch (NullPointerException ignored) {
-        }
-        RenderSystem.setShaderColor(1.0F,1.0F,1.0F,1.0F);
+            this.drawCenteredText(stack, Text.literal(text).styled((it) -> it.withParent(Style.EMPTY.withColor(color))), x, y, ColorUtils.getAlpha(color)/255.0F);
+        } catch (NullPointerException ignored) {}
     }
 
 }
