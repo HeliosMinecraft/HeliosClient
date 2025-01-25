@@ -2,8 +2,8 @@ package dev.heliosclient.module.modules.render.hiteffect.particles;
 
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.module.modules.render.hiteffect.HitEffectParticle;
+import dev.heliosclient.util.fontutils.BetterFontRenderer;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.Renderer3D;
 import dev.heliosclient.util.timer.TimerUtils;
 import net.minecraft.client.util.math.MatrixStack;
@@ -50,7 +50,7 @@ public class TextParticle extends HitEffectParticle {
         //Random is best for comical fontRenderer
         this.particleColor = hasRandomColor ? particleColor : color;
 
-        fxFontRenderer fontRenderer = COMICAL && FontRenderers.Comical_fxfontRenderer != null? FontRenderers.Comical_fxfontRenderer : FontRenderers.Large_fxfontRenderer;
+        BetterFontRenderer fontRenderer = COMICAL && FontRenderers.Comical_fxfontRenderer != null? FontRenderers.Comical_fxfontRenderer : FontRenderers.Large_fxfontRenderer;
 
                                                                     //Levitating effect
         Renderer3D.drawText(fontRenderer, text, (float) pos.x, (float) pos.y + (current_age/10.0f) * 0.032f, (float) pos.z, -fontRenderer.getStringWidth(text) / 2.0f, -fontRenderer.getStringHeight(text) / 2.0f, scale, particleColor.getRGB());

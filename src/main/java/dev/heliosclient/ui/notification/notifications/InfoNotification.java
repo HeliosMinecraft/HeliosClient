@@ -6,8 +6,8 @@ import dev.heliosclient.module.modules.misc.NotificationModule;
 import dev.heliosclient.ui.notification.Notification;
 import dev.heliosclient.util.SoundUtils;
 import dev.heliosclient.util.color.ColorUtils;
+import dev.heliosclient.util.fontutils.BetterFontRenderer;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.render.Renderer2D;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvent;
@@ -70,7 +70,7 @@ public class InfoNotification extends Notification {
     }
 
     @Override
-    public void render(MatrixStack matrices, int y, fxFontRenderer fontRenderer) {
+    public void render(MatrixStack matrices, int y, BetterFontRenderer fontRenderer) {
         if (IS_FANCY) {
             renderFancyStyle(matrices, fontRenderer);
             return;
@@ -79,7 +79,7 @@ public class InfoNotification extends Notification {
         renderDefaultStyle(matrices, fontRenderer);
     }
 
-    private void renderFancyStyle(MatrixStack matrices, fxFontRenderer fontRenderer) {
+    private void renderFancyStyle(MatrixStack matrices, BetterFontRenderer fontRenderer) {
         //Fancy, but neither customisable nor practical.
         //TODO : ^^^
 
@@ -103,7 +103,7 @@ public class InfoNotification extends Notification {
         );
     }
 
-    private void renderDefaultStyle(MatrixStack matrices, fxFontRenderer fontRenderer) {
+    private void renderDefaultStyle(MatrixStack matrices, BetterFontRenderer fontRenderer) {
         String titleText = fontRenderer.trimToWidth(title, width - 17);
 
         // Rounded rectangle background

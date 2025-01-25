@@ -7,6 +7,7 @@ import dev.heliosclient.module.Module_;
 import dev.heliosclient.module.settings.BooleanSetting;
 import dev.heliosclient.module.settings.SettingGroup;
 import dev.heliosclient.module.settings.StringSetting;
+import dev.heliosclient.util.ChatUtils;
 import dev.heliosclient.util.inputbox.InputBox;
 import net.minecraft.network.packet.BrandCustomPayload;
 import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
@@ -17,6 +18,7 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
 
 public class BrandSpoof extends Module_ {
@@ -57,8 +59,13 @@ public class BrandSpoof extends Module_ {
     public void onPacketSend(PacketEvent.SEND event) {
         if (!(event.packet instanceof CustomPayloadC2SPacket packet)) return;
 
-        if (spoofBrand.value && packet.payload().getId().equals(BrandCustomPayload.ID)) {
-            mc.getNetworkHandler().getConnection().send(new CustomPayloadC2SPacket(new BrandCustomPayload(brandToSpoof.value)));
+        Identifier id = packet.payload().getId().id();
+
+        if (spoofBrand.value && id.equals(BrandCustomPayload.ID.id()) && event.connection != null) {
+            try {
+                event.connection.send(new CustomPayloadC2SPacket(new BrandCustomPayload(brandToSpoof.value)));
+            } catch (Throwable ignored){}
+            event.setCanceled(true);
         }
     }
 
@@ -101,7 +108,8 @@ public class BrandSpoof extends Module_ {
             msg.append("\t").append(download).append(" ");
             msg.append(spoof);
 
-            mc.player.sendMessage(msg,false);
+            ChatUtils.sendHeliosMsg(msg);
+            //mc.player.sendMessage(msg,false);
         }
     }
 

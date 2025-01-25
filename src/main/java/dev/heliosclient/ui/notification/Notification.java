@@ -4,7 +4,7 @@ import dev.heliosclient.HeliosClient;
 import dev.heliosclient.managers.NotificationManager;
 import dev.heliosclient.util.animation.Easing;
 import dev.heliosclient.util.animation.EasingType;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
+import dev.heliosclient.util.fontutils.BetterFontRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.MathHelper;
@@ -274,7 +274,7 @@ public abstract class Notification {
     /**
      * Render the notification in this method
      */
-    public abstract void render(MatrixStack matrices, int y, fxFontRenderer fontRenderer);
+    public abstract void render(MatrixStack matrices, int y, BetterFontRenderer fontRenderer);
 
     /**
      * Override this method to play a sound when the notification is displayed. Called in {@link NotificationManager#updateNotifications()}

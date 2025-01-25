@@ -83,7 +83,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
     @Override
     public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         if (this.client.world == null) {
-            super.renderBackgroundTexture(drawContext,MENU_BACKGROUND_TEXTURE,0,0,0,0,width,height);
+            renderBackgroundTexture(drawContext,MENU_BACKGROUND_TEXTURE,0,0,0,0,width,height);
         }
 
         if(GUI.coolVisuals()){
@@ -101,8 +101,8 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
 
         navBar.render(drawContext, textRenderer, mouseX, mouseY);
         Tooltip.tooltip.render(drawContext, textRenderer, mouseX, mouseY);
-        FontManager.hudFontSize = (int) HeliosClient.CLICKGUI.hudFontSize.value;
-        FontManager.clientFontSize = (int) HeliosClient.CLICKGUI.clientFontSize.value;
+        FontManager.HUD_FONT_SIZE = (int) HeliosClient.CLICKGUI.hudFontSize.value;
+        FontManager.GLOBAL_FONT_SIZE = (int) HeliosClient.CLICKGUI.clientFontSize.value;
     }
 
     @Override
@@ -124,7 +124,7 @@ public class ClientSettingsScreen extends AbstractSettingScreen implements IWind
                     if (setting.shouldRender()) {
                         if (setting instanceof RGBASetting rgbaSetting) {
                             rgbaSetting.setParentScreen(this);
-                        } else if (setting instanceof ListSetting listSetting) {
+                        } else if (setting instanceof ListSetting<?> listSetting) {
                             listSetting.setParentScreen(this);
                         }
 

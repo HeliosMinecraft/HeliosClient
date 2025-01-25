@@ -5,37 +5,35 @@ import dev.heliosclient.event.SubscribeEvent;
 import dev.heliosclient.event.events.TickEvent;
 import dev.heliosclient.event.events.heliosclient.FontChangeEvent;
 import dev.heliosclient.event.listener.Listener;
+import dev.heliosclient.util.fontutils.BetterFontRenderer;
 import dev.heliosclient.util.fontutils.FontLoader;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FontManager implements Listener {
-    public static Font[] fonts, iconFonts;
-    public static Font font, iconFont;
-    public static Font[] originalFonts;
-    public static int hudFontSize = 8, clientFontSize = 8;
-    public static ArrayList<String> fontNames = new ArrayList<>();
+    public static final Map<String, Font> FONTS = new HashMap<>();
+    public static final Map<String, Font> ICON_FONTS = new HashMap<>();
+    public static Font ACTIVE_FONT;
+    public static Font ACTIVE_ICON_FONT;
+    public static int HUD_FONT_SIZE = 8, GLOBAL_FONT_SIZE = 8;
     public static FontManager INSTANCE = new FontManager();
 
-    public FontManager() {
+    private FontManager(){
         refresh();
     }
 
-    public void refresh() {
-        fontNames.clear();
-        fonts = FontLoader.loadFonts();
-        font = fonts[0];
-        iconFonts = FontLoader.loadIconFonts();
-        iconFont = iconFonts[0];
-        originalFonts = fonts.clone();
-        for (Font font : originalFonts) {
-            fontNames.add(font.getName());
-        }
-        EventManager.register(this);
+    public void refresh(){
+        FONTS.clear();
+        ICON_FONTS.clear();
+        ACTIVE_FONT = null;
+        ACTIVE_ICON_FONT = null;
+
+        FontLoader.getFonts().forEach(FontManager::registerFont);
+        FontLoader.getFonts().forEach(FontManager::registerIconFont);
     }
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
@@ -47,28 +45,63 @@ public class FontManager implements Listener {
     }
 
     public void registerFonts() {
-        FontRenderers.fontRenderer = new FontRenderer(font, hudFontSize);
-        FontRenderers.fxfontRenderer = new fxFontRenderer(font, clientFontSize);
-        FontRenderers.iconRenderer = new fxFontRenderer(iconFont, 10f);
+        FontRenderers.fontRenderer = new FontRenderer(ACTIVE_FONT, HUD_FONT_SIZE);
+        FontRenderers.fxfontRenderer = new BetterFontRenderer(ACTIVE_FONT, GLOBAL_FONT_SIZE);
+        FontRenderers.iconRenderer = new BetterFontRenderer(ACTIVE_ICON_FONT, 10f);
 
-        FontRenderers.Super_Small_fxfontRenderer = new fxFontRenderer(font, 4f);
-        FontRenderers.Super_Small_iconRenderer = new fxFontRenderer(iconFont, 4f);
+        FontRenderers.Super_Small_fxfontRenderer = new BetterFontRenderer(ACTIVE_FONT, 4f);
+        FontRenderers.Super_Small_iconRenderer = new BetterFontRenderer(ACTIVE_ICON_FONT, 4f);
 
-        FontRenderers.Small_fxfontRenderer = new fxFontRenderer(font, 6f);
-        FontRenderers.Small_iconRenderer = new fxFontRenderer(iconFont, 6f);
+        FontRenderers.Small_fxfontRenderer = new BetterFontRenderer(ACTIVE_FONT, 6f);
+        FontRenderers.Small_iconRenderer = new BetterFontRenderer(ACTIVE_ICON_FONT, 6f);
 
-        FontRenderers.Mid_fxfontRenderer = new fxFontRenderer(font, 8f);
-        FontRenderers.Mid_iconRenderer = new fxFontRenderer(iconFont, 8f);
+        FontRenderers.Mid_fxfontRenderer = new BetterFontRenderer(ACTIVE_FONT, 8f);
+        FontRenderers.Mid_iconRenderer = new BetterFontRenderer(ACTIVE_ICON_FONT, 8f);
 
-        FontRenderers.Large_fxfontRenderer = new fxFontRenderer(font, 13f);
-        FontRenderers.Large_iconRenderer = new fxFontRenderer(iconFont, 13f);
+        FontRenderers.Large_fxfontRenderer = new BetterFontRenderer(ACTIVE_FONT, 13f);
+        FontRenderers.Large_iconRenderer = new BetterFontRenderer(ACTIVE_ICON_FONT, 13f);
 
         if(FontLoader.COMICALFONTS != null)
-          FontRenderers.Comical_fxfontRenderer = new fxFontRenderer(FontLoader.COMICALFONTS[0], 12f);
+            FontRenderers.Comical_fxfontRenderer = new BetterFontRenderer(FontLoader.COMICALFONTS[0], 12f);
 
-        FontRenderers.Ultra_Large_iconRenderer = new fxFontRenderer(iconFont, 25f);
+        FontRenderers.Ultra_Large_iconRenderer = new BetterFontRenderer(ACTIVE_ICON_FONT, 25f);
 
         //Post the font change event to the EventManager
-        EventManager.postEvent(new FontChangeEvent(FontManager.fonts));
+        EventManager.postEvent(new FontChangeEvent());
+    }
+
+    private static void registerFont(Font font) {
+        FONTS.put(font.getFontName(), font);
+        if(ACTIVE_FONT == null) ACTIVE_FONT = font;
+    }
+
+    private static void registerIconFont(Font font) {
+        ICON_FONTS.put(font.getFontName(), font);
+        if(ACTIVE_ICON_FONT == null) ACTIVE_ICON_FONT = font;
+    }
+    private static void setActiveIconFont(Font font) {
+        if(!ICON_FONTS.containsValue(font)) {
+            ICON_FONTS.put(font.getFontName(), font);
+        }
+        ACTIVE_ICON_FONT = font;
+    }
+
+    private static void setActiveFont(Font font) {
+        if(!FONTS.containsValue(font)) {
+            FONTS.put(font.getFontName(), font);
+        }
+        ACTIVE_FONT = font;
+    }
+
+    public static Font getFont(String key) {
+        return FONTS.getOrDefault(key, ACTIVE_FONT);
+    }
+
+    public static Font getIconFont(String key) {
+        return ICON_FONTS.getOrDefault(key, ACTIVE_ICON_FONT);
+    }
+
+    public static boolean areFontsAvailable(){
+        return !FONTS.isEmpty();
     }
 }

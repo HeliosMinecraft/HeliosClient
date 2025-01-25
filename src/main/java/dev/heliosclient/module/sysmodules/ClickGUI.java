@@ -14,9 +14,8 @@ import dev.heliosclient.ui.clickgui.Tooltip;
 import dev.heliosclient.util.FileUtils;
 import dev.heliosclient.util.animation.AnimationUtils;
 import dev.heliosclient.util.color.ColorUtils;
+import dev.heliosclient.util.fontutils.BetterFontRenderer;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import dev.heliosclient.util.fontutils.FontUtils;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
 import dev.heliosclient.util.inputbox.InputBox;
 import dev.heliosclient.util.render.Renderer2D;
 import me.x150.renderer.font.FontRenderer;
@@ -27,7 +26,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static dev.heliosclient.managers.FontManager.fonts;
 
 /**
  * Settings for the client and ClickGUI.
@@ -133,7 +131,7 @@ public class ClickGUI extends Module_ {
             .name("Font")
             .description("Font for the client")
             .onSettingChange(this)
-            .value(FontManager.fontNames)
+            .value(FontManager.FONTS.keySet().stream().toList())
             .defaultListIndex(0)
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
@@ -145,7 +143,7 @@ public class ClickGUI extends Module_ {
             .defaultValue(8.0)
             .min(1)
             .max(15)
-            .roundingPlace(1)
+            .roundingPlace(0)
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
@@ -156,7 +154,7 @@ public class ClickGUI extends Module_ {
             .defaultValue(8.0)
             .min(1)
             .max(15)
-            .roundingPlace(1)
+            .roundingPlace(0)
             .shouldRender(() -> FontRenderer.value == 0)
             .build()
     );
@@ -355,7 +353,7 @@ public class ClickGUI extends Module_ {
 
         loadFonts.addButton("Load Fonts", 0, 0, () -> {
             FontManager.INSTANCE.refresh();
-            Font.setOptions(FontManager.fontNames);
+            Font.setOptions(FontManager.FONTS.keySet().stream().toList());
 
             HeliosClient.LOGGER.info("Reloaded fonts successfully!");
         });
@@ -407,22 +405,22 @@ public class ClickGUI extends Module_ {
         Renderer2D.renderer = Renderer2D.Renderers.values()[FontRenderer.value];
         pause = Pause.value;
         keybinds = Keybinds.value;
-        FontManager.hudFontSize = hudFontSize.getInt();
-        FontManager.clientFontSize = clientFontSize.getInt();
+        FontManager.HUD_FONT_SIZE = hudFontSize.getInt();
+        FontManager.GLOBAL_FONT_SIZE = clientFontSize.getInt();
 
         //Font changes
         if (HeliosClient.MC.getWindow() != null) {
             if (setting == FontRenderer || setting == loadFonts || setting == Font) {
-                fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
-                FontManager.font = fonts[0];
-                FontRenderers.fontRenderer = new FontRenderer(FontManager.font, FontManager.hudFontSize);
-                FontRenderers.fxfontRenderer = new fxFontRenderer(FontManager.font, FontManager.clientFontSize);
-                EventManager.postEvent(new FontChangeEvent(fonts));
+                //fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
+                FontManager.ACTIVE_FONT = FontManager.getFont(Font.getOption().toString());
+                FontRenderers.fontRenderer = new FontRenderer(FontManager.ACTIVE_FONT, FontManager.HUD_FONT_SIZE);
+                FontRenderers.fxfontRenderer = new BetterFontRenderer(FontManager.ACTIVE_FONT, FontManager.GLOBAL_FONT_SIZE);
+                EventManager.postEvent(new FontChangeEvent());
             }
             if(setting == hudFontSize || setting == clientFontSize){
-                FontRenderers.fontRenderer = new FontRenderer(FontManager.font, FontManager.hudFontSize);
-                FontRenderers.fxfontRenderer = new fxFontRenderer(FontManager.font, FontManager.clientFontSize);
-                EventManager.postEvent(new FontChangeEvent(fonts));
+                FontRenderers.fontRenderer = new FontRenderer(FontManager.ACTIVE_FONT, FontManager.HUD_FONT_SIZE);
+                FontRenderers.fxfontRenderer = new BetterFontRenderer(FontManager.ACTIVE_FONT, FontManager.GLOBAL_FONT_SIZE);
+                EventManager.postEvent(new FontChangeEvent());
             }
 
             if (setting == FontRenderer || setting == Font) {
@@ -453,10 +451,10 @@ public class ClickGUI extends Module_ {
 
         pause = Pause.value;
         keybinds = Keybinds.value;
-        FontManager.hudFontSize = hudFontSize.getInt();
-        FontManager.clientFontSize = clientFontSize.getInt();
+        FontManager.HUD_FONT_SIZE = hudFontSize.getInt();
+        FontManager.GLOBAL_FONT_SIZE = clientFontSize.getInt();
 
-        fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
+        //fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
 
         FontManager.INSTANCE.registerFonts();
     }

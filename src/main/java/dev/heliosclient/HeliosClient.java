@@ -38,8 +38,6 @@ import java.io.File;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static dev.heliosclient.managers.FontManager.fonts;
-
 public class HeliosClient implements ModInitializer, Listener {
     public static final HeliosClient INSTANCE = new HeliosClient();
     public static final MinecraftClient MC = MinecraftClient.getInstance();
@@ -83,8 +81,8 @@ public class HeliosClient implements ModInitializer, Listener {
         configTimer.resetTimer();
 
         // Font event is posted to allow the GUI to reset its calculation for the new font by the config.
-        if (fonts != null)
-            EventManager.postEvent(new FontChangeEvent(fonts));
+        if (FontManager.areFontsAvailable())
+            EventManager.postEvent(new FontChangeEvent());
     }
 
     public static void loadModulesOnly() {
@@ -173,8 +171,8 @@ public class HeliosClient implements ModInitializer, Listener {
         //Saving is handled when the client stops, crashes, the world stops or the player disconnects.
         //Crash save is handled in MixinCrashReport and configs are saved while switching.
 
-        if (fonts != null)
-            EventManager.postEvent(new FontChangeEvent(fonts));
+        if (FontManager.areFontsAvailable())
+            EventManager.postEvent(new FontChangeEvent());
 
     }
 

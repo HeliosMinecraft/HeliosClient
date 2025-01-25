@@ -11,13 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class FontLoader {
     private static final String FONTS_FOLDER = "heliosclient/fonts";
     private static final String ICON_FONTS_FOLDER = "heliosclient/fonts/icons";
-    private static final String[] DEFAULT_FONT = {"Minecraftia.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf","DComicFont.ttf"};
-    private static final String[] DEFAULT_ICON_FONT = {"fontello.ttf", "icons2.ttf", "icons.ttf"};
+    private static final String[] DEFAULT_FONTS = {"Minecraftia.ttf", "Comfortaa.ttf", "JetBrainsMono.ttf", "Nunito.ttf","DComicFont.ttf"};
+    private static final String[] DEFAULT_ICON_FONTS = {"fontello.ttf", "icons2.ttf", "icons.ttf"};
     public static Font[] COMICALFONTS = null;
     private static final String COMICAL_FONT_NAME = "DComicFont.ttf";
 
@@ -26,8 +27,8 @@ public class FontLoader {
      *
      * @return An array of all the fonts created from the files
      */
-    public static Font[] loadFonts() {
-        return loadFonts(FONTS_FOLDER, DEFAULT_FONT);
+    public static List<Font> getFonts() {
+        return getFonts(FONTS_FOLDER, DEFAULT_FONTS);
     }
 
     /**
@@ -35,8 +36,8 @@ public class FontLoader {
      *
      * @return An array of all the fonts created from the files
      */
-    public static Font[] loadIconFonts() {
-        return loadFonts(ICON_FONTS_FOLDER, DEFAULT_ICON_FONT);
+    public static List<Font> getIconFonts() {
+        return getFonts(ICON_FONTS_FOLDER, DEFAULT_ICON_FONTS);
     }
 
     /**
@@ -46,7 +47,7 @@ public class FontLoader {
      * @param defaultFonts Default font files in the assets folder to be copied.
      * @return An array of all the fonts created from the files
      */
-    private static Font[] loadFonts(String folder, String[] defaultFonts) {
+    private static List<Font> getFonts(String folder, String[] defaultFonts) {
         File gameDir = MinecraftClient.getInstance().runDirectory;
         File fontsDir = new File(gameDir, folder);
         if (!fontsDir.exists()) {
@@ -63,7 +64,8 @@ public class FontLoader {
 
         LinkedList<Font> fonts = new LinkedList<>();
         for (File file : Objects.requireNonNull(fontsDir.listFiles())) {
-            if (file.isFile() && (file.getName().toLowerCase().endsWith(".ttf") || file.getName().toLowerCase().endsWith(".otf"))) {
+            String fileName = file.getName().toLowerCase();
+            if (file.isFile() && (fileName.endsWith(".ttf") || fileName.endsWith(".otf"))) {
                 try {
                     Font[] fontArray = Font.createFonts(file);
 
@@ -81,6 +83,6 @@ public class FontLoader {
             }
         }
 
-        return fonts.toArray(new Font[0]);
+        return fonts;
     }
 }

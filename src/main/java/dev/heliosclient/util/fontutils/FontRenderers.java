@@ -10,14 +10,14 @@ public class FontRenderers {
      *  These font renderers are standard font renderer for the clickGUI, whose size is modified by the user
      *  (except the iconRenderer which is at 10f)
      */
-    public static fxFontRenderer fxfontRenderer;
-    public static fxFontRenderer iconRenderer;
+    public static BetterFontRenderer fxfontRenderer;
+    public static BetterFontRenderer iconRenderer;
 
     /**
      * This fontRenderer uses the DComicFont font for HitEffect Text mode
      * Size: 12f
      */
-    public static fxFontRenderer Comical_fxfontRenderer;
+    public static BetterFontRenderer Comical_fxfontRenderer;
 
 
     // -- These fontRenderers have fixed size which cannot be changed. -- //
@@ -25,29 +25,29 @@ public class FontRenderers {
     /**
      * Size 4f
      */
-    public static fxFontRenderer Super_Small_iconRenderer;
-    public static fxFontRenderer Super_Small_fxfontRenderer;
+    public static BetterFontRenderer Super_Small_iconRenderer;
+    public static BetterFontRenderer Super_Small_fxfontRenderer;
 
     /**
      * Size 6f
      */
-    public static fxFontRenderer Small_iconRenderer;
-    public static fxFontRenderer Small_fxfontRenderer;
+    public static BetterFontRenderer Small_iconRenderer;
+    public static BetterFontRenderer Small_fxfontRenderer;
 
     /**
      * Size 8f
      */
-    public static fxFontRenderer Mid_iconRenderer;
-    public static fxFontRenderer Mid_fxfontRenderer;
+    public static BetterFontRenderer Mid_iconRenderer;
+    public static BetterFontRenderer Mid_fxfontRenderer;
 
     /**
      * Size 13f
      */
-    public static fxFontRenderer Large_iconRenderer;
-    public static fxFontRenderer Large_fxfontRenderer;
+    public static BetterFontRenderer Large_iconRenderer;
+    public static BetterFontRenderer Large_fxfontRenderer;
 
     /**
      * Size 25f
      */
-    public static fxFontRenderer Ultra_Large_iconRenderer;
+    public static BetterFontRenderer Ultra_Large_iconRenderer;
 }

@@ -62,7 +62,6 @@ public abstract class TitleScreenMixin extends Screen {
                 .color(Color.GREEN,Color.YELLOW,Renderer2D.Direction.BOTTOM_TOP)
                 .outline(true,1.5f)
                 .draw(context.getMatrices());
-
          */
 
         if(entity != null) {

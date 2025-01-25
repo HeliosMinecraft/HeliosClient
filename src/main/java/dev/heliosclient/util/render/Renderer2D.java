@@ -9,8 +9,8 @@ import dev.heliosclient.event.events.render.RenderEvent;
 import dev.heliosclient.event.listener.Listener;
 import dev.heliosclient.util.color.ColorUtils;
 import dev.heliosclient.util.entity.DisplayPreviewEntity;
+import dev.heliosclient.util.fontutils.BetterFontRenderer;
 import dev.heliosclient.util.fontutils.FontRenderers;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
 import me.x150.renderer.font.FontRenderer;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.ShaderProgramKeys;
@@ -22,6 +22,7 @@ import net.minecraft.client.render.entity.equipment.EquipmentModelLoader;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
@@ -963,6 +964,8 @@ public class Renderer2D implements Listener {
 
 
     public static void drawRoundedRectangle(Matrix4f matrix4f, float x, float y, boolean TL, boolean TR, boolean BL, boolean BR, float width, float height, float radius, int color) {
+        radius = Math.min(radius, Math.min(width, height) / 2);
+
         float centerX = x + (width / 2.0f);
         float centerY = y + (height / 2.0f);
 
@@ -1702,7 +1705,7 @@ public class Renderer2D implements Listener {
         if (isVanillaRenderer()) {
             return HeliosClient.MC.textRenderer.getWidth(text);
         }
-        return fontRenderer.getStringWidth(text);
+        return fontRenderer.getTextWidth(Text.of(text));
     }
 
     public static float getStringWidth() {
@@ -1716,14 +1719,14 @@ public class Renderer2D implements Listener {
             return HeliosClient.MC.textRenderer.getWidth(TEXT);
         }
 
-        return fontRenderer.getStringWidth(TEXT);
+        return fontRenderer.getTextWidth(Text.of(TEXT));
     }
 
     public static float getFxStringWidth(String text) {
         if (isVanillaRenderer()) {
             return HeliosClient.MC.textRenderer.getWidth(text);
         }
-        return getFxFontRenderer() != null ? getFxFontRenderer().getStringWidth(text) : 0;
+        return getFxFontRenderer() != null ? getFxFontRenderer().getTextWidth(Text.of(text)) : 0;
     }
 
     public static float getFxStringWidth() {
@@ -1734,7 +1737,7 @@ public class Renderer2D implements Listener {
         if (isVanillaRenderer()) {
             return HeliosClient.MC.textRenderer.fontHeight;
         }
-        return getFontRenderer() != null ? getFontRenderer().getStringHeight(text) : 0;
+        return getFontRenderer() != null ? getFontRenderer().getTextHeight(Text.of(text)) : 0;
     }
 
     public static float getCustomStringHeight(String text, FontRenderer fontRenderer) {
@@ -1744,7 +1747,7 @@ public class Renderer2D implements Listener {
         if (isVanillaRenderer()) {
             return HeliosClient.MC.textRenderer.fontHeight;
         }
-        return fontRenderer.getStringHeight(text);
+        return fontRenderer.getTextHeight(Text.of(text));
     }
 
     public static float getStringHeight() {
@@ -1758,14 +1761,14 @@ public class Renderer2D implements Listener {
             return HeliosClient.MC.textRenderer.fontHeight;
         }
 
-        return fontRenderer.getStringHeight(TEXT);
+        return fontRenderer.getTextHeight(Text.of(TEXT));
     }
 
     public static float getFxStringHeight(String text) {
         if (isVanillaRenderer()) {
             return HeliosClient.MC.textRenderer.fontHeight;
         }
-        return getFxFontRenderer() != null ? getFxFontRenderer().getStringHeight(text) : 0;
+        return getFxFontRenderer() != null ? getFxFontRenderer().getTextHeight(Text.of(text)) : 0;
     }
 
     public static float getFxStringHeight() {
@@ -1776,7 +1779,7 @@ public class Renderer2D implements Listener {
         return renderer == Renderers.VANILLA && drawContext != null && HeliosClient.MC.textRenderer != null;
     }
 
-    public static fxFontRenderer getFxFontRenderer() {
+    public static BetterFontRenderer getFxFontRenderer() {
         return FontRenderers.fxfontRenderer;
     }
 
@@ -1790,7 +1793,7 @@ public class Renderer2D implements Listener {
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (getFontRenderer() != null) {
             try {
-                getFontRenderer().drawString(matrixStack, text, x, y, 256 - ColorUtils.getRed(color), 256 - ColorUtils.getGreen(color), 256 - ColorUtils.getBlue(color), 256 - ColorUtils.getAlpha(color));
+                getFontRenderer().drawString(matrixStack, text, x, y - 1, ColorUtils.getRed(color)/255.0F, ColorUtils.getGreen(color)/255.0F, ColorUtils.getBlue(color)/255.0F, ColorUtils.getAlpha(color)/255.0F);
             } catch (NullPointerException ignored) {
             }
         }
@@ -1801,7 +1804,7 @@ public class Renderer2D implements Listener {
             color = fixColorValue(color);
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (getFontRenderer() != null) {
-            getFontRenderer().drawCenteredString(matrixStack, text, x, y, 256 - ColorUtils.getRed(color), 256 - ColorUtils.getGreen(color), 256 - ColorUtils.getBlue(color), 256 - ColorUtils.getAlpha(color));
+            getFontRenderer().drawCenteredString(matrixStack, text, x, y - 1, ColorUtils.getRed(color)/255.0F, ColorUtils.getGreen(color)/255.0F, ColorUtils.getBlue(color)/255.0F, ColorUtils.getAlpha(color)/255.0F);
         }
     }
 
@@ -1826,7 +1829,7 @@ public class Renderer2D implements Listener {
         }
     }
 
-    public static void drawCustomString(fxFontRenderer fontRenderer, MatrixStack matrixStack, String text, float x, float y, int color) {
+    public static void drawCustomString(BetterFontRenderer fontRenderer, MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
             color =fixColorValue(color);
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
@@ -1838,12 +1841,12 @@ public class Renderer2D implements Listener {
         }
     }
 
-    public static void drawCustomCenteredString(fxFontRenderer fontRenderer, MatrixStack matrixStack, String text, float x, float y, int color) {
+    public static void drawCustomCenteredString(BetterFontRenderer fontRenderer, MatrixStack matrixStack, String text, float x, float y, int color) {
         if (isVanillaRenderer()) {
             color = fixColorValue(color);
             drawContext.drawText(HeliosClient.MC.textRenderer, text, (int) x, (int) y, color, false);
         } else if (fontRenderer != null) {
-            fontRenderer.drawCenteredString(matrixStack, text, x, y, color);
+            fontRenderer.drawCenteredString(matrixStack, text,x, y, color);
         }
     }
     private static int fixColorValue(int color){
@@ -1879,7 +1882,7 @@ public class Renderer2D implements Listener {
         return lines;
     }
 
-    public static List<String> wrapText(String text, int maxWidth, fxFontRenderer fontRenderer) {
+    public static List<String> wrapText(String text, int maxWidth, BetterFontRenderer fontRenderer) {
         List<String> lines = new ArrayList<>();
 
         if (Math.ceil(getCustomStringWidth(text, fontRenderer)) < maxWidth) {
@@ -1931,7 +1934,7 @@ public class Renderer2D implements Listener {
         return lines;
     }
 
-    public static void drawBottomText(MatrixStack stack,int x,fxFontRenderer fontRenderer, String... textBottomToTop){
+    public static void drawBottomText(MatrixStack stack,int x,BetterFontRenderer fontRenderer, String... textBottomToTop){
         float fontHeight = getCustomStringHeight(fontRenderer);
 
         for(int i = 1; i <= textBottomToTop.length; i++){

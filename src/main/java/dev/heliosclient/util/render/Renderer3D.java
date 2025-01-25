@@ -3,7 +3,7 @@ package dev.heliosclient.util.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.heliosclient.HeliosClient;
 import dev.heliosclient.util.color.ColorUtils;
-import dev.heliosclient.util.fontutils.fxFontRenderer;
+import dev.heliosclient.util.fontutils.BetterFontRenderer;
 import dev.heliosclient.util.render.color.LineColor;
 import dev.heliosclient.util.render.color.QuadColor;
 import net.minecraft.client.MinecraftClient;
@@ -285,7 +285,7 @@ public class Renderer3D {
         RenderSystem.disableBlend();
     }
 
-    public static void drawText(fxFontRenderer font, String text, float x, float y, float z, float offX, float offY, float scale, int color) {
+    public static void drawText(BetterFontRenderer font, String text, float x, float y, float z, float offX, float offY, float scale, int color) {
         MatrixStack matrices = matrixFrom(x, y, z);
 
         Camera camera = mc.gameRenderer.getCamera();
