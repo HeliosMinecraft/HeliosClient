@@ -35,7 +35,7 @@
   
 ## Installation
 
-- Install [Fabric](https://fabricmc.net/use/installer/) for Minecraft 1.20.4
+- Install [Fabric](https://fabricmc.net/use/installer/) for Minecraft 1.21.4
 - Put this mod into the `.minecraft/mods` folder
 - The default keybind for the click-gui is `RSHIFT`.
 
