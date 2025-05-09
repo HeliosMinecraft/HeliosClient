@@ -37,14 +37,14 @@ public class FontManager implements Listener {
     }
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.HIGHEST)
-    public void onTick(TickEvent.CLIENT event) {
+    public void onTick(TickEvent.CLIENT e) {
         if (HeliosClient.MC.getWindow() != null) {
-            registerFonts();
+            initialiseFonts();
             EventManager.unregister(this);
         }
     }
 
-    public void registerFonts() {
+    public void initialiseFonts() {
         FontRenderers.fontRenderer = new FontRenderer(ACTIVE_FONT, HUD_FONT_SIZE);
         FontRenderers.fxfontRenderer = new BetterFontRenderer(ACTIVE_FONT, GLOBAL_FONT_SIZE);
         FontRenderers.iconRenderer = new BetterFontRenderer(ACTIVE_ICON_FONT, 10f);
@@ -70,23 +70,23 @@ public class FontManager implements Listener {
         EventManager.postEvent(new FontChangeEvent());
     }
 
-    private static void registerFont(Font font) {
+    public static void registerFont(Font font) {
         FONTS.put(font.getFontName(), font);
         if(ACTIVE_FONT == null) ACTIVE_FONT = font;
     }
 
-    private static void registerIconFont(Font font) {
+    public static void registerIconFont(Font font) {
         ICON_FONTS.put(font.getFontName(), font);
         if(ACTIVE_ICON_FONT == null) ACTIVE_ICON_FONT = font;
     }
-    private static void setActiveIconFont(Font font) {
+    public static void setActiveIconFont(Font font) {
         if(!ICON_FONTS.containsValue(font)) {
             ICON_FONTS.put(font.getFontName(), font);
         }
         ACTIVE_ICON_FONT = font;
     }
 
-    private static void setActiveFont(Font font) {
+    public static void setActiveFont(Font font) {
         if(!FONTS.containsValue(font)) {
             FONTS.put(font.getFontName(), font);
         }

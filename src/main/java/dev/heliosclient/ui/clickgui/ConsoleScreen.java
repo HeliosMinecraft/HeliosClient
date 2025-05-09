@@ -20,10 +20,10 @@ public class ConsoleScreen extends Screen {
     public ConsoleScreen() {
         super(Text.of("Console"));
         consoleBox = new MultiLineInputBox(50, 50, "", Long.MAX_VALUE, InputBox.InputMode.ALL)
-                .setSyntaxHighLighting(true)
-                .setAutoComplete(true)
-                .setAutoScroll(true)
-                .setDisplayLineNo(true);
+                .doSyntaxHighLighting(true)
+                .doAutoComplete(true)
+                .doAutoScroll(true)
+                .doDisplayLineNo(true);
 
         enterBox = new InputBox(29, 13, "", 256, InputBox.InputMode.ALL);
         enterButton = new Button("Enter", this::setText, 20, 20, 45, 13);

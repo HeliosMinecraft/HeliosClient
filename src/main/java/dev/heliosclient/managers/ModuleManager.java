@@ -168,7 +168,8 @@ public class ModuleManager {
                 new LogOutSpot(),
                 new Xray(),
                 new ViewModel(),
-                new Test()
+                new Test(),
+                new Test2()
         );
 
         AddonManager.HELIOS_ADDONS.forEach(HeliosAddon::registerModules);

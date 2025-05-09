@@ -121,7 +121,7 @@ public abstract class MixinSplashScreen {
         } else {
             alpha = 1.0F;
         }
-        /*
+
         renderSplashBackground(context);
 
         alpha = MathHelper.clamp(alpha, 0.0F, 1.0F);

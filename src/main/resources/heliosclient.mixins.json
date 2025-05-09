@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "AccessorEntityVelocityUpS2CPacket",
+    "AccessorMapState",
     "AccessorPlayerInputC2SPacket",
     "AccessorPlayerPosition",
     "MixinAbstractBlockState",

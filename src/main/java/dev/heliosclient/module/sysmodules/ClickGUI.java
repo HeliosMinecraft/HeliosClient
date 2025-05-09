@@ -412,7 +412,7 @@ public class ClickGUI extends Module_ {
         if (HeliosClient.MC.getWindow() != null) {
             if (setting == FontRenderer || setting == loadFonts || setting == Font) {
                 //fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
-                FontManager.ACTIVE_FONT = FontManager.getFont(Font.getOption().toString());
+                FontManager.setActiveFont(FontManager.getFont(Font.getOption().toString()));
                 FontRenderers.fontRenderer = new FontRenderer(FontManager.ACTIVE_FONT, FontManager.HUD_FONT_SIZE);
                 FontRenderers.fxfontRenderer = new BetterFontRenderer(FontManager.ACTIVE_FONT, FontManager.GLOBAL_FONT_SIZE);
                 EventManager.postEvent(new FontChangeEvent());
@@ -424,7 +424,7 @@ public class ClickGUI extends Module_ {
             }
 
             if (setting == FontRenderer || setting == Font) {
-                FontManager.INSTANCE.registerFonts();
+                FontManager.INSTANCE.initialiseFonts();
             }
         }
 
@@ -456,7 +456,7 @@ public class ClickGUI extends Module_ {
 
         //fonts = FontUtils.rearrangeFontsArray(FontManager.originalFonts, FontManager.originalFonts[Font.value]);
 
-        FontManager.INSTANCE.registerFonts();
+        FontManager.INSTANCE.initialiseFonts();
     }
 
     public int getRainbowSpeed(){
@@ -500,7 +500,7 @@ public class ClickGUI extends Module_ {
     //Hard coded :(
     public enum Theme {
         Rounded,
-        Rectangle
+        Plain
     }
 
     public enum ScrollTypes {

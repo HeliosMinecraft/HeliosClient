@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
+//TODO: Optimise this to avoid memory leaks
 public class MultiLineInputBox implements Listener {
     protected final InputBox.InputMode inputMode;
     public int x, y, width, height;
@@ -56,7 +57,7 @@ public class MultiLineInputBox implements Listener {
     protected boolean selectedAll = false;
     protected Screen screen;
 
-    //Basic SyntaxManager with the auto correct
+    //Basic SyntaxManager with the autocorrect
     protected LuaSyntaxManager syntaxMan = new LuaSyntaxManager();
 
 
@@ -789,7 +790,7 @@ public class MultiLineInputBox implements Listener {
         return autoScroll;
     }
 
-    public MultiLineInputBox setAutoScroll(boolean autoScroll) {
+    public MultiLineInputBox doAutoScroll(boolean autoScroll) {
         this.autoScroll = autoScroll;
         return this;
     }
@@ -798,7 +799,7 @@ public class MultiLineInputBox implements Listener {
         return doSyntaxHighLighting;
     }
 
-    public MultiLineInputBox setSyntaxHighLighting(boolean doSyntaxHighLighting) {
+    public MultiLineInputBox doSyntaxHighLighting(boolean doSyntaxHighLighting) {
         this.doSyntaxHighLighting = doSyntaxHighLighting;
         return this;
     }
@@ -807,7 +808,7 @@ public class MultiLineInputBox implements Listener {
         return displayLineNos;
     }
 
-    public MultiLineInputBox setDisplayLineNo(boolean displayLineNos) {
+    public MultiLineInputBox doDisplayLineNo(boolean displayLineNos) {
         this.displayLineNos = displayLineNos;
         return this;
     }
@@ -816,7 +817,7 @@ public class MultiLineInputBox implements Listener {
         return doAutoComplete;
     }
 
-    public MultiLineInputBox setAutoComplete(boolean doAutoComplete) {
+    public MultiLineInputBox doAutoComplete(boolean doAutoComplete) {
         this.doAutoComplete = doAutoComplete;
         return this;
     }

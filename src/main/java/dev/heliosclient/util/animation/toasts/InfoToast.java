@@ -53,7 +53,7 @@ public class InfoToast implements Toast {
         RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX);
         RenderSystem.setShaderColor(1, 1, 1, 1);
 
-        context.drawTexture(RenderLayer::getArmorCutoutNoCull,TEXTURE, 0, 0,0,0,getWidth(), getHeight(),getWidth(), getHeight());
+        context.drawTexture(RenderLayer::getGuiTextured,TEXTURE, 0, 0,0,0,getWidth(), getHeight(),getWidth(), getHeight());
         List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth(), HeliosClient.MC.textRenderer);
 
         int yOffset = 2;

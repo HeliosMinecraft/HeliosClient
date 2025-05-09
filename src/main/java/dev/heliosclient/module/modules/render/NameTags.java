@@ -283,9 +283,9 @@ public class NameTags extends Module_ {
 
     @SubscribeEvent(priority = SubscribeEvent.Priority.LOW)
     public void itemLabelRenderEvent(ItemPhysicsEvent event) {
-        String text = event.itemEntityRenderState.displayName.getString();
         IEntityRenderState state = (IEntityRenderState)event.itemEntityRenderState;
         ItemEntity itemEntity = ((ItemEntity) state.helios$getEntity());
+        String text = itemEntity.getStack().getName().getString();
         if (displayCount.value) {
             text = text + " x" + itemEntity.getStack().getCount();
         }

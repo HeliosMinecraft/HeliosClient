@@ -16,7 +16,7 @@ public class HeliosExecutor {
     });
 
     public static void execute(Runnable task) {
-        if(task != null)
+        if(task != null && !executorService.isTerminated() && !executorService.isShutdown())
            executorService.execute(task);
     }
 

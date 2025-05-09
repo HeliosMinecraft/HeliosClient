@@ -49,7 +49,7 @@ public class ErrorToast implements net.minecraft.client.toast.Toast {
     public void draw(DrawContext context, TextRenderer textRenderer, long startTime) {
         this.startTime = startTime;
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        context.drawGuiTexture(RenderLayer::getEntityCutoutNoCull,TEXTURE, 0, 0, this.getWidth(), this.getHeight());
+        context.drawGuiTexture(RenderLayer::getGuiTextured, TEXTURE, 0, 0, this.getWidth(), this.getHeight());
 
         List<String> messageWarp = Renderer2D.wrapText(this.message, this.getWidth() - 5, HeliosClient.MC.textRenderer);
 

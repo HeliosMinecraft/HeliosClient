@@ -212,6 +212,7 @@ public class DoubleSetting extends Setting<Double> {
     public float getFloat() {
         return (float) value;
     }
+
     public int getInt() {
         return (int) value;
     }

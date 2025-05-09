@@ -187,7 +187,7 @@ public class TriggerBot extends Module_ {
     @Override
     public void onEnable() {
         super.onEnable();
-        timer = new TickTimer();
+        timer = new TickTimer(true);
     }
 
     private boolean isTeamMate(LivingEntity targetEntity) {

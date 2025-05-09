@@ -30,6 +30,9 @@ import java.util.regex.Pattern;
 
 import static dev.heliosclient.util.color.ColorUtils.reset;
 
+/**
+ Old and not fit for use
+ */
 public class MultiLineInputBoxOld implements Listener {
     protected final InputBox.InputMode inputMode;
     public int x, y, width, height;

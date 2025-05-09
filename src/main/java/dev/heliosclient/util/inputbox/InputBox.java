@@ -29,6 +29,7 @@ public class InputBox implements Listener {
     protected final InputMode inputMode;
     public int x, y, width, height;
     protected String value;
+    // Text is stored in segments displayed on screen instead of doing a sliding window technique
     protected List<String> textSegments;
     protected boolean focused = false;
     protected int cursorPosition = 0;
@@ -41,7 +42,7 @@ public class InputBox implements Listener {
     protected Screen screen;
 
     /** This supplier is called before the user un-focuses the inputbox (by pressing enter), if false is returned then it won't un-focus. */
-    public Supplier<Boolean> enterTask = ()->true;
+    public Supplier<Boolean> enterTask = () -> true;
 
     public InputBox(int width, int height, String value, int characterLimit, InputMode inputMode) {
         this.width = width;
