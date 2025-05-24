@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/text.png?raw=true" height="150px">
+    <img src="https://github.com/HeliosMinecraft/HeliosClient/blob/main/.github/images/logo.png?raw=true" height="150px">
 </p>
 <div align="center">
     <h3>Fabric anarchy utility mod for the latest Minecraft version.</h3>
